@@ -1,4 +1,4 @@
-# Contexto de Sesión — TFG Gastronómica
+# Contexto de Sesión — TFG
 
 **Fecha:** 2025-03-16
 **Sprint Actual:** Sprint 1 — Setup + Autenticación (Mar 16 → Mar 29)
