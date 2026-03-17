@@ -23,7 +23,7 @@
 - [SETUP-001] CI/CD GitHub Actions → aplazado a Fase 6
 - [SETUP-002] Rama develop → pendiente
 - [SETUP-003] Variables Vercel → aplazado a Fase 6
-- [SETUP-004] Google Cloud Console OAuth → necesario en Sprint 1
+- ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
 
 ## Próxima Tarea
 

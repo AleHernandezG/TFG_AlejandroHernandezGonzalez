@@ -69,7 +69,7 @@ Qué hay que hacer:
 ---
 
 ## [SETUP-004] Google Cloud Console — OAuth credentials
-Estado:   ⏳ Pendiente
+Estado:   ✅ Completado — 17/03/2025
 Cuándo:   Sprint 1 — al implementar login con Google
 
 Qué hay que hacer:
