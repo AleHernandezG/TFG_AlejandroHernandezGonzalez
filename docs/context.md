@@ -9,28 +9,41 @@
 - ✅ Fase 0 completada: repo, estructura, Next.js 14, shadcn/ui, dependencias, Prettier, Linear
 - ✅ Stack instalado: TanStack Query, Zustand, Axios, Framer Motion, Lucide, next-pwa, NextAuth, Zod, React Hook Form
 - ✅ shadcn/ui componentes: button, card, avatar, badge, tabs, sheet, dialog, drawer, skeleton, form, input, label, separator
-- ✅ Landing Page (TFG-14) implementada en App Router con enfoque mobile-first y datos mock
+- ✅ Landing Page (TFG-14) implementada, refinada y documentada con enfoque mobile-first y datos mock
+- ✅ Footer global (`LandingFooter`) creado con tech stack, links útiles, disclaimer de IA y cita
 - 🔜 Pendiente este sprint: Login, Registro, Google OAuth
 
-## Avance de la sesión (TFG-14 — Landing Page)
+## Avance de la sesión (TFG-14 — Landing Page Refinada)
 
-- ✅ Hero section con CTA principal hacia registro
-- ✅ Sección de 3 features de la app
-- ✅ Responsive mobile-first (<=768px) con adaptación desktop
-- ✅ Animaciones con Framer Motion
-- ✅ Botones con shadcn/ui Button
-- ✅ Datos mock desacoplados en `frontend/src/lib/mocks/landing.ts`
-- ⚠️ Pendiente validación local final de lint/build: no hay `npm` disponible en el entorno actual
+- ✅ HeroSection convertida a fullscreen real (min-h-screen, sin bordes, sin card styling)
+- ✅ Carrusel de fondo a pantalla completa con gradientes y emoji decorativo difuminado
+- ✅ Texto, badge y CTAs centrados sobre el carrusel con overlays de legibilidad
+- ✅ Header con ChefHat + "Iniciar sesión" eliminado de la vista
+- ✅ Sección de estadísticas eliminada (limpieza de UI)
+- ✅ Nuevo componente TestimonialCard con avatar, nombre bold, rol, comentario y valoración en corazones
+- ✅ TestimonialsBento rediseñado: grid 1→2→3 cols, 6 usuarios mock con datos ricos
+- ✅ FeaturesBento rediseñado: iconos con gradiente de color por categoría, card hero (col-span-2), subtítulo con tracking
+- ✅ page.tsx restructurado: HeroSection fuera del contenedor, secciones dentro de max-w-5xl
+- ✅ landing-data.ts actualizado: rol de usuario, 6 testimonios, 4 slides del carrusel
+- ✅ tailwind.config.ts corregido: añadido src/features/**/* al content array
+- ✅ Phase report de carrusel pendiente creado: docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md
+- ✅ LandingFooter creado en components/common/ con tech stack, links, disclaimer IA y cita
+- ✅ Documentación técnica de landing creada: docs/desarrollo/landingPage.md
 
-## Reporte asociado
+## Reportes asociados
 
-- Ver: docs/phase-reports/fase-1-sprint-1-landing.md
+- Ver: docs/phase-reports/fase-1-sprint-1-landing.md (landing — historial completo)
+- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md (carrusel con imágenes reales)
+- Ver: docs/desarrollo/landingPage.md (documentación técnica de todos los componentes)
 
 ## Estructura del Proyecto
 
 - /frontend → Next.js 14 App Router + TypeScript + Tailwind
 - /backend → vacío hasta Fase 4
 - /docs → documentación y contexto
+  - /docs/desarrollo → documentación técnica de cada módulo
+  - /docs/phase-reports → sprints y tareas pendientes
+  - /docs/changes → registro de cambios por capa (ui, api, domain)
 
 ## Tareas Pendientes de Fase 0
 
@@ -39,6 +52,13 @@
 - [SETUP-002] Rama develop → pendiente
 - [SETUP-003] Variables Vercel → aplazado a Fase 6
 - ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
+
+## Carrusel — Pendientes
+
+- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md
+- [CAROUSEL-001] Imágenes reales (sustituir gradientes + emoji)
+- [CAROUSEL-002] Transición Ken Burns (opcional, sprint 3)
+- [CAROUSEL-003] Controles accesibles prev/next + aria-live
 
 ## Próxima Tarea
 

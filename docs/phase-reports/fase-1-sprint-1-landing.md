@@ -1,7 +1,7 @@
 # Fase 1 — Sprint 1 — Reporte TFG-14 (Landing Page)
 
-**Fecha:** 2026-03-20  
-**Estado:** ✅ Implementado (pendiente validacion local final)
+**Fecha:** 2026-03-20 (actualizado: 2026-03-20)
+**Estado:** ✅ Implementado, refinado y documentado
 
 ## Objetivo
 
@@ -16,7 +16,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - ✅ Botones con shadcn/ui Button
 - ✅ Implementada en App Router (Next.js)
 
-## Cambios realizados
+## Cambios realizados — Iteración 1 (implementación base)
 
 - Reemplazo de la pagina inicial por Landing productiva.
 - Estructura mobile-first con:
@@ -29,12 +29,45 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - Datos mock separados para facilitar iteracion de contenido sin backend.
 - Metadatos base actualizados para la app.
 
-## Archivos modificados
+## Cambios realizados — Iteración 2 (refinamiento de UI)
 
-- frontend/src/app/page.tsx
-- frontend/src/lib/mocks/landing.ts
-- frontend/src/app/layout.tsx
-- docs/context.md
+- HeroSection convertida a fullscreen (min-h-screen, sin card border/radius)
+- Carrusel como imagen de fondo real con overlays para legibilidad del texto
+- LandingHeader (barra con ChefHat + Iniciar sesión) eliminada de la vista
+- Sección de estadísticas eliminada
+- Nuevo componente TestimonialCard: avatar + nombre bold + rol + comentario + corazones
+- TestimonialsBento: 6 testimonios en grid 1→2→3 cols con heading de sección
+- FeaturesBento: iconos con gradiente por categoría, card hero col-span-2, subtítulo con tracking
+- Datos mock enriquecidos: 6 testimonios con campo `role`, 4 slides en carrusel
+
+## Cambios realizados — Iteración 3 (footer + documentación)
+
+- LandingFooter creado en `components/common/landing-footer.tsx`:
+  - Grid 3 columnas (marca centrada, tech stack con 12 enlaces, links útiles)
+  - Disclaimer explícito sobre uso de IA
+  - Cita textual en blockquote itálico
+  - Copyright con año dinámico
+- Corrección mobile: borde derecho de tarjetas bento visible en viewport < 768 px (padding lateral en contenedor)
+- Documentación técnica completa creada en `docs/desarrollo/landingPage.md`
+
+## Archivos creados / modificados
+
+### Creados
+- `frontend/src/features/landing/components/testimonial-card.tsx`
+- `frontend/src/features/landing/components/testimonials-bento.tsx`
+- `frontend/src/components/common/landing-footer.tsx`
+- `docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md`
+- `docs/desarrollo/landingPage.md`
+
+### Modificados
+- `frontend/src/app/page.tsx`
+- `frontend/src/app/layout.tsx`
+- `frontend/tailwind.config.ts` (añadido src/features/** al content array)
+- `frontend/src/features/landing/components/hero-section.tsx`
+- `frontend/src/features/landing/components/features-bento.tsx`
+- `frontend/src/features/landing/components/index.ts`
+- `frontend/src/features/landing/data/landing-data.ts`
+- `docs/context.md`
 
 ## Riesgos y bloqueos
 
@@ -49,9 +82,11 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
   - npm run build
 - Revisar visual final en viewport mobile (<=768px) y desktop.
 
-## Commit sugerido
+## Commits realizados
 
+```
 feat(landing): implementar landing page mobile-first con hero, cta y 3 features animadas
+```
 
 ## Siguiente paso de Sprint 1
 

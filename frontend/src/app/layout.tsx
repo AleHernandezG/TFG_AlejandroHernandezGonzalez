@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   weight: "100 900",
 });
 
 export const metadata: Metadata = {
-  title: "Red Social Gastronomica",
-  description: "Comparte recetas y cocina mejor cada dia con ayuda de IA.",
+  title: "Gastronómica — Cocina mejor cada día",
+  description:
+    "Red social gastronómica con IA. Descubre recetas, comparte platos y recibe sugerencias personalizadas.",
 };
 
 export default function RootLayout({
@@ -28,9 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={cn("font-sans", geist.variable)}>
+    <html lang="es" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          geistSans.variable,
+          geistMono.variable,
+          "font-sans antialiased"
+        )}
       >
         {children}
       </body>
