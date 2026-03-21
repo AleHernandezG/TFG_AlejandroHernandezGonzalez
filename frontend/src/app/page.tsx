@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HeroSection, FeaturesBento, TestimonialsBento } from "@/features/landing/components";
-import { LandingFooter } from "@/components/common/landing-footer";
+import { SeccionHero, BentoCaracteristicas, BentoTestimonios } from "@/features/landing/components";
+import { PiePagina } from "@/components/common/piePagina";
 
-const container = {
+const contenedor = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -12,25 +12,24 @@ const container = {
   },
 };
 
-export default function Home() {
+export default function PaginaInicio() {
   return (
     <main className="relative min-h-screen bg-background">
-      {/* Hero — full viewport, no container constraints */}
-      <HeroSection />
-
-      {/* Content sections — padding lateral generoso para que los bordes de las cards no se corten */}
+      
+      <SeccionHero />
+      
       <motion.div
-        variants={container}
+        variants={contenedor}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.05 }}
         className="mx-auto w-full max-w-5xl px-5 md:px-10"
       >
-        <TestimonialsBento />
-        <FeaturesBento />
+        <BentoTestimonios />
+        <BentoCaracteristicas />
       </motion.div>
 
-      <LandingFooter />
+      <PiePagina />
     </main>
   );
 }

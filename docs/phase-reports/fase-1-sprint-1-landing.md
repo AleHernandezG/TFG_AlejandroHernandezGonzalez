@@ -1,6 +1,6 @@
 # Fase 1 — Sprint 1 — Reporte TFG-14 (Landing Page)
 
-**Fecha:** 2026-03-20 (actualizado: 2026-03-20)
+**Fecha:** 2026-03-20 (actualizado: 2026-03-21)
 **Estado:** ✅ Implementado, refinado y documentado
 
 ## Objetivo
@@ -69,6 +69,52 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `frontend/src/features/landing/data/landing-data.ts`
 - `docs/context.md`
 
+## Cambios realizados — Iteración 4 (renombrado a español + documentación de deuda técnica)
+
+- Todos los componentes renombrados a convención en español para coherencia con el idioma del proyecto:
+  - `hero-section.tsx` → `seccionHero.tsx` (export: `SeccionHero`)
+  - `features-bento.tsx` → `bentoCaracteristicas.tsx` (export: `BentoCaracteristicas`)
+  - `testimonials-bento.tsx` → `bentoTestimonios.tsx` (export: `BentoTestimonios`)
+  - `testimonial-card.tsx` → `tarjetaTestimonio.tsx` (export: `TarjetaTestimonio`)
+  - `landing-footer.tsx` → `piePagina.tsx` (export: `PiePagina`, movido a `components/common/`)
+  - `landing-data.ts` → `datosLanding.ts`
+  - `landing-header.tsx` eliminado (ya no se usaba)
+- `index.ts` actualizado para exportar los nuevos nombres
+- `page.tsx` actualizado: imports, nombre de la función (`PaginaInicio`), variable de animación (`contenedor`)
+- `layout.tsx`: limpieza menor (sin cambios funcionales)
+- Nuevo archivo `docs/tech-debt.md` con registro de deuda técnica (DEBT-001: eslint@8 + next-pwa@5)
+- Nuevo archivo `docs/landing.html` (exportación estática de referencia visual)
+- Nuevo archivo `frontend/.env.example` con todas las variables de entorno del proyecto documentadas
+
+## Archivos creados / modificados — Iteración 4
+
+### Creados
+- `frontend/src/features/landing/components/seccionHero.tsx`
+- `frontend/src/features/landing/components/bentoCaracteristicas.tsx`
+- `frontend/src/features/landing/components/bentoTestimonios.tsx`
+- `frontend/src/features/landing/components/tarjetaTestimonio.tsx`
+- `frontend/src/features/landing/data/datosLanding.ts`
+- `frontend/src/components/common/piePagina.tsx`
+- `docs/tech-debt.md`
+- `docs/landing.html`
+- `frontend/.env.example`
+
+### Modificados
+- `frontend/src/features/landing/components/index.ts`
+- `frontend/src/app/page.tsx`
+- `frontend/src/app/layout.tsx`
+- `docs/context.md`
+- `docs/phase-reports/fase-0-pendientes.md`
+
+### Eliminados
+- `frontend/src/features/landing/components/hero-section.tsx`
+- `frontend/src/features/landing/components/features-bento.tsx`
+- `frontend/src/features/landing/components/testimonials-bento.tsx`
+- `frontend/src/features/landing/components/testimonial-card.tsx`
+- `frontend/src/features/landing/components/landing-header.tsx`
+- `frontend/src/features/landing/data/landing-data.ts`
+- `frontend/src/components/common/landing-footer.tsx`
+
 ## Riesgos y bloqueos
 
 - Entorno local sin npm/node operativo en PATH durante esta sesion.
@@ -86,6 +132,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 
 ```
 feat(landing): implementar landing page mobile-first con hero, cta y 3 features animadas
+chore(landing): renombrar componentes a español, añadir tech-debt doc y .env.example
 ```
 
 ## Siguiente paso de Sprint 1

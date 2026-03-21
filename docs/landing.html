@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landing Page — Documentación completa</title>
+  <style>
+    /* ─── Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    /* ─── Tipografía ────────────────────────────────────── */
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+
+    strong { color: #111; }
+
+    em { color: #6b7280; font-style: italic; }
+
+    /* ─── Código ────────────────────────────────────────── */
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    /* Colores de sintaxis manual */
+    pre .cm { color: #6c7086; }   /* comentario */
+    pre .kw { color: #cba6f7; }   /* keyword */
+    pre .fn { color: #89b4fa; }   /* función */
+    pre .st { color: #a6e3a1; }   /* string */
+    pre .ty { color: #f38ba8; }   /* tipo */
+    pre .nm { color: #fab387; }   /* nombre variable */
+    pre .nu { color: #fab387; }   /* número */
+    pre .hl { color: #f9e2af; }   /* highlight */
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    /* ─── Cajas de información ──────────────────────────── */
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    /* ─── Badges ────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ok    { background: #dcfce7; color: #15803d; }
+    .warn  { background: #fef9c3; color: #92400e; }
+    .pend  { background: #fee2e2; color: #991b1b; }
+    .info  { background: #dbeafe; color: #1e40af; }
+
+    /* ─── Portada ───────────────────────────────────────── */
+    .portada {
+      text-align: center;
+      padding: 64px 0 48px;
+      border-bottom: 2px solid #b45309;
+      margin-bottom: 48px;
+    }
+
+    .portada h1 {
+      font-size: 30pt;
+      border: none;
+      margin: 0 0 6px;
+      color: #b45309;
+    }
+
+    .portada .subtitulo { font-size: 14pt; color: #4b5563; margin: 0; }
+    .portada .meta      { font-size: 9.5pt; color: #9ca3af; margin-top: 20px; }
+
+    /* ─── Árbol de archivos ─────────────────────────────── */
+    .arbol {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 1.8;
+      margin: 12px 0 20px;
+    }
+
+    .arbol .dir  { color: #93c5fd; font-weight: 700; }
+    .arbol .file { color: #86efac; }
+    .arbol .note { color: #6c7086; font-style: italic; }
+    .arbol .new  { color: #f9e2af; }
+
+    /* ─── Flujo de conexión ─────────────────────────────── */
+    .flujo {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 2;
+      margin: 12px 0 20px;
+    }
+
+    .flujo .nodo   { color: #1c3d5a; font-weight: 700; }
+    .flujo .ruta   { color: #b45309; }
+    .flujo .nota   { color: #6b7280; font-style: italic; }
+    .flujo .flecha { color: #9ca3af; }
+
+    /* ─── Lista con iconos ──────────────────────────────── */
+    ul.lista { list-style: none; padding: 0; margin: 8px 0 16px; }
+    ul.lista li {
+      padding: 4px 0 4px 22px;
+      position: relative;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    ul.lista li::before {
+      content: "▸";
+      position: absolute;
+      left: 6px;
+      color: #b45309;
+      font-size: 9pt;
+    }
+
+    /* ─── Separadores ───────────────────────────────────── */
+    hr {
+      border: none;
+      border-top: 1.5px solid #e5e7eb;
+      margin: 40px 0;
+    }
+
+    /* ─── Pie ───────────────────────────────────────────── */
+    .pie {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 9pt;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════════════════ -->
+<div class="portada">
+  <h1>Gastronómica — TFG</h1>
+  <p class="subtitulo">Landing Page: Documentación técnica completa</p>
+  <p class="meta">
+    Fase 1 · Sprint 1 · Marzo 2026<br>
+    Alejandro Hernández González
+  </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     ÍNDICE
+══════════════════════════════════════════════════════ -->
+<h1>Índice</h1>
+
+<table>
+  <tr><th>#</th><th>Sección</th></tr>
+  <tr><td>1</td><td>¿Qué es la landing page y para qué sirve?</td></tr>
+  <tr><td>2</td><td>Conceptos clave para entender el código</td></tr>
+  <tr><td>3</td><td>Estructura de archivos</td></tr>
+  <tr><td>4</td><td>Cómo se conectan los componentes</td></tr>
+  <tr><td>5</td><td>Cada componente explicado en detalle</td></tr>
+  <tr><td>6</td><td>Los datos: datosLanding.ts</td></tr>
+  <tr><td>7</td><td>Las animaciones: cómo funciona Framer Motion aquí</td></tr>
+  <tr><td>8</td><td>El sistema de diseño (colores, fuentes, tamaños)</td></tr>
+  <tr><td>9</td><td>Estado actual y pendientes</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     1. QUÉ ES LA LANDING PAGE
+══════════════════════════════════════════════════════ -->
+<h1>1. ¿Qué es la landing page y para qué sirve?</h1>
+
+<p>
+  La landing page es la <strong>primera pantalla que ve cualquier persona</strong> que entra a Gastronómica.
+  Su único objetivo es convencer al visitante de que se registre o inicie sesión.
+  No requiere estar logueado para verla y no hace ninguna consulta al servidor — todo el contenido
+  está escrito directamente en el código (datos "mock" o de prueba).
+</p>
+
+<p>
+  Visualmente se divide en cuatro bloques que el usuario ve de arriba a abajo al hacer scroll:
+</p>
+
+<table>
+  <tr><th>Orden visual</th><th>Bloque</th><th>¿Qué hace?</th></tr>
+  <tr>
+    <td>1º (pantalla completa)</td>
+    <td><strong>SeccionHero</strong></td>
+    <td>Carrusel de fondo animado + titular + dos botones (Crear cuenta / Ya tengo cuenta)</td>
+  </tr>
+  <tr>
+    <td>2º (al hacer scroll)</td>
+    <td><strong>BentoTestimonios</strong></td>
+    <td>6 tarjetas con opiniones de usuarios de la app</td>
+  </tr>
+  <tr>
+    <td>3º (al seguir bajando)</td>
+    <td><strong>BentoCaracteristicas</strong></td>
+    <td>3 tarjetas explicando las funciones principales de la app</td>
+  </tr>
+  <tr>
+    <td>4º (al final de la página)</td>
+    <td><strong>PiePagina</strong></td>
+    <td>Footer con stack tecnológico, enlaces y aviso de IA</td>
+  </tr>
+</table>
+
+<div class="caja caja-info">
+  <strong>¿Por qué no hay navegación (navbar) en la landing?</strong>
+  Es una decisión de diseño deliberada. Se quiere que el visitante se centre
+  únicamente en el mensaje y los botones de registro/login, sin distracciones.
+  El header de navegación aparecerá una vez el usuario esté dentro de la app.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     2. CONCEPTOS CLAVE
+══════════════════════════════════════════════════════ -->
+<h1>2. Conceptos clave para entender el código</h1>
+
+<p>
+  Si eres nuevo en React o Next.js, estos son los conceptos que aparecen constantemente
+  en este código y que necesitas entender antes de leer los componentes:
+</p>
+
+<h2>¿Qué es un componente?</h2>
+<p>
+  Un componente es simplemente una <strong>función de JavaScript que devuelve HTML</strong> (técnicamente JSX).
+  Cada bloque visual de la página es un componente. Se pueden reutilizar, anidar unos dentro de otros
+  y pasarles datos como parámetros (llamados <strong>props</strong>).
+</p>
+<pre><span class="cm">// Ejemplo simplificado de componente</span>
+<span class="kw">function</span> <span class="fn">MiComponente</span>({ titulo }) {
+  <span class="kw">return</span> &lt;<span class="ty">h1</span>&gt;{titulo}&lt;/<span class="ty">h1</span>&gt;;
+}
+
+<span class="cm">// Uso: &lt;MiComponente titulo="Hola mundo" /&gt;</span></pre>
+
+<h2>"use client" — Componente de cliente vs servidor</h2>
+<p>
+  En Next.js 14 hay dos tipos de componentes. Por defecto, los componentes son de <strong>servidor</strong>
+  (se renderizan en el servidor y el navegador recibe HTML estático). Si el componente necesita
+  interactividad (useState, useEffect, eventos de ratón...) hay que marcarlo con <code>"use client"</code>
+  al principio del archivo para que se ejecute también en el navegador.
+  Todos los componentes de la landing usan <code>"use client"</code> porque tienen animaciones.
+</p>
+
+<h2>useState — Guardar información que cambia</h2>
+<p>
+  <code>useState</code> es la forma de guardar un valor que puede cambiar y que, cuando cambia,
+  hace que el componente se vuelva a dibujar en pantalla. Por ejemplo, el número del slide activo
+  del carrusel se guarda con useState: cuando cambia de 0 a 1, React redibuja el fondo del hero.
+</p>
+
+<h2>useEffect — Ejecutar código "al lado"</h2>
+<p>
+  <code>useEffect</code> permite ejecutar código después de que el componente se dibuje en pantalla.
+  Se usa para cosas como temporizadores, llamadas a APIs o suscripciones a eventos.
+  En el carrusel del hero, useEffect arranca el intervalo de 5 segundos que avanza los slides.
+</p>
+
+<h2>Framer Motion — Las animaciones</h2>
+<p>
+  Framer Motion es una librería que permite animar componentes de React de forma declarativa.
+  En vez de escribir CSS de animación complejo, defines el estado inicial (<code>hidden</code>)
+  y el estado final (<code>show</code>) y Framer Motion hace la transición automáticamente.
+  El concepto de <strong>variantes</strong> permite que un componente padre coordine las animaciones
+  de todos sus hijos a la vez (stagger = aparecen uno tras otro con un retardo).
+</p>
+
+<h2>Barrel export (index.ts)</h2>
+<p>
+  En vez de importar cada componente desde su ruta completa, existe un archivo <code>index.ts</code>
+  que reexporta todo. Así, en lugar de escribir tres imports largos, se escribe uno solo:
+</p>
+<pre><span class="cm">// Sin barrel export (molesto):</span>
+<span class="kw">import</span> { SeccionHero }        <span class="kw">from</span> <span class="st">"@/features/landing/components/seccionHero"</span>;
+<span class="kw">import</span> { BentoCaracteristicas } <span class="kw">from</span> <span class="st">"@/features/landing/components/bentoCaracteristicas"</span>;
+<span class="kw">import</span> { BentoTestimonios }    <span class="kw">from</span> <span class="st">"@/features/landing/components/bentoTestimonios"</span>;
+
+<span class="cm">// Con barrel export (limpio):</span>
+<span class="kw">import</span> { SeccionHero, BentoCaracteristicas, BentoTestimonios } <span class="kw">from</span> <span class="st">"@/features/landing/components"</span>;</pre>
+
+
+<!-- ══════════════════════════════════════════════════════
+     3. ESTRUCTURA DE ARCHIVOS
+══════════════════════════════════════════════════════ -->
+<h1>3. Estructura de archivos</h1>
+
+<p>
+  El proyecto sigue una arquitectura <strong>feature-based</strong>: en lugar de agrupar los archivos
+  por tipo (todos los componentes juntos, todos los estilos juntos…), se agrupan por
+  <strong>funcionalidad</strong>. Todo lo relacionado con la landing vive dentro de
+  <code>features/landing/</code>, lo que facilita encontrar y modificar cosas.
+</p>
+
+<div class="arbol">
+<span class="dir">frontend/src/</span>
+│
+├── <span class="dir">app/</span>                          <span class="note">← Rutas de Next.js (App Router)</span>
+│   ├── <span class="file">page.tsx</span>              <span class="note">← Ruta "/" — orquesta la landing page</span>
+│   ├── <span class="file">layout.tsx</span>            <span class="note">← HTML base (fuentes, metadata, &lt;body&gt;)</span>
+│   └── <span class="file">globals.css</span>           <span class="note">← Variables de color, tipografía global</span>
+│
+├── <span class="dir">components/</span>
+│   ├── <span class="dir">common/</span>               <span class="note">← Componentes reutilizables en toda la app</span>
+│   │   └── <span class="new">piePagina.tsx</span>     <span class="note">← Footer (se usará en más páginas)</span>
+│   └── <span class="dir">ui/</span>                   <span class="note">← Primitivas de shadcn/ui — NO TOCAR</span>
+│       ├── <span class="file">button.tsx</span>
+│       ├── <span class="file">card.tsx</span>
+│       ├── <span class="file">avatar.tsx</span>
+│       └── <span class="file">... (9 más)</span>
+│
+└── <span class="dir">features/</span>
+    └── <span class="dir">landing/</span>              <span class="note">← Todo lo propio de la landing page</span>
+        ├── <span class="dir">components/</span>
+        │   ├── <span class="new">seccionHero.tsx</span>         <span class="note">← Pantalla inicial con carrusel</span>
+        │   ├── <span class="new">bentoCaracteristicas.tsx</span> <span class="note">← Grid de 3 funcionalidades</span>
+        │   ├── <span class="new">bentoTestimonios.tsx</span>     <span class="note">← Grid de 6 testimonios</span>
+        │   ├── <span class="new">tarjetaTestimonio.tsx</span>    <span class="note">← Carta individual de un testimonio</span>
+        │   └── <span class="file">index.ts</span>                 <span class="note">← Barrel export</span>
+        └── <span class="dir">data/</span>
+            └── <span class="new">datosLanding.ts</span>          <span class="note">← Todos los textos y datos mock</span>
+</div>
+
+<div class="caja caja-aviso">
+  <strong>Regla importante sobre la carpeta ui/</strong>
+  Los archivos dentro de <code>components/ui/</code> son generados automáticamente por shadcn/ui
+  y no se deben modificar manualmente. Si necesitas personalizar un componente de shadcn,
+  se hace desde fuera (pasando props o con clases de Tailwind), nunca editando los archivos de ui/.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     4. CÓMO SE CONECTAN LOS COMPONENTES
+══════════════════════════════════════════════════════ -->
+<h1>4. Cómo se conectan los componentes</h1>
+
+<p>
+  La landing page funciona como un árbol: <code>page.tsx</code> es la raíz y el resto de
+  componentes cuelgan de él. Cuando Next.js recibe una petición a la ruta <code>/</code>,
+  ejecuta <code>page.tsx</code>, que a su vez renderiza cada componente hijo en orden.
+</p>
+
+<div class="flujo">
+<span class="nodo">app/page.tsx</span>  <span class="ruta">← ruta "/"</span>  <span class="nota">← punto de entrada de la landing</span>
+│
+│  <span class="nota">Define el contenedor de animación (motion.div)</span>
+│  <span class="nota">Importa y monta los 4 componentes principales</span>
+│
+├── <span class="flecha">renderiza</span> <span class="nodo">SeccionHero</span>
+│     <span class="ruta">features/landing/components/seccionHero.tsx</span>
+│     <span class="nota">Autónomo — gestiona su propio estado (slideActivo)</span>
+│     <span class="nota">No recibe props del padre</span>
+│
+├── <span class="flecha">renderiza</span> <span class="nodo">motion.div</span>  <span class="nota">← contenedor de Framer Motion</span>
+│   │   <span class="nota">Coordina las animaciones de sus hijos (stagger)</span>
+│   │   <span class="nota">Se activa al entrar en el viewport (whileInView)</span>
+│   │
+│   ├── <span class="flecha">renderiza</span> <span class="nodo">BentoTestimonios</span>
+│   │     <span class="ruta">features/landing/components/bentoTestimonios.tsx</span>
+│   │     <span class="nota">Lee testimoniosLanding desde datosLanding.ts</span>
+│   │     <span class="nota">Renderiza una TarjetaTestimonio por cada testimonio</span>
+│   │     │
+│   │     └── <span class="flecha">renderiza ×6</span> <span class="nodo">TarjetaTestimonio</span>
+│   │           <span class="ruta">features/landing/components/tarjetaTestimonio.tsx</span>
+│   │           <span class="nota">Recibe un objeto Testimonio como prop</span>
+│   │           <span class="nota">Recibe variants para participar en el stagger</span>
+│   │
+│   └── <span class="flecha">renderiza</span> <span class="nodo">BentoCaracteristicas</span>
+│         <span class="ruta">features/landing/components/bentoCaracteristicas.tsx</span>
+│         <span class="nota">Lee caracteristicasLanding desde datosLanding.ts</span>
+│         <span class="nota">Renderiza una Card por cada característica</span>
+│
+└── <span class="flecha">renderiza</span> <span class="nond">PiePagina</span>
+      <span class="ruta">components/common/piePagina.tsx</span>
+      <span class="nota">Sus datos (stackTecnologico, enlacesUtiles) están hardcodeados en el propio archivo</span>
+</div>
+
+<h2>¿Cómo se pasan datos entre componentes?</h2>
+
+<p>
+  En React, los datos fluyen <strong>siempre de padre a hijo</strong> mediante props.
+  En esta landing hay dos patrones de paso de datos:
+</p>
+
+<table>
+  <tr>
+    <th>Patrón</th>
+    <th>Quién lo usa</th>
+    <th>Cómo funciona</th>
+  </tr>
+  <tr>
+    <td><strong>Datos desde archivo externo</strong></td>
+    <td>BentoTestimonios, BentoCaracteristicas</td>
+    <td>Importan directamente el array desde <code>datosLanding.ts</code> y lo mapean</td>
+  </tr>
+  <tr>
+    <td><strong>Props de padre a hijo</strong></td>
+    <td>BentoTestimonios → TarjetaTestimonio</td>
+    <td>BentoTestimonios pasa un objeto <code>Testimonio</code> y las <code>variants</code> de animación a cada TarjetaTestimonio</td>
+  </tr>
+  <tr>
+    <td><strong>Datos hardcodeados en el propio componente</strong></td>
+    <td>PiePagina</td>
+    <td>Los arrays <code>stackTecnologico</code> y <code>enlacesUtiles</code> están definidos dentro del mismo archivo</td>
+  </tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     5. CADA COMPONENTE EXPLICADO
+══════════════════════════════════════════════════════ -->
+<h1>5. Cada componente explicado en detalle</h1>
+
+
+<!-- ── page.tsx ─────────────────────────────────────── -->
+<h2>5.1 — page.tsx &nbsp;<code>app/page.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> Es el punto de entrada de la ruta <code>/</code>.
+  En Next.js 14 (App Router), cualquier archivo llamado <code>page.tsx</code> dentro de <code>app/</code>
+  se convierte automáticamente en una página. Este archivo no contiene casi lógica:
+  su única responsabilidad es <strong>montar los componentes en el orden correcto</strong>
+  y configurar el contenedor de animaciones que coordina a los hijos.
+</p>
+
+<p>
+  <strong>¿Por qué tiene "use client"?</strong> Porque usa <code>motion.div</code> de Framer Motion,
+  que necesita JavaScript en el navegador para funcionar. Sin ese directive, Next.js lo renderizaría
+  solo en el servidor y las animaciones no funcionarían.
+</p>
+
+<p><strong>Variables que define:</strong></p>
+<ul class="lista">
+  <li><code>contenedor</code> — objeto de variantes de Framer Motion que define la animación del bloque central (fade in + stagger de 0.1s entre hijos). Actúa como director de orquesta.</li>
+  <li><code>PaginaInicio</code> — función del componente (export default). Next.js la llama al servir la ruta /.</li>
+</ul>
+
+<p><strong>Estructura JSX que renderiza:</strong></p>
+<pre>&lt;<span class="ty">main</span>&gt;
+  &lt;<span class="fn">SeccionHero</span> /&gt;
+
+  &lt;<span class="fn">motion.div</span> variants={contenedor} whileInView="show"&gt;  <span class="cm">← activa al hacer scroll</span>
+    &lt;<span class="fn">BentoTestimonios</span> /&gt;
+    &lt;<span class="fn">BentoCaracteristicas</span> /&gt;
+  &lt;/<span class="fn">motion.div</span>&gt;
+
+  &lt;<span class="fn">PiePagina</span> /&gt;
+&lt;/<span class="ty">main</span>&gt;</pre>
+
+<div class="caja caja-codigo">
+  <strong>¿Por qué BentoTestimonios va antes que BentoCaracteristicas?</strong>
+  Orden visual de la página: primero los testimonios (prueba social — convencer al visitante)
+  y después las características (explicar qué hace la app). Es una decisión de UX/copywriting,
+  no técnica.
+</div>
+
+
+<!-- ── SeccionHero ───────────────────────────────────── -->
+<h2>5.2 — SeccionHero &nbsp;<code>features/landing/components/seccionHero.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> La primera pantalla que ve el usuario. Ocupa el 100% del alto
+  de la ventana (<code>min-h-screen</code>). Contiene un carrusel de fondos animado, un titular,
+  un subtítulo y dos botones de acción.
+</p>
+
+<p><strong>Estado interno (useState):</strong></p>
+<ul class="lista">
+  <li><code>slideActivo</code> — número del slide que se está mostrando ahora mismo (0, 1, 2 ó 3). Empieza en 0.</li>
+</ul>
+
+<p><strong>Efectos (useEffect + useCallback):</strong></p>
+<ul class="lista">
+  <li><code>siguienteSlide</code> — función que incrementa <code>slideActivo</code> en 1, volviendo a 0 al llegar al final. Está envuelta en <code>useCallback</code> para que no se recree en cada render.</li>
+  <li>El <code>useEffect</code> arranca un <code>setInterval</code> de 5000ms que llama a <code>siguienteSlide</code> automáticamente. Cuando el componente se desmonta, el <code>clearInterval</code> del return limpia el temporizador para evitar fugas de memoria.</li>
+</ul>
+
+<p><strong>Cómo funciona el carrusel:</strong></p>
+<p>
+  El fondo no es un carrusel HTML tradicional. Es una serie de <code>motion.div</code> donde
+  solo se renderiza el slide activo (identificado por <code>key={slideActivo}</code>).
+  <code>AnimatePresence</code> de Framer Motion detecta cuándo un elemento desaparece del DOM
+  y anima su salida antes de eliminar el anterior y animar la entrada del nuevo.
+  El modo <code>"popLayout"</code> evita que los slides se superpongan con z-index incorrecto
+  durante la transición.
+</p>
+
+<p><strong>Capas de overlay sobre el fondo:</strong></p>
+<p>
+  Para que el texto blanco sea legible sobre cualquier gradiente de color, se apilan
+  3 capas semitransparentes sobre el fondo:
+</p>
+<table>
+  <tr><th>Capa</th><th>Efecto</th><th>Por qué</th></tr>
+  <tr><td>25% oscuro uniforme</td><td>Oscurece todo el fondo</td><td>Base de legibilidad</td></tr>
+  <tr><td>Gradiente vertical (abajo más oscuro)</td><td>La zona del texto queda más oscura</td><td>El texto está centrado y abajo</td></tr>
+  <tr><td>Gradiente horizontal (laterales oscuros)</td><td>Enfoca la atención al centro</td><td>Efecto cinematográfico</td></tr>
+</table>
+
+<p><strong>Datos que consume:</strong></p>
+<ul class="lista">
+  <li><code>slidesHero</code> de <code>datosLanding.ts</code> — array de 4 slides, cada uno con <code>gradiente</code>, <code>emoji</code> y <code>etiqueta</code></li>
+</ul>
+
+<p><strong>Los dos CTAs (call to action):</strong></p>
+<table>
+  <tr><th>Botón</th><th>Ruta</th><th>Estilo</th><th>Para quién</th></tr>
+  <tr><td>"Crear cuenta hoy"</td><td><code>/registro</code></td><td>Primario — sólido, color brand</td><td>Usuario nuevo</td></tr>
+  <tr><td>"Ya tengo cuenta"</td><td><code>/login</code></td><td>Secundario — outline transparente</td><td>Usuario que vuelve</td></tr>
+</table>
+
+<div class="caja caja-aviso">
+  <strong>Pendiente (Sprint 2 — LANDING-001):</strong>
+  Actualmente el fondo de cada slide es un gradiente CSS + un emoji gigante borroso.
+  En Sprint 2 se reemplazará por imágenes reales usando <code>next/image</code> con <code>fill</code>
+  y <code>objectFit="cover"</code>, y habrá que añadir los dominios externos en <code>next.config.js</code>.
+</div>
+
+
+<!-- ── BentoTestimonios ──────────────────────────────── -->
+<h2>5.3 — BentoTestimonios &nbsp;<code>features/landing/components/bentoTestimonios.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> Una sección con un encabezado y un grid de 6 tarjetas de testimonios.
+  El nombre "bento" hace referencia al estilo de cuadrícula japonesa (bento box) donde
+  elementos de distintos tamaños se distribuyen en un grid.
+</p>
+
+<p>
+  <strong>¿Qué hace exactamente?</strong> Este componente no contiene el HTML de cada tarjeta:
+  su única responsabilidad es <strong>iterar el array de testimonios</strong> y
+  <strong>renderizar un <code>TarjetaTestimonio</code> por cada uno</strong>, pasándole los datos
+  correspondientes. Es el patrón contenedor/presentador: BentoTestimonios es el contenedor
+  y TarjetaTestimonio es el presentador.
+</p>
+
+<p><strong>Grid responsive:</strong></p>
+<table>
+  <tr><th>Pantalla</th><th>Columnas</th><th>Ancho aproximado</th></tr>
+  <tr><td>Móvil</td><td>1 columna</td><td>&lt; 640px</td></tr>
+  <tr><td>Tablet</td><td>2 columnas</td><td>640px – 1023px</td></tr>
+  <tr><td>Escritorio</td><td>3 columnas</td><td>&gt; 1024px</td></tr>
+</table>
+
+<p><strong>¿Cómo se pasan las animaciones a los hijos?</strong></p>
+<p>
+  BentoTestimonios define dos objetos de variantes (<code>contenedor</code> y <code>elemento</code>)
+  y pasa <code>elemento</code> como prop <code>variants</code> a cada <code>TarjetaTestimonio</code>.
+  Framer Motion automáticamente conecta las variantes del hijo con las del padre: cuando el
+  contenedor pasa a estado "show", activa las animaciones de todos los hijos en cascada (stagger).
+</p>
+
+<p><strong>Datos que consume:</strong></p>
+<ul class="lista">
+  <li><code>testimoniosLanding</code> de <code>datosLanding.ts</code> — array de 6 objetos <code>Testimonio</code></li>
+</ul>
+
+
+<!-- ── TarjetaTestimonio ─────────────────────────────── -->
+<h2>5.4 — TarjetaTestimonio &nbsp;<code>features/landing/components/tarjetaTestimonio.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> El componente más "hoja" de la landing (no tiene hijos propios).
+  Representa la tarjeta visual de un único testimonio de usuario.
+</p>
+
+<p><strong>Props que recibe:</strong></p>
+<table>
+  <tr><th>Prop</th><th>Tipo</th><th>Obligatorio</th><th>Para qué sirve</th></tr>
+  <tr><td><code>testimonio</code></td><td><code>Testimonio</code></td><td>Sí</td><td>El objeto con todos los datos del usuario (nombre, comentario, valoración…)</td></tr>
+  <tr><td><code>variants</code></td><td><code>object</code></td><td>No</td><td>Las variantes de Framer Motion pasadas desde BentoTestimonios para coordinar el stagger</td></tr>
+</table>
+
+<p><strong>Estructura visual de la tarjeta:</strong></p>
+<table>
+  <tr><th>Zona</th><th>Qué muestra</th><th>Elemento HTML</th></tr>
+  <tr><td>Arriba</td><td>Icono de comillas (Quote de Lucide)</td><td><code>&lt;svg&gt;</code></td></tr>
+  <tr><td>Centro</td><td>El comentario del usuario entre comillas tipográficas</td><td><code>&lt;blockquote&gt;</code></td></tr>
+  <tr><td>Abajo izquierda</td><td>Avatar con iniciales + nombre + rol</td><td><code>&lt;Avatar&gt;</code> de shadcn</td></tr>
+  <tr><td>Abajo derecha</td><td>Valoración del 1 al 5 con iconos de corazón</td><td>5× <code>&lt;Heart&gt;</code> de Lucide</td></tr>
+</table>
+
+<p><strong>Efectos visuales en hover:</strong></p>
+<ul class="lista">
+  <li>La tarjeta sube 1px (<code>hover:-translate-y-1</code>) — da sensación de flotación</li>
+  <li>Aparece una sombra suave con el color brand (<code>hover:shadow-brand/5</code>)</li>
+  <li>El borde se tiñe ligeramente del color brand (<code>hover:border-brand/25</code>)</li>
+  <li>Una línea de acento se desliza de izquierda a derecha en el borde superior (<code>w-0 → w-full</code> en 500ms)</li>
+</ul>
+
+
+<!-- ── BentoCaracteristicas ─────────────────────────── -->
+<h2>5.5 — BentoCaracteristicas &nbsp;<code>features/landing/components/bentoCaracteristicas.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> La sección que explica las tres funcionalidades principales de la app.
+  A diferencia de BentoTestimonios donde todas las tarjetas son iguales, aquí la primera
+  tarjeta es el doble de grande que las otras dos (layout bento asimétrico).
+</p>
+
+<p><strong>Grid bento asimétrico:</strong></p>
+<table>
+  <tr><th>Tarjeta</th><th>Característica</th><th>Tamaño en grid</th><th>¿Por qué?</th></tr>
+  <tr><td>0 (índice 0)</td><td>Recetas inteligentes</td><td>2 columnas × 2 filas</td><td>Es la funcionalidad más importante — merece más espacio</td></tr>
+  <tr><td>1</td><td>Comunidad foodie</td><td>1 columna × 1 fila</td><td>Secundaria</td></tr>
+  <tr><td>2</td><td>Asistente con IA</td><td>1 columna × 1 fila</td><td>Secundaria</td></tr>
+</table>
+
+<p>
+  La variable <code>esPrincipal</code> (booleano, <code>indice === 0</code>) controla
+  todo el comportamiento diferencial de la tarjeta principal: tamaño del icono,
+  tamaño del texto, padding interno y clases del grid.
+</p>
+
+<p><strong>Sistema de iconos:</strong></p>
+<p>
+  El tipo <code>IconoCaracteristicaLanding</code> solo acepta tres valores: <code>"chef"</code>,
+  <code>"social"</code> e <code>"ia"</code>. Dos objetos Record mapean cada valor a su icono
+  de Lucide y a sus clases de gradiente:
+</p>
+<pre><span class="kw">const</span> <span class="nm">mapaIconos</span> = {
+  chef:   ChefHat,   <span class="cm">// icono de gorro de cocinero</span>
+  social: Users,     <span class="cm">// icono de personas</span>
+  ia:     Sparkles,  <span class="cm">// icono de destellos</span>
+}
+
+<span class="kw">const</span> <span class="nm">gradienteIcono</span> = {
+  chef:   <span class="st">"from-amber-400/20 to-orange-300/10 text-amber-600"</span>,
+  social: <span class="st">"from-sky-400/20 to-blue-300/10 text-sky-600"</span>,
+  ia:     <span class="st">"from-violet-400/20 to-purple-300/10 text-violet-600"</span>,
+}</pre>
+
+<p><strong>Datos que consume:</strong></p>
+<ul class="lista">
+  <li><code>caracteristicasLanding</code> de <code>datosLanding.ts</code> — array de 3 objetos <code>CaracteristicaLanding</code></li>
+</ul>
+
+
+<!-- ── PiePagina ─────────────────────────────────────── -->
+<h2>5.6 — PiePagina &nbsp;<code>components/common/piePagina.tsx</code></h2>
+
+<p>
+  <strong>¿Qué es?</strong> El footer de la página. Está ubicado en <code>components/common/</code>
+  en lugar de <code>features/landing/</code> porque se reutilizará en otras páginas de la app
+  (como las páginas internas una vez el usuario esté logueado).
+</p>
+
+<p>
+  <strong>No recibe props.</strong> Todos sus datos están hardcodeados en el propio archivo
+  en dos arrays: <code>stackTecnologico</code> (12 elementos) y <code>enlacesUtiles</code> (4 elementos).
+</p>
+
+<p><strong>Grid de 3 columnas:</strong></p>
+<table>
+  <tr><th>Columna</th><th>Contenido</th><th>Notas</th></tr>
+  <tr>
+    <td>1 — Marca</td>
+    <td>Logo textual "Gastronómica" + aviso legal sobre el uso de IA</td>
+    <td>El aviso de IA es obligatorio por buenas prácticas</td>
+  </tr>
+  <tr>
+    <td>2 — Stack tecnológico</td>
+    <td>12 enlaces externos a las tecnologías usadas</td>
+    <td>Grid interno de 2 columnas para que quepa todo</td>
+  </tr>
+  <tr>
+    <td>3 — Enlaces</td>
+    <td>Política de privacidad, términos, contacto, GitHub</td>
+    <td>Las rutas aún no existen (están pendientes de crear)</td>
+  </tr>
+</table>
+
+<p><strong>Elementos especiales:</strong></p>
+<ul class="lista">
+  <li>El año del copyright se genera con <code>new Date().getFullYear()</code> — se actualiza solo cada año sin tocar el código</li>
+  <li>La cita "<em>Mami te quiero mucho</em>" es un elemento personal del autor</li>
+  <li>Los <code>&lt;Separator /&gt;</code> son el componente de línea divisoria de shadcn/ui</li>
+</ul>
+
+
+<!-- ══════════════════════════════════════════════════════
+     6. LOS DATOS
+══════════════════════════════════════════════════════ -->
+<h1>6. Los datos: datosLanding.ts</h1>
+
+<p>
+  <code>features/landing/data/datosLanding.ts</code> es el único lugar donde viven todos los
+  textos y contenidos de la landing. Si mañana hay que cambiar un testimonio, el título de una
+  característica o añadir un slide al carrusel, solo hay que tocar este archivo.
+  Ningún componente define textos propios — los reciben de aquí.
+</p>
+
+<div class="caja caja-info">
+  <strong>Excepción:</strong> PiePagina y los textos dentro del JSX del hero (el titular principal,
+  el subtítulo) sí están escritos directamente en sus componentes, porque son textos únicos
+  que no tiene sentido externalizar.
+</div>
+
+<h2>Tipos TypeScript definidos</h2>
+<p>
+  Los tipos son "contratos" que definen qué forma tiene cada objeto de datos.
+  TypeScript comprueba en tiempo de compilación que los datos cumplen el contrato,
+  evitando errores como pasar un número donde se espera un string.
+</p>
+
+<table>
+  <tr><th>Tipo</th><th>Campos</th><th>Usado en</th></tr>
+  <tr>
+    <td><code>SlideHero</code></td>
+    <td><code>id, gradiente, emoji, etiqueta</code></td>
+    <td>SeccionHero</td>
+  </tr>
+  <tr>
+    <td><code>CaracteristicaLanding</code></td>
+    <td><code>id, titulo, subtitulo, descripcion, icono</code></td>
+    <td>BentoCaracteristicas</td>
+  </tr>
+  <tr>
+    <td><code>Testimonio</code></td>
+    <td><code>id, nombre, rol, avatarId, comentario, valoracion</code></td>
+    <td>BentoTestimonios → TarjetaTestimonio</td>
+  </tr>
+  <tr>
+    <td><code>EstadisticaLanding</code></td>
+    <td><code>valor, etiqueta</code></td>
+    <td>Definido, pendiente de usar</td>
+  </tr>
+  <tr>
+    <td><code>IconoCaracteristicaLanding</code></td>
+    <td><code>"chef" | "social" | "ia"</code></td>
+    <td>Clave de mapaIconos y gradienteIcono</td>
+  </tr>
+</table>
+
+<h2>Arrays de datos exportados</h2>
+
+<table>
+  <tr><th>Constante</th><th>Elementos</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>slidesHero</code></td>
+    <td>4 slides</td>
+    <td>🍳 Desayunos · 🥗 Ensaladas · 🍰 Postres · 🍝 Pastas</td>
+  </tr>
+  <tr>
+    <td><code>caracteristicasLanding</code></td>
+    <td>3 características</td>
+    <td>Recetas inteligentes · Comunidad foodie · Asistente con IA</td>
+  </tr>
+  <tr>
+    <td><code>testimoniosLanding</code></td>
+    <td>6 testimonios</td>
+    <td>Laura (5★) · Carlos (5★) · Sofía (4★) · Martín (5★) · Elena (4★) · Pablo (5★)</td>
+  </tr>
+  <tr>
+    <td><code>estadisticasLanding</code></td>
+    <td>3 estadísticas</td>
+    <td>12k+ recetas · 3.5k cocineros · 24/7 IA — definidas pero sin componente aún</td>
+  </tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     7. LAS ANIMACIONES
+══════════════════════════════════════════════════════ -->
+<h1>7. Las animaciones: cómo funciona Framer Motion aquí</h1>
+
+<p>
+  Framer Motion funciona mediante el concepto de <strong>variantes</strong>: se define cómo
+  debe verse un elemento cuando está "escondido" (<code>hidden</code>) y cómo cuando está
+  "visible" (<code>show</code>), y la librería genera la transición automáticamente.
+</p>
+
+<h2>Sistema de variantes compartidas (stagger)</h2>
+<p>
+  El truco del efecto "los elementos aparecen uno tras otro" (stagger) funciona así:
+  el componente padre define <code>staggerChildren: 0.1</code> en su variante <code>show</code>,
+  lo que significa "activa a mis hijos con 0.1s de retraso entre cada uno".
+  Los hijos solo necesitan definir su animación propia (fade + subir desde abajo) —
+  Framer Motion gestiona el timing automáticamente.
+</p>
+
+<pre><span class="cm">// Padre — coordina el timing</span>
+<span class="kw">const</span> <span class="nm">contenedor</span> = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { <span class="hl">staggerChildren: 0.1</span> } }
+}
+
+<span class="cm">// Hijo — solo define su propia animación</span>
+<span class="kw">const</span> <span class="nm">elemento</span> = {
+  hidden: { opacity: 0, y: 20 },        <span class="cm">// invisible, 20px más abajo</span>
+  show:   { opacity: 1, y: 0 }          <span class="cm">// visible, posición normal</span>
+}
+
+<span class="cm">// TarjetaTestimonio recibe "elemento" como prop variants</span>
+<span class="cm">// y participa en el stagger del padre automáticamente</span></pre>
+
+<h2>Trigger: whileInView</h2>
+<p>
+  Las animaciones del bloque central no se ejecutan al cargar la página sino al hacer scroll.
+  <code>whileInView="show"</code> activa la variante <code>show</code> cuando el elemento
+  entra en el viewport del navegador. <code>viewport={{ once: true }}</code> significa que
+  la animación solo ocurre una vez (no se repite al volver a subir).
+</p>
+
+<h2>Carrusel del Hero: AnimatePresence</h2>
+<p>
+  El hero usa un mecanismo diferente. <code>AnimatePresence</code> es especial:
+  detecta cuando un componente hijo va a desaparecer del DOM y le permite ejecutar
+  una animación de salida antes de eliminarse. Sin AnimatePresence, el slide anterior
+  desaparecería instantáneamente. Con él, el slide viejo hace fade out mientras el nuevo
+  hace fade in + scale desde 1.06 hasta 1.
+</p>
+
+<h2>Resumen de todas las animaciones</h2>
+<table>
+  <tr><th>Componente</th><th>Tipo</th><th>Trigger</th><th>Duración</th></tr>
+  <tr><td>SeccionHero — contenido (h1, p, botones)</td><td>Fade + subida + stagger 0.12s</td><td>Al montar la página</td><td>0.6s por elemento</td></tr>
+  <tr><td>SeccionHero — slides de fondo</td><td>Fade + scale 1.06→1</td><td>Cada 5 segundos (auto)</td><td>1.4s</td></tr>
+  <tr><td>BentoTestimonios — sección</td><td>Fade + stagger 0.1s</td><td>Al entrar en viewport</td><td>0.5s por tarjeta</td></tr>
+  <tr><td>BentoCaracteristicas — sección</td><td>Fade + stagger 0.14s</td><td>Al entrar en viewport</td><td>0.55s por tarjeta</td></tr>
+  <tr><td>Hover en tarjetas</td><td>Translate -1px + shadow + border</td><td>Hover de ratón</td><td>300ms (CSS transition)</td></tr>
+  <tr><td>Línea acento en TarjetaTestimonio</td><td>Ancho w-0 → w-full</td><td>Hover de ratón</td><td>500ms (CSS transition)</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     8. SISTEMA DE DISEÑO
+══════════════════════════════════════════════════════ -->
+<h1>8. El sistema de diseño</h1>
+
+<h2>Variables de color (OKLch)</h2>
+<p>
+  En lugar de usar colores hexadecimales o RGB directamente, se usan <strong>variables CSS</strong>
+  definidas en <code>globals.css</code>. Esto permite cambiar toda la paleta desde un solo lugar,
+  y tener un tema claro y uno oscuro (aún pendiente de implementar).
+  El formato <strong>OKLch</strong> es más moderno que HSL/RGB: percibe mejor la diferencia
+  de brillo entre colores (útil para accesibilidad).
+</p>
+
+<table>
+  <tr><th>Variable CSS</th><th>Uso</th><th>Color aproximado</th></tr>
+  <tr><td><code>--background</code></td><td>Fondo de la página</td><td>Casi blanco cálido</td></tr>
+  <tr><td><code>--foreground</code></td><td>Texto principal</td><td>Casi negro suave</td></tr>
+  <tr><td><code>--brand</code></td><td>Color principal de la app</td><td>Naranja-marrón cálido</td></tr>
+  <tr><td><code>--card</code></td><td>Fondo de las tarjetas</td><td>Blanco puro</td></tr>
+  <tr><td><code>--muted-foreground</code></td><td>Texto secundario / subtítulos</td><td>Gris medio</td></tr>
+  <tr><td><code>--border</code></td><td>Bordes de componentes</td><td>Gris muy claro</td></tr>
+  <tr><td><code>--brand-subtle</code></td><td>Fondos con toque de brand (avatares)</td><td>Naranja muy pálido</td></tr>
+</table>
+
+<p>
+  En el código de Tailwind se usan como <code>bg-background</code>, <code>text-foreground</code>,
+  <code>text-brand</code>, <code>border-border/40</code> (con opacidad), etc.
+</p>
+
+<h2>Tipografía</h2>
+<table>
+  <tr><th>Variable</th><th>Fuente</th><th>Uso</th></tr>
+  <tr><td><code>--font-sans</code></td><td>Geist (variable font)</td><td>Texto general, títulos</td></tr>
+  <tr><td><code>--font-mono</code></td><td>Geist Mono (variable font)</td><td>Código, datos técnicos</td></tr>
+</table>
+<p>
+  Ambas fuentes se cargan localmente con <code>next/font/local</code> desde la carpeta
+  <code>app/fonts/</code>, evitando peticiones externas a Google Fonts (mejor rendimiento y privacidad).
+</p>
+
+<h2>Breakpoints responsive (mobile-first)</h2>
+<p>
+  "Mobile-first" significa que el CSS base está escrito para móvil y los breakpoints
+  añaden estilos para pantallas más grandes. En Tailwind, los prefijos activan reglas
+  a partir de ese ancho:
+</p>
+<table>
+  <tr><th>Prefijo Tailwind</th><th>Ancho mínimo</th><th>Dispositivo típico</th></tr>
+  <tr><td>(sin prefijo)</td><td>0px</td><td>Móvil</td></tr>
+  <tr><td><code>sm:</code></td><td>640px</td><td>Móvil grande / tablet pequeña</td></tr>
+  <tr><td><code>md:</code></td><td>768px</td><td>Tablet</td></tr>
+  <tr><td><code>lg:</code></td><td>1024px</td><td>Escritorio</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     9. ESTADO ACTUAL Y PENDIENTES
+══════════════════════════════════════════════════════ -->
+<h1>9. Estado actual y pendientes</h1>
+
+<h2>Estado de la landing page</h2>
+
+<table>
+  <tr><th>Componente / Área</th><th>Estado</th><th>Notas</th></tr>
+  <tr>
+    <td>SeccionHero — carrusel 4 slides</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>Pendiente sustituir gradiente+emoji por imágenes reales (Sprint 2)</td>
+  </tr>
+  <tr>
+    <td>BentoCaracteristicas (3 tarjetas)</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>BentoTestimonios + TarjetaTestimonio (6 tarjetas)</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>Datos mock — sin backend</td>
+  </tr>
+  <tr>
+    <td>PiePagina (footer)</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>Animaciones Framer Motion</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>Stagger + whileInView + AnimatePresence</td>
+  </tr>
+  <tr>
+    <td>Mobile-first responsive</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>Breakpoints sm / md / lg</td>
+  </tr>
+  <tr>
+    <td>Accesibilidad básica</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>aria-labels, semántica HTML, jerarquía de headings h1→h2</td>
+  </tr>
+  <tr>
+    <td>Nombres en castellano + camelCase</td>
+    <td><span class="badge ok">✅ Completo</span></td>
+    <td>Refactorización completa de archivos, componentes, variables y tipos</td>
+  </tr>
+</table>
+
+<h2>Pendientes Sprint 1 (en curso)</h2>
+
+<table>
+  <tr><th>ID</th><th>Tarea</th><th>Prioridad</th><th>Estado</th></tr>
+  <tr>
+    <td>TFG-15</td>
+    <td>Página de login (<code>/login</code>)</td>
+    <td>Alta</td>
+    <td><span class="badge pend">❌ Pendiente</span></td>
+  </tr>
+  <tr>
+    <td>TFG-16</td>
+    <td>Formulario de registro (<code>/registro</code>)</td>
+    <td>Alta</td>
+    <td><span class="badge pend">❌ Pendiente</span></td>
+  </tr>
+  <tr>
+    <td>SETUP-004</td>
+    <td>Integración Google OAuth con NextAuth</td>
+    <td>Alta</td>
+    <td><span class="badge pend">❌ Pendiente</span></td>
+  </tr>
+</table>
+
+<h2>Pendientes futuros (Sprints 2–3)</h2>
+
+<table>
+  <tr><th>ID</th><th>Tarea</th><th>Sprint</th></tr>
+  <tr>
+    <td>LANDING-001</td>
+    <td>Imágenes reales en el carrusel del hero con <code>next/image</code></td>
+    <td>Sprint 2</td>
+  </tr>
+  <tr>
+    <td>CAROUSEL-001</td>
+    <td>Configurar dominios externos en <code>next.config.js</code> para <code>next/image</code></td>
+    <td>Sprint 2</td>
+  </tr>
+  <tr>
+    <td>CAROUSEL-002</td>
+    <td>Efecto Ken Burns (zoom lento) en las imágenes del carrusel (opcional)</td>
+    <td>Sprint 3</td>
+  </tr>
+  <tr>
+    <td>CAROUSEL-003</td>
+    <td>Botones prev/next + aria-live + pausa al hacer hover</td>
+    <td>Sprint 3</td>
+  </tr>
+  <tr>
+    <td>SETUP-001</td>
+    <td>GitHub Actions para CI/CD automático</td>
+    <td>Fase 6</td>
+  </tr>
+  <tr>
+    <td>SETUP-003</td>
+    <td>Variables de entorno en Vercel para producción</td>
+    <td>Fase 6</td>
+  </tr>
+</table>
+
+<hr />
+<div class="pie">
+  Gastronómica TFG &nbsp;·&nbsp; Fase 1 Sprint 1 &nbsp;·&nbsp; Documentación generada el 21 de marzo de 2026<br>
+  Alejandro Hernández González
+</div>
+
+</body>
+</html>

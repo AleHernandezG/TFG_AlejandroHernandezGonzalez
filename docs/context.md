@@ -52,6 +52,7 @@
 - [SETUP-002] Rama develop → pendiente
 - [SETUP-003] Variables Vercel → aplazado a Fase 6
 - ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
+- [SETUP-005] Paquetes deprecated (eslint@8, next-pwa@5) → aplazado a Fase 6, ver docs/tech-debt.md
 
 ## Carrusel — Pendientes
 

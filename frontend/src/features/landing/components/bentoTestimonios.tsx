@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TestimonialCard } from "./testimonial-card";
-import { landingTestimonials } from "@/features/landing/data/landing-data";
+import { TarjetaTestimonio } from "./tarjetaTestimonio";
+import { testimoniosLanding } from "@/features/landing/data/datosLanding";
 
-const container = {
+const contenedor = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -12,22 +12,22 @@ const container = {
   },
 } as const;
 
-const item = {
+const elemento = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 } as const;
 
-export function TestimonialsBento() {
+export function BentoTestimonios() {
   return (
     <motion.section
-      variants={container}
+      variants={contenedor}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.15 }}
       className="mt-24 md:mt-32"
     >
-      {/* Section heading */}
-      <motion.div variants={item} className="mb-12 text-center">
+      {/* Encabezado de sección */}
+      <motion.div variants={elemento} className="mb-12 text-center">
         <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand">
           Comunidad
         </span>
@@ -39,16 +39,16 @@ export function TestimonialsBento() {
         </p>
       </motion.div>
 
-      {/* Bento grid: 1 col → 2 col → 3 col */}
+      {/* Grid bento: 1 col → 2 col → 3 col */}
       <motion.div
-        variants={container}
+        variants={contenedor}
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {landingTestimonials.map((testimonial) => (
-          <TestimonialCard
-            key={testimonial.id}
-            testimonial={testimonial}
-            variants={item}
+        {testimoniosLanding.map((testimonio) => (
+          <TarjetaTestimonio
+            key={testimonio.id}
+            testimonio={testimonio}
+            variants={elemento}
           />
         ))}
       </motion.div>

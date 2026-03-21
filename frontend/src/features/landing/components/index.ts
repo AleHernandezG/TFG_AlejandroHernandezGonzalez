@@ -1,4 +1,4 @@
-export { HeroSection } from "./hero-section";
-export { FeaturesBento } from "./features-bento";
-export { TestimonialsBento } from "./testimonials-bento";
-export { TestimonialCard } from "./testimonial-card";
+export { SeccionHero } from "./seccionHero";
+export { BentoCaracteristicas } from "./bentoCaracteristicas";
+export { BentoTestimonios } from "./bentoTestimonios";
+export { TarjetaTestimonio } from "./tarjetaTestimonio";

@@ -68,6 +68,22 @@ Qué hay que hacer:
 
 ---
 
+## [SETUP-005] Actualizar paquetes deprecated (eslint@8, next-pwa@5)
+Estado:   ⏳ Aplazado — registrado 2026-03-21
+Cuándo:   Fase 6 — antes del primer deploy a Vercel
+
+Resumen:
+  Los warnings de `npm install` son en su mayoría transitivos (no controlables).
+  Los dos únicos paquetes directamente actualizables están bloqueados por dependencias
+  de framework hasta la migración a Next.js 15 (Fase 6).
+
+  Ver análisis completo y pasos exactos de migración en:
+  → docs/tech-debt.md [DEBT-001]
+
+  No bloquea ninguna fase de desarrollo (1-5). Ignorar warnings hasta Fase 6.
+
+---
+
 ## [SETUP-004] Google Cloud Console — OAuth credentials
 Estado:   ✅ Completado — 17/03/2025
 Cuándo:   Sprint 1 — al implementar login con Google
