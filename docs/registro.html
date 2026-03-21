@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro — Documentación completa</title>
+  <style>
+    /* ─── Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    /* ─── Tipografía ────────────────────────────────────── */
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+
+    strong { color: #111; }
+
+    em { color: #6b7280; font-style: italic; }
+
+    /* ─── Código ────────────────────────────────────────── */
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    /* Colores de sintaxis manual */
+    pre .cm { color: #6c7086; }   /* comentario */
+    pre .kw { color: #cba6f7; }   /* keyword */
+    pre .fn { color: #89b4fa; }   /* función */
+    pre .st { color: #a6e3a1; }   /* string */
+    pre .ty { color: #f38ba8; }   /* tipo */
+    pre .nm { color: #fab387; }   /* nombre variable */
+    pre .nu { color: #fab387; }   /* número */
+    pre .hl { color: #f9e2af; }   /* highlight */
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    /* ─── Cajas de información ──────────────────────────── */
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    /* ─── Badges ────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ok    { background: #dcfce7; color: #15803d; }
+    .warn  { background: #fef9c3; color: #92400e; }
+    .pend  { background: #fee2e2; color: #991b1b; }
+    .info  { background: #dbeafe; color: #1e40af; }
+
+    /* ─── Portada ───────────────────────────────────────── */
+    .portada {
+      text-align: center;
+      padding: 64px 0 48px;
+      border-bottom: 2px solid #b45309;
+      margin-bottom: 48px;
+    }
+
+    .portada h1 {
+      font-size: 30pt;
+      border: none;
+      margin: 0 0 6px;
+      color: #b45309;
+    }
+
+    .portada .subtitulo { font-size: 14pt; color: #4b5563; margin: 0; }
+    .portada .meta      { font-size: 9.5pt; color: #9ca3af; margin-top: 20px; }
+
+    /* ─── Árbol de archivos ─────────────────────────────── */
+    .arbol {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 1.8;
+      margin: 12px 0 20px;
+    }
+
+    .arbol .dir  { color: #93c5fd; font-weight: 700; }
+    .arbol .file { color: #86efac; }
+    .arbol .note { color: #6c7086; font-style: italic; }
+    .arbol .new  { color: #f9e2af; }
+
+    /* ─── Flujo de conexión ─────────────────────────────── */
+    .flujo {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 2;
+      margin: 12px 0 20px;
+    }
+
+    .flujo .nodo   { color: #1c3d5a; font-weight: 700; }
+    .flujo .ruta   { color: #b45309; }
+    .flujo .nota   { color: #6b7280; font-style: italic; }
+    .flujo .flecha { color: #9ca3af; }
+
+    /* ─── Lista con iconos ──────────────────────────────── */
+    ul.lista { list-style: none; padding: 0; margin: 8px 0 16px; }
+    ul.lista li {
+      padding: 4px 0 4px 22px;
+      position: relative;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    ul.lista li::before {
+      content: "▸";
+      position: absolute;
+      left: 6px;
+      color: #b45309;
+      font-size: 9pt;
+    }
+
+    /* ─── Separadores ───────────────────────────────────── */
+    hr {
+      border: none;
+      border-top: 1.5px solid #e5e7eb;
+      margin: 40px 0;
+    }
+
+    /* ─── Pie ───────────────────────────────────────────── */
+    .pie {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 9pt;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════════════════ -->
+<div class="portada">
+  <h1>Gastronómica — TFG</h1>
+  <p class="subtitulo">Página de Registro: Documentación técnica completa</p>
+  <p class="meta">
+    Fase 1 · Sprint 1 · Marzo 2026<br>
+    Alejandro Hernández González
+  </p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     ÍNDICE
+══════════════════════════════════════════════════════ -->
+<h1>Índice</h1>
+
+<table>
+  <tr><th>#</th><th>Sección</th></tr>
+  <tr><td>1</td><td>¿Qué es la página de registro y para qué sirve?</td></tr>
+  <tr><td>2</td><td>Conceptos clave para entender el código</td></tr>
+  <tr><td>3</td><td>Estructura de archivos del feature auth</td></tr>
+  <tr><td>4</td><td>Cómo se conectan todos los archivos</td></tr>
+  <tr><td>5</td><td>Cada archivo explicado en detalle</td></tr>
+  <tr><td>6</td><td>El esquema de validación con Zod</td></tr>
+  <tr><td>7</td><td>React Hook Form: cómo se controla el formulario</td></tr>
+  <tr><td>8</td><td>NextAuth: autenticación con Google</td></tr>
+  <tr><td>9</td><td>Las animaciones en el formulario</td></tr>
+  <tr><td>10</td><td>Estado actual, pendientes y TODOs</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     1. QUÉ ES LA PÁGINA DE REGISTRO
+══════════════════════════════════════════════════════ -->
+<h1>1. ¿Qué es la página de registro y para qué sirve?</h1>
+
+<p>
+  La página de registro es la <strong>puerta de entrada a la aplicación</strong>. Su misión es permitir
+  que un visitante nuevo cree una cuenta para poder usar Gastronómica. Está en la ruta <code>/registro</code>
+  y el usuario llega aquí normalmente pulsando el botón "Crear cuenta" de la landing page.
+</p>
+
+<p>
+  La página ofrece <strong>dos formas de registrarse</strong>, pensadas para minimizar la fricción
+  (cuanto menos pasos, más usuarios completan el registro):
+</p>
+
+<table>
+  <tr><th>Método</th><th>Cómo funciona</th><th>Estado actual</th></tr>
+  <tr>
+    <td><strong>Google OAuth</strong></td>
+    <td>El usuario pulsa un botón y Google gestiona todo el proceso de identidad. No hay que escribir
+    nada: Google confirma quién es la persona y devuelve sus datos al app.</td>
+    <td><span class="badge ok">Funcional</span></td>
+  </tr>
+  <tr>
+    <td><strong>Email + contraseña</strong></td>
+    <td>El usuario rellena un formulario con nombre, correo y contraseña. Los datos se validan
+    localmente antes de enviarse. El envío es un mock hasta que el backend esté listo en Fase 4.</td>
+    <td><span class="badge warn">Validación lista — envío mock</span></td>
+  </tr>
+</table>
+
+<div class="caja caja-info">
+  <strong>¿Qué significa "mock"?</strong>
+  En desarrollo, cuando todavía no existe un servidor real al que enviar datos, se simula una respuesta.
+  El formulario valida correctamente todos los campos, pero en lugar de llamar a una API real,
+  espera 1 segundo (simula latencia de red) y muestra la pantalla de éxito. Cuando el backend
+  esté implementado en Fase 4, solo hay que sustituir esa línea por la llamada real.
+</div>
+
+<p>
+  Visualmente la página tiene un fondo con <strong>blobs de color difuminados</strong> (círculos
+  con blur extremo) sobre el color de fondo base, y en el centro una tarjeta (<code>Card</code>)
+  con el formulario. Esta estructura es la misma que se usará en la página de login, manteniendo
+  coherencia visual entre las vistas de autenticación.
+</p>
+
+<table>
+  <tr><th>Zona de la página</th><th>Qué hay</th></tr>
+  <tr>
+    <td>Fondo</td>
+    <td>3 blobs decorativos con <code>blur-3xl</code> en tonos brand/amber. Pointer-events-none para
+    que no interfieran con los clics.</td>
+  </tr>
+  <tr>
+    <td>Tarjeta central</td>
+    <td>Logo + nombre de la app (link a "/"), título, descripción, botón Google, divisor, formulario,
+    enlace a login, disclaimer legal.</td>
+  </tr>
+  <tr>
+    <td>Estado de éxito</td>
+    <td>Cuando el registro finaliza, la tarjeta entera se reemplaza por un mensaje de confirmación
+    con icono verde y botón hacia /login.</td>
+  </tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     2. CONCEPTOS CLAVE
+══════════════════════════════════════════════════════ -->
+<h1>2. Conceptos clave para entender el código</h1>
+
+<p>
+  El registro introduce herramientas que no aparecían en la landing page. Antes de leer los
+  componentes, estos son los conceptos que necesitas tener claros:
+</p>
+
+<h2>Formularios controlados vs. no controlados</h2>
+<p>
+  En React, un formulario "controlado" es aquel en el que cada campo está vinculado a un estado
+  de React — cada tecla que pulsa el usuario actualiza una variable en el componente.
+  Un formulario "no controlado" deja que el DOM gestione los valores internamente y React
+  solo los lee cuando los necesita (por ejemplo, al enviar).
+</p>
+<p>
+  <strong>React Hook Form usa el enfoque no controlado</strong> por defecto, lo que lo hace
+  muy eficiente: no hay rerenders por cada tecla. Los valores se leen del DOM solo cuando
+  se valida o se envía el formulario. La función <code>register()</code> es la que "registra"
+  cada campo del formulario en React Hook Form sin necesidad de <code>useState</code>.
+</p>
+<pre><span class="cm">// Sin React Hook Form necesitaríamos un useState por cada campo:</span>
+<span class="kw">const</span> [<span class="nm">nombre</span>, <span class="nm">setNombre</span>] = <span class="fn">useState</span>(<span class="st">""</span>);
+<span class="kw">const</span> [<span class="nm">correo</span>, <span class="nm">setCorreo</span>] = <span class="fn">useState</span>(<span class="st">""</span>);
+<span class="kw">const</span> [<span class="nm">contrasena</span>, <span class="nm">setContrasena</span>] = <span class="fn">useState</span>(<span class="st">""</span>);
+<span class="cm">// ... y manejadores onChange para cada uno. Muy repetitivo.</span>
+
+<span class="cm">// Con React Hook Form: registro sin estado extra</span>
+&lt;<span class="ty">Input</span> {...<span class="fn">register</span>(<span class="st">"nombre"</span>)} /&gt;
+&lt;<span class="ty">Input</span> {...<span class="fn">register</span>(<span class="st">"correo"</span>)} /&gt;
+&lt;<span class="ty">Input</span> {...<span class="fn">register</span>(<span class="st">"contrasena"</span>)} /&gt;</pre>
+
+<h2>Zod — Validación con esquemas tipados</h2>
+<p>
+  Zod es una librería para <strong>definir la forma que deben tener los datos</strong> y validarlos.
+  En lugar de escribir funciones de validación a mano ("si el campo está vacío, muestra este error…"),
+  se describe el esquema de datos una sola vez y Zod lo valida automáticamente.
+</p>
+<p>
+  La ventaja principal es que el esquema Zod también genera el <strong>tipo TypeScript</strong>
+  automáticamente con <code>z.infer&lt;typeof esquema&gt;</code>. Así el tipo y la validación
+  nunca se desincronizarán porque son el mismo objeto.
+</p>
+<pre><span class="cm">// Zod define el esquema UNA vez y da validación + tipo TypeScript</span>
+<span class="kw">const</span> <span class="nm">esquemaRegistro</span> = <span class="nm">z</span>.<span class="fn">object</span>({
+  <span class="nm">nombre</span>: <span class="nm">z</span>.<span class="fn">string</span>().<span class="fn">min</span>(<span class="nu">2</span>),     <span class="cm">// mínimo 2 caracteres</span>
+  <span class="nm">correo</span>: <span class="nm">z</span>.<span class="fn">string</span>().<span class="fn">email</span>(),   <span class="cm">// debe ser un email válido</span>
+  <span class="nm">contrasena</span>: <span class="nm">z</span>.<span class="fn">string</span>().<span class="fn">min</span>(<span class="nu">8</span>),<span class="cm">// mínimo 8 caracteres</span>
+});
+
+<span class="cm">// z.infer extrae el tipo TypeScript del esquema Zod:</span>
+<span class="kw">type</span> <span class="ty">DatosRegistro</span> = <span class="nm">z</span>.<span class="fn">infer</span>&lt;<span class="kw">typeof</span> <span class="nm">esquemaRegistro</span>&gt;;
+<span class="cm">// Equivale a: { nombre: string; correo: string; contrasena: string }</span></pre>
+
+<h2>zodResolver — El puente entre Zod y React Hook Form</h2>
+<p>
+  React Hook Form tiene su propio sistema de validación, pero también permite usar validadores
+  externos. <code>zodResolver</code> es el adaptador que convierte el esquema Zod en algo que
+  React Hook Form puede ejecutar automáticamente al intentar enviar el formulario o al escribir
+  en un campo. Sin él, habría que pasar las reglas de validación manualmente a cada <code>register()</code>.
+</p>
+<pre><span class="kw">const</span> { <span class="nm">register</span>, <span class="nm">handleSubmit</span>, <span class="nm">formState</span>: { <span class="nm">errors</span> } } = <span class="fn">useForm</span>&lt;<span class="ty">DatosRegistro</span>&gt;({
+  <span class="nm">resolver</span>: <span class="fn">zodResolver</span>(<span class="nm">esquemaRegistro</span>), <span class="cm">// ← aquí se conectan</span>
+});
+<span class="cm">// Ahora React Hook Form ejecutará esquemaRegistro.parse() al validar</span></pre>
+
+<h2>handleSubmit — Prevenir el envío sin validación</h2>
+<p>
+  En HTML nativo, cuando un formulario se envía, el navegador recarga la página. En React
+  eso no queremos que pase. <code>handleSubmit</code> de React Hook Form es una función que:
+  <strong>1)</strong> previene el comportamiento del navegador, <strong>2)</strong> ejecuta
+  la validación Zod sobre todos los campos, y <strong>3)</strong> solo llama a tu función
+  (<code>alEnviar</code>) si todos los campos pasan la validación. Si hay errores, los
+  pone disponibles en el objeto <code>errors</code>.
+</p>
+<pre>&lt;<span class="ty">form</span> <span class="nm">onSubmit</span>={<span class="fn">handleSubmit</span>(<span class="nm">alEnviar</span>)}&gt;
+  <span class="cm">//                   ↑ tu función solo se llama si todos los campos son válidos</span>
+  &lt;<span class="ty">Input</span> {...<span class="fn">register</span>(<span class="st">"correo"</span>)} /&gt;
+  {<span class="nm">errors</span>.<span class="nm">correo</span> &amp;&amp; &lt;<span class="ty">p</span>&gt;{<span class="nm">errors</span>.<span class="nm">correo</span>.<span class="nm">message</span>}&lt;/<span class="ty">p</span>&gt;} <span class="cm">// ← muestra el error</span>
+&lt;/<span class="ty">form</span>&gt;</pre>
+
+<h2>NextAuth — Autenticación lista para usar</h2>
+<p>
+  NextAuth.js es una librería que implementa <strong>flujos completos de autenticación</strong>
+  sin tener que construirlos desde cero. Gestiona el intercambio de tokens con Google,
+  la creación de sesiones y cookies de forma segura, y las redirecciones de login/logout.
+  En el proyecto lo usamos para el botón "Registrarse con Google": en un solo clic, el usuario
+  va a Google, da permiso, y NextAuth devuelve sus datos al app creando una sesión automáticamente.
+</p>
+
+<h2>OAuth 2.0 — El protocolo de "Continúa con Google"</h2>
+<p>
+  OAuth 2.0 es un protocolo estándar de la industria que permite que una app (Gastronómica) delegue
+  la autenticación a otro servicio (Google) <strong>sin ver la contraseña del usuario</strong>.
+  El flujo simplificado es:
+</p>
+<ul class="lista">
+  <li>El usuario pulsa "Registrarse con Google" → el app redirige a <code>accounts.google.com</code></li>
+  <li>Google muestra su pantalla de selección de cuenta y pide permiso</li>
+  <li>El usuario acepta → Google redirige de vuelta a <code>/api/auth/callback/google</code> con un código</li>
+  <li>NextAuth intercambia ese código por un token y crea la sesión del usuario</li>
+  <li>El usuario llega a la <code>callbackUrl</code> configurada ya autenticado</li>
+</ul>
+
+<h2>Server Component vs. Client Component en la página de registro</h2>
+<p>
+  La ruta <code>/registro</code> usa <strong>dos capas</strong>: el <code>page.tsx</code>
+  es un Server Component (sin <code>"use client"</code>), lo que permite exportar
+  <code>metadata</code> para SEO sin coste de JavaScript en el navegador. Dentro renderiza
+  <code>FormularioRegistro</code> que sí es un Client Component porque necesita <code>useState</code>
+  y eventos. Next.js sabe distinguirlos automáticamente.
+</p>
+<pre><span class="cm">// page.tsx — Server Component (no lleva "use client")</span>
+<span class="kw">export const</span> <span class="nm">metadata</span> = { <span class="nm">title</span>: <span class="st">"Crear cuenta — Gastronómica"</span> }; <span class="cm">// ← solo funciona en server</span>
+<span class="kw">export default function</span> <span class="fn">PaginaRegistro</span>() {
+  <span class="kw">return</span> &lt;<span class="ty">FormularioRegistro</span> /&gt;; <span class="cm">// ← este sí es client, pero puede estar dentro</span>
+}
+
+<span class="cm">// formularioRegistro.tsx — Client Component</span>
+<span class="st">"use client"</span>;
+<span class="kw">import</span> { <span class="nm">useState</span> } <span class="kw">from</span> <span class="st">"react"</span>;
+<span class="cm">// ... hooks, eventos, etc.</span></pre>
+
+
+<!-- ══════════════════════════════════════════════════════
+     3. ESTRUCTURA DE ARCHIVOS
+══════════════════════════════════════════════════════ -->
+<h1>3. Estructura de archivos del feature auth</h1>
+
+<p>
+  El registro introduce un nuevo feature en la arquitectura: <code>features/auth/</code>.
+  Siguiendo el mismo patrón feature-based que la landing, todo lo relacionado con autenticación
+  vive en esta carpeta. Además, se añaden dos archivos fuera de features: la configuración de
+  NextAuth en <code>lib/auth.ts</code> y el route handler en <code>app/api/auth/</code>.
+</p>
+
+<div class="arbol">
+<span class="dir">frontend/src/</span>
+│
+├── <span class="dir">app/</span>
+│   ├── <span class="dir">api/</span>
+│   │   └── <span class="dir">auth/</span>
+│   │       └── <span class="dir">[...nextauth]/</span>        <span class="note">← ruta dinámica que captura todo /api/auth/*</span>
+│   │           └── <span class="new">route.ts</span>             <span class="note">← route handler GET/POST para NextAuth</span>
+│   │
+│   ├── <span class="dir">registro/</span>
+│   │   └── <span class="new">page.tsx</span>                  <span class="note">← ruta /registro (Server Component)</span>
+│   │
+│   ├── <span class="file">page.tsx</span>                      <span class="note">← ruta / (landing — sin cambios)</span>
+│   └── <span class="file">layout.tsx</span>
+│
+├── <span class="dir">lib/</span>
+│   ├── <span class="file">utils.ts</span>                      <span class="note">← utilidad cn() de shadcn — NO TOCAR</span>
+│   └── <span class="new">auth.ts</span>                       <span class="note">← opcionesAuth: GoogleProvider + JWT + callbacks</span>
+│
+└── <span class="dir">features/</span>
+    ├── <span class="dir">landing/</span>                       <span class="note">← sin cambios</span>
+    │   └── <span class="file">...</span>
+    └── <span class="dir">auth/</span>                          <span class="note">← nuevo feature de autenticación</span>
+        ├── <span class="dir">components/</span>
+        │   ├── <span class="new">botonGoogle.tsx</span>           <span class="note">← botón OAuth con SVG + estado de carga</span>
+        │   ├── <span class="new">divisorOAuth.tsx</span>          <span class="note">← separador "o continúa con correo"</span>
+        │   ├── <span class="new">formularioRegistro.tsx</span>    <span class="note">← formulario completo (componente principal)</span>
+        │   └── <span class="new">index.ts</span>                  <span class="note">← barrel export del feature auth</span>
+        └── <span class="dir">types/</span>
+            └── <span class="new">autenticacion.ts</span>          <span class="note">← esquema Zod + tipos TypeScript</span>
+</div>
+
+<div class="caja caja-aviso">
+  <strong>¿Por qué auth.ts está en lib/ y no en features/auth/?</strong>
+  La configuración de NextAuth (<code>opcionesAuth</code>) la necesitan tanto el route handler
+  (<code>app/api/auth/[...nextauth]/route.ts</code>) como futuros Server Components que quieran
+  leer la sesión con <code>getServerSession(opcionesAuth)</code>. Al ser compartida entre la capa
+  de rutas API y la capa de componentes, se coloca en <code>lib/</code> —
+  la carpeta de utilidades compartidas — en lugar de dentro del feature.
+</div>
+
+<div class="caja caja-info">
+  <strong>¿Qué es [...nextauth]? Los corchetes y los puntos suspensivos</strong>
+  En Next.js App Router, los corchetes en el nombre de una carpeta indican un
+  <strong>segmento dinámico</strong>. Los tres puntos (<code>...</code>) hacen que sea un
+  <strong>catch-all</strong>: captura cualquier ruta que empiece por <code>/api/auth/</code>
+  independientemente de cuántos segmentos tenga. NextAuth necesita esto porque gestiona
+  múltiples endpoints: <code>/api/auth/signin</code>, <code>/api/auth/callback/google</code>,
+  <code>/api/auth/session</code>, <code>/api/auth/signout</code>, etc.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     4. CÓMO SE CONECTAN TODOS LOS ARCHIVOS
+══════════════════════════════════════════════════════ -->
+<h1>4. Cómo se conectan todos los archivos</h1>
+
+<p>
+  La página de registro involucra más archivos que la landing porque combina la capa de UI,
+  la capa de validación y la capa de autenticación. Este diagrama muestra cómo se llaman unos a otros:
+</p>
+
+<div class="flujo">
+<span class="nota">── Petición HTTP: usuario accede a /registro ──</span>
+
+<span class="nodo">app/registro/page.tsx</span>  <span class="ruta">← ruta /registro</span>
+│   <span class="nota">Server Component — exporta metadata, renderiza el formulario</span>
+│   <span class="nota">Importa FormularioRegistro desde el barrel export del feature auth</span>
+│
+└── <span class="flecha">monta</span> <span class="nodo">FormularioRegistro</span>
+      <span class="ruta">features/auth/components/formularioRegistro.tsx</span>
+      <span class="nota">Client Component — orquesta toda la lógica del formulario</span>
+      <span class="nota">Importa useForm + zodResolver para la validación</span>
+      <span class="nota">Lee esquemaRegistro y DatosRegistro desde types/autenticacion.ts</span>
+      │
+      ├── <span class="flecha">lee esquema de</span> <span class="nodo">autenticacion.ts</span>
+      │     <span class="ruta">features/auth/types/autenticacion.ts</span>
+      │     <span class="nota">Define las reglas Zod + los tipos TypeScript del formulario</span>
+      │
+      ├── <span class="flecha">monta</span> <span class="nodo">BotonGoogle</span>
+      │     <span class="ruta">features/auth/components/botonGoogle.tsx</span>
+      │     <span class="nota">Al hacer clic llama a signIn("google") de next-auth/react</span>
+      │     <span class="nota">NextAuth redirige a Google → callback → crea sesión</span>
+      │
+      ├── <span class="flecha">monta</span> <span class="nodo">DivisorOAuth</span>
+      │     <span class="ruta">features/auth/components/divisorOAuth.tsx</span>
+      │     <span class="nota">Solo visual — línea + texto "o continúa con correo"</span>
+      │
+      └── <span class="flecha">al enviar formulario llama a</span> <span class="nodo">alEnviar(datos)</span>
+            <span class="nota">Mock: console.log + timeout + setEstadoEnvio("exito")</span>
+            <span class="nota">TODO Fase 4: axios.post("/api/usuarios/registro", datos)</span>
+
+<span class="nota">── Flujo paralelo: NextAuth gestiona /api/auth/* ──</span>
+
+<span class="nodo">app/api/auth/[...nextauth]/route.ts</span>
+│   <span class="nota">Route handler de Next.js — exporta GET y POST</span>
+│   <span class="nota">Importa opcionesAuth desde lib/auth.ts</span>
+│
+└── <span class="flecha">usa configuración de</span> <span class="nodo">lib/auth.ts</span>
+      <span class="nota">Define GoogleProvider con las credenciales de .env.local</span>
+      <span class="nota">Configura strategy JWT, páginas de auth y callbacks de sesión</span>
+</div>
+
+<h2>¿Qué datos fluyen entre los archivos?</h2>
+
+<table>
+  <tr><th>Desde</th><th>Hacia</th><th>Qué se pasa</th></tr>
+  <tr>
+    <td><code>autenticacion.ts</code></td>
+    <td><code>formularioRegistro.tsx</code></td>
+    <td><code>esquemaRegistro</code> (reglas Zod) y el tipo <code>DatosRegistro</code></td>
+  </tr>
+  <tr>
+    <td><code>page.tsx</code> (registro)</td>
+    <td><code>FormularioRegistro</code></td>
+    <td>Sin props — el formulario no necesita datos del padre</td>
+  </tr>
+  <tr>
+    <td><code>formularioRegistro.tsx</code></td>
+    <td><code>BotonGoogle</code></td>
+    <td>Prop <code>textoAccion="Registrarse con Google"</code></td>
+  </tr>
+  <tr>
+    <td><code>lib/auth.ts</code></td>
+    <td><code>route.ts</code></td>
+    <td>El objeto <code>opcionesAuth</code> completo con todos los providers</td>
+  </tr>
+  <tr>
+    <td><code>.env.local</code></td>
+    <td><code>lib/auth.ts</code></td>
+    <td><code>GOOGLE_CLIENT_ID</code> y <code>GOOGLE_CLIENT_SECRET</code> via <code>process.env</code></td>
+  </tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     5. CADA ARCHIVO EXPLICADO EN DETALLE
+══════════════════════════════════════════════════════ -->
+<h1>5. Cada archivo explicado en detalle</h1>
+
+
+<h2>app/registro/page.tsx — La ruta</h2>
+
+<p>
+  Este archivo es el <strong>punto de entrada de la ruta <code>/registro</code></strong>.
+  Es un Server Component porque no tiene <code>"use client"</code> y no usa ningún hook de React.
+  Su única función es exportar los metadatos de la página (título SEO, descripción) y renderizar
+  el layout visual: fondo + tarjeta centrada.
+</p>
+
+<pre><span class="kw">export const</span> <span class="nm">metadata</span>: <span class="ty">Metadata</span> = {
+  <span class="nm">title</span>: <span class="st">"Crear cuenta — Gastronómica"</span>,
+  <span class="nm">description</span>: <span class="st">"Únete a la comunidad gastronómica..."</span>,
+};
+
+<span class="kw">export default function</span> <span class="fn">PaginaRegistro</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="ty">main</span> <span class="nm">className</span>=<span class="st">"relative flex min-h-screen items-center justify-center ..."</span>&gt;
+      <span class="cm">{/* Blobs decorativos de fondo */}</span>
+      &lt;<span class="ty">div</span> <span class="nm">aria-hidden</span>&gt;
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"... bg-brand/5 blur-3xl"</span> /&gt; <span class="cm">← blob tono brand</span>
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"... bg-amber-300/8 blur-3xl"</span> /&gt; <span class="cm">← blob cálido</span>
+      &lt;/<span class="ty">div</span>&gt;
+      &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"w-full max-w-md"</span>&gt;
+        &lt;<span class="ty">FormularioRegistro</span> /&gt;   <span class="cm">← toda la lógica vive aquí</span>
+      &lt;/<span class="ty">div</span>&gt;
+    &lt;/<span class="ty">main</span>&gt;
+  );
+}</pre>
+
+<div class="caja caja-info">
+  <strong>¿Por qué los blobs están en page.tsx y no en FormularioRegistro?</strong>
+  El fondo pertenece al layout de la página, no al formulario. Si en el futuro el formulario
+  se reutiliza en un modal o en otro contexto, no debería llevarse el fondo con él.
+  Separar el layout del componente es una buena práctica de diseño.
+</div>
+
+<hr>
+
+<h2>lib/auth.ts — La configuración de NextAuth</h2>
+
+<p>
+  Este archivo define <code>opcionesAuth</code>, el objeto de configuración central de NextAuth.
+  Se exporta para poder reutilizarlo en el route handler y en <code>getServerSession()</code>
+  desde cualquier Server Component que necesite leer la sesión.
+</p>
+
+<pre><span class="kw">export const</span> <span class="nm">opcionesAuth</span>: <span class="ty">NextAuthOptions</span> = {
+  <span class="nm">providers</span>: [
+    <span class="fn">GoogleProvider</span>({
+      <span class="nm">clientId</span>:     <span class="nm">process</span>.<span class="nm">env</span>.<span class="nm">GOOGLE_CLIENT_ID</span>!,     <span class="cm">← de .env.local</span>
+      <span class="nm">clientSecret</span>: <span class="nm">process</span>.<span class="nm">env</span>.<span class="nm">GOOGLE_CLIENT_SECRET</span>!, <span class="cm">← de .env.local</span>
+    }),
+    <span class="cm">// TODO Fase 4: añadir CredentialsProvider para email/contraseña</span>
+  ],
+
+  <span class="nm">pages</span>: {
+    <span class="nm">signIn</span>:  <span class="st">"/login"</span>,    <span class="cm">← si hay error, ir a /login en vez de la página de NextAuth</span>
+    <span class="nm">newUser</span>: <span class="st">"/registro"</span>, <span class="cm">← cuando un usuario nuevo se registra, ir aquí</span>
+    <span class="nm">error</span>:   <span class="st">"/login"</span>,    <span class="cm">← errores de auth también van a /login</span>
+  },
+
+  <span class="nm">session</span>: { <span class="nm">strategy</span>: <span class="st">"jwt"</span> }, <span class="cm">← sin base de datos por ahora (Fases 1-3)</span>
+
+  <span class="nm">callbacks</span>: {
+    <span class="kw">async</span> <span class="fn">session</span>({ <span class="nm">session</span>, <span class="nm">token</span> }) {
+      <span class="cm">// Añade el ID del usuario a la sesión para usarlo en componentes</span>
+      <span class="cm">// TODO Fase 4: enriquecer con datos del backend (avatar, rol, etc.)</span>
+      <span class="kw">if</span> (<span class="nm">token</span>.<span class="nm">sub</span>) (<span class="nm">session</span>.<span class="nm">user</span> <span class="kw">as</span> { <span class="nm">id</span>?: <span class="ty">string</span> }).<span class="nm">id</span> = <span class="nm">token</span>.<span class="nm">sub</span>;
+      <span class="kw">return</span> <span class="nm">session</span>;
+    },
+  },
+};</pre>
+
+<div class="caja caja-aviso">
+  <strong>¿Qué es strategy: "jwt"?</strong>
+  NextAuth puede guardar la sesión de dos formas: en una base de datos (strategy: "database")
+  o en un token JWT firmado en la cookie del navegador (strategy: "jwt"). Sin base de datos,
+  usamos JWT. El token está firmado con <code>NEXTAUTH_SECRET</code> de .env.local —
+  nadie puede falsificarlo sin conocer ese secreto. La desventaja es que no se puede invalidar
+  una sesión activa individualmente (no hay tabla de sesiones). Para un TFG es suficiente.
+</div>
+
+<hr>
+
+<h2>app/api/auth/[...nextauth]/route.ts — El route handler</h2>
+
+<p>
+  Este archivo es la <strong>instalación técnica de NextAuth en Next.js App Router</strong>.
+  Es el más corto del proyecto (solo 3 líneas de lógica) pero el más importante para que
+  la autenticación funcione. Sin él, los endpoints <code>/api/auth/*</code> no existirían.
+</p>
+
+<pre><span class="kw">import</span> <span class="nm">NextAuth</span> <span class="kw">from</span> <span class="st">"next-auth"</span>;
+<span class="kw">import</span> { <span class="nm">opcionesAuth</span> } <span class="kw">from</span> <span class="st">"@/lib/auth"</span>;
+
+<span class="kw">const</span> <span class="nm">manejador</span> = <span class="fn">NextAuth</span>(<span class="nm">opcionesAuth</span>);
+<span class="cm">// NextAuth devuelve una función que puede manejar tanto GET como POST</span>
+
+<span class="kw">export</span> { <span class="nm">manejador</span> <span class="kw">as</span> <span class="nm">GET</span>, <span class="nm">manejador</span> <span class="kw">as</span> <span class="nm">POST</span> };</pre>
+
+<p>
+  Next.js App Router requiere que cada route handler exporte funciones nombradas
+  (<code>GET</code>, <code>POST</code>, etc.) en lugar de un handler genérico.
+  Al exportar el mismo manejador como <code>GET</code> y <code>POST</code>, NextAuth puede
+  recibir tanto redirecciones GET (cuando Google devuelve al usuario) como peticiones POST
+  (cuando el formulario envía credenciales o cuando el cliente solicita la sesión).
+</p>
+
+<hr>
+
+<h2>features/auth/types/autenticacion.ts — Tipos y esquema Zod</h2>
+
+<p>
+  Este archivo es el <strong>contrato de datos del formulario</strong>. Define exactamente qué
+  campos tiene el formulario, qué restricciones tiene cada uno y cuáles son los mensajes de error.
+  Al ser un archivo de tipos puro, no importa React ni ninguna librería de UI.
+</p>
+
+<pre><span class="kw">export const</span> <span class="nm">esquemaRegistro</span> = <span class="nm">z</span>
+  .<span class="fn">object</span>({
+    <span class="nm">nombre</span>: <span class="nm">z</span>.<span class="fn">string</span>()
+      .<span class="fn">min</span>(<span class="nu">2</span>, <span class="st">"El nombre debe tener al menos 2 caracteres"</span>)
+      .<span class="fn">max</span>(<span class="nu">50</span>, <span class="st">"El nombre no puede superar los 50 caracteres"</span>)
+      .<span class="fn">trim</span>(),  <span class="cm">← elimina espacios al inicio y al final automáticamente</span>
+
+    <span class="nm">correo</span>: <span class="nm">z</span>.<span class="fn">string</span>()
+      .<span class="fn">email</span>(<span class="st">"Introduce un correo electrónico válido"</span>)
+      .<span class="fn">trim</span>(),
+
+    <span class="nm">contrasena</span>: <span class="nm">z</span>.<span class="fn">string</span>()
+      .<span class="fn">min</span>(<span class="nu">8</span>, <span class="st">"La contraseña debe tener al menos 8 caracteres"</span>)
+      .<span class="fn">regex</span>(<span class="st">/[A-Za-z]/</span>, <span class="st">"... al menos una letra"</span>)    <span class="cm">← regex: una letra cualquiera</span>
+      .<span class="fn">regex</span>(<span class="st">/[0-9]/</span>,    <span class="st">"... al menos un número"</span>),   <span class="cm">← regex: un dígito</span>
+
+    <span class="nm">confirmarContrasena</span>: <span class="nm">z</span>.<span class="fn">string</span>(),
+  })
+  .<span class="fn">refine</span>(
+    (<span class="nm">datos</span>) =&gt; <span class="nm">datos</span>.<span class="nm">contrasena</span> === <span class="nm">datos</span>.<span class="nm">confirmarContrasena</span>,
+    {
+      <span class="nm">message</span>: <span class="st">"Las contraseñas no coinciden"</span>,
+      <span class="nm">path</span>: [<span class="st">"confirmarContrasena"</span>], <span class="cm">← el error aparece en ese campo concreto</span>
+    }
+  );
+
+<span class="kw">export type</span> <span class="ty">DatosRegistro</span> = <span class="nm">z</span>.<span class="fn">infer</span>&lt;<span class="kw">typeof</span> <span class="nm">esquemaRegistro</span>&gt;;
+<span class="kw">export type</span> <span class="ty">EstadoFormulario</span> = <span class="st">"idle"</span> | <span class="st">"cargando"</span> | <span class="st">"exito"</span> | <span class="st">"error"</span>;</pre>
+
+<div class="caja caja-codigo">
+  <strong>¿Qué es .refine()?</strong>
+  <code>.refine()</code> permite añadir una validación personalizada que comprueba
+  el objeto completo, no solo un campo. Se usa cuando la validez de un campo depende del
+  valor de otro (como la confirmación de contraseña, que solo puede validarse sabiendo
+  el valor del campo contraseña). Recibe una función que devuelve <code>true</code> si
+  es válido o <code>false</code> si no lo es, y el objeto de configuración con el mensaje
+  y el <code>path</code> del campo donde aparece el error.
+</div>
+
+<hr>
+
+<h2>features/auth/components/botonGoogle.tsx — El botón OAuth</h2>
+
+<p>
+  Componente reutilizable para lanzar el flujo OAuth de Google. Está pensado para usarse
+  tanto en la página de registro como en la de login sin cambiar código: la diferencia
+  solo es el texto, que se pasa como prop <code>textoAccion</code>.
+</p>
+
+<pre><span class="kw">export function</span> <span class="fn">BotonGoogle</span>({ <span class="nm">textoAccion</span> = <span class="st">"Continúa con Google"</span>, <span class="nm">urlRetorno</span> = <span class="st">"/"</span> }) {
+  <span class="kw">const</span> [<span class="nm">cargando</span>, <span class="nm">setCargando</span>] = <span class="fn">useState</span>(<span class="kw">false</span>);
+
+  <span class="kw">const</span> <span class="nm">manejarClic</span> = <span class="kw">async</span> () =&gt; {
+    <span class="fn">setCargando</span>(<span class="kw">true</span>);
+    <span class="kw">await</span> <span class="fn">signIn</span>(<span class="st">"google"</span>, { <span class="nm">callbackUrl</span>: <span class="nm">urlRetorno</span> });
+    <span class="cm">// setCargando(false) nunca llega: el navegador ya habrá redirigido</span>
+  };
+
+  <span class="kw">return</span> (
+    &lt;<span class="ty">Button</span> <span class="nm">type</span>=<span class="st">"button"</span> <span class="nm">variant</span>=<span class="st">"outline"</span> <span class="nm">onClick</span>={<span class="nm">manejarClic</span>} <span class="nm">disabled</span>={<span class="nm">cargando</span>}&gt;
+      {<span class="nm">cargando</span> ? &lt;<span class="ty">Loader2</span> <span class="nm">className</span>=<span class="st">"animate-spin"</span> /&gt; : <span class="cm">/* SVG Google */</span>}
+      {<span class="nm">textoAccion</span>}
+    &lt;/<span class="ty">Button</span>&gt;
+  );
+}</pre>
+
+<p>
+  El SVG del logo de Google está embebido directamente en el componente (no como imagen externa)
+  para evitar una petición de red adicional y garantizar que siempre se muestre aunque la CDN
+  esté caída. Los colores del SVG (<code>#4285F4</code>, <code>#34A853</code>, <code>#FBBC05</code>,
+  <code>#EA4335</code>) son los colores oficiales de Google y no deben cambiarse por los colores
+  del proyecto para respetar las guías de marca de Google.
+</p>
+
+<hr>
+
+<h2>features/auth/components/divisorOAuth.tsx — El separador</h2>
+
+<p>
+  Componente puramente visual sin lógica. Muestra una línea horizontal con un texto en el centro.
+  Es un <strong>Server Component</strong> (no tiene <code>"use client"</code>) porque no necesita
+  ningún hook ni interactividad.
+</p>
+
+<pre>&lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"flex items-center gap-3"</span>&gt;
+  &lt;<span class="ty">Separator</span> <span class="nm">className</span>=<span class="st">"flex-1"</span> /&gt;          <span class="cm">← línea izquierda</span>
+  &lt;<span class="ty">span</span> <span class="nm">className</span>=<span class="st">"text-xs text-muted-foreground"</span>&gt;{<span class="nm">texto</span>}&lt;/<span class="ty">span</span>&gt;
+  &lt;<span class="ty">Separator</span> <span class="nm">className</span>=<span class="st">"flex-1"</span> /&gt;          <span class="cm">← línea derecha</span>
+&lt;/<span class="ty">div</span>&gt;</pre>
+
+<p>
+  Cada <code>Separator</code> tiene <code>flex-1</code>, lo que hace que ambas líneas crezcan
+  para ocupar el espacio disponible a ambos lados del texto, independientemente de la longitud
+  del texto. Esto hace que el componente sea flexible con cualquier texto.
+</p>
+
+<hr>
+
+<h2>features/auth/components/formularioRegistro.tsx — El formulario principal</h2>
+
+<p>
+  Este es el componente más complejo de la vista. Gestiona el estado de la UI, la validación,
+  la visibilidad de contraseñas y las transiciones de estado. Está dividido en dos vistas
+  distintas dependiendo de <code>estadoEnvio</code>: el formulario en sí, y la pantalla de éxito.
+</p>
+
+<h3>Estado interno del componente</h3>
+<table>
+  <tr><th>Variable de estado</th><th>Tipo</th><th>Qué controla</th></tr>
+  <tr>
+    <td><code>mostrarContrasena</code></td>
+    <td><code>boolean</code></td>
+    <td>Si el campo contraseña muestra el texto en claro o como puntos</td>
+  </tr>
+  <tr>
+    <td><code>mostrarConfirmacion</code></td>
+    <td><code>boolean</code></td>
+    <td>Lo mismo para el campo de confirmación de contraseña</td>
+  </tr>
+  <tr>
+    <td><code>estadoEnvio</code></td>
+    <td><code>EstadoFormulario</code></td>
+    <td>Controla qué se muestra: formulario normal, spinner, pantalla éxito, banner error</td>
+  </tr>
+  <tr>
+    <td><code>mensajeError</code></td>
+    <td><code>string | null</code></td>
+    <td>Texto del error global (distinto de los errores de campo de Zod)</td>
+  </tr>
+</table>
+
+<h3>Los cuatro campos del formulario</h3>
+<table>
+  <tr><th>Campo</th><th>ID HTML</th><th>Reglas Zod</th><th>Autocomplete</th></tr>
+  <tr>
+    <td>Nombre completo</td>
+    <td><code>nombre</code></td>
+    <td>min 2, max 50, trim</td>
+    <td><code>name</code></td>
+  </tr>
+  <tr>
+    <td>Correo electrónico</td>
+    <td><code>correo</code></td>
+    <td>email válido, trim</td>
+    <td><code>email</code></td>
+  </tr>
+  <tr>
+    <td>Contraseña</td>
+    <td><code>contrasena</code></td>
+    <td>min 8, ≥1 letra, ≥1 número</td>
+    <td><code>new-password</code></td>
+  </tr>
+  <tr>
+    <td>Confirmar contraseña</td>
+    <td><code>confirmarContrasena</code></td>
+    <td>igual a contrasena (refine)</td>
+    <td><code>new-password</code></td>
+  </tr>
+</table>
+
+<div class="caja caja-info">
+  <strong>¿Por qué autocomplete="new-password" en los campos de contraseña?</strong>
+  Esta pista le dice al navegador y al gestor de contraseñas que estos campos son para
+  crear una contraseña nueva, no para rellenar una existente. El navegador puede entonces
+  ofrecer generar una contraseña segura automáticamente, o guardar la nueva contraseña
+  al enviar el formulario. Es una buena práctica de UX y seguridad.
+</div>
+
+<h3>Toggle de visibilidad de contraseña</h3>
+<p>
+  Cada campo de contraseña tiene un botón <code>type="button"</code> (importante: si fuera
+  <code>type="submit"</code>, enviaría el formulario) que alterna el <code>type</code> del
+  input entre <code>"password"</code> y <code>"text"</code>.
+</p>
+
+<pre><span class="cm">// El type del input cambia según el estado:</span>
+&lt;<span class="ty">Input</span>
+  <span class="nm">type</span>={<span class="nm">mostrarContrasena</span> ? <span class="st">"text"</span> : <span class="st">"password"</span>}
+  {...<span class="fn">register</span>(<span class="st">"contrasena"</span>)}
+/&gt;
+&lt;<span class="ty">button</span>
+  <span class="nm">type</span>=<span class="st">"button"</span>  <span class="cm">← ¡importante! evita enviar el formulario accidentalmente</span>
+  <span class="nm">onClick</span>={() =&gt; <span class="fn">setMostrarContrasena</span>(<span class="nm">v</span> =&gt; !<span class="nm">v</span>)}
+  <span class="nm">aria-label</span>={<span class="nm">mostrarContrasena</span> ? <span class="st">"Ocultar contraseña"</span> : <span class="st">"Mostrar contraseña"</span>}
+&gt;
+  {<span class="nm">mostrarContrasena</span> ? &lt;<span class="ty">EyeOff</span> /&gt; : &lt;<span class="ty">Eye</span> /&gt;}
+&lt;/<span class="ty">button</span>&gt;</pre>
+
+<h3>La pantalla de éxito</h3>
+<p>
+  Cuando <code>estadoEnvio === "exito"</code>, el componente devuelve una vista completamente
+  distinta: un icono verde <code>CheckCircle2</code>, un mensaje de confirmación y un botón
+  hacia <code>/login</code>. Esta pantalla reemplaza toda la tarjeta con una animación de
+  <code>scale: 0.96 → 1</code> para que el cambio sea suave y no abrupto.
+</p>
+
+<h3>El error global vs. los errores de campo</h3>
+<p>
+  Hay dos tipos de errores en el formulario y es importante distinguirlos:
+</p>
+<table>
+  <tr><th>Tipo de error</th><th>Origen</th><th>Dónde aparece</th><th>Ejemplo</th></tr>
+  <tr>
+    <td><strong>Errores de campo</strong></td>
+    <td>Zod (validación local)</td>
+    <td>Debajo del campo correspondiente, en rojo</td>
+    <td>"La contraseña debe tener al menos 8 caracteres"</td>
+  </tr>
+  <tr>
+    <td><strong>Error global</strong></td>
+    <td>Servidor (fallo de red o API)</td>
+    <td>Banner rojo entre el divisor y el formulario</td>
+    <td>"No se pudo crear la cuenta. Inténtalo de nuevo."</td>
+  </tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════
+     6. EL ESQUEMA ZOD
+══════════════════════════════════════════════════════ -->
+<h1>6. El esquema de validación con Zod</h1>
+
+<p>
+  El esquema Zod es el corazón de la validación. Merece su propia sección porque tiene
+  varios comportamientos que es importante entender para depurar problemas futuros.
+</p>
+
+<h2>Cómo funciona la cadena de validadores</h2>
+<p>
+  Zod aplica los validadores <strong>en orden, de izquierda a derecha</strong>. Si el primero falla,
+  no ejecuta el siguiente. Por eso el orden importa: tiene sentido poner <code>.min(8)</code>
+  antes de <code>.regex()</code>, porque si la contraseña tiene menos de 8 caracteres, el error
+  de longitud es más informativo que el de "falta una letra".
+</p>
+
+<h2>¿Qué pasa si hay múltiples errores en un campo?</h2>
+<p>
+  Por defecto, Zod para en el primer error de cada campo (<code>abortEarly: true</code> internamente).
+  Solo se muestra un error a la vez por campo. Si se quisieran mostrar todos los errores a la vez,
+  habría que usar <code>.superRefine()</code> en lugar de encadenar <code>.regex()</code>.
+  Para el registro, mostrar uno a uno es mejor UX: el usuario resuelve un problema cada vez.
+</p>
+
+<h2>El .refine() para la confirmación de contraseña</h2>
+<p>
+  La validación de que las dos contraseñas coinciden no puede hacerse dentro de un campo individual
+  porque necesita leer el valor de otro campo. Por eso va en <code>.refine()</code> al nivel del
+  objeto completo, después de cerrar el <code>.object({})</code>:
+</p>
+
+<pre><span class="nm">z</span>.<span class="fn">object</span>({ ... })  <span class="cm">← define los campos</span>
+ .<span class="fn">refine</span>(
+   (<span class="nm">datos</span>) =&gt; <span class="nm">datos</span>.<span class="nm">contrasena</span> === <span class="nm">datos</span>.<span class="nm">confirmarContrasena</span>,
+   {
+     <span class="nm">message</span>: <span class="st">"Las contraseñas no coinciden"</span>,
+     <span class="nm">path</span>: [<span class="st">"confirmarContrasena"</span>],  <span class="cm">← el error aparece en ese campo específico</span>
+   }
+ );</pre>
+
+<p>
+  El campo <code>path</code> en la configuración de <code>.refine()</code> es crucial:
+  sin él, el error aparecería a nivel del formulario completo y React Hook Form no sabría
+  a qué campo asociarlo. Con <code>path: ["confirmarContrasena"]</code>, el error llega
+  a <code>errors.confirmarContrasena.message</code> y se muestra exactamente debajo del
+  campo correcto.
+</p>
+
+<h2>noValidate en el form</h2>
+<p>
+  El <code>&lt;form&gt;</code> tiene el atributo <code>noValidate</code>. Esto desactiva la
+  validación nativa del navegador (los pequeños popups de "rellena este campo" que aparecen
+  en rojo al enviar). El motivo es que queremos que Zod sea la única fuente de verdad sobre
+  los errores — los mensajes del navegador tienen un estilo diferente al del diseño y no
+  se pueden personalizar fácilmente.
+</p>
+
+
+<!-- ══════════════════════════════════════════════════════
+     7. REACT HOOK FORM
+══════════════════════════════════════════════════════ -->
+<h1>7. React Hook Form: cómo se controla el formulario</h1>
+
+<h2>El hook useForm</h2>
+<p>
+  <code>useForm</code> devuelve varias utilidades que se usan en distintas partes del formulario.
+  Las tres que usamos son:
+</p>
+
+<table>
+  <tr><th>Utilidad</th><th>Qué hace</th><th>Dónde se usa</th></tr>
+  <tr>
+    <td><code>register("campo")</code></td>
+    <td>Devuelve props (name, ref, onChange, onBlur) para conectar un input al formulario.
+    Se esparce con <code>...register()</code> sobre el Input.</td>
+    <td>En cada <code>&lt;Input&gt;</code></td>
+  </tr>
+  <tr>
+    <td><code>handleSubmit(fn)</code></td>
+    <td>Envuelve la función de envío: previene el reload, valida con Zod y solo llama a
+    <code>fn</code> si todo es válido.</td>
+    <td>En <code>onSubmit</code> del form</td>
+  </tr>
+  <tr>
+    <td><code>formState.errors</code></td>
+    <td>Objeto con los errores actuales de validación. Cada clave corresponde a un campo.
+    Si el campo es válido, no existe en el objeto.</td>
+    <td>Debajo de cada Input para mostrar el error</td>
+  </tr>
+</table>
+
+<h2>¿Cuándo se valida?</h2>
+<p>
+  Por defecto, React Hook Form valida <strong>al intentar enviar</strong> el formulario
+  (mode: "onSubmit"). Después del primer intento fallido, cambia a validar también
+  <strong>al cambiar</strong> el campo (mode: "onChange") para que el usuario vea en tiempo
+  real si ya ha corregido el error. Este comportamiento es el mejor para formularios de
+  registro: no molesta mientras el usuario está escribiendo por primera vez, pero da feedback
+  inmediato en correcciones.
+</p>
+
+<h2>aria-invalid: accesibilidad para lectores de pantalla</h2>
+<p>
+  Cada <code>Input</code> tiene <code>aria-invalid={!!errors.campo}</code>. Esto convierte el
+  booleano de "hay error" en un atributo HTML estándar que los lectores de pantalla entienden.
+  El doble <code>!!</code> convierte cualquier valor (objeto de error o <code>undefined</code>)
+  en un booleano limpio (<code>true</code> o <code>false</code>). El componente <code>Input</code>
+  de shadcn ya tiene estilos para <code>aria-invalid="true"</code>: borde rojo y ring rojo.
+</p>
+
+
+<!-- ══════════════════════════════════════════════════════
+     8. NEXTAUTH: AUTENTICACIÓN CON GOOGLE
+══════════════════════════════════════════════════════ -->
+<h1>8. NextAuth: autenticación con Google</h1>
+
+<h2>El flujo completo paso a paso</h2>
+
+<table>
+  <tr><th>Paso</th><th>Qué ocurre</th><th>Quién lo gestiona</th></tr>
+  <tr>
+    <td>1</td>
+    <td>Usuario pulsa "Registrarse con Google"</td>
+    <td><code>BotonGoogle</code> → llama a <code>signIn("google")</code></td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>NextAuth redirige al usuario a <code>accounts.google.com</code></td>
+    <td>NextAuth + configuración en <code>lib/auth.ts</code></td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Google muestra la pantalla de selección de cuenta</td>
+    <td>Google (fuera del control de la app)</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Usuario selecciona cuenta y acepta los permisos</td>
+    <td>Google</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Google redirige a <code>/api/auth/callback/google?code=...</code></td>
+    <td>Route handler <code>[...nextauth]/route.ts</code></td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>NextAuth intercambia el código por el token de Google y obtiene el perfil del usuario</td>
+    <td>NextAuth internamente</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>NextAuth crea la sesión JWT firmada y la guarda en una cookie segura</td>
+    <td>NextAuth + <code>NEXTAUTH_SECRET</code> de .env.local</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>El usuario es redirigido a <code>callbackUrl</code> (actualmente <code>"/"</code>)</td>
+    <td>NextAuth</td>
+  </tr>
+</table>
+
+<h2>Variables de entorno necesarias</h2>
+
+<table>
+  <tr><th>Variable</th><th>Dónde se obtiene</th><th>Qué hace</th></tr>
+  <tr>
+    <td><code>NEXTAUTH_URL</code></td>
+    <td>Se define manualmente en .env.local</td>
+    <td>URL base de la app — NextAuth la necesita para construir las URLs de callback</td>
+  </tr>
+  <tr>
+    <td><code>NEXTAUTH_SECRET</code></td>
+    <td>Generado con <code>openssl rand -base64 32</code></td>
+    <td>Clave privada para firmar y verificar los tokens JWT de sesión</td>
+  </tr>
+  <tr>
+    <td><code>GOOGLE_CLIENT_ID</code></td>
+    <td>Google Cloud Console → Credenciales</td>
+    <td>Identifica la aplicación ante Google en el flujo OAuth</td>
+  </tr>
+  <tr>
+    <td><code>GOOGLE_CLIENT_SECRET</code></td>
+    <td>Google Cloud Console → Credenciales</td>
+    <td>Secreto para que solo nuestra app pueda intercambiar códigos por tokens</td>
+  </tr>
+</table>
+
+<div class="caja caja-error">
+  <strong>Nunca subas .env.local al repositorio</strong>
+  El archivo .env.local está en .gitignore precisamente para que estas credenciales no sean
+  públicas. Si NEXTAUTH_SECRET se expone, cualquiera podría forjar tokens de sesión válidos
+  y suplantar la identidad de cualquier usuario. Si GOOGLE_CLIENT_SECRET se expone, cualquiera
+  podría hacer peticiones OAuth en nombre de la aplicación.
+</div>
+
+<h2>¿Cómo leer la sesión en otros componentes?</h2>
+
+<p>
+  Una vez el usuario está autenticado, en los componentes de la app (Fases 2-5) se puede acceder
+  a los datos de sesión de dos formas:
+</p>
+
+<pre><span class="cm">// En un Client Component:</span>
+<span class="kw">import</span> { <span class="fn">useSession</span> } <span class="kw">from</span> <span class="st">"next-auth/react"</span>;
+<span class="kw">const</span> { <span class="nm">data</span>: <span class="nm">sesion</span>, <span class="nm">status</span> } = <span class="fn">useSession</span>();
+<span class="cm">// status puede ser "loading" | "authenticated" | "unauthenticated"</span>
+<span class="cm">// sesion.user tiene: name, email, image (los datos de Google)</span>
+
+<span class="cm">// En un Server Component:</span>
+<span class="kw">import</span> { <span class="fn">getServerSession</span> } <span class="kw">from</span> <span class="st">"next-auth"</span>;
+<span class="kw">import</span> { <span class="nm">opcionesAuth</span> } <span class="kw">from</span> <span class="st">"@/lib/auth"</span>;
+<span class="kw">const</span> <span class="nm">sesion</span> = <span class="kw">await</span> <span class="fn">getServerSession</span>(<span class="nm">opcionesAuth</span>);
+<span class="kw">if</span> (!<span class="nm">sesion</span>) <span class="fn">redirect</span>(<span class="st">"/login"</span>); <span class="cm">← proteger rutas</span></pre>
+
+
+<!-- ══════════════════════════════════════════════════════
+     9. ANIMACIONES
+══════════════════════════════════════════════════════ -->
+<h1>9. Las animaciones en el formulario</h1>
+
+<p>
+  Las animaciones en el formulario de registro son más simples que las de la landing (no hay
+  carrusel ni whileInView), pero siguen el mismo sistema de variantes de Framer Motion.
+  El objetivo es que la página aparezca de forma suave al cargarse y que los campos del
+  formulario aparezcan escalonados (uno ligeramente después del otro).
+</p>
+
+<h2>Las tres variantes definidas</h2>
+
+<table>
+  <tr><th>Nombre</th><th>Qué anima</th><th>Cómo entra</th></tr>
+  <tr>
+    <td><code>variantesContenedor</code></td>
+    <td>La tarjeta completa (<code>motion.div</code> raíz)</td>
+    <td><code>opacity: 0 → 1</code> + <code>y: 24px → 0</code> en 450 ms (easeOut)</td>
+  </tr>
+  <tr>
+    <td><code>variantesForm</code></td>
+    <td>El <code>&lt;form&gt;</code> — solo coordina el stagger de sus hijos</td>
+    <td>No anima por sí mismo — <code>staggerChildren: 0.07</code> + <code>delayChildren: 0.1</code></td>
+  </tr>
+  <tr>
+    <td><code>variantesCampo</code></td>
+    <td>Cada campo individual (Label + Input + error)</td>
+    <td><code>opacity: 0 → 1</code> + <code>y: 10px → 0</code> en 300 ms (easeOut)</td>
+  </tr>
+</table>
+
+<pre><span class="kw">const</span> <span class="nm">variantesContenedor</span> = {
+  <span class="nm">oculto</span>:  { <span class="nm">opacity</span>: <span class="nu">0</span>, <span class="nm">y</span>: <span class="nu">24</span> },
+  <span class="nm">visible</span>: { <span class="nm">opacity</span>: <span class="nu">1</span>, <span class="nm">y</span>: <span class="nu">0</span>, <span class="nm">transition</span>: { <span class="nm">duration</span>: <span class="nu">0.45</span>, <span class="nm">ease</span>: <span class="st">"easeOut"</span> } },
+};
+
+<span class="kw">const</span> <span class="nm">variantesForm</span> = {
+  <span class="nm">oculto</span>:  {},
+  <span class="nm">visible</span>: { <span class="nm">transition</span>: { <span class="nm">staggerChildren</span>: <span class="nu">0.07</span>, <span class="nm">delayChildren</span>: <span class="nu">0.1</span> } },
+  <span class="cm">// staggerChildren: 0.07 → cada campo aparece 70 ms después del anterior</span>
+  <span class="cm">// delayChildren: 0.1  → espera 100 ms antes de empezar el stagger</span>
+};
+
+<span class="kw">const</span> <span class="nm">variantesCampo</span> = {
+  <span class="nm">oculto</span>:  { <span class="nm">opacity</span>: <span class="nu">0</span>, <span class="nm">y</span>: <span class="nu">10</span> },
+  <span class="nm">visible</span>: { <span class="nm">opacity</span>: <span class="nu">1</span>, <span class="nm">y</span>: <span class="nu">0</span>, <span class="nm">transition</span>: { <span class="nm">duration</span>: <span class="nu">0.3</span> } },
+};</pre>
+
+<h2>¿Por qué el form es un motion.form?</h2>
+<p>
+  El <code>&lt;form&gt;</code> está convertido en <code>&lt;motion.form&gt;</code> para que
+  pueda ser el componente padre que coordina el stagger de los campos hijos. Si fuera
+  un <code>&lt;form&gt;</code> normal, los <code>motion.div</code> de los campos no podrían
+  recibir las variantes del padre automáticamente — habría que pasarlas manualmente como
+  prop <code>variants</code> a cada uno.
+</p>
+
+<h2>La animación de la pantalla de éxito</h2>
+<p>
+  Cuando el formulario se envía correctamente, la vista completa cambia. Para que este
+  cambio no sea brusco, la pantalla de éxito aparece con una animación de escala:
+  <code>scale: 0.96 → 1</code> combinada con <code>opacity: 0 → 1</code>. Da la sensación
+  de que la tarjeta "crece suavemente" hacia su tamaño final, lo que es más elegante que
+  simplemente aparecer de golpe.
+</p>
+
+
+<!-- ══════════════════════════════════════════════════════
+     10. ESTADO ACTUAL Y PENDIENTES
+══════════════════════════════════════════════════════ -->
+<h1>10. Estado actual, pendientes y TODOs</h1>
+
+<h2>Qué funciona ahora mismo (Sprint 1)</h2>
+
+<table>
+  <tr><th>Funcionalidad</th><th>Estado</th><th>Notas</th></tr>
+  <tr>
+    <td>Ruta <code>/registro</code> accesible</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Fondo decorativo, card centrada, responsive</td>
+  </tr>
+  <tr>
+    <td>Google OAuth completo</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Redirige a <code>"/"</code> tras autenticar</td>
+  </tr>
+  <tr>
+    <td>Validación del formulario</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Zod + RHF — errores inline en tiempo real</td>
+  </tr>
+  <tr>
+    <td>Toggle mostrar/ocultar contraseña</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>En ambos campos de contraseña</td>
+  </tr>
+  <tr>
+    <td>Pantalla de éxito</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Con animación de escala y botón a /login</td>
+  </tr>
+  <tr>
+    <td>Animaciones de entrada</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Framer Motion — stagger de campos</td>
+  </tr>
+  <tr>
+    <td>Envío email/contraseña al servidor</td>
+    <td><span class="badge warn">Mock</span></td>
+    <td>Simula 1 segundo de latencia y muestra éxito</td>
+  </tr>
+  <tr>
+    <td>Página de Login <code>/login</code></td>
+    <td><span class="badge pend">Pendiente</span></td>
+    <td>Siguiente tarea del Sprint 1 — TFG-16</td>
+  </tr>
+</table>
+
+<h2>TODOs marcados en el código</h2>
+
+<table>
+  <tr><th>Archivo</th><th>TODO</th><th>Fase</th></tr>
+  <tr>
+    <td><code>formularioRegistro.tsx</code></td>
+    <td>Sustituir mock por <code>axios.post("/api/usuarios/registro", datos)</code></td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>botonGoogle.tsx</code></td>
+    <td>Cambiar <code>callbackUrl</code> de <code>"/"</code> a <code>"/feed"</code></td>
+    <td>Fase 2</td>
+  </tr>
+  <tr>
+    <td><code>lib/auth.ts</code></td>
+    <td>Añadir <code>CredentialsProvider</code> para email/contraseña real</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>lib/auth.ts</code></td>
+    <td>Enriquecer callback <code>session</code> con avatar, rol e ID del backend</td>
+    <td>Fase 4</td>
+  </tr>
+</table>
+
+<h2>Lo que vendrá después del registro</h2>
+
+<ul class="lista">
+  <li><strong>TFG-16 — Login (/login):</strong> vista de inicio de sesión. Reutilizará BotonGoogle y DivisorOAuth directamente desde el feature auth. Solo tendrá nombre y contraseña (sin confirmación).</li>
+  <li><strong>Fase 2:</strong> interfaz principal de la app (feed de recetas, perfil). Google OAuth redirigirá aquí en lugar de a "/".</li>
+  <li><strong>Fase 4 — Backend:</strong> API REST con endpoints de registro y login. Los TODOs marcados en el código se activarán en esta fase.</li>
+  <li><strong>Fase 4 — CredentialsProvider:</strong> NextAuth añadirá un segundo provider para email/contraseña real, que llamará al backend para verificar las credenciales.</li>
+</ul>
+
+<div class="caja caja-exito">
+  <strong>Reutilización en el Login</strong>
+  El feature <code>auth</code> está diseñado para ser compartido. Los componentes
+  <code>BotonGoogle</code> y <code>DivisorOAuth</code> son genéricos y se importarán
+  directamente en el formulario de login sin duplicar código. Solo habrá que crear
+  un nuevo <code>formularioLogin.tsx</code> con dos campos en lugar de cuatro,
+  y el mismo esquema Zod simplificado.
+</div>
+
+<hr>
+
+<div class="pie">
+  <p>Gastronómica — TFG · Alejandro Hernández González · Fase 1 Sprint 1 · 2026-03-21</p>
+  <p>Generado con Claude Code · Next.js 14 · TypeScript · React Hook Form · Zod · NextAuth.js</p>
+</div>
+
+</body>
+</html>

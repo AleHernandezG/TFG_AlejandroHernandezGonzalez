@@ -1,17 +1,27 @@
 # Estructura de Carpetas — `frontend/src`
 
-> **Última actualización:** 2026-03-20 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
+> **Última actualización:** 2026-03-22 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
 
 ## Árbol
 
 ```
 src/
 ├── app/                        # Next.js App Router — rutas, layouts, globals
+│   ├── api/
+│   │   └── auth/
+│   │       └── [...nextauth]/  # Route handler NextAuth (GET + POST)
+│   │           └── route.ts
+│   ├── registro/               # Ruta /registro
+│   │   └── page.tsx
 │   ├── fonts/
 │   ├── globals.css
 │   ├── layout.tsx
 │   ├── page.tsx
 │   └── favicon.ico
+│
+├── lib/
+│   ├── utils.ts                # Requerido por shadcn/ui (NO mover)
+│   └── auth.ts                 # opcionesAuth — NextAuth config centralizada
 │
 ├── components/
 │   ├── ui/                     # Primitivas de shadcn/ui (NO mover)
@@ -36,7 +46,8 @@ src/
 ├── config/                     # Configuración de la app, constantes globales
 │
 └── lib/
-    └── utils.ts                # Utilidades requeridas por shadcn/ui (NO mover)
+    ├── utils.ts                # Utilidades requeridas por shadcn/ui (NO mover)
+    └── auth.ts                 # opcionesAuth — NextAuth config centralizada (NO mover)
 ```
 
 ## Reglas
@@ -63,16 +74,22 @@ Cada dominio de negocio tiene su propia carpeta en `features/`. Dentro:
 **Barrel export:** cada `components/` debe tener un `index.ts` que re-exporte todos los componentes.
 
 ```ts
-// features/landing/components/index.ts
-export { LandingHeader } from "./landing-header";
-export { HeroSection } from "./hero-section";
-export { FeaturesBento } from "./features-bento";
+// features/landing/components/index.ts — nombres en español (camelCase)
+export { SeccionHero } from "./seccionHero";
+export { BentoCaracteristicas } from "./bentoCaracteristicas";
+export { BentoTestimonios } from "./bentoTestimonios";
+
+// features/auth/components/index.ts
+export { FormularioRegistro } from "./formularioRegistro";
+export { BotonGoogle } from "./botonGoogle";
+export { DivisorOAuth } from "./divisorOAuth";
 ```
 
 **Import desde fuera:**
 
 ```ts
-import { HeroSection } from "@/features/landing/components";
+import { SeccionHero } from "@/features/landing/components";
+import { BotonGoogle } from "@/features/auth/components";
 ```
 
 ### 3. Componentes compartidos → `components/`
@@ -108,9 +125,10 @@ Todos los imports usan `@/` como raíz de `src/`.
 
 ## Features Actuales
 
-| Feature   | Estado | Descripción                                      |
-| --------- | ------ | ------------------------------------------------- |
-| `landing` | ✅     | Hero, header, features bento, datos mock          |
+| Feature   | Estado | Descripción                                                                           |
+| --------- | ------ | ------------------------------------------------------------------------------------- |
+| `landing` | ✅     | SeccionHero, BentoCaracteristicas, BentoTestimonios, datos mock                       |
+| `auth`    | 🔄     | BotonGoogle, DivisorOAuth, FormularioRegistro — TFG-16 Login pendiente (Sprint 1)     |
 
 ## Añadir un Nuevo Feature
 
