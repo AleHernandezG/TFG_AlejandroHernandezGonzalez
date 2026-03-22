@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Eye, EyeOff, Loader2, ChefHat, CheckCircle2, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ import {
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
-const variantesContenedor = {
+const variantesContenedor: Variants = {
   oculto: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
@@ -37,14 +37,14 @@ const variantesContenedor = {
   },
 };
 
-const variantesForm = {
+const variantesForm: Variants = {
   oculto: {},
   visible: {
     transition: { staggerChildren: 0.07, delayChildren: 0.1 },
   },
 };
 
-const variantesCampo = {
+const variantesCampo: Variants = {
   oculto: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };

@@ -1,14 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Heart, Quote } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import type { Testimonio } from "@/features/landing/data/datosLanding";
 
 interface PropsTarjetaTestimonio {
   testimonio: Testimonio;
-  variants?: object;
+  variants?: Variants;
 }
 
 export function TarjetaTestimonio({ testimonio, variants }: PropsTarjetaTestimonio) {
