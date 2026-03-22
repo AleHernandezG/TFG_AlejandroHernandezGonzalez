@@ -35,7 +35,7 @@ export function BentoTestimonios() {
           Lo que dicen nuestros usuarios
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground md:text-base">
-          Miles de personas ya cocinan mejor con Gastronómica cada día.
+          Miles de personas ya cocinan mejor con Cookr cada día.
         </p>
       </motion.div>
 

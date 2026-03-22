@@ -16,9 +16,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Gastronómica — Cocina mejor cada día",
-  description:
-    "Red social gastronómica. Descubre recetas, comparte platos y recibe sugerencias personalizadas.",
+  title: "Cookr",
+  description: "La red social gastronómica con IA",
 };
 
 export default function RootLayout({

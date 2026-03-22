@@ -306,28 +306,46 @@
 </div>
 
 <p>
-  Visualmente la página tiene un fondo con <strong>blobs de color difuminados</strong> (círculos
-  con blur extremo) sobre el color de fondo base, y en el centro una tarjeta (<code>Card</code>)
-  con el formulario. Esta estructura es la misma que se usará en la página de login, manteniendo
-  coherencia visual entre las vistas de autenticación.
+  Visualmente la página usa un <strong>layout split-screen</strong> (referentes: Linear, Spotify, Netflix):
+  en pantallas grandes (≥ lg) la pantalla se divide en dos paneles horizontales. En móvil la imagen
+  desaparece y el formulario ocupa toda la pantalla.
 </p>
 
 <table>
-  <tr><th>Zona de la página</th><th>Qué hay</th></tr>
+  <tr><th>Panel / Zona</th><th>Qué hay</th><th>Responsive</th></tr>
   <tr>
-    <td>Fondo</td>
-    <td>3 blobs decorativos con <code>blur-3xl</code> en tonos brand/amber. Pointer-events-none para
-    que no interfieran con los clics.</td>
+    <td><strong>Panel izquierdo — imagen</strong></td>
+    <td>Fotografía gastronómica (<code>public/images/fondo-auth.jpg</code>) renderizada con
+    <code>next/image fill + object-cover</code>. Encima: overlay <code>bg-black/30</code> para
+    contraste, gradiente lateral <code>from-transparent to-stone-950</code> que funde la imagen
+    con el panel derecho sin corte brusco, y texto editorial centrado.</td>
+    <td><code>hidden lg:block lg:w-1/2 xl:w-3/5</code></td>
   </tr>
   <tr>
-    <td>Tarjeta central</td>
-    <td>Logo + nombre de la app (link a "/"), título, descripción, botón Google, divisor, formulario,
-    enlace a login, disclaimer legal.</td>
+    <td><strong>Texto editorial</strong></td>
+    <td>Etiqueta superior con líneas decorativas · Nombre de marca en <code>font-black italic</code>
+    con <code>clamp()</code> para tamaño fluido · Subtítulo en <code>uppercase tracking-[0.35em]</code>
+    flanqueado por líneas horizontales (patrón Bon Appétit / Spotify).</td>
+    <td>Solo visible en el panel izquierdo</td>
   </tr>
   <tr>
-    <td>Estado de éxito</td>
-    <td>Cuando el registro finaliza, la tarjeta entera se reemplaza por un mensaje de confirmación
+    <td><strong>Panel derecho — formulario</strong></td>
+    <td>Fondo <code>bg-gradient-to-b from-stone-950 to-zinc-950</code> (oscuro cálido). La
+    <code>Card</code> blanca del formulario flota con alto contraste sobre el oscuro.
+    Diferenciado visualmente de la barra blanca del navegador.</td>
+    <td><code>w-full lg:w-1/2 xl:w-2/5</code></td>
+  </tr>
+  <tr>
+    <td><strong>Formulario (Card)</strong></td>
+    <td>Logo + nombre de la app (link a "/"), título, descripción, botón Google, divisor, 4 campos,
+    botón de envío, enlace a login, disclaimer legal.</td>
+    <td>Centrado en el panel derecho</td>
+  </tr>
+  <tr>
+    <td><strong>Estado de éxito</strong></td>
+    <td>Cuando el registro finaliza, la Card entera se reemplaza por un mensaje de confirmación
     con icono verde y botón hacia /login.</td>
+    <td>Ambos breakpoints</td>
   </tr>
 </table>
 
@@ -615,36 +633,85 @@
 
 <p>
   Este archivo es el <strong>punto de entrada de la ruta <code>/registro</code></strong>.
-  Es un Server Component porque no tiene <code>"use client"</code> y no usa ningún hook de React.
-  Su única función es exportar los metadatos de la página (título SEO, descripción) y renderizar
-  el layout visual: fondo + tarjeta centrada.
+  Es un Server Component: no tiene <code>"use client"</code>, exporta <code>metadata</code> para SEO
+  y define el layout visual split-screen. Todo el comportamiento interactivo vive en
+  <code>FormularioRegistro</code> (Client Component).
 </p>
 
-<pre><span class="kw">export const</span> <span class="nm">metadata</span>: <span class="ty">Metadata</span> = {
-  <span class="nm">title</span>: <span class="st">"Crear cuenta — Gastronómica"</span>,
-  <span class="nm">description</span>: <span class="st">"Únete a la comunidad gastronómica..."</span>,
-};
-
-<span class="kw">export default function</span> <span class="fn">PaginaRegistro</span>() {
+<pre><span class="kw">export default function</span> <span class="fn">PaginaRegistro</span>() {
   <span class="kw">return</span> (
-    &lt;<span class="ty">main</span> <span class="nm">className</span>=<span class="st">"relative flex min-h-screen items-center justify-center ..."</span>&gt;
-      <span class="cm">{/* Blobs decorativos de fondo */}</span>
-      &lt;<span class="ty">div</span> <span class="nm">aria-hidden</span>&gt;
-        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"... bg-brand/5 blur-3xl"</span> /&gt; <span class="cm">← blob tono brand</span>
-        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"... bg-amber-300/8 blur-3xl"</span> /&gt; <span class="cm">← blob cálido</span>
+    &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"flex min-h-screen"</span>&gt;
+
+      <span class="cm">{/* ── Panel izquierdo — imagen (solo ≥ lg) ──────────────── */}</span>
+      &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"relative hidden lg:block lg:w-1/2 xl:w-3/5"</span>&gt;
+        &lt;<span class="ty">Image</span> <span class="nm">src</span>=<span class="st">"/images/fondo-auth.jpg"</span> <span class="nm">fill</span> <span class="nm">priority</span>
+               <span class="nm">className</span>=<span class="st">"object-cover object-center"</span> <span class="nm">alt</span>=<span class="st">""</span> /&gt;
+
+        <span class="cm">{/* Overlay general sutil */}</span>
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"absolute inset-0 bg-black/30"</span> /&gt;
+
+        <span class="cm">{/* Gradiente lateral → funde imagen con panel derecho sin corte */}</span>
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-stone-950"</span> /&gt;
+
+        <span class="cm">{/* Texto editorial centrado — estilo Bon Appétit / Spotify */}</span>
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"absolute inset-0 flex flex-col items-center justify-center text-center px-12"</span>&gt;
+          <span class="cm">{/* Etiqueta decorativa con líneas */}</span>
+          &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"mb-7 flex items-center gap-3"</span>&gt;
+            &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"h-px w-14 bg-white/45"</span> /&gt;
+            &lt;<span class="ty">span</span> <span class="nm">className</span>=<span class="st">"text-[9px] uppercase tracking-[0.35em] text-white/65"</span>&gt;
+              Red social gastronómica
+            &lt;/<span class="ty">span</span>&gt;
+            &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"h-px w-14 bg-white/45"</span> /&gt;
+          &lt;/<span class="ty">div</span>&gt;
+          <span class="cm">{/* Nombre de marca: bold italic, tamaño fluido con clamp() */}</span>
+          &lt;<span class="ty">h1</span> <span class="nm">className</span>=<span class="st">"font-black italic tracking-tight text-white drop-shadow-2xl"</span>
+              <span class="nm">style</span>={{ <span class="nm">fontSize</span>: <span class="st">"clamp(2.8rem, 5vw, 4.5rem)"</span> }}&gt;
+            Gastronómica
+          &lt;/<span class="ty">h1</span>&gt;
+          <span class="cm">{/* Subtítulo con separadores horizontales */}</span>
+          &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"mt-6 flex items-center gap-4 text-white/75"</span>&gt;
+            &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"h-px w-12 bg-white/40"</span> /&gt;
+            &lt;<span class="ty">p</span> <span class="nm">className</span>=<span class="st">"text-xs uppercase tracking-[0.35em]"</span>&gt;El arte de cocinar&lt;/<span class="ty">p</span>&gt;
+            &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"h-px w-12 bg-white/40"</span> /&gt;
+          &lt;/<span class="ty">div</span>&gt;
+        &lt;/<span class="ty">div</span>&gt;
       &lt;/<span class="ty">div</span>&gt;
-      &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"w-full max-w-md"</span>&gt;
-        &lt;<span class="ty">FormularioRegistro</span> /&gt;   <span class="cm">← toda la lógica vive aquí</span>
-      &lt;/<span class="ty">div</span>&gt;
-    &lt;/<span class="ty">main</span>&gt;
+
+      <span class="cm">{/* ── Panel derecho — formulario ──────────────────────── */}</span>
+      &lt;<span class="ty">main</span> <span class="nm">className</span>=<span class="st">"flex w-full flex-col items-center justify-center
+             bg-gradient-to-b from-stone-950 to-zinc-950 px-4 py-12
+             lg:w-1/2 xl:w-2/5"</span>&gt;
+        &lt;<span class="ty">div</span> <span class="nm">className</span>=<span class="st">"w-full max-w-md"</span>&gt;
+          &lt;<span class="ty">FormularioRegistro</span> /&gt;   <span class="cm">← toda la lógica interactiva vive aquí</span>
+        &lt;/<span class="ty">div</span>&gt;
+      &lt;/<span class="ty">main</span>&gt;
+
+    &lt;/<span class="ty">div</span>&gt;
   );
 }</pre>
 
 <div class="caja caja-info">
-  <strong>¿Por qué los blobs están en page.tsx y no en FormularioRegistro?</strong>
-  El fondo pertenece al layout de la página, no al formulario. Si en el futuro el formulario
-  se reutiliza en un modal o en otro contexto, no debería llevarse el fondo con él.
-  Separar el layout del componente es una buena práctica de diseño.
+  <strong>¿Por qué el layout está en page.tsx y no en FormularioRegistro?</strong>
+  El fondo, la imagen y el split-screen pertenecen al layout de la <em>página</em>, no al formulario.
+  Si el formulario se reutiliza en un modal o en otro contexto (por ejemplo, un drawer lateral),
+  no debería llevarse el layout con él. Esta separación es la misma que aplican Linear, Vercel
+  y otros productos modernos: el componente de formulario es "tonto" respecto al layout exterior.
+</div>
+
+<div class="caja caja-aviso">
+  <strong>¿Por qué un gradiente oscuro en el panel derecho?</strong>
+  <code>bg-background</code> (blanco) era indistinguible de la barra del navegador en la parte superior,
+  dando sensación de continuidad indeseada. El gradiente <code>from-stone-950 to-zinc-950</code> rompe
+  esa continuidad y crea contraste elegante: la Card blanca del formulario "flota" visualmente sobre
+  el fondo oscuro, igual que en la página de inicio de sesión de Netflix o Linear.
+</div>
+
+<div class="caja caja-codigo">
+  <strong>Técnica: gradiente lateral para fusión imagen↔panel</strong>
+  El div <code>w-32 bg-gradient-to-r from-transparent to-stone-950</code> se superpone al borde
+  derecho de la imagen y crea un fundido suave hacia el color exacto del panel del formulario.
+  No hay corte brusco. Este patrón lo usan Spotify (hero → sidebar), Linear (onboarding),
+  y Vercel (páginas de autenticación).
 </div>
 
 <hr>
@@ -1245,7 +1312,22 @@
   <tr>
     <td>Ruta <code>/registro</code> accesible</td>
     <td><span class="badge ok">Funcional</span></td>
-    <td>Fondo decorativo, card centrada, responsive</td>
+    <td>Layout split-screen, responsive (imagen oculta en móvil)</td>
+  </tr>
+  <tr>
+    <td>Layout split-screen con imagen gastronómica</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>next/image + overlay + gradiente de fusión lateral</td>
+  </tr>
+  <tr>
+    <td>Texto editorial sobre la imagen</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td>Bold italic + líneas decorativas + subtítulo tracking-widest</td>
+  </tr>
+  <tr>
+    <td>Panel formulario con fondo oscuro</td>
+    <td><span class="badge ok">Funcional</span></td>
+    <td><code>from-stone-950 to-zinc-950</code> — diferenciado de la barra del navegador</td>
   </tr>
   <tr>
     <td>Google OAuth completo</td>
@@ -1270,7 +1352,7 @@
   <tr>
     <td>Animaciones de entrada</td>
     <td><span class="badge ok">Funcional</span></td>
-    <td>Framer Motion — stagger de campos</td>
+    <td>Framer Motion — stagger de campos, tipos <code>Variants</code> correctos</td>
   </tr>
   <tr>
     <td>Envío email/contraseña al servidor</td>
@@ -1280,7 +1362,7 @@
   <tr>
     <td>Página de Login <code>/login</code></td>
     <td><span class="badge pend">Pendiente</span></td>
-    <td>Siguiente tarea del Sprint 1 — TFG-16</td>
+    <td>Siguiente tarea del Sprint 1 — TFG-16 — mismo split-screen que /registro</td>
   </tr>
 </table>
 

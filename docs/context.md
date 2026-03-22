@@ -15,9 +15,38 @@
 - ✅ Página de Registro (TFG-15) implementada: /registro con formulario Zod + Google OAuth
 - ✅ NextAuth configurado: opcionesAuth + route handler /api/auth/[...nextauth]
 - ✅ Documentación técnica de registro creada: docs/registro.html (10 secciones)
+- ✅ Lint y build limpios: fixes en tarjetaTestimonio.tsx y formularioRegistro.tsx (Framer Motion v12)
+- ✅ [UI-001] Layout split-screen en /registro con imagen gastronómica, texto editorial y gradiente de fusión lateral
+- ✅ Rebrand completo a **Cookr**: nombre oficial de la app actualizado en todo el frontend
+- ✅ Registro con correo/contraseña funcional: validación Zod con mensajes personalizados
+- ✅ Registro con Google OAuth funcional: NextAuth + GoogleProvider operativo en local
 - 🔜 Pendiente este sprint: Login (/login) — TFG-16
 
-## Avance de la sesión (TFG-15 — Registro + NextAuth + Documentación)
+## Avance de la sesión actual (rebrand Cookr + fixes auth)
+
+- ✅ **Rebrand a Cookr** — nombre cambiado de "Gastronómica" a "Cookr" en:
+  - `src/app/layout.tsx` — metadata `title` y `description`
+  - `src/app/registro/page.tsx` — metadata title + h1 editorial
+  - `src/features/landing/components/bentoTestimonios.tsx` — tagline de la sección
+  - `src/components/common/piePagina.tsx` — marca y copyright (2 ocurrencias)
+  - `src/features/auth/components/formularioRegistro.tsx` — aria-label y span del logo (2 ocurrencias)
+- ✅ **Fix validación Zod v4** en `formularioRegistro.tsx` — `useForm` sin `defaultValues` hacía que Zod v4 recibiera `undefined` en todos los campos, produciendo el mensaje genérico "Invalid input: expected string, received undefined" en lugar de los mensajes personalizados. Fix: añadido `defaultValues: { nombre: "", correo: "", contrasena: "", confirmarContrasena: "" }`
+- ✅ **Fix `Input` shadcn** en `src/components/ui/input.tsx` — refactorizado de función simple a `React.forwardRef`. En React 18, sin `forwardRef` la `ref` del `register()` de RHF no se adjunta al elemento DOM; RHF no puede leer valores directamente del input
+- ✅ **Google OAuth operativo** — credenciales `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` añadidas a `.env.local`; Next.js requiere reinicio del servidor para leer nuevas variables de entorno (`.env.local` solo se carga al arrancar, no en caliente)
+- ✅ Build y lint limpios: 0 errores, 0 warnings (4 rutas generadas)
+
+## Avance de la sesión anterior (TFG-15 cont. — Lint, Build y Diseño de /registro)
+
+- ✅ Lint/build: eliminado import `CardContent` no usado en `tarjetaTestimonio.tsx`
+- ✅ Tipos Framer Motion v12: anotadas variantes con `Variants` en `formularioRegistro.tsx` y `tarjetaTestimonio.tsx` (framer-motion v12 es estricto con `ease: string`)
+- ✅ Imagen de fondo: `frontend/public/images/fondo-auth.jpg` (2843×4264 px) — next/image la optimiza automáticamente, no hace falta redimensionar
+- ✅ Layout split-screen implementado en `/registro` (referentes: Linear, Spotify, Netflix):
+  - Panel izquierdo (lg+): imagen gastronómica + overlay `bg-black/30` + gradiente lateral `from-transparent to-stone-950` que funde la imagen con el panel derecho sin corte brusco
+  - Texto editorial centrado sobre la imagen: `h1 font-black italic` + etiqueta decorativa con líneas horizontales + subtítulo `uppercase tracking-[0.35em]` (estilo Bon Appétit / Spotify)
+  - Panel derecho: `bg-gradient-to-b from-stone-950 to-zinc-950` — oscuro cálido, diferenciado visualmente de la barra del navegador; Card blanca flota con contraste elegante
+  - Móvil: imagen oculta, formulario a pantalla completa con fondo oscuro
+
+## Avance de la sesión anterior (TFG-15 — Registro + NextAuth + Documentación)
 
 - ✅ `src/lib/auth.ts` creado con `opcionesAuth` (NextAuth, GoogleProvider, JWT strategy)
 - ✅ `src/app/api/auth/[...nextauth]/route.ts` — route handler GET/POST

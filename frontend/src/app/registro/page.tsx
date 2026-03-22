@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { FormularioRegistro } from '@/features/auth/components'
 
 export const metadata: Metadata = {
-  title: 'Crear cuenta — Gastronómica',
+  title: 'Crear cuenta — Cookr',
   description:
     'Únete a la comunidad gastronómica. Crea tu cuenta gratis y empieza a descubrir recetas personalizadas.',
 }
@@ -53,7 +53,7 @@ export default function PaginaRegistro() {
           {/* Nombre de marca — bold italic, estilo editorial de revista de gastronomía */}
           <h1 className="font-black italic leading-none tracking-tight text-white drop-shadow-2xl"
               style={{ fontSize: 'clamp(2.8rem, 5vw, 4.5rem)' }}>
-            Gastronómica
+            Cookr
           </h1>
 
           {/* Subtítulo con separadores horizontales — patrón Spotify / Bon Appétit */}

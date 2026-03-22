@@ -36,7 +36,7 @@ export function PiePagina() {
           {/* Marca + aviso sobre IA */}
           <div className="flex flex-col gap-4">
             <div className="text-center">
-              <p className="text-base font-bold text-foreground">Gastronómica</p>
+              <p className="text-base font-bold text-foreground">Cookr</p>
               <p className="mt-1 text-xs text-muted-foreground">Red social gastronómica</p>
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
@@ -101,7 +101,7 @@ export function PiePagina() {
         {/* Barra inferior */}
         <div className="flex flex-col items-center justify-between gap-2 text-center md:flex-row md:text-left">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Gastronómica — Trabajo de Fin de Grado.
+            © {new Date().getFullYear()} Cookr — Trabajo de Fin de Grado.
           </p>
         </div>
       </div>
