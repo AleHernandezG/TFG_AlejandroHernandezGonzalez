@@ -53,6 +53,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 ## Archivos creados / modificados
 
 ### Creados
+
 - `frontend/src/features/landing/components/testimonial-card.tsx`
 - `frontend/src/features/landing/components/testimonials-bento.tsx`
 - `frontend/src/components/common/landing-footer.tsx`
@@ -60,9 +61,10 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `docs/desarrollo/landingPage.md`
 
 ### Modificados
+
 - `frontend/src/app/page.tsx`
 - `frontend/src/app/layout.tsx`
-- `frontend/tailwind.config.ts` (añadido src/features/** al content array)
+- `frontend/tailwind.config.ts` (añadido src/features/\*\* al content array)
 - `frontend/src/features/landing/components/hero-section.tsx`
 - `frontend/src/features/landing/components/features-bento.tsx`
 - `frontend/src/features/landing/components/index.ts`
@@ -89,6 +91,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 ## Archivos creados / modificados — Iteración 4
 
 ### Creados
+
 - `frontend/src/features/landing/components/seccionHero.tsx`
 - `frontend/src/features/landing/components/bentoCaracteristicas.tsx`
 - `frontend/src/features/landing/components/bentoTestimonios.tsx`
@@ -100,6 +103,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `frontend/.env.example`
 
 ### Modificados
+
 - `frontend/src/features/landing/components/index.ts`
 - `frontend/src/app/page.tsx`
 - `frontend/src/app/layout.tsx`
@@ -107,6 +111,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `docs/phase-reports/fase-0-pendientes.md`
 
 ### Eliminados
+
 - `frontend/src/features/landing/components/hero-section.tsx`
 - `frontend/src/features/landing/components/features-bento.tsx`
 - `frontend/src/features/landing/components/testimonials-bento.tsx`
@@ -114,6 +119,34 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `frontend/src/features/landing/components/landing-header.tsx`
 - `frontend/src/features/landing/data/landing-data.ts`
 - `frontend/src/components/common/landing-footer.tsx`
+
+## Cambios realizados — Iteración 5 (tipografía creativa hero — [UI-004])
+
+**Fecha:** 2026-03-23
+
+Patrones de estilo tipográfico aplicados al titular y subtítulo de `SeccionHero`, inspirados en Linear, Framer, Notion y Spotify:
+
+### H1 — tratamientos tipográficos por palabra clave
+
+| Palabra     | Técnica                                                                    | Referente              |
+| ----------- | -------------------------------------------------------------------------- | ---------------------- |
+| `cocinando` | `font-black italic text-brand`                                             | Spotify, Bon Appétit   |
+| `recetas`   | Subrayado wavy SVG `var(--brand)`, `preserveAspectRatio="none"`            | Notion, Framer, Arc    |
+| `Cookr`     | `bg-gradient-to-r from-brand to-brand-muted bg-clip-text text-transparent` | Linear, Stripe, Vercel |
+
+El SVG del subrayado wavy usa la curva cuadrática `M0,5 Q25,1 50,5 Q75,9 100,5` con `preserveAspectRatio="none"` para que se estire proporcionalmente al texto en cualquier viewport.
+
+### Subtítulo
+
+- `comparte tus recetas` envuelto en `<span className="font-semibold text-foreground/80">` para contrastar dentro del párrafo muted
+
+### Archivos modificados
+
+- `frontend/src/features/landing/components/seccionHero.tsx`
+
+### Regla mantenida
+
+- 0 colores hardcodeados — todos los estilos usan variables Cookr del sistema de diseño
 
 ## Riesgos y bloqueos
 

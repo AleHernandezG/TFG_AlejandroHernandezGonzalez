@@ -90,11 +90,11 @@ export function PiePagina() {
         <Separator className="mb-6 mt-12 opacity-50" />
 
         {/* Cita */}
-        <div className="mb-12 flex justify-center">
+        {/* <div className="mb-12 flex justify-center">
           <blockquote className="max-w-2xl text-center text-base italic leading-relaxed text-muted-foreground md:text-lg">
             &ldquo;Mami te amo&rdquo;
           </blockquote>
-        </div>
+        </div> */}
 
         {/* Barra inferior */}
         <div className="flex flex-col items-center justify-center gap-2 text-center">

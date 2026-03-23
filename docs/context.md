@@ -22,9 +22,33 @@
 - ✅ Registro con Google OAuth funcional: NextAuth + GoogleProvider operativo en local
 - ✅ [UI-002] Paleta de colores Cookr completa: oklch + CSS vars + Tailwind tokens, 0 colores hardcodeados
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
+- ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
 - 🔜 Pendiente este sprint: Login (/login) — TFG-16
 
-## Avance de la sesión actual (paleta Cookr + páginas legales)
+## Avance de la sesión actual (tipografía hero — SeccionHero)
+
+### [UI-004] Tipografía creativa en `SeccionHero`
+
+Fichero modificado: `frontend/src/features/landing/components/seccionHero.tsx`
+
+Patrones aplicados, inspirados en Linear, Framer, Notion, Spotify:
+
+**Badge pre-titular** (patrón Linear / Vercel):
+- Píldora animada con `🍳 La comunidad gastronómica`
+- Estilos: `border-brand/30 bg-[var(--brand-subtle)] text-brand` → 100% paleta Cookr
+- Entra con el mismo `variants={elemento}` del stagger, antes del h1
+
+**H1 — tres tratamientos tipográficos:**
+- `cocinando` → `font-black italic text-brand` (énfasis en la acción principal, estilo Spotify/Bon Appétit)
+- `recetas` → subrayado wavy SVG en `var(--brand)` con `preserveAspectRatio="none"` para adaptarse a cualquier tamaño de fuente (patrón Notion / Framer / Arc)
+- `Cookr` → gradiente `from-brand to-brand-muted` con `bg-clip-text text-transparent` (patrón Linear / Stripe)
+
+**Subtítulo:**
+- `comparte tus recetas` → `font-semibold text-foreground/80` (rompe la monotonía del texto muted)
+
+Todos los estilos usan exclusivamente la paleta Cookr (0 colores hardcodeados).
+
+## Avance de la sesión anterior (paleta Cookr + páginas legales)
 
 ### [UI-002] Refactorización completa de paleta de colores
 

@@ -73,48 +73,72 @@ export function SeccionHero() {
         {/* Titular principal */}
         <motion.h1
           variants={elemento}
-          className="text-balance text-4xl font-bold leading-[1.12] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[5rem]"
+          className="text-balance text-[2.25rem] font-bold leading-[1.2] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[4.25rem] xl:text-[5rem]"
         >
-          Cocina mejor cada día con recetas, comunidad y ayuda inteligente.
+          Disfruta {/* "cocinando" — italic bold brand color: énfasis en la acción */}
+          <span className="font-black italic text-brand">cocinando</span> con nuevas{' '}
+          {/* "recetas" — subrayado wavy SVG (patrón Notion / Framer) */}
+          <span className="relative inline-block">
+            recetas
+            <svg
+              aria-hidden
+              className="absolute -bottom-1 left-0 w-full overflow-visible"
+              height="8"
+              viewBox="0 0 100 8"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M0,5 Q25,1 50,5 Q75,9 100,5"
+                fill="none"
+                stroke="var(--brand)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>{' '}
+          y una amplia comunidad{' '}
+          {/* "Cookr" — gradiente brand→brand-muted: nombre de marca destacado */}
+          <span className="bg-gradient-to-r from-brand to-brand-muted bg-clip-text text-transparent">
+            Cookr
+          </span>
         </motion.h1>
 
         {/* Subtítulo */}
         <motion.p
           variants={elemento}
-          className="mx-auto mt-7 max-w-2xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg lg:text-xl"
+          className="mx-auto mt-5 max-w-2xl text-balance text-sm leading-relaxed text-muted-foreground sm:mt-7 sm:text-base md:text-lg lg:text-xl"
         >
-          Descubre ideas según tus gustos, comparte tus platos y recibe sugerencias personalizadas
-          para transformar lo que tienes en la nevera en tu siguiente receta favorita.
+          Descubre ideas según tus gustos,{' '}
+          <span className="text-foreground/80 font-semibold">comparte tus recetas</span> y conéctate
+          con otros amantes de la cocina. ¡Únete a la comunidad gastronómica más sabrosa y creativa!
         </motion.p>
 
         {/* Botones de acción */}
         <motion.div
           variants={elemento}
-          className="mt-12 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row"
+          className="mt-9 flex w-full flex-col items-center justify-center gap-3 sm:mt-11 sm:w-auto sm:flex-row"
         >
           <Button
             asChild
-            size="lg"
-            className="shadow-brand/20 hover:shadow-brand/30 h-16 min-w-[220px] rounded-full px-12 text-lg font-semibold shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
+            className="shadow-brand/20 hover:shadow-brand/30 h-11 w-full rounded-full px-8 text-base font-semibold shadow-xl transition-all hover:scale-105 hover:shadow-2xl sm:h-12 sm:w-auto sm:min-w-[200px] sm:px-10 lg:h-14 lg:min-w-[220px] lg:px-12 lg:text-lg"
           >
-            <Link href="/registro" className="inline-flex items-center gap-3">
+            <Link href="/registro" className="inline-flex items-center gap-2">
               Crear cuenta hoy
-              <ArrowRight className="h-5 w-5" aria-hidden />
+              <ArrowRight className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden />
             </Link>
           </Button>
           <Button
             asChild
-            size="lg"
             variant="outline"
-            className="border-border/60 bg-card/50 hover:bg-card/70 h-16 min-w-[220px] rounded-full px-12 text-lg backdrop-blur-sm transition-all hover:scale-105"
+            className="border-border/60 bg-card/50 hover:bg-card/70 h-11 w-full rounded-full px-8 text-base backdrop-blur-sm transition-all hover:scale-105 sm:h-12 sm:w-auto sm:min-w-[200px] sm:px-10 lg:h-14 lg:min-w-[220px] lg:px-12 lg:text-lg"
           >
             <Link href="/login">Ya tengo cuenta</Link>
           </Button>
         </motion.div>
       </motion.div>
 
-      {/* ── Indicadores de slide ────────────────────────────────── */}
-      <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
+      {/* ── Indicador de slide ────────────────────────────────── */}
+      <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 sm:bottom-6 lg:bottom-8">
         {slidesHero.map((slide, i) => (
           <button
             key={slide.id}

@@ -1,0 +1,86 @@
+# UI Changes — Cookr
+
+Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden cronológico.
+
+> **Regla de oro:** nunca editar una entrada completada. Si el cambio evoluciona, crear una nueva entrada.
+
+---
+
+## [UI-001] — Layout split-screen /registro ✅
+
+**Fecha:** 2026-03-21
+**Fichero:** `frontend/src/app/registro/page.tsx`
+
+Layout de dos paneles para la ruta `/registro`:
+
+- Panel izquierdo (lg+): imagen gastronómica `fondo-auth.jpg` con `overlay bg-black/30` + gradiente lateral `from-transparent to-[var(--auth-dark)]` que funde imagen y panel sin corte brusco
+- Texto editorial: `h1 font-black italic` + etiqueta decorativa con líneas horizontales + subtítulo `uppercase tracking-[0.35em]`
+- Panel derecho: `bg-[var(--auth-dark)]` — negro cálido; Card blanca flota con contraste elegante
+- Móvil: imagen oculta, formulario a pantalla completa con fondo oscuro
+
+---
+
+## [UI-002] — Paleta de colores Cookr completa ✅
+
+**Fecha:** 2026-03-23
+**Ficheros:** `frontend/src/app/globals.css`, `datosLanding.ts`, `bentoCaracteristicas.tsx`, `tarjetaTestimonio.tsx`, `formularioRegistro.tsx`, `registro/page.tsx`
+
+Refactorización en dos pasadas para eliminar todos los colores hardcodeados:
+
+**Pasada 1** — colores Tailwind genéricos sustituidos por vars existentes (`--brand`, `--brand-muted`, `--hero-gradient-*`, `--destructive`, `--chart-3`).
+
+**Pasada 2** — nuevas variables CSS añadidas a `globals.css` (`:root` y `.dark`):
+
+- `--category-social` → azul para elementos de comunidad
+- `--category-ai` → violeta para elementos de IA
+- `--theme-fresh` → verde para carrusel ensaladas
+- `--theme-sweet` → rosa para carrusel postres
+- `--theme-pasta` → violeta para carrusel pastas
+- `--auth-dark` → negro cálido para panel de autenticación
+
+Excepciones documentadas: `bg-black/30` (overlay funcional) y Google SVG fills (colores corporativos obligatorios).
+
+---
+
+## [UI-003] — Páginas legales /privacidad y /terminos ✅
+
+**Fecha:** 2026-03-23
+**Ficheros:** `frontend/src/app/privacidad/page.tsx`, `frontend/src/app/terminos/page.tsx`
+
+**Política de privacidad** (`/privacidad`) — 10 secciones RGPD:
+
+- Responsable del tratamiento (aviso académico TFG)
+- Datos recogidos, tabla de finalidades con base legal
+- Servicios de terceros: Google OAuth, Gemini, Edamam, Cloudinary, Resend, MongoDB Atlas, Vercel
+- Retención, derechos RGPD, seguridad, menores (mín. 14 años)
+
+**Términos de uso** (`/terminos`) — 11 secciones:
+
+- Descripción completa del servicio (recetas, despensa, Gemini IA, Edamam, grupos, Modo Manos Libres, PWA)
+- Tabla uso aceptable (✅ permitido / 🚫 prohibido)
+- Aviso legal IA (respuestas orientativas, no consejo médico)
+
+Diseño: cabecera sticky con logo Cookr + botón volver, índice navegable con anclas `#id`, 100% paleta Cookr.
+
+---
+
+## [UI-004] — Tipografía creativa en SeccionHero ✅
+
+**Fecha:** 2026-03-23
+**Fichero:** `frontend/src/features/landing/components/seccionHero.tsx`
+
+Patrones tipográficos creativos aplicados al titular y subtítulo de la hero section, inspirados en Linear, Framer, Notion y Spotify:
+
+**H1 — tres tratamientos por palabra clave:**
+
+| Palabra     | Técnica CSS                                                                | Referente            |
+| ----------- | -------------------------------------------------------------------------- | -------------------- |
+| `cocinando` | `font-black italic text-brand`                                             | Spotify, Bon Appétit |
+| `recetas`   | SVG wavy `var(--brand)`, `preserveAspectRatio="none"`                      | Notion, Framer, Arc  |
+| `Cookr`     | `bg-gradient-to-r from-brand to-brand-muted bg-clip-text text-transparent` | Linear, Stripe       |
+
+El SVG wavy usa la curva cuadrática `M0,5 Q25,1 50,5 Q75,9 100,5` con `overflow-visible` para no recortarse fuera del bounding box del texto.
+
+**Subtítulo:** `comparte tus recetas` en `font-semibold text-foreground/80` para contrastar dentro del párrafo muted.
+
+0 colores hardcodeados — toda la paleta usa variables Cookr del sistema de diseño.
