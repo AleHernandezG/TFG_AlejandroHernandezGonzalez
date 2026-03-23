@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
-import { Eye, EyeOff, Loader2, ChefHat, CheckCircle2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, ChefHat, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +53,7 @@ const variantesCampo: Variants = {
 // ─── Componente ─────────────────────────────────────────────────────────────
 
 export function FormularioRegistro() {
+  const router = useRouter();
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [estadoEnvio, setEstadoEnvio] = useState<EstadoFormulario>("idle");
@@ -83,7 +85,9 @@ export function FormularioRegistro() {
         correo: datos.correo,
       });
       await new Promise((r) => setTimeout(r, 1000)); // simula latencia de red
-      setEstadoEnvio("exito");
+      // Redirige a la pantalla de verificación pendiente pasando el email como query param
+      // TODO [AUTH-005] Fase 6: el backend enviará el correo real vía Resend antes de esta redirección
+      router.push(`/verificar-email/pendiente?email=${encodeURIComponent(datos.correo)}`);
     } catch {
       setMensajeError(
         "No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos."
@@ -91,32 +95,6 @@ export function FormularioRegistro() {
       setEstadoEnvio("error");
     }
   };
-
-  // ── Vista de éxito ─────────────────────────────────────────────────────────
-  if (estadoEnvio === "exito") {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-      >
-        <Card className="border-border/60 shadow-lg">
-          <CardContent className="flex flex-col items-center gap-5 py-12 text-center">
-            <CheckCircle2 className="h-14 w-14 text-[var(--chart-3)]" aria-hidden />
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold">¡Cuenta creada!</h2>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.
-              </p>
-            </div>
-            <Button asChild variant="outline" className="mt-2 w-full max-w-xs">
-              <Link href="/login">Ir a iniciar sesión</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-    );
-  }
 
   // ── Formulario ─────────────────────────────────────────────────────────────
   return (

@@ -23,6 +23,7 @@
 - ✅ [UI-002] Paleta de colores Cookr completa: oklch + CSS vars + Tailwind tokens, 0 colores hardcodeados
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
 - ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
+- ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (mock, Fase 6 para Resend real)
 - 🔜 Pendiente este sprint: Login (/login) — TFG-16
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
@@ -153,6 +154,8 @@ Diseño de ambas páginas:
 - 🔴 [AUTH-002] `formularioRegistro.tsx` — sustituir mock por `POST /api/usuarios/registro` → Fase 4
 - 🔴 [AUTH-003] `lib/auth.ts` — añadir `CredentialsProvider` para email/contraseña real → Fase 4
 - 🔴 [AUTH-004] `lib/auth.ts` — enriquecer callback `session` con avatar, rol e ID del backend → Fase 4
+- 🔴 [AUTH-005] Backend — endpoint `POST /api/auth/enviar-verificacion`: generar token firmado (JWT 24h), persistirlo en MongoDB, enviarlo vía Resend → Fase 4 + Fase 6
+- 🔴 [AUTH-006] Backend — endpoint `POST /api/auth/verificar-email`: validar token, marcar usuario como verificado en MongoDB, invalidar token → Fase 4
 
 ## Reportes asociados
 
@@ -171,6 +174,8 @@ Diseño de ambas páginas:
 | `/privacidad` | Política de privacidad | ✅ |
 | `/terminos` | Términos de uso | ✅ |
 | `/login` | Inicio de sesión | 🔜 TFG-16 |
+| `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
+| `/verificar-email` | Verificación de token por enlace | ✅ mock |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
 
 ## Estructura del Proyecto

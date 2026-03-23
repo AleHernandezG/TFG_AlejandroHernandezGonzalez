@@ -64,6 +64,35 @@ Diseño: cabecera sticky con logo Cookr + botón volver, índice navegable con a
 
 ---
 
+## [UI-005] — Flujo de verificación de email (mock) ✅
+
+**Fecha:** 2026-03-23
+**Ficheros:** `frontend/src/app/verificar-email/pendiente/page.tsx`, `frontend/src/app/verificar-email/page.tsx`, `frontend/src/features/auth/components/tarjetaVerificacionPendiente.tsx`, `frontend/src/features/auth/components/formularioRegistro.tsx`
+
+Pantallas del flujo de verificación de email post-registro. Todo es mock hasta Fase 4-6.
+
+**`/verificar-email/pendiente`** — Pantalla "revisa tu correo":
+- Icono de sobre con fondo `--brand-subtle`
+- Muestra el email pasado como `?email=` desde `formularioRegistro.tsx`
+- Aviso de carpeta spam
+- Botón "Reenviar correo" con cooldown de 60 s (mock, TODO [AUTH-005] Fase 6: Resend)
+- Link "Volver al registro"
+
+**`/verificar-email`** — Verificación de token:
+- Lee `?token=` de la query string
+- Estado `verificando` → spinner + texto
+- Si hay token: éxito tras 1.5 s (mock) → CheckCircle2 + botón a `/login`
+- Si no hay token: error inmediato → XCircle + botones a `/registro` y reenvío
+- TODO [AUTH-006] Fase 4: POST /api/auth/verificar-email con validación real del JWT
+
+**`formularioRegistro.tsx`** — Modificación:
+- Al hacer submit con éxito, `router.push('/verificar-email/pendiente?email=...')` en lugar del inline success card
+- Eliminada la vista de éxito inline (reemplazada por la página dedicada)
+
+0 colores hardcodeados — usa `--brand-subtle`, `--chart-3`, `text-brand`, `text-destructive`.
+
+---
+
 ## [UI-004] — Tipografía creativa en SeccionHero ✅
 
 **Fecha:** 2026-03-23

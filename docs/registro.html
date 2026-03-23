@@ -262,6 +262,7 @@
   <tr><td>8</td><td>NextAuth: autenticación con Google</td></tr>
   <tr><td>9</td><td>Las animaciones en el formulario</td></tr>
   <tr><td>10</td><td>Estado actual, pendientes y TODOs</td></tr>
+  <tr><td>11</td><td>Flujo de verificación de email (mock → Fase 6)</td></tr>
 </table>
 
 
@@ -498,9 +499,14 @@
 │   │           └── <span class="new">route.ts</span>             <span class="note">← route handler GET/POST para NextAuth</span>
 │   │
 │   ├── <span class="dir">registro/</span>
-│   │   └── <span class="new">page.tsx</span>                  <span class="note">← ruta /registro (Server Component)</span>
+│   │   └── <span class="new">page.tsx</span>                           <span class="note">← ruta /registro (Server Component)</span>
 │   │
-│   ├── <span class="file">page.tsx</span>                      <span class="note">← ruta / (landing — sin cambios)</span>
+│   ├── <span class="dir">verificar-email/</span>
+│   │   ├── <span class="new">page.tsx</span>                           <span class="note">← ruta /verificar-email?token=xxx (Client Component, mock)</span>
+│   │   └── <span class="dir">pendiente/</span>
+│   │       └── <span class="new">page.tsx</span>                       <span class="note">← ruta /verificar-email/pendiente?email=xxx (Server Component)</span>
+│   │
+│   ├── <span class="file">page.tsx</span>                               <span class="note">← ruta / (landing — sin cambios)</span>
 │   └── <span class="file">layout.tsx</span>
 │
 ├── <span class="dir">lib/</span>
@@ -512,10 +518,11 @@
     │   └── <span class="file">...</span>
     └── <span class="dir">auth/</span>                          <span class="note">← nuevo feature de autenticación</span>
         ├── <span class="dir">components/</span>
-        │   ├── <span class="new">botonGoogle.tsx</span>           <span class="note">← botón OAuth con SVG + estado de carga</span>
-        │   ├── <span class="new">divisorOAuth.tsx</span>          <span class="note">← separador "o continúa con correo"</span>
-        │   ├── <span class="new">formularioRegistro.tsx</span>    <span class="note">← formulario completo (componente principal)</span>
-        │   └── <span class="new">index.ts</span>                  <span class="note">← barrel export del feature auth</span>
+        │   ├── <span class="new">botonGoogle.tsx</span>                    <span class="note">← botón OAuth con SVG + estado de carga</span>
+        │   ├── <span class="new">divisorOAuth.tsx</span>                   <span class="note">← separador "o continúa con correo"</span>
+        │   ├── <span class="new">formularioRegistro.tsx</span>             <span class="note">← formulario completo; redirige a /verificar-email/pendiente al enviar</span>
+        │   ├── <span class="new">tarjetaVerificacionPendiente.tsx</span>   <span class="note">← card "revisa tu correo" con cooldown de reenvío</span>
+        │   └── <span class="new">index.ts</span>                           <span class="note">← barrel export del feature auth</span>
         └── <span class="dir">types/</span>
             └── <span class="new">autenticacion.ts</span>          <span class="note">← esquema Zod + tipos TypeScript</span>
 </div>
@@ -1357,7 +1364,22 @@
   <tr>
     <td>Envío email/contraseña al servidor</td>
     <td><span class="badge warn">Mock</span></td>
-    <td>Simula 1 segundo de latencia y muestra éxito</td>
+    <td>Simula 1 segundo de latencia y redirige a <code>/verificar-email/pendiente?email=xxx</code></td>
+  </tr>
+  <tr>
+    <td>Pantalla post-registro <code>/verificar-email/pendiente</code></td>
+    <td><span class="badge ok">Funcional (mock)</span></td>
+    <td>Muestra email recibido por query param, botón reenvío con cooldown 60 s, aviso de spam</td>
+  </tr>
+  <tr>
+    <td>Verificación de token <code>/verificar-email</code></td>
+    <td><span class="badge ok">Funcional (mock)</span></td>
+    <td>Lee <code>?token=</code>; éxito tras 1.5 s si hay token, error inmediato si no hay token</td>
+  </tr>
+  <tr>
+    <td>Envío real de email vía Resend</td>
+    <td><span class="badge pend">Pendiente</span></td>
+    <td>[AUTH-005] Fase 4+6: backend genera JWT 24 h y lo envía con Resend</td>
   </tr>
   <tr>
     <td>Página de Login <code>/login</code></td>
@@ -1390,6 +1412,26 @@
     <td>Enriquecer callback <code>session</code> con avatar, rol e ID del backend</td>
     <td>Fase 4</td>
   </tr>
+  <tr>
+    <td><code>formularioRegistro.tsx</code> + backend</td>
+    <td>[AUTH-005] Backend: <code>POST /api/auth/enviar-verificacion</code> — generar JWT 24 h, persistirlo en MongoDB y enviarlo con Resend</td>
+    <td>Fase 4 + Fase 6</td>
+  </tr>
+  <tr>
+    <td>Backend</td>
+    <td>[AUTH-006] Backend: <code>POST /api/auth/verificar-email</code> — validar token firmado, marcar usuario como verificado, invalidar token</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>tarjetaVerificacionPendiente.tsx</code></td>
+    <td>[AUTH-005] Conectar botón "Reenviar" al endpoint real en lugar del mock <code>setTimeout</code></td>
+    <td>Fase 6</td>
+  </tr>
+  <tr>
+    <td><code>verificar-email/page.tsx</code></td>
+    <td>[AUTH-006] Reemplazar <code>setTimeout</code> con llamada real a <code>POST /api/auth/verificar-email</code></td>
+    <td>Fase 4</td>
+  </tr>
 </table>
 
 <h2>Lo que vendrá después del registro</h2>
@@ -1397,8 +1439,9 @@
 <ul class="lista">
   <li><strong>TFG-16 — Login (/login):</strong> vista de inicio de sesión. Reutilizará BotonGoogle y DivisorOAuth directamente desde el feature auth. Solo tendrá nombre y contraseña (sin confirmación).</li>
   <li><strong>Fase 2:</strong> interfaz principal de la app (feed de recetas, perfil). Google OAuth redirigirá aquí en lugar de a "/".</li>
-  <li><strong>Fase 4 — Backend:</strong> API REST con endpoints de registro y login. Los TODOs marcados en el código se activarán en esta fase.</li>
+  <li><strong>Fase 4 — Backend:</strong> API REST con endpoints de registro y login. Los TODOs marcados en el código se activarán en esta fase. Incluye [AUTH-005] y [AUTH-006] del flujo de verificación.</li>
   <li><strong>Fase 4 — CredentialsProvider:</strong> NextAuth añadirá un segundo provider para email/contraseña real, que llamará al backend para verificar las credenciales.</li>
+  <li><strong>Fase 6 — Resend:</strong> envío real del correo de verificación mediante la API de Resend. Las páginas <code>/verificar-email/pendiente</code> y <code>/verificar-email</code> ya están listas; solo hay que sustituir los mocks por llamadas al backend.</li>
 </ul>
 
 <div class="caja caja-exito">
@@ -1412,9 +1455,134 @@
 
 <hr>
 
+
+<!-- ══════════════════════════════════════════════════════
+     11. FLUJO DE VERIFICACIÓN DE EMAIL
+══════════════════════════════════════════════════════ -->
+<h1>11. Flujo de verificación de email (mock → Fase 6)</h1>
+
+<p>
+  Cuando un usuario se registra con email y contraseña, el flujo ideal es:
+  el sistema le envía un correo con un enlace de verificación, el usuario
+  hace clic y su cuenta queda activa. <strong>Las páginas de UI ya están
+  implementadas como mock.</strong> El envío real con Resend se conecta en Fase 6.
+</p>
+
+<h2>Flujo completo (estado actual → futuro)</h2>
+
+<table>
+  <tr><th>Paso</th><th>Qué ocurre</th><th>Estado</th></tr>
+  <tr>
+    <td>1. Usuario envía el formulario</td>
+    <td><code>formularioRegistro.tsx</code> hace <code>router.push('/verificar-email/pendiente?email=xxx')</code></td>
+    <td><span class="badge ok">Funcional</span></td>
+  </tr>
+  <tr>
+    <td>2. Backend registra al usuario</td>
+    <td><code>POST /api/usuarios/registro</code> crea el documento en MongoDB con <code>emailVerificado: false</code></td>
+    <td><span class="badge pend">Pendiente (Fase 4)</span></td>
+  </tr>
+  <tr>
+    <td>3. Backend genera el token</td>
+    <td>JWT firmado con expiración de 24 h, guardado en MongoDB</td>
+    <td><span class="badge pend">Pendiente (Fase 4)</span></td>
+  </tr>
+  <tr>
+    <td>4. Backend envía el email</td>
+    <td>Resend: <code>resend.emails.send({ to: email, subject: "Verifica tu cuenta en Cookr", html: "..." })</code></td>
+    <td><span class="badge pend">Pendiente (Fase 6)</span></td>
+  </tr>
+  <tr>
+    <td>5. Pantalla "revisa tu correo"</td>
+    <td><code>/verificar-email/pendiente</code> muestra el email, botón reenvío con cooldown 60 s</td>
+    <td><span class="badge ok">Funcional (mock)</span></td>
+  </tr>
+  <tr>
+    <td>6. Usuario hace clic en el enlace</td>
+    <td>El email contiene <code>https://cookr.app/verificar-email?token=xxx</code></td>
+    <td><span class="badge pend">Pendiente — URL real Fase 6</span></td>
+  </tr>
+  <tr>
+    <td>7. Página verifica el token</td>
+    <td><code>/verificar-email?token=xxx</code>: mock → éxito tras 1.5 s. Real: <code>POST /api/auth/verificar-email</code></td>
+    <td><span class="badge ok">Mock funcional</span></td>
+  </tr>
+  <tr>
+    <td>8. Cuenta activada</td>
+    <td>Backend marca <code>emailVerificado: true</code>, invalida el token</td>
+    <td><span class="badge pend">Pendiente (Fase 4)</span></td>
+  </tr>
+</table>
+
+<h2>Archivos del flujo de verificación</h2>
+
+<table>
+  <tr><th>Archivo</th><th>Tipo</th><th>Responsabilidad</th></tr>
+  <tr>
+    <td><code>app/verificar-email/pendiente/page.tsx</code></td>
+    <td>Server Component</td>
+    <td>Página que recibe <code>?email=</code> como prop de <code>searchParams</code> y renderiza <code>TarjetaVerificacionPendiente</code></td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/tarjetaVerificacionPendiente.tsx</code></td>
+    <td>Client Component</td>
+    <td>Card interactiva: muestra el email, gestiona el cooldown del botón "Reenviar", aviso de spam</td>
+  </tr>
+  <tr>
+    <td><code>app/verificar-email/page.tsx</code></td>
+    <td>Client Component</td>
+    <td>Lee <code>?token=</code> con <code>useSearchParams</code>, simula verificación con <code>setTimeout</code>, muestra estados verificando/éxito/error</td>
+  </tr>
+</table>
+
+<h2>TarjetaVerificacionPendiente — lógica del cooldown</h2>
+
+<p>
+  El botón "Reenviar correo" tiene un cooldown de 60 segundos para evitar que el usuario
+  haga spam al sistema de emails. Se implementa con dos <code>useState</code> y un <code>useEffect</code>:
+</p>
+
+<pre><span class="kw">const</span> [<span class="nm">segundosRestantes</span>, <span class="nm">setSegundosRestantes</span>] = <span class="fn">useState</span>(<span class="nm">0</span>);
+
+<span class="cm">// Decrementa cada segundo mientras el cooldown esté activo</span>
+<span class="fn">useEffect</span>(() =&gt; {
+  <span class="kw">if</span> (<span class="nm">segundosRestantes</span> &lt;= <span class="nm">0</span>) <span class="kw">return</span>;
+  <span class="kw">const</span> <span class="nm">id</span> = <span class="fn">setTimeout</span>(() =&gt; <span class="fn">setSegundosRestantes</span>((<span class="nm">s</span>) =&gt; <span class="nm">s</span> - <span class="nm">1</span>), <span class="nm">1000</span>);
+  <span class="kw">return</span> () =&gt; <span class="fn">clearTimeout</span>(<span class="nm">id</span>); <span class="cm">// cleanup al desmontar o re-render</span>
+}, [<span class="nm">segundosRestantes</span>]);
+
+<span class="cm">// Al reenviar: mock + arranca cooldown</span>
+<span class="kw">const</span> <span class="fn">handleReenviar</span> = <span class="kw">async</span> () =&gt; {
+  <span class="cm">// TODO Fase 6: await axios.post('/api/auth/enviar-verificacion', { email })</span>
+  <span class="kw">await</span> <span class="kw">new</span> <span class="ty">Promise</span>((<span class="nm">r</span>) =&gt; <span class="fn">setTimeout</span>(<span class="nm">r</span>, <span class="nm">900</span>));
+  <span class="fn">setSegundosRestantes</span>(<span class="nm">COOLDOWN_SEGUNDOS</span>); <span class="cm">// arranca 60 s</span>
+};</pre>
+
+<h2>PaginaVerificarEmail — estados de la verificación</h2>
+
+<pre><span class="kw">type</span> <span class="ty">EstadoVerificacion</span> = <span class="st">'verificando'</span> | <span class="st">'exito'</span> | <span class="st">'error'</span>;
+
+<span class="fn">useEffect</span>(() =&gt; {
+  <span class="kw">if</span> (!<span class="nm">token</span>) { <span class="fn">setEstado</span>(<span class="st">'error'</span>); <span class="kw">return</span>; } <span class="cm">// sin token → error inmediato</span>
+  <span class="kw">const</span> <span class="nm">id</span> = <span class="fn">setTimeout</span>(() =&gt; <span class="fn">setEstado</span>(<span class="st">'exito'</span>), <span class="nm">1500</span>); <span class="cm">// mock: éxito tras 1.5 s</span>
+  <span class="kw">return</span> () =&gt; <span class="fn">clearTimeout</span>(<span class="nm">id</span>);
+  <span class="cm">// TODO Fase 4: await axios.post('/api/auth/verificar-email', { token })</span>
+  <span class="cm">//              → exito | error según respuesta del backend</span>
+}, [<span class="nm">token</span>]);</pre>
+
+<div class="caja caja-info">
+  <strong>¿Por qué <code>pendiente/page.tsx</code> es Server Component?</strong><br>
+  El email se recibe como <code>searchParams.email</code>, que Next.js resuelve en servidor.
+  La parte interactiva (cooldown, botón reenvío) está en <code>TarjetaVerificacionPendiente</code>
+  (Client Component). Este patrón — Server Component wrapper + Client Component interactivo —
+  es el mismo que usa <code>registro/page.tsx</code> con <code>FormularioRegistro</code>.
+</div>
+
+<hr>
+
 <div class="pie">
-  <p>Gastronómica — TFG · Alejandro Hernández González · Fase 1 Sprint 1 · 2026-03-21</p>
-  <p>Generado con Claude Code · Next.js 14 · TypeScript · React Hook Form · Zod · NextAuth.js</p>
+  <p>Cookr — TFG · Alejandro Hernández González · Fase 1 Sprint 1 · 2026-03-23</p>
+  <p>Generado con Claude Code · Next.js 14 · TypeScript · React Hook Form · Zod · NextAuth.js · Resend (Fase 6)</p>
 </div>
 
 </body>
