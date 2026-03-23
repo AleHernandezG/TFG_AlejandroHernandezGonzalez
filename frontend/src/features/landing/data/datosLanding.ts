@@ -32,25 +32,26 @@ export type SlideHero = {
 export const slidesHero: SlideHero[] = [
   {
     id: "slide-1",
-    gradiente: "from-amber-300/50 via-orange-200/35 to-yellow-100/25",
+    // Hero gradient Cookr (ocre/naranja cálido) — vars definidas en globals.css
+    gradiente: "from-[var(--hero-gradient-start)] via-[var(--hero-gradient-mid)] to-[var(--hero-gradient-end)]",
     emoji: "🍳",
     etiqueta: "Desayunos creativos",
   },
   {
     id: "slide-2",
-    gradiente: "from-emerald-300/45 via-teal-200/30 to-cyan-100/20",
+    gradiente: "from-[var(--theme-fresh)]/45 via-[var(--theme-fresh)]/20 to-[var(--theme-fresh)]/10",
     emoji: "🥗",
     etiqueta: "Ensaladas frescas",
   },
   {
     id: "slide-3",
-    gradiente: "from-rose-300/45 via-pink-200/30 to-fuchsia-100/20",
+    gradiente: "from-[var(--theme-sweet)]/45 via-[var(--theme-sweet)]/20 to-[var(--theme-sweet)]/10",
     emoji: "🍰",
     etiqueta: "Postres caseros",
   },
   {
     id: "slide-4",
-    gradiente: "from-violet-300/45 via-purple-200/30 to-indigo-100/20",
+    gradiente: "from-[var(--theme-pasta)]/45 via-[var(--theme-pasta)]/20 to-[var(--theme-pasta)]/10",
     emoji: "🍝",
     etiqueta: "Pastas artesanales",
   },

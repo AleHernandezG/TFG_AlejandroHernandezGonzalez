@@ -16,13 +16,12 @@ const stackTecnologico = [
   { etiqueta: 'Zod', href: 'https://zod.dev' },
   { etiqueta: 'React Hook Form', href: 'https://react-hook-form.com' },
   { etiqueta: 'Lucide Icons', href: 'https://lucide.dev' },
+  { etiqueta: 'GitHub', href: 'https://github.com' },
 ]
 
 const enlacesUtiles = [
   { etiqueta: 'Política de privacidad', href: '/privacidad' },
   { etiqueta: 'Términos de uso', href: '/terminos' },
-  { etiqueta: 'Contacto', href: '/contacto' },
-  { etiqueta: 'GitHub del proyecto', href: 'https://github.com' },
 ]
 
 export function PiePagina() {
@@ -31,7 +30,6 @@ export function PiePagina() {
       <div className="mx-auto w-full max-w-5xl px-5 py-14 md:px-10">
         <Separator className="mb-12 opacity-50" />
 
-        {/* Grid principal */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {/* Marca + aviso sobre IA */}
           <div className="flex flex-col gap-4">
@@ -94,14 +92,14 @@ export function PiePagina() {
         {/* Cita */}
         <div className="mb-12 flex justify-center">
           <blockquote className="max-w-2xl text-center text-base italic leading-relaxed text-muted-foreground md:text-lg">
-            &ldquo;Mami te quiero mucho&rdquo;
+            &ldquo;Mami te amo&rdquo;
           </blockquote>
         </div>
 
         {/* Barra inferior */}
-        <div className="flex flex-col items-center justify-between gap-2 text-center md:flex-row md:text-left">
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Cookr — Trabajo de Fin de Grado.
+            © {new Date().getFullYear()} CookR — Trabajo de Fin de Grado.
           </p>
         </div>
       </div>

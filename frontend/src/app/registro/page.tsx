@@ -33,11 +33,12 @@ export default function PaginaRegistro() {
         />
 
         {/* Overlay general — mejora contraste del texto sin ahogar la imagen */}
+        {/* sin equivalente en paleta Cookr: overlay semitransparente negro sobre foto */}
         <div className="absolute inset-0 bg-black/30" />
 
         {/* Gradiente lateral derecho — funde la imagen con el panel del formulario
             (técnica usada por Linear, Spotify, Vercel en sus páginas de auth) */}
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-stone-950" />
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[var(--auth-dark)]" />
 
         {/* ── Texto editorial centrado ────────────────────────────────── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
@@ -70,7 +71,7 @@ export default function PaginaRegistro() {
       {/* ── Panel derecho — formulario ────────────────────────────────── */}
       {/* Gradiente oscuro cálido: diferencia claramente del blanco del navegador
           y crea contraste elegante con la Card blanca del formulario */}
-      <main className="flex w-full flex-col items-center justify-center bg-gradient-to-b from-stone-950 to-zinc-950 px-4 py-12 lg:w-1/2 xl:w-2/5">
+      <main className="flex w-full flex-col items-center justify-center bg-[var(--auth-dark)] px-4 py-12 lg:w-1/2 xl:w-2/5">
         <div className="w-full max-w-md">
           <FormularioRegistro />
         </div>

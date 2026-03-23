@@ -70,6 +70,18 @@
     --sidebar-accent-foreground: oklch(0.28 0.04 55);
     --sidebar-border: oklch(0.90 0.015 70);
     --sidebar-ring: oklch(0.65 0.12 65);
+
+    /* ── Categorías semánticas ───────────────────────────── */
+    --category-social: oklch(0.45 0.10 240);
+    --category-ai:     oklch(0.45 0.12 290);
+
+    /* ── Temas del carrusel ──────────────────────────────── */
+    --theme-fresh: oklch(0.55 0.12 160);
+    --theme-sweet: oklch(0.60 0.15 350);
+    --theme-pasta: oklch(0.50 0.12 290);
+
+    /* ── Auth panel ──────────────────────────────────────── */
+    --auth-dark: oklch(0.12 0.015 50);
   }
 
   .dark {
@@ -127,6 +139,18 @@
     --sidebar-accent-foreground: oklch(0.92 0.01 70);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.55 0.10 55);
+
+    /* ── Categorías semánticas (dark) ────────────────────── */
+    --category-social: oklch(0.65 0.08 240);
+    --category-ai:     oklch(0.65 0.10 290);
+
+    /* ── Temas del carrusel (dark) ───────────────────────── */
+    --theme-fresh: oklch(0.65 0.10 160);
+    --theme-sweet: oklch(0.70 0.12 350);
+    --theme-pasta: oklch(0.65 0.10 290);
+
+    /* ── Auth panel (dark) ───────────────────────────────── */
+    --auth-dark: oklch(0.10 0.015 50);
   }
 
   .theme {

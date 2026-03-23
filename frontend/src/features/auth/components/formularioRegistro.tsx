@@ -102,7 +102,7 @@ export function FormularioRegistro() {
       >
         <Card className="border-border/60 shadow-lg">
           <CardContent className="flex flex-col items-center gap-5 py-12 text-center">
-            <CheckCircle2 className="h-14 w-14 text-emerald-500" aria-hidden />
+            <CheckCircle2 className="h-14 w-14 text-[var(--chart-3)]" aria-hidden />
             <div className="space-y-1">
               <h2 className="text-xl font-semibold">¡Cuenta creada!</h2>
               <p className="text-sm text-muted-foreground max-w-xs">

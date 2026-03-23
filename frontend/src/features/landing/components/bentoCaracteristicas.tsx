@@ -13,9 +13,9 @@ const mapaIconos: Record<IconoCaracteristicaLanding, typeof ChefHat> = {
 };
 
 const gradienteIcono: Record<IconoCaracteristicaLanding, string> = {
-  chef: "from-amber-400/20 to-orange-300/10 text-amber-600",
-  social: "from-sky-400/20 to-blue-300/10 text-sky-600",
-  ia: "from-violet-400/20 to-purple-300/10 text-violet-600",
+  chef:   "from-brand/20 to-brand-muted/10 text-brand",
+  social: "bg-[oklch(0.92_0.04_240)] text-[var(--category-social)]",
+  ia:     "bg-[oklch(0.92_0.04_290)] text-[var(--category-ai)]",
 };
 
 const contenedor = {

@@ -54,8 +54,8 @@ export function TarjetaTestimonio({ testimonio, variants }: PropsTarjetaTestimon
               <Heart
                 key={i}
                 className={`h-3.5 w-3.5 transition-colors ${
-                  i < testimonio.valoracion
-                    ? "fill-rose-500 text-rose-500"
+                i < testimonio.valoracion
+                    ? "fill-destructive text-destructive"
                     : "fill-transparent text-muted-foreground/25"
                 }`}
               />
