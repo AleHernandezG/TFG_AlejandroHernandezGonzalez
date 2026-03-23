@@ -42,28 +42,29 @@ export default function PaginaRegistro() {
 
         {/* ── Texto editorial centrado ────────────────────────────────── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
-          {/* Etiqueta decorativa superior */}
-          <div className="mb-7 flex items-center gap-3">
-            <div className="h-px w-14 bg-white/45" />
-            <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-white/65">
+          {/* Etiqueta decorativa superior — uniforme, sin mezcla de colores */}
+          <div className="mb-8 flex items-center gap-3">
+            <div className="h-px w-14 bg-white/40" />
+            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/55">
               Red social gastronómica
             </span>
-            <div className="h-px w-14 bg-white/45" />
+            <div className="h-px w-14 bg-white/40" />
           </div>
 
-          {/* Nombre de marca — bold italic, estilo editorial de revista de gastronomía */}
-          <h1 className="font-black italic leading-none tracking-tight text-white drop-shadow-2xl"
-              style={{ fontSize: 'clamp(2.8rem, 5vw, 4.5rem)' }}>
+          {/* Nombre de marca — único tratamiento: gradiente brand→brand-muted
+              Patrón Linear / Stripe / Vercel: máximo impacto con un solo efecto */}
+          <h1
+            className="bg-gradient-to-r from-brand to-brand-muted bg-clip-text font-black italic leading-none tracking-tight text-transparent"
+            style={{ fontSize: 'clamp(3.5rem, 6vw, 6.5rem)' }}
+          >
             Cookr
           </h1>
 
-          {/* Subtítulo con separadores horizontales — patrón Spotify / Bon Appétit */}
-          <div className="mt-6 flex items-center gap-4 text-white/75">
-            <div className="h-px w-12 bg-white/40" />
-            <p className="text-xs font-light uppercase tracking-[0.35em] drop-shadow-md">
-              El arte de cocinar
-            </p>
-            <div className="h-px w-12 bg-white/40" />
+          {/* Subtítulo — limpio, sin efectos extra */}
+          <div className="mt-7 flex items-center gap-4 text-white/60">
+            <div className="h-px w-12 bg-white/35" />
+            <p className="text-xs font-semibold uppercase tracking-[0.35em]">El arte de cocinar</p>
+            <div className="h-px w-12 bg-white/35" />
           </div>
         </div>
       </div>
