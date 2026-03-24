@@ -2,7 +2,7 @@
 
 # TFG · Red Social Gastronómica con IA
 
-# Creado: 2026-03-20 | Actualizado: 2026-03-22 (sesión 3) | Estado: ⏳ En progreso
+# Creado: 2026-03-20 | Actualizado: 2026-03-24 (sesión 4) | Estado: ⏳ En progreso
 
 #
 
@@ -14,37 +14,28 @@
 
 ## [TFG-16] Login (/login)
 
-Estado: ⏳ Pendiente — siguiente tarea del Sprint 1
-Cuándo: Sprint 1 (Mar 16 → Mar 29)
+Estado: 👁️ Pendiente revisión autor — implementado en sesión 4 (2026-03-24)
 
-Qué hay que hacer:
+Qué se hizo:
+- `src/app/login/page.tsx` — layout split-screen espejado (form izquierda, imagen derecha)
+- `src/features/auth/components/formularioLogin.tsx` — 2 campos, toggle contraseña, enlace "¿Olvidaste tu contraseña?", mock submit
+- `esquemaLogin` + `DatosLogin` añadidos a `autenticacion.ts`
+- Barrel export actualizado
+- Documentación técnica: `docs/iniciar.html` (10 secciones)
 
-1. Crear `src/app/login/page.tsx` — Server Component con metadata (igual que registro/page.tsx)
-   - Título: "Iniciar sesión — Cookr"
-   - Fondo decorativo: mismo layout split-screen que /registro — misma imagen `fondo-auth.jpg`, mismo gradiente `from-stone-950 to-zinc-950` en el panel del formulario
-2. Crear `src/features/auth/components/formularioLogin.tsx` — Client Component
-   - Importar BotonGoogle (textoAccion="Iniciar sesión con Google", urlRetorno="/")
-   - Importar DivisorOAuth — reutilización directa sin duplicar código
-   - Solo 2 campos: correo + contraseña (sin nombre, sin confirmar contraseña)
-   - esquemaLogin Zod: correo (email) + contrasena (min 1, sin regex fuertes — ya registrada)
-   - Toggle mostrar/ocultar contraseña (igual que en registro)
-   - Link "¿Olvidaste tu contraseña?" → pendiente implementar en Fase 4
-   - Link "¿No tienes cuenta?" → /registro
-   - Mock en submit (mismo patrón que formularioRegistro — TODO Fase 4: signIn credentials)
-3. Añadir `FormularioLogin` al barrel export en `src/features/auth/components/index.ts`
-4. Actualizar `docs/context.md` y `docs/folderStructure.md` al terminar
-5. Crear phase report `docs/phase-reports/fase-1-sprint-1-login.md`
-6. Crear documentación técnica `docs/login.html` (mismo estilo que registro.html)
+---
 
-Reutilización del feature auth:
+## [UI-007] Flujo de recuperación de contraseña (3 vistas)
 
-- BotonGoogle: pasar textoAccion="Iniciar sesión con Google"
-- DivisorOAuth: import directo sin cambios
-- Tipos EstadoFormulario: reutilizar de autenticacion.ts
-- NO duplicar BotonGoogle ni DivisorOAuth
+Estado: 👁️ Pendiente revisión autor — implementado en sesión 4 (2026-03-24)
 
-Commit esperado:
-feat(auth): implementar página de login /login con formulario Zod + Google OAuth
+Qué se hizo:
+- `src/app/recuperar-contrasena/page.tsx` — layout igual que /login (form izq, imagen der), solo campo email
+- `src/app/recuperar-contrasena/pendiente/page.tsx` — pantalla "revisa tu correo" con cooldown reenvío 60s
+- `src/app/nueva-contrasena/page.tsx` — layout como /registro (imagen izq, form der), 2 campos + éxito in-page
+- Componentes: `FormularioRecuperarContrasena`, `TarjetaRecuperacionPendiente`, `FormularioNuevaContrasena`
+- Tipos Zod: `esquemaRecuperarContrasena`, `esquemaNuevaContrasena` en `autenticacion.ts`
+- TODOs marcados: `[AUTH-008]` (Fase 6) y `[AUTH-009]` (Fase 4+6)
 
 ---
 

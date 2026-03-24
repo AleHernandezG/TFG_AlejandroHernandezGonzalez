@@ -1,8 +1,25 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-03-23
+**Fecha:** 2026-03-24
 **Sprint Actual:** Sprint 1 — Setup + Autenticación (Mar 16 → Mar 29)
 **Fase:** Fase 1 de 7 — Autenticación (Frontend)
+
+---
+
+## Reglas de flujo de trabajo — Claude
+
+### Estados de vistas/componentes
+
+Cuando Claude crea una vista nueva, el estado en context.md y en el registro de cambios es:
+
+| Estado | Símbolo | Significado |
+|---|---|---|
+| Implementado, pendiente de revisión | `👁️ Pendiente revisión` | Claude ha creado el código. El autor aún no ha revisado ni aprobado visualmente la vista |
+| Aprobado por el autor | `✅` | El autor ha revisado la vista en el navegador y da el visto bueno |
+
+**Regla:** Claude nunca marca una vista como `✅ Completado` en context.md hasta que el autor confirme explícitamente que la ha revisado y aprobado. Si el autor dice "ok", "aprobado", "bien" o similar, Claude actualiza el estado a `✅`.
+
+---
 
 ## Estado Actual
 
@@ -24,7 +41,11 @@
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
 - ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
 - ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (mock, Fase 6 para Resend real)
-- 🔜 Pendiente este sprint: Login (/login) — TFG-16
+- 👁️ Pendiente revisión — [UI-006] Login (/login) — TFG-16: layout split-screen espejado (form izquierda, imagen derecha), FormularioLogin con RHF + Zod, enlace "¿Olvidaste tu contraseña?", reutiliza BotonGoogle y DivisorOAuth
+- 👁️ Pendiente revisión — [UI-007] Flujo recuperación de contraseña (3 vistas mock):
+  - /recuperar-contrasena: layout igual que /login, solo campo email
+  - /recuperar-contrasena/pendiente: pantalla "revisa tu correo" con cooldown reenvío 60s
+  - /nueva-contrasena: layout como /registro (imagen izq, form der), 2 campos contraseña + confirmar + pantalla éxito in-page
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -173,7 +194,10 @@ Diseño de ambas páginas:
 | `/registro` | Página de registro | ✅ |
 | `/privacidad` | Política de privacidad | ✅ |
 | `/terminos` | Términos de uso | ✅ |
-| `/login` | Inicio de sesión | 🔜 TFG-16 |
+| `/login` | Inicio de sesión | 👁️ Pendiente revisión |
+| `/recuperar-contrasena` | Solicitar recuperación (email) | 👁️ Pendiente revisión |
+| `/recuperar-contrasena/pendiente` | Confirmar envío de correo | 👁️ Pendiente revisión |
+| `/nueva-contrasena` | Establecer nueva contraseña | 👁️ Pendiente revisión |
 | `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
 | `/verificar-email` | Verificación de token por enlace | ✅ mock |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
@@ -205,7 +229,7 @@ Diseño de ambas páginas:
 
 ## Próxima Tarea
 
-Continuar Sprint 1: Login (/login) — TFG-16
+Sprint 1 completado. Continuar Sprint 2: Perfil + Navegación Global (barra inferior mobile-first)
 
 ## Paleta de colores — Cookr
 

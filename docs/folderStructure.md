@@ -128,7 +128,7 @@ Todos los imports usan `@/` como raíz de `src/`.
 | Feature   | Estado | Descripción                                                                           |
 | --------- | ------ | ------------------------------------------------------------------------------------- |
 | `landing` | ✅     | SeccionHero, BentoCaracteristicas, BentoTestimonios, datos mock                       |
-| `auth`    | 🔄     | BotonGoogle, DivisorOAuth, FormularioRegistro — TFG-16 Login pendiente (Sprint 1)     |
+| `auth`    | 👁️     | FormularioRegistro, FormularioLogin, FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente, TarjetaRecuperacionPendiente, BotonGoogle, DivisorOAuth — Sprint 1 completado, pendiente revisión autor |
 
 ## Añadir un Nuevo Feature
 

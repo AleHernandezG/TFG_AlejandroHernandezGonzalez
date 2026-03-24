@@ -27,6 +27,45 @@ export const esquemaRegistro = z
 
 export type DatosRegistro = z.infer<typeof esquemaRegistro>;
 
+// ─── Esquema de validación para recuperar contraseña ────────────────────────
+
+export const esquemaRecuperarContrasena = z.object({
+  correo: z.string().email("Introduce un correo electrónico válido").trim(),
+});
+
+export type DatosRecuperarContrasena = z.infer<typeof esquemaRecuperarContrasena>;
+
+// ─── Esquema de validación para establecer nueva contraseña ──────────────────
+
+export const esquemaNuevaContrasena = z
+  .object({
+    contrasena: z
+      .string()
+      .min(8, "La contraseña debe tener al menos 8 caracteres")
+      .regex(/[A-Za-z]/, "La contraseña debe contener al menos una letra")
+      .regex(/[0-9]/, "La contraseña debe contener al menos un número"),
+
+    confirmarContrasena: z.string(),
+  })
+  .refine((datos) => datos.contrasena === datos.confirmarContrasena, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmarContrasena"],
+  });
+
+export type DatosNuevaContrasena = z.infer<typeof esquemaNuevaContrasena>;
+
+// ─── Esquema de validación para el formulario de login ──────────────────────
+
+export const esquemaLogin = z.object({
+  correo: z.string().email("Introduce un correo electrónico válido").trim(),
+
+  contrasena: z
+    .string()
+    .min(1, "Introduce tu contraseña"),
+});
+
+export type DatosLogin = z.infer<typeof esquemaLogin>;
+
 // ─── Estados posibles del formulario ────────────────────────────────────────
 
 export type EstadoFormulario = "idle" | "cargando" | "exito" | "error";

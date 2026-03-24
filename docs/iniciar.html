@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Documentación técnica</title>
+  <style>
+    /* ─── Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    /* ─── Tipografía ────────────────────────────────────── */
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+
+    strong { color: #111; }
+
+    em { color: #6b7280; font-style: italic; }
+
+    /* ─── Código ────────────────────────────────────────── */
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    /* ─── Cajas de información ──────────────────────────── */
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    /* ─── Badges ────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ok    { background: #dcfce7; color: #15803d; }
+    .warn  { background: #fef9c3; color: #92400e; }
+    .pend  { background: #fee2e2; color: #991b1b; }
+    .info  { background: #dbeafe; color: #1e40af; }
+
+    /* ─── Portada ───────────────────────────────────────── */
+    .portada {
+      text-align: center;
+      padding: 64px 0 48px;
+      border-bottom: 2px solid #b45309;
+      margin-bottom: 48px;
+    }
+
+    .portada h1 {
+      font-size: 30pt;
+      border: none;
+      margin: 0 0 6px;
+      color: #b45309;
+    }
+
+    .portada .subtitulo { font-size: 14pt; color: #4b5563; margin: 0; }
+    .portada .meta      { font-size: 9.5pt; color: #9ca3af; margin-top: 20px; }
+
+    /* ─── Árbol de archivos ─────────────────────────────── */
+    .arbol {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 1.8;
+      margin: 12px 0 20px;
+    }
+
+    .arbol .dir  { color: #93c5fd; font-weight: 700; }
+    .arbol .file { color: #86efac; }
+    .arbol .new  { color: #f9e2af; font-weight: 700; }
+    .arbol .note { color: #6c7086; }
+
+    /* ─── Índice ────────────────────────────────────────── */
+    .indice {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px 28px;
+      margin-bottom: 40px;
+    }
+
+    .indice h2 {
+      font-size: 12pt;
+      border: none;
+      margin: 0 0 12px;
+      color: #374151;
+    }
+
+    .indice ol {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 32px;
+    }
+
+    .indice li { margin-bottom: 5px; font-size: 10pt; }
+
+    .indice a { color: #1c3d5a; text-decoration: none; }
+    .indice a:hover { text-decoration: underline; color: #b45309; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="portada">
+  <h1>Iniciar Sesión</h1>
+  <p class="subtitulo">Documentación técnica — Vista <code>/login</code></p>
+  <p class="meta">
+    Proyecto: <strong>Cookr</strong> · TFG AlejandroHernandezGonzalez ·
+    Sprint 1 · Fase 1 — Autenticación (Frontend)<br/>
+    Fecha: 2026-03-24 · Estado: <span class="badge ok">✅ Completado</span>
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     ÍNDICE
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="indice">
+  <h2>Contenido</h2>
+  <ol>
+    <li><a href="#resumen">Resumen ejecutivo</a></li>
+    <li><a href="#archivos">Archivos creados / modificados</a></li>
+    <li><a href="#layout">Layout split-screen (espejado)</a></li>
+    <li><a href="#esquema">Esquema Zod — DatosLogin</a></li>
+    <li><a href="#formulario">FormularioLogin — arquitectura</a></li>
+    <li><a href="#animaciones">Sistema de animaciones</a></li>
+    <li><a href="#estados">Estados del formulario</a></li>
+    <li><a href="#oauth">Google OAuth en login</a></li>
+    <li><a href="#paleta">Paleta de colores aplicada</a></li>
+    <li><a href="#todos">TODOs y fases posteriores</a></li>
+    <li><a href="#recuperacion">Flujo recuperación de contraseña</a></li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     1. RESUMEN EJECUTIVO
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="resumen">1. Resumen ejecutivo</h1>
+
+<p>
+  La vista <code>/login</code> es la segunda pantalla del flujo de autenticación de Cookr.
+  Permite al usuario identificarse mediante <strong>correo electrónico + contraseña</strong>
+  o mediante <strong>Google OAuth</strong>.
+</p>
+
+<p>
+  El diseño sigue el mismo sistema visual que <code>/registro</code> (referentes: Linear,
+  Spotify, Netflix) con una única variación de composición: el <strong>layout split-screen
+  está espejado</strong> — el formulario ocupa el panel izquierdo y la imagen el panel derecho,
+  creando simetría visual entre ambas rutas y una sensación de progresión natural para el usuario
+  que navega entre ellas.
+</p>
+
+<div class="caja caja-aviso">
+  <strong>Estado: mock (Sprint 1)</strong>
+  El envío del formulario simula una latencia de red (1 s) y redirige a <code>/</code>.
+  La integración real con NextAuth <code>CredentialsProvider</code> y el backend se implementará
+  en la Fase 4 (Sprint 9-10).
+</div>
+
+<table>
+  <tr>
+    <th>Aspecto</th>
+    <th>Detalle</th>
+  </tr>
+  <tr>
+    <td>Ruta</td>
+    <td><code>/login</code></td>
+  </tr>
+  <tr>
+    <td>Sprint</td>
+    <td>Sprint 1 — TFG-16</td>
+  </tr>
+  <tr>
+    <td>Épica</td>
+    <td>E1 — Autenticación</td>
+  </tr>
+  <tr>
+    <td>Componente principal</td>
+    <td><code>FormularioLogin</code></td>
+  </tr>
+  <tr>
+    <td>Validación</td>
+    <td>Zod v4 + React Hook Form</td>
+  </tr>
+  <tr>
+    <td>OAuth</td>
+    <td>Google OAuth via NextAuth (<code>BotonGoogle</code> reutilizado)</td>
+  </tr>
+  <tr>
+    <td>Diferencia vs /registro</td>
+    <td>Layout espejado · 2 campos en vez de 4 · enlace "¿Olvidaste tu contraseña?"</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     2. ARCHIVOS CREADOS / MODIFICADOS
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="archivos">2. Archivos creados / modificados</h1>
+
+<div class="arbol">
+<span class="dir">frontend/src/</span>
+├── <span class="dir">app/</span>
+│   └── <span class="dir new">login/</span>                              <span class="note">← NUEVO</span>
+│       └── <span class="file new">page.tsx</span>                       <span class="note">← NUEVO — ruta /login, layout espejado</span>
+│
+├── <span class="dir">features/auth/</span>
+│   ├── <span class="dir">components/</span>
+│   │   ├── <span class="file new">formularioLogin.tsx</span>            <span class="note">← NUEVO — FormularioLogin</span>
+│   │   └── <span class="file">index.ts</span>                           <span class="note">← MODIFICADO — export FormularioLogin añadido</span>
+│   └── <span class="dir">types/</span>
+│       └── <span class="file">autenticacion.ts</span>                   <span class="note">← MODIFICADO — esquemaLogin + DatosLogin añadidos</span>
+</div>
+
+<table>
+  <tr>
+    <th>Archivo</th>
+    <th>Tipo de cambio</th>
+    <th>Descripción</th>
+  </tr>
+  <tr>
+    <td><code>app/login/page.tsx</code></td>
+    <td><span class="badge ok">NUEVO</span></td>
+    <td>Página Next.js con metadata, layout split-screen espejado e instancia de <code>FormularioLogin</code></td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/formularioLogin.tsx</code></td>
+    <td><span class="badge ok">NUEVO</span></td>
+    <td>Componente de formulario con RHF + Zod, toggle contraseña, estados de envío y animaciones Framer Motion</td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/index.ts</code></td>
+    <td><span class="badge info">MODIFICADO</span></td>
+    <td>Añadido barrel export: <code>export { FormularioLogin }</code></td>
+  </tr>
+  <tr>
+    <td><code>features/auth/types/autenticacion.ts</code></td>
+    <td><span class="badge info">MODIFICADO</span></td>
+    <td>Añadidos <code>esquemaLogin</code>, <code>DatosLogin</code> (tipo inferido). <code>EstadoFormulario</code> compartido con registro</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     3. LAYOUT SPLIT-SCREEN
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="layout">3. Layout split-screen (espejado)</h1>
+
+<p>
+  La página <code>/login</code> es un espejo visual de <code>/registro</code>. Ambas usan el
+  mismo sistema de dos paneles, pero con las posiciones invertidas:
+</p>
+
+<table>
+  <tr>
+    <th>Panel</th>
+    <th>/registro</th>
+    <th>/login</th>
+  </tr>
+  <tr>
+    <td>Izquierdo</td>
+    <td>Imagen gastronómica + texto editorial</td>
+    <td><strong>Formulario + fondo oscuro</strong></td>
+  </tr>
+  <tr>
+    <td>Derecho</td>
+    <td>Formulario + fondo oscuro</td>
+    <td><strong>Imagen gastronómica + texto editorial</strong></td>
+  </tr>
+  <tr>
+    <td>Gradiente de fusión</td>
+    <td><code>from-transparent to-[var(--auth-dark)]</code> (derecha)</td>
+    <td><code>from-transparent to-[var(--auth-dark)]</code> (izquierda)</td>
+  </tr>
+  <tr>
+    <td>Móvil (< lg)</td>
+    <td>Imagen oculta, formulario pantalla completa</td>
+    <td>Imagen oculta, formulario pantalla completa</td>
+  </tr>
+</table>
+
+<h3>Técnica de fusión imagen → panel</h3>
+<p>
+  El gradiente lateral crea una transición sin corte brusco entre la imagen y el fondo oscuro del formulario.
+  En <code>/login</code> el gradiente apunta hacia la izquierda:
+</p>
+
+<pre>
+<span class="cm">/* Panel imagen — gradiente izquierdo (fusiona con panel formulario) */</span>
+<span class="nm">className</span>=<span class="st">"absolute inset-y-0 left-0 w-32
+           bg-gradient-to-l from-transparent to-[var(--auth-dark)]"</span>
+</pre>
+
+<div class="caja caja-info">
+  <strong>Referentes de diseño</strong>
+  Linear, Spotify, Netflix y Vercel usan este patrón split-screen en sus páginas de autenticación.
+  La inversión de paneles entre registro y login es una convención reconocida (ej. Notion, Figma)
+  que transmite al usuario que está en una pantalla distinta sin romper el sistema visual.
+</div>
+
+<h3>Comportamiento responsive</h3>
+
+<table>
+  <tr>
+    <th>Breakpoint</th>
+    <th>Comportamiento</th>
+  </tr>
+  <tr>
+    <td>Mobile (< 1024px)</td>
+    <td>Imagen oculta. Formulario ocupa 100% del ancho con <code>bg-[var(--auth-dark)]</code></td>
+  </tr>
+  <tr>
+    <td>Desktop (≥ 1024px)</td>
+    <td>Formulario izquierda <code>lg:w-1/2</code>, imagen derecha <code>lg:w-1/2</code></td>
+  </tr>
+  <tr>
+    <td>Desktop XL (≥ 1280px)</td>
+    <td>Formulario <code>xl:w-2/5</code>, imagen <code>xl:w-3/5</code> — imagen gana espacio</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     4. ESQUEMA ZOD — DatosLogin
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="esquema">4. Esquema Zod — DatosLogin</h1>
+
+<p>
+  El esquema de login es deliberadamente minimalista: solo dos campos, sin confirmaciones
+  ni validaciones de complejidad (esas pertenecen al registro). El único requisito de
+  <code>contrasena</code> es que no esté vacía — la validación de credenciales es responsabilidad
+  del backend.
+</p>
+
+<pre>
+<span class="cm">// features/auth/types/autenticacion.ts</span>
+
+<span class="kw">export const</span> <span class="nm">esquemaLogin</span> = <span class="fn">z</span>.<span class="fn">object</span>({
+  <span class="nm">correo</span>: <span class="fn">z</span>.<span class="fn">string</span>().<span class="fn">email</span>(<span class="st">"Introduce un correo electrónico válido"</span>).<span class="fn">trim</span>(),
+  <span class="nm">contrasena</span>: <span class="fn">z</span>.<span class="fn">string</span>().<span class="fn">min</span>(<span class="nu">1</span>, <span class="st">"Introduce tu contraseña"</span>),
+});
+
+<span class="kw">export type</span> <span class="ty">DatosLogin</span> = <span class="fn">z</span>.<span class="fn">infer</span>&lt;<span class="kw">typeof</span> <span class="nm">esquemaLogin</span>&gt;;
+</pre>
+
+<table>
+  <tr>
+    <th>Campo</th>
+    <th>Tipo</th>
+    <th>Validación</th>
+    <th>Mensaje de error</th>
+  </tr>
+  <tr>
+    <td><code>correo</code></td>
+    <td>string</td>
+    <td>Formato email válido</td>
+    <td>"Introduce un correo electrónico válido"</td>
+  </tr>
+  <tr>
+    <td><code>contrasena</code></td>
+    <td>string</td>
+    <td>No vacía (min 1 carácter)</td>
+    <td>"Introduce tu contraseña"</td>
+  </tr>
+</table>
+
+<div class="caja caja-aviso">
+  <strong>¿Por qué no validar complejidad en login?</strong>
+  En login la contraseña ya existe — no tiene sentido imponer reglas de formato que podrían
+  bloquear a usuarios que se registraron con reglas distintas. Solo validamos que el campo no
+  esté vacío antes de enviar al servidor.
+</div>
+
+<h3>Reutilización de EstadoFormulario</h3>
+<p>
+  El tipo <code>EstadoFormulario = "idle" | "cargando" | "exito" | "error"</code> definido
+  originalmente para registro es compartido por el formulario de login sin modificación.
+  Evita duplicar tipos para el mismo concepto.
+</p>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     5. FORMULARIOLOGIN — ARQUITECTURA
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="formulario">5. FormularioLogin — arquitectura</h1>
+
+<h3>Estructura del componente</h3>
+
+<pre>
+<span class="ty">FormularioLogin</span> (<span class="st">"use client"</span>)
+├── <span class="fn">useState</span>: mostrarContrasena, estadoEnvio, mensajeError
+├── <span class="fn">useForm</span> (RHF + zodResolver)
+│   ├── defaultValues: { correo: "", contrasena: "" }
+│   └── formState.errors → mensajes bajo cada campo
+├── <span class="fn">alEnviar</span> (async)
+│   ├── setEstadoEnvio("cargando")
+│   ├── <span class="cm">// TODO Fase 4: signIn("credentials", { correo, contrasena })</span>
+│   ├── await simulación 1000ms (mock)
+│   └── router.push("/")  <span class="cm">// TODO Fase 2: cambiar a "/feed"</span>
+└── JSX
+    ├── Card > CardHeader
+    │   ├── Link Cookr (logo nav)
+    │   ├── CardTitle: "Bienvenido de vuelta"
+    │   └── CardDescription
+    └── CardContent
+        ├── BotonGoogle (textoAccion="Continuar con Google")
+        ├── DivisorOAuth
+        ├── Banner de error (condicional)
+        └── motion.form
+            ├── Campo correo
+            ├── Campo contraseña + toggle ojo + enlace "¿Olvidaste...?"
+            ├── Botón submit (idle / cargando)
+            └── Enlace a /registro
+</pre>
+
+<h3>Diferencias clave respecto a FormularioRegistro</h3>
+
+<table>
+  <tr>
+    <th>Característica</th>
+    <th>FormularioRegistro</th>
+    <th>FormularioLogin</th>
+  </tr>
+  <tr>
+    <td>Número de campos</td>
+    <td>4 (nombre, correo, contraseña, confirmar)</td>
+    <td>2 (correo, contraseña)</td>
+  </tr>
+  <tr>
+    <td>Toggle visibilidad</td>
+    <td>2 botones (contraseña + confirmación)</td>
+    <td>1 botón (contraseña)</td>
+  </tr>
+  <tr>
+    <td>Enlace "¿Olvidaste...?"</td>
+    <td>No</td>
+    <td>Sí — inline junto al label de contraseña</td>
+  </tr>
+  <tr>
+    <td>Texto del botón submit</td>
+    <td>"Crear cuenta" / "Creando cuenta…"</td>
+    <td>"Iniciar sesión" / "Iniciando sesión…"</td>
+  </tr>
+  <tr>
+    <td>Enlace inferior</td>
+    <td>→ /login ("Inicia sesión")</td>
+    <td>→ /registro ("Regístrate gratis")</td>
+  </tr>
+  <tr>
+    <td>Disclaimer legal</td>
+    <td>Sí (términos + privacidad)</td>
+    <td>No (solo aplica en el momento del registro)</td>
+  </tr>
+  <tr>
+    <td>autoComplete contraseña</td>
+    <td><code>new-password</code></td>
+    <td><code>current-password</code></td>
+  </tr>
+</table>
+
+<h3>Enlace "¿Olvidaste tu contraseña?"</h3>
+<p>
+  Se coloca en la misma línea que el label de contraseña usando <code>justify-between</code>,
+  patrón estándar en apps de autenticación (Linear, GitHub, Notion). Tiene <code>tabIndex={-1}</code>
+  para no interrumpir el flujo natural de teclado (Tab) del formulario.
+</p>
+
+<pre>
+<span class="kw">&lt;div</span> <span class="nm">className</span>=<span class="st">"flex items-center justify-between"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;Label</span> <span class="nm">htmlFor</span>=<span class="st">"contrasena"</span><span class="kw">&gt;</span>Contraseña<span class="kw">&lt;/Label&gt;</span>
+  <span class="kw">&lt;Link</span>
+    <span class="nm">href</span>=<span class="st">"/recuperar-contrasena"</span>
+    <span class="nm">className</span>=<span class="st">"text-xs text-muted-foreground hover:text-brand"</span>
+    <span class="nm">tabIndex</span>={-<span class="nu">1</span>}
+  <span class="kw">&gt;</span>¿Olvidaste tu contraseña?<span class="kw">&lt;/Link&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+</pre>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     6. SISTEMA DE ANIMACIONES
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="animaciones">6. Sistema de animaciones</h1>
+
+<p>
+  Idéntico al sistema de <code>FormularioRegistro</code> para garantizar coherencia visual
+  entre ambas pantallas. Tres variantes encadenadas con Framer Motion:
+</p>
+
+<pre>
+<span class="cm">// Contenedor raíz — fade + slide up</span>
+<span class="kw">const</span> <span class="nm">variantesContenedor</span>: <span class="ty">Variants</span> = {
+  <span class="nm">oculto</span>:  { <span class="nm">opacity</span>: <span class="nu">0</span>, <span class="nm">y</span>: <span class="nu">24</span> },
+  <span class="nm">visible</span>: { <span class="nm">opacity</span>: <span class="nu">1</span>, <span class="nm">y</span>: <span class="nu">0</span>,
+    <span class="nm">transition</span>: { <span class="nm">duration</span>: <span class="nu">0.45</span>, <span class="nm">ease</span>: <span class="st">"easeOut"</span> } },
+};
+
+<span class="cm">// Formulario — stagger de campos hijos</span>
+<span class="kw">const</span> <span class="nm">variantesForm</span>: <span class="ty">Variants</span> = {
+  <span class="nm">oculto</span>:  {},
+  <span class="nm">visible</span>: {
+    <span class="nm">transition</span>: { <span class="nm">staggerChildren</span>: <span class="nu">0.07</span>, <span class="nm">delayChildren</span>: <span class="nu">0.1</span> }
+  },
+};
+
+<span class="cm">// Cada campo — fade + slide up individual</span>
+<span class="kw">const</span> <span class="nm">variantesCampo</span>: <span class="ty">Variants</span> = {
+  <span class="nm">oculto</span>:  { <span class="nm">opacity</span>: <span class="nu">0</span>, <span class="nm">y</span>: <span class="nu">10</span> },
+  <span class="nm">visible</span>: { <span class="nm">opacity</span>: <span class="nu">1</span>, <span class="nm">y</span>: <span class="nu">0</span>,
+    <span class="nm">transition</span>: { <span class="nm">duration</span>: <span class="nu">0.3</span>, <span class="nm">ease</span>: <span class="st">"easeOut"</span> } },
+};
+</pre>
+
+<table>
+  <tr>
+    <th>Variante</th>
+    <th>Elemento</th>
+    <th>Efecto</th>
+    <th>Duración</th>
+  </tr>
+  <tr>
+    <td><code>variantesContenedor</code></td>
+    <td>Card completa</td>
+    <td>Fade in + sube 24px</td>
+    <td>450ms</td>
+  </tr>
+  <tr>
+    <td><code>variantesForm</code></td>
+    <td>Formulario</td>
+    <td>Orquesta stagger de hijos</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>variantesCampo</code></td>
+    <td>Cada campo</td>
+    <td>Fade in + sube 10px, cada 70ms</td>
+    <td>300ms cada uno</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     7. ESTADOS DEL FORMULARIO
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="estados">7. Estados del formulario</h1>
+
+<table>
+  <tr>
+    <th>Estado</th>
+    <th>Cuándo ocurre</th>
+    <th>UI resultante</th>
+  </tr>
+  <tr>
+    <td><code>idle</code></td>
+    <td>Estado inicial / tras limpiar error</td>
+    <td>Formulario normal, botón "Iniciar sesión" activo</td>
+  </tr>
+  <tr>
+    <td><code>cargando</code></td>
+    <td>Durante el envío (mock o real)</td>
+    <td>Botón deshabilitado + spinner <code>Loader2</code> + texto "Iniciando sesión…"</td>
+  </tr>
+  <tr>
+    <td><code>error</code></td>
+    <td>Fallo de red o credenciales incorrectas</td>
+    <td>Banner rojo con <code>AlertCircle</code> + mensaje de error. Botón vuelve a ser clicable</td>
+  </tr>
+  <tr>
+    <td><code>exito</code></td>
+    <td>Login correcto</td>
+    <td>Redirección inmediata (<code>router.push</code>), no hay estado visual visible</td>
+  </tr>
+</table>
+
+<h3>Banner de error</h3>
+<p>
+  Igual que en registro: aparece sobre el formulario con animación de entrada
+  (<code>opacity 0→1, y -8→0</code>) y tiene <code>role="alert"</code> para lectores de pantalla.
+</p>
+
+<div class="caja caja-info">
+  <strong>Mensaje de error en login</strong>
+  El mensaje es deliberadamente ambiguo: <em>"Correo o contraseña incorrectos"</em>.
+  No indica cuál de los dos falla — es una práctica de seguridad estándar que evita
+  que un atacante pueda confirmar si un correo está registrado.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     8. GOOGLE OAUTH EN LOGIN
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="oauth">8. Google OAuth en login</h1>
+
+<p>
+  El componente <code>BotonGoogle</code> se reutiliza sin modificaciones.
+  Recibe el texto personalizado <code>textoAccion="Continuar con Google"</code>
+  (distinto del "Registrarse con Google" de /registro) para claridad semántica.
+</p>
+
+<pre>
+<span class="cm">/* En FormularioLogin */</span>
+<span class="kw">&lt;BotonGoogle</span> <span class="nm">textoAccion</span>=<span class="st">"Continuar con Google"</span> <span class="kw">/&gt;</span>
+
+<span class="cm">/* BotonGoogle internamente llama: */</span>
+<span class="fn">signIn</span>(<span class="st">"google"</span>, { <span class="nm">callbackUrl</span>: <span class="nm">urlRetorno</span> }) <span class="cm">// urlRetorno por defecto = "/"</span>
+</pre>
+
+<table>
+  <tr>
+    <th>Prop</th>
+    <th>Valor en login</th>
+    <th>Valor en registro</th>
+  </tr>
+  <tr>
+    <td><code>textoAccion</code></td>
+    <td>"Continuar con Google"</td>
+    <td>"Registrarse con Google"</td>
+  </tr>
+  <tr>
+    <td><code>urlRetorno</code></td>
+    <td><code>"/"</code> (default)</td>
+    <td><code>"/"</code> (default)</td>
+  </tr>
+</table>
+
+<div class="caja caja-aviso">
+  <strong>TODO [AUTH-001] — Fase 2</strong>
+  Cambiar <code>urlRetorno</code> de <code>"/"</code> a <code>"/feed"</code> cuando exista la ruta
+  de feed de recetas. Aplica tanto a login como a registro.
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     9. PALETA DE COLORES APLICADA
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="paleta">9. Paleta de colores aplicada</h1>
+
+<p>
+  Cero colores hardcodeados. Todos los valores usan variables CSS de <code>globals.css</code>
+  a través de clases Tailwind o la sintaxis <code>[var(--nombre)]</code>.
+</p>
+
+<table>
+  <tr>
+    <th>Elemento</th>
+    <th>Clase / variable</th>
+    <th>Variable CSS</th>
+  </tr>
+  <tr>
+    <td>Fondo panel formulario</td>
+    <td><code>bg-[var(--auth-dark)]</code></td>
+    <td><code>--auth-dark</code></td>
+  </tr>
+  <tr>
+    <td>Gradiente fusión imagen</td>
+    <td><code>to-[var(--auth-dark)]</code></td>
+    <td><code>--auth-dark</code></td>
+  </tr>
+  <tr>
+    <td>Logo + link Cookr</td>
+    <td><code>text-brand</code></td>
+    <td><code>--brand</code></td>
+  </tr>
+  <tr>
+    <td>Nombre "Cookr" imagen</td>
+    <td><code>from-brand to-brand-muted</code></td>
+    <td><code>--brand</code> / <code>--brand-muted</code></td>
+  </tr>
+  <tr>
+    <td>Botón submit</td>
+    <td><code>bg-brand hover:bg-brand/90</code></td>
+    <td><code>--brand</code></td>
+  </tr>
+  <tr>
+    <td>Enlace "¿Olvidaste...?"</td>
+    <td><code>hover:text-brand</code></td>
+    <td><code>--brand</code></td>
+  </tr>
+  <tr>
+    <td>Enlace a /registro</td>
+    <td><code>text-brand</code></td>
+    <td><code>--brand</code></td>
+  </tr>
+  <tr>
+    <td>Banner de error</td>
+    <td><code>border-destructive/30 bg-destructive/8 text-destructive</code></td>
+    <td><code>--destructive</code></td>
+  </tr>
+  <tr>
+    <td>Overlay sobre foto</td>
+    <td><code>bg-black/30</code></td>
+    <td>Excepción permitida (overlay funcional)</td>
+  </tr>
+</table>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     10. TODOs Y FASES POSTERIORES
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="todos">10. TODOs y fases posteriores</h1>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Archivo</th>
+    <th>Descripción</th>
+    <th>Fase</th>
+  </tr>
+  <tr>
+    <td><code>[AUTH-001]</code></td>
+    <td><code>botonGoogle.tsx</code></td>
+    <td>Cambiar <code>callbackUrl</code> de <code>"/"</code> a <code>"/feed"</code></td>
+    <td>Fase 2</td>
+  </tr>
+  <tr>
+    <td><code>[AUTH-007]</code></td>
+    <td><code>formularioLogin.tsx</code></td>
+    <td>Sustituir mock por <code>signIn("credentials", { correo, contrasena })</code> con NextAuth CredentialsProvider real</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>[AUTH-003]</code></td>
+    <td><code>lib/auth.ts</code></td>
+    <td>Añadir <code>CredentialsProvider</code> que valide correo + contraseña contra el backend Express</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>[AUTH-004]</code></td>
+    <td><code>lib/auth.ts</code></td>
+    <td>Enriquecer callback <code>session</code> con avatar, rol e ID del usuario del backend</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>[AUTH-008]</code></td>
+    <td><code>formularioRecuperarContrasena.tsx</code> · <code>tarjetaRecuperacionPendiente.tsx</code></td>
+    <td>Conectar con <code>POST /api/auth/recuperar-contrasena</code>: generar token JWT (1h), guardarlo en MongoDB, enviarlo vía Resend</td>
+    <td>Fase 4 + 6</td>
+  </tr>
+  <tr>
+    <td><code>[AUTH-009]</code></td>
+    <td><code>formularioNuevaContrasena.tsx</code></td>
+    <td>Conectar con <code>POST /api/auth/nueva-contrasena</code>: validar token (firma + expiración), actualizar contraseña con bcrypt, invalidar token</td>
+    <td>Fase 4 + 6</td>
+  </tr>
+</table>
+
+<div class="caja caja-codigo">
+  <strong>Flujo completo de login en Fase 4</strong>
+  <ol style="margin:8px 0 0; padding-left:20px; line-height:2">
+    <li>Usuario introduce correo + contraseña y pulsa "Iniciar sesión"</li>
+    <li><code>FormularioLogin.alEnviar</code> llama a <code>signIn("credentials", datos)</code></li>
+    <li>NextAuth invoca <code>CredentialsProvider.authorize</code> → <code>POST /api/auth/login</code> en Express</li>
+    <li>Express valida contra MongoDB (bcrypt) → devuelve usuario o error</li>
+    <li>NextAuth crea sesión JWT → callback <code>session</code> añade id, rol, avatar</li>
+    <li>NextAuth redirige a <code>/feed</code></li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     11. FLUJO DE RECUPERACIÓN DE CONTRASEÑA
+══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="recuperacion">11. Flujo de recuperación de contraseña</h1>
+
+<p>
+  Implementado en la misma sesión que el login (Sprint 1, 2026-03-24) como extensión natural
+  del enlace "¿Olvidaste tu contraseña?" de <code>FormularioLogin</code>.
+  El flujo completo consta de <strong>3 vistas + 3 componentes</strong>, todos en estado mock.
+  La integración real con Resend y el backend se realiza en Fase 4 + 6.
+</p>
+
+<h2>11.1 Mapa del flujo</h2>
+
+<pre>
+/login
+  └─ clic "¿Olvidaste tu contraseña?"
+       ↓
+/recuperar-contrasena           <span class="cm">← formularioRecuperarContrasena.tsx</span>
+  └─ introduce email → submit
+       ↓
+/recuperar-contrasena/pendiente <span class="cm">← tarjetaRecuperacionPendiente.tsx</span>
+  └─ (usuario recibe email con link)
+       ↓
+/nueva-contrasena?token=xxx     <span class="cm">← formularioNuevaContrasena.tsx</span>
+  └─ nueva contraseña + confirmar → éxito in-page → "Iniciar sesión"
+       ↓
+/login
+</pre>
+
+<h2>11.2 Archivos creados</h2>
+
+<table>
+  <tr>
+    <th>Archivo</th>
+    <th>Tipo</th>
+    <th>Descripción</th>
+  </tr>
+  <tr>
+    <td><code>app/recuperar-contrasena/page.tsx</code></td>
+    <td>Server Component</td>
+    <td>Layout form izq + imagen der (igual que /login). Instancia <code>FormularioRecuperarContrasena</code></td>
+  </tr>
+  <tr>
+    <td><code>app/recuperar-contrasena/pendiente/page.tsx</code></td>
+    <td>Server Component</td>
+    <td>Pantalla centrada sobre <code>--auth-dark</code>. Lee <code>?email</code> y lo pasa a <code>TarjetaRecuperacionPendiente</code></td>
+  </tr>
+  <tr>
+    <td><code>app/nueva-contrasena/page.tsx</code></td>
+    <td>Server Component</td>
+    <td>Layout imagen izq + form der (igual que /registro). Lee <code>?token</code> y lo pasa a <code>FormularioNuevaContrasena</code></td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/formularioRecuperarContrasena.tsx</code></td>
+    <td>Client Component</td>
+    <td>1 campo email, Zod <code>esquemaRecuperarContrasena</code>, redirige a <code>/recuperar-contrasena/pendiente?email=...</code></td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/tarjetaRecuperacionPendiente.tsx</code></td>
+    <td>Client Component</td>
+    <td>Muestra email destino, aviso de spam, botón reenvío con cooldown 60s</td>
+  </tr>
+  <tr>
+    <td><code>features/auth/components/formularioNuevaContrasena.tsx</code></td>
+    <td>Client Component</td>
+    <td>2 campos (contraseña + confirmar), Zod <code>esquemaNuevaContrasena</code>, éxito in-page sin redirección</td>
+  </tr>
+  <tr>
+    <td><code>features/auth/types/autenticacion.ts</code></td>
+    <td>Tipos</td>
+    <td>Añadidos <code>esquemaRecuperarContrasena</code>, <code>DatosRecuperarContrasena</code>, <code>esquemaNuevaContrasena</code>, <code>DatosNuevaContrasena</code></td>
+  </tr>
+</table>
+
+<h2>11.3 Layouts y coherencia visual</h2>
+
+<table>
+  <tr>
+    <th>Ruta</th>
+    <th>Panel izquierdo</th>
+    <th>Panel derecho</th>
+    <th>Referente</th>
+  </tr>
+  <tr>
+    <td><code>/recuperar-contrasena</code></td>
+    <td>Formulario (form)</td>
+    <td>Imagen gastronómica</td>
+    <td>Igual que <code>/login</code></td>
+  </tr>
+  <tr>
+    <td><code>/recuperar-contrasena/pendiente</code></td>
+    <td colspan="2">Pantalla centrada, fondo <code>--auth-dark</code></td>
+    <td>Igual que <code>/verificar-email/pendiente</code></td>
+  </tr>
+  <tr>
+    <td><code>/nueva-contrasena</code></td>
+    <td>Imagen gastronómica</td>
+    <td>Formulario (form)</td>
+    <td>Igual que <code>/registro</code> — "vuelta al inicio"</td>
+  </tr>
+</table>
+
+<h2>11.4 Esquemas Zod añadidos</h2>
+
+<pre>
+<span class="cm">// Paso 1 — solicitar recuperación: solo email</span>
+<span class="kw">export const</span> <span class="nm">esquemaRecuperarContrasena</span> = <span class="fn">z</span>.<span class="fn">object</span>({
+  <span class="nm">correo</span>: <span class="fn">z</span>.<span class="fn">string</span>().<span class="fn">email</span>(<span class="st">"Introduce un correo electrónico válido"</span>).<span class="fn">trim</span>(),
+});
+
+<span class="cm">// Paso 3 — nueva contraseña: mismas reglas que registro + refine de coincidencia</span>
+<span class="kw">export const</span> <span class="nm">esquemaNuevaContrasena</span> = <span class="fn">z</span>
+  .<span class="fn">object</span>({
+    <span class="nm">contrasena</span>: <span class="fn">z</span>.<span class="fn">string</span>()
+      .<span class="fn">min</span>(<span class="nu">8</span>, <span class="st">"Mínimo 8 caracteres"</span>)
+      .<span class="fn">regex</span>(<span class="st">/[A-Za-z]/</span>, <span class="st">"Debe contener al menos una letra"</span>)
+      .<span class="fn">regex</span>(<span class="st">/[0-9]/</span>, <span class="st">"Debe contener al menos un número"</span>),
+    <span class="nm">confirmarContrasena</span>: <span class="fn">z</span>.<span class="fn">string</span>(),
+  })
+  .<span class="fn">refine</span>(<span class="nm">d</span> =&gt; <span class="nm">d</span>.<span class="nm">contrasena</span> === <span class="nm">d</span>.<span class="nm">confirmarContrasena</span>, {
+    <span class="nm">message</span>: <span class="st">"Las contraseñas no coinciden"</span>,
+    <span class="nm">path</span>: [<span class="st">"confirmarContrasena"</span>],
+  });
+</pre>
+
+<h2>11.5 Decisiones de diseño destacadas</h2>
+
+<h3>Token como prop, no como hook</h3>
+<p>
+  <code>FormularioNuevaContrasena</code> recibe el <code>token</code> como prop desde la página Server Component,
+  que lo lee de <code>searchParams.token</code>. Esto evita usar <code>useSearchParams()</code> en el Client Component
+  y previene el error de Suspense boundary que afecta a <code>/verificar-email</code>.
+</p>
+
+<h3>Éxito in-page en /nueva-contrasena</h3>
+<p>
+  Tras guardar la contraseña correctamente, en vez de redirigir con <code>router.push</code>,
+  el componente renderiza un estado de éxito en la misma Card (fade in + icono <code>CheckCircle2</code>)
+  con un botón "Iniciar sesión" hacia <code>/login</code>. Evita una redirección extra y permite
+  al usuario leer la confirmación sin prisa.
+</p>
+
+<h3>Cooldown de 60s en reenvío</h3>
+<p>
+  Igual que <code>TarjetaVerificacionPendiente</code>: el botón se deshabilita 60 segundos tras
+  cada reenvío para evitar spam. El estado se gestiona localmente con <code>useState</code> +
+  <code>useEffect</code> (contador regresivo cada 1s).
+</p>
+
+<div class="caja caja-aviso">
+  <strong>Estado: mock en los 3 pasos</strong>
+  Ningún correo real se envía. El flujo simula latencia de red (1s) y avanza por las vistas.
+  <code>[AUTH-008]</code> y <code>[AUTH-009]</code> documentan la integración real en Fase 4 + 6.
+</div>
+
+<hr style="margin-top:60px; border:none; border-top:1px solid #e5e7eb;" />
+<p style="text-align:center; color:#9ca3af; font-size:9pt; margin-top:16px;">
+  Cookr — TFG · AlejandroHernandezGonzalez · 2026-03-24
+</p>
+
+</body>
+</html>
