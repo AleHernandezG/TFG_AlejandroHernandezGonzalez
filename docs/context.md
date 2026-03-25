@@ -227,6 +227,18 @@ Diseño de ambas páginas:
 - [CAROUSEL-002] Transición Ken Burns (opcional, sprint 3)
 - [CAROUSEL-003] Controles accesibles prev/next + aria-live
 
+## Estrategia de despliegue — decidida en Fase 1
+Estado: ⏳ Pendiente de implementar (Fase 6 / Sprint 15)
+
+Frontend → Vercel → cookr.vercel.app
+Backend  → Azure App Service Free F1 → api-cookr.azurewebsites.net
+CI/CD    → GitHub Actions → .github/workflows/ci-cd.yml
+Método   → zip deploy sin Docker (máxima simplicidad)
+Dominio  → cookr.vercel.app (gratuito, sin configuración extra)
+OAuth localhost: funciona hasta Fase 6, no tocar .env.local
+
+Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [SETUP-007]
+
 ## Próxima Tarea
 
 Sprint 1 completado. Continuar Sprint 2: Perfil + Navegación Global (barra inferior mobile-first)

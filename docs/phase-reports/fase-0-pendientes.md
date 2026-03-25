@@ -84,6 +84,49 @@ Resumen:
 
 ---
 
+## [SETUP-006] Deploy — Azure App Service + Vercel + GitHub Actions
+Estado:   ⏳ Pendiente
+Cuándo:   Fase 6 / Sprint 15
+
+Pasos en orden:
+  1. Activar Azure for Students en azure.microsoft.com/free/students
+  2. Crear App Service: api-cookr, Node 20, West Europe, Free F1, Linux
+  3. Descargar Publish Profile desde Azure Portal → Overview
+  4. Añadir secretos en GitHub:
+       AZURE_WEBAPP_PUBLISH_PROFILE (el XML descargado)
+       VERCEL_TOKEN
+       VERCEL_ORG_ID
+       VERCEL_PROJECT_ID
+  5. Crear .github/workflows/ci-cd.yml (ver roadmap.md sección 9)
+  6. Configurar App Settings en Azure Portal (ver infraestructura.md sección 7)
+  7. Configurar Environment Variables en Vercel (ver infraestructura.md sección 7)
+  8. Añadir en Google Cloud Console:
+       https://cookr.vercel.app/api/auth/callback/google
+  9. Verificar CORS en backend (ver api-changes.md [API-002])
+
+---
+
+## [SETUP-007] OAuth — Configuración para producción
+Estado:   ⏳ Pendiente
+Cuándo:   Fase 6 / Sprint 15 — hacer el mismo día del deploy
+
+Dominio definitivo: cookr.vercel.app (no se usa dominio personalizado)
+
+Pasos (hacer todo el mismo día que el deploy):
+  1. Añadir en Vercel → Settings → Environment Variables:
+       NEXTAUTH_URL=https://cookr.vercel.app
+  2. Ir a console.cloud.google.com → APIs & Services
+     → Credentials → OAuth 2.0 Client ID → editar
+  3. Añadir en Authorized redirect URIs:
+       https://cookr.vercel.app/api/auth/callback/google
+  4. Añadir en Authorized JavaScript origins:
+       https://cookr.vercel.app
+  5. Guardar y verificar login con Google en producción
+
+Hasta entonces: desarrollo siempre en localhost:3000, no tocar nada.
+
+---
+
 ## [SETUP-004] Google Cloud Console — OAuth credentials
 Estado:   ✅ Completado — 17/03/2025
 Cuándo:   Sprint 1 — al implementar login con Google

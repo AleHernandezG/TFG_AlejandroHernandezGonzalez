@@ -106,7 +106,7 @@
 | Sprint 11 | E8 Backend Social | Endpoints grupos, notificaciones, seguidores, Redis cache |
 | Sprint 12 | E8 Backend AI + Despensa | Gemini API, Edamam, endpoints despensa y chat |
 | Sprint 13-14 | E9 Integración | Conectar FE, Axios interceptors, TanStack Query real |
-| Sprint 15 | E9 Deploy + QA | Vercel, Render, CI/CD, tests E2E básicos, documentación |
+| Sprint 15 | E9 Deploy + QA | Vercel + Azure App Service + GitHub Actions CI/CD + Google OAuth URI producción + tests básicos |
 
 ---
 
@@ -247,6 +247,100 @@ GEMINI_API_KEY=
 EDAMAM_APP_ID=
 EDAMAM_APP_KEY=
 RESEND_API_KEY=
+```
+
+---
+
+## 9. Estrategia de despliegue — Fase 6
+
+### Pasos en orden (Sprint 15)
+
+**1. Activar Azure for Students**
+- azure.microsoft.com/free/students
+- Verificar con email de la universidad
+- Crédito: $100 sin tarjeta
+
+**2. Crear App Service en Azure Portal**
+- Nombre: api-cookr
+- Runtime: Node.js 20 LTS
+- Region: West Europe
+- Plan: Free F1
+- Sistema operativo: Linux
+
+**3. Descargar Publish Profile**
+- Azure Portal → api-cookr → Overview → Download publish profile
+- Guardar como secreto AZURE_WEBAPP_PUBLISH_PROFILE en GitHub
+
+**4. Configurar GitHub Actions**
+- Crear .github/workflows/ci-cd.yml
+- Jobs: lint → deploy-frontend (Vercel) → deploy-backend (Azure)
+- El workflow solo se activa en push a main
+
+**5. Configurar variables de entorno**
+- Vercel: Settings → Environment Variables
+- Azure: Portal → api-cookr → Configuration → App Settings
+
+**6. Actualizar Google Cloud Console**
+- Añadir URI de producción:
+  https://cookr.vercel.app/api/auth/callback/google
+
+**7. Verificar CORS en backend**
+- Permitir origen: https://cookr.vercel.app
+- Bloquear otros orígenes en producción
+
+### GitHub Actions workflow (ci-cd.yml)
+
+```yaml
+name: CI/CD Cookr
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+      - run: npx tsc --noEmit
+        working-directory: frontend
+
+  deploy-frontend:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: frontend
+
+  deploy-backend:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+        working-directory: backend
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: api-cookr
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend
 ```
 
 ---

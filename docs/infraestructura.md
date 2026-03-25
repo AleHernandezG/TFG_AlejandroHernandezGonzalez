@@ -172,13 +172,66 @@ Redis actúa como intermediario entre Express y MongoDB para reducir consultas r
 
 ## 7. Despliegue e infraestructura cloud
 
-| Componente | Plataforma y motivo |
-|---|---|
-| Frontend Next.js | Vercel — deploy automático, CDN global, optimizado para Next.js |
-| Backend Node.js | Render o Railway — más económico que AWS para un TFG |
-| Base de datos | MongoDB Atlas — cloud, backups automáticos, tier gratuito M0 |
-| Redis | Upstash — serverless Redis, tier gratuito, sin servidor que mantener |
-| CI/CD | GitHub Actions — deploy automático al hacer push a la rama main |
+| Componente | Plataforma | Motivo |
+|---|---|---|
+| Frontend Next.js | Vercel | Deploy automático, CDN global, optimizado para Next.js |
+| Backend Node.js | Azure App Service (Free F1) | Azure for Students, $100 crédito, válido para CV |
+| Base de datos | MongoDB Atlas M0 | Cloud, backups automáticos, tier gratuito |
+| Redis | Upstash | Serverless Redis, tier gratuito, sin servidor |
+| Imágenes/vídeos | Cloudinary | CDN global, transformaciones automáticas |
+| CI/CD | GitHub Actions | Deploy automático en push a main |
+
+### URLs de producción
+- Frontend: https://cookr.vercel.app
+- Backend API: https://api-cookr.azurewebsites.net
+- CORS permitido: solo cookr.vercel.app en producción
+
+### Flujo de deploy (Fase 6)
+```
+git push main
+  ↓
+GitHub Actions: lint + tsc
+  ↓ (si pasa)
+Vercel despliega frontend automáticamente
+Azure App Service despliega backend (zip deploy)
+  ↓
+App en producción en ~3 minutos
+```
+
+### Variables de entorno por entorno
+
+**Frontend — Vercel (Settings → Environment Variables)**
+```
+NEXTAUTH_SECRET
+NEXTAUTH_URL=https://cookr.vercel.app
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+NEXT_PUBLIC_API_URL=https://api-cookr.azurewebsites.net/api
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+```
+
+**Backend — Azure Portal (Configuration → App Settings)**
+```
+MONGODB_URI
+UPSTASH_REDIS_URL
+UPSTASH_REDIS_TOKEN
+JWT_SECRET
+FRONTEND_URL=https://cookr.vercel.app
+GEMINI_API_KEY
+EDAMAM_APP_ID
+EDAMAM_APP_KEY
+RESEND_API_KEY
+NODE_ENV=production
+PORT=8080
+```
+
+**GitHub Secrets (Settings → Secrets → Actions)**
+```
+VERCEL_TOKEN
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID
+AZURE_WEBAPP_PUBLISH_PROFILE
+```
 
 ---
 
