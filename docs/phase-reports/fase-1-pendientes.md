@@ -86,6 +86,40 @@ En `src/lib/auth.ts`:
 
 ---
 
+## [AUTH-005] Proteger rutas autenticadas con getServerSession + redirect
+
+Estado: ⏳ Pendiente — aplazado a Fase 2
+Cuándo: Fase 2 — cuando exista la ruta /feed y otras rutas protegidas
+
+Qué hay que hacer:
+
+Crear un grupo de rutas protegidas en App Router y añadir un layout que verifique la sesión:
+
+1. Crear la carpeta `src/app/(autenticado)/layout.tsx`
+2. Dentro del layout llamar a `getServerSession(opcionesAuth)`
+3. Si no hay sesión → `redirect("/login")`
+4. Si hay sesión → renderizar `{children}`
+
+```tsx
+// src/app/(autenticado)/layout.tsx
+import { getServerSession } from "next-auth";
+import { opcionesAuth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export default async function LayoutAutenticado({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(opcionesAuth);
+  if (!session) redirect("/login");
+  return <>{children}</>;
+}
+```
+
+5. Mover `/feed` y cualquier otra ruta que requiera login dentro de `(autenticado)/`
+
+Nota: NextAuth instala y lee la cookie JWT automáticamente, pero NO redirige por sí solo.
+La protección de rutas debe implementarse explícitamente en el layout del grupo.
+
+---
+
 ## [AUTH-004] Enriquecer callback session con datos del backend
 
 Estado: ⏳ Pendiente — aplazado a Fase 4
