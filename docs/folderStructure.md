@@ -28,12 +28,17 @@ src/
 │   └── common/                 # Componentes reutilizables globales (Footer, Navbar…)
 │
 ├── features/                   # Módulos por dominio — patrón "feature-based"
-│   └── <feature>/
-│       ├── components/         # Componentes propios del feature
-│       │   └── index.ts        # Barrel export
-│       ├── hooks/              # Hooks específicos del feature
-│       ├── data/               # Datos mock / constantes del feature
-│       └── types/              # Tipos específicos del feature
+│   ├── <feature>/
+│   │   ├── components/         # Componentes propios del feature
+│   │   │   └── index.ts        # Barrel export
+│   │   ├── hooks/              # Hooks específicos del feature
+│   │   ├── data/               # Datos mock / constantes del feature
+│   │   └── types/              # Tipos específicos del feature
+│   ├── recetas/                # Sprint 2+ — feed, detalle, crear, buscar
+│   ├── perfil/                 # Sprint 4+
+│   ├── despensa/               # Sprint 5+
+│   ├── chat/                   # Sprint 5+
+│   └── grupos/                 # Sprint 6+
 │
 ├── hooks/                      # Custom hooks globales compartidos
 │
@@ -111,6 +116,101 @@ import { BotonGoogle } from "@/features/auth/components";
 
 `lib/utils.ts` es requerido por shadcn/ui (alias `@/lib/utils`). No añadir más archivos aquí; las utilidades del proyecto deben ir en `hooks/`, `services/` o `config/` según el caso.
 
+## Árbol backend
+
+```
+backend/               # Node.js + Express — activo desde Sprint 2
+├── src/
+│   ├── controllers/
+│   ├── models/        # Mongoose schemas
+│   ├── repositories/  # Toda la comunicación con MongoDB/Redis
+│   ├── routes/
+│   ├── middlewares/
+│   ├── services/
+│   └── lib/           # db.ts, redis.ts, jwt.ts
+├── .env
+└── package.json
+```
+
+## Patrón de capas — Backend
+
+Flujo obligatorio: **Route → Controller → Service → Repository → MongoDB/Redis**
+
+### Capa 1 — Routes
+
+Responsabilidad: definir endpoints y aplicar middlewares.
+NO pueden contener lógica de negocio ni acceder a modelos.
+
+### Capa 2 — Controllers
+
+Responsabilidad: recibir request validado, llamar al service,
+devolver response. Sin lógica de negocio.
+
+### Capa 3 — Services
+
+Responsabilidad: toda la lógica de negocio.
+NO acceden a MongoDB directamente — usan el Repository.
+
+### Capa 4 — Repositories (`backend/src/repositories/`)
+
+Responsabilidad: toda la comunicación con MongoDB y Redis.
+Si se cambia MongoDB por PostgreSQL, solo se tocan los repositories.
+
+```ts
+export const usuarioRepository = {
+  crear:           (datos) => Usuario.create(datos),
+  buscarPorCorreo: (correo) => Usuario.findOne({ correo }),
+  existePorCorreo: async (correo) => !!(await Usuario.exists({ correo })),
+  actualizar:      (id, datos) =>
+    Usuario.findByIdAndUpdate(id, datos, { new: true }),
+}
+```
+
+### Capa 5 — Models
+
+Responsabilidad: definir esquemas Mongoose únicamente.
+Sin lógica de negocio dentro del modelo.
+
+### Repositories planificados
+
+| Fichero | Modelos | Sprint |
+|---|---|---|
+| `backend/src/repositories/usuarioRepository.ts` | Usuario | Sprint 2 |
+| `backend/src/repositories/tokenRepository.ts` | Token | Sprint 2 |
+| `backend/src/repositories/recetaRepository.ts` | Receta, Ingrediente | Sprint 3 |
+| `backend/src/repositories/despensaRepository.ts` | Despensa, ItemDespensa | Sprint 6 |
+| `backend/src/repositories/grupoRepository.ts` | Grupo, Miembro | Sprint 7 |
+
+## Regla de oro — cambio sin efecto cascada
+
+| Si quiero cambiar… | Solo toco… |
+|---|---|
+| URL del backend | `src/services/apiClient.ts` |
+| Axios por fetch | `src/services/apiClient.ts` |
+| MongoDB por PostgreSQL | `backend/src/repositories/*.ts` |
+| shadcn por otra UI lib | `src/components/ui/` |
+| Zustand por Jotai | `src/stores/*.ts` |
+| TanStack Query por SWR | `src/features/*/hooks/*.ts` |
+| Gemini por otro modelo IA | `backend/src/services/chatService.ts` |
+| Cloudinary por S3 | `backend/src/services/imagenService.ts` |
+
+## Árbol docs/stitch/
+
+```
+docs/stitch/              # Diseños de referencia Stitch by Google
+├── home/                 # home.png + home.html (Sprint 2)
+├── detalleReceta/        # detalleReceta.png + detalleReceta.html (Sprint 2)
+├── crearReceta/          # (Sprint 3+)
+├── perfil/               # (Sprint 4+)
+├── despensa/             # (Sprint 5+)
+├── chat/                 # (Sprint 5+)
+├── grupos/               # (Sprint 6+)
+├── notificaciones/       # (Sprint 6+)
+└── ajustes/              # (Sprint 7+)
+```
+
+Ver [docs/stitch/LEEME.md](../stitch/LEEME.md) para el flujo completo de uso.
+
 ## Aliases (tsconfig)
 
 ```json
@@ -125,10 +225,15 @@ Todos los imports usan `@/` como raíz de `src/`.
 
 ## Features Actuales
 
-| Feature   | Estado | Descripción                                                                           |
-| --------- | ------ | ------------------------------------------------------------------------------------- |
-| `landing` | ✅     | SeccionHero, BentoCaracteristicas, BentoTestimonios, datos mock                       |
-| `auth`    | 👁️     | FormularioRegistro, FormularioLogin, FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente, TarjetaRecuperacionPendiente, BotonGoogle, DivisorOAuth — Sprint 1 completado, pendiente revisión autor |
+| Feature    | Estado          | Descripción |
+| ---------- | --------------- | ----------- |
+| `landing`  | ✅              | SeccionHero, BentoCaracteristicas, BentoTestimonios, datos mock |
+| `auth`     | 👁️ revisión    | FormularioRegistro, FormularioLogin, FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente, TarjetaRecuperacionPendiente, BotonGoogle, DivisorOAuth — Sprint 1 completado, pendiente revisión autor |
+| `recetas`  | ⏳ Sprint 2     | Feed, NavBar, Detalle — requiere Stitch previo |
+| `perfil`   | ⏳ Sprint 4     | Pendiente |
+| `despensa` | ⏳ Sprint 5     | Pendiente |
+| `chat`     | ⏳ Sprint 5     | Pendiente |
+| `grupos`   | ⏳ Sprint 6     | Pendiente |
 
 ## Añadir un Nuevo Feature
 

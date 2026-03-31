@@ -61,6 +61,25 @@ Arquitectura Mobile-First construida sobre Next.js + React.
 | `useNotificaciones.js` | Leer y marcar como leídas las notificaciones |
 | `useModoManoLibres.js` | Control del modo cocina con TTS y wake lock |
 
+### Patrón de capas — Frontend
+
+Flujo: **Componente → Hook → Service → API Client → Backend**
+
+- Ningún componente importa Axios directamente.
+- Ningún hook conoce URLs de la API.
+- Todos los hooks de datos del servidor usan TanStack Query.
+- Todo el estado global de UI usa Zustand.
+
+### Patrón de capas — Backend
+
+Flujo: **Route → Controller → Service → Repository → MongoDB/Redis**
+
+- Ningún controller accede a MongoDB directamente.
+- Toda la lógica de negocio vive en services.
+- Todo acceso a BD vive en repositories.
+
+Ver detalle completo en [docs/folderStructure.md](../folderStructure.md).
+
 ### PWA y Accesibilidad
 
 | Feature | Descripción |

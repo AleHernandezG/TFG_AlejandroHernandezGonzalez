@@ -6,6 +6,23 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-014] — Comportamiento scroll en Home: header y buscador no sticky
+Fecha: 2026-04-01 | Estado: 👁️ Pendiente revisión | Sprint: 2
+
+Decisión del autor: tanto `HeaderHome` como `BuscadorFiltros` desaparecen al hacer scroll,
+sin quedarse anclados en pantalla.
+
+Ficheros modificados:
+- `features/recetas/components/headerHome.tsx` — eliminado `sticky top-0 z-40`; también
+  eliminada la campana (Bell) y centrado el título "Cookr" (`justify-center`)
+- `components/common/buscadorFiltros.tsx` — eliminado `sticky z-30` del contenedor base
+- `features/recetas/components/feedHome.tsx` — eliminado `className="top-0"` del prop
+  `BuscadorFiltros` (ya no es necesario)
+
+Motivo: preferencia visual del autor — la pantalla completa es para el feed de recetas.
+
+---
+
 ## [UI-001] — Layout split-screen /registro ✅
 
 **Fecha:** 2026-03-21
@@ -90,6 +107,105 @@ Pantallas del flujo de verificación de email post-registro. Todo es mock hasta 
 - Eliminada la vista de éxito inline (reemplazada por la página dedicada)
 
 0 colores hardcodeados — usa `--brand-subtle`, `--chart-3`, `text-brand`, `text-destructive`.
+
+---
+
+## [UI-008] Refactor capas — FormularioRegistro
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 4
+Fichero: `src/features/auth/components/formularioRegistro.tsx`
+
+Cambio:
+  Extraer `alEnviar` a hook `useRegistro()` en `useAuth.ts`.
+  El componente solo llama al hook: `const { registrar, estado } = useAuth()`.
+
+Archivos afectados:
+  `src/services/apiClient.ts` → CREAR (instancia Axios con JWT)
+  `src/services/authService.ts` → CREAR (método `registro`)
+  `src/features/auth/hooks/useAuth.ts` → CREAR (hook `useRegistro`)
+  `src/features/auth/components/formularioRegistro.tsx` → MODIFICAR
+
+Motivo: cumplir patrón FE: Componente → Hook → Service → apiClient.
+        Ver [DEBT-001](../tech-debt.md)
+
+---
+
+## [UI-009] Refactor capas — FormularioLogin
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 4
+Fichero: `src/features/auth/components/formularioLogin.tsx`
+
+Cambio:
+  Extraer `alEnviar` a hook `useLogin()` en `useAuth.ts`.
+
+Archivos afectados:
+  `src/services/authService.ts` → MODIFICAR (añadir método `login`)
+  `src/features/auth/hooks/useAuth.ts` → MODIFICAR (añadir `useLogin`)
+  `src/features/auth/components/formularioLogin.tsx` → MODIFICAR
+
+Motivo: ver [DEBT-002](../tech-debt.md)
+
+---
+
+## [UI-010] Refactor capas — FormularioRecuperarContrasena
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 5
+Fichero: `src/features/auth/components/formularioRecuperarContrasena.tsx`
+
+Cambio:
+  Extraer `alEnviar` a hook `useRecuperarContrasena()` en `useAuth.ts`.
+
+Archivos afectados:
+  `src/services/authService.ts` → MODIFICAR (añadir método `recuperarContrasena`)
+  `src/features/auth/hooks/useAuth.ts` → MODIFICAR
+  `src/features/auth/components/formularioRecuperarContrasena.tsx` → MODIFICAR
+
+Motivo: ver [DEBT-003](../tech-debt.md)
+
+---
+
+## [UI-011] Refactor capas — FormularioNuevaContrasena
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 5
+Fichero: `src/features/auth/components/formularioNuevaContrasena.tsx`
+
+Cambio:
+  Extraer `alEnviar` a hook `useNuevaContrasena()` en `useAuth.ts`.
+
+Archivos afectados:
+  `src/services/authService.ts` → MODIFICAR (añadir método `nuevaContrasena`)
+  `src/features/auth/hooks/useAuth.ts` → MODIFICAR
+  `src/features/auth/components/formularioNuevaContrasena.tsx` → MODIFICAR
+
+Motivo: ver [DEBT-004](../tech-debt.md)
+
+---
+
+## [UI-012] Refactor capas — TarjetaVerificacionPendiente
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 5
+Fichero: `src/features/auth/components/tarjetaVerificacionPendiente.tsx`
+
+Cambio:
+  Extraer `handleReenviar` a hook `useReenviarVerificacion()` en `useAuth.ts`.
+
+Archivos afectados:
+  `src/services/authService.ts` → MODIFICAR (añadir método `reenviarVerificacion`)
+  `src/features/auth/hooks/useAuth.ts` → MODIFICAR
+  `src/features/auth/components/tarjetaVerificacionPendiente.tsx` → MODIFICAR
+
+Motivo: ver [DEBT-005](../tech-debt.md)
+
+---
+
+## [UI-013] Refactor capas — TarjetaRecuperacionPendiente
+Fecha:   2026-03-31 | Estado: ⏳ Pendiente | Sprint: 5
+Fichero: `src/features/auth/components/tarjetaRecuperacionPendiente.tsx`
+
+Cambio:
+  Extraer `handleReenviar` a hook `useReenviarRecuperacion()` en `useAuth.ts`.
+
+Archivos afectados:
+  `src/services/authService.ts` → MODIFICAR (añadir método `reenviarRecuperacion`)
+  `src/features/auth/hooks/useAuth.ts` → MODIFICAR
+  `src/features/auth/components/tarjetaRecuperacionPendiente.tsx` → MODIFICAR
+
+Motivo: ver [DEBT-006](../tech-debt.md)
 
 ---
 

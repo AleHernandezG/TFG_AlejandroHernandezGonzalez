@@ -2,7 +2,7 @@
 
 # TFG · Red Social Gastronómica con IA
 
-# Creado: 2026-03-20 | Actualizado: 2026-03-24 (sesión 4) | Estado: ⏳ En progreso
+# Creado: 2026-03-20 | Actualizado: 2026-03-30 (sesión 5) | Estado: ✅ Completada
 
 #
 
@@ -14,7 +14,7 @@
 
 ## [TFG-16] Login (/login)
 
-Estado: 👁️ Pendiente revisión autor — implementado en sesión 4 (2026-03-24)
+Estado: ✅ Aprobado por autor — 2026-03-30
 
 Qué se hizo:
 - `src/app/login/page.tsx` — layout split-screen espejado (form izquierda, imagen derecha)
@@ -27,7 +27,7 @@ Qué se hizo:
 
 ## [UI-007] Flujo de recuperación de contraseña (3 vistas)
 
-Estado: 👁️ Pendiente revisión autor — implementado en sesión 4 (2026-03-24)
+Estado: ✅ Aprobado por autor — 2026-03-30
 
 Qué se hizo:
 - `src/app/recuperar-contrasena/page.tsx` — layout igual que /login (form izq, imagen der), solo campo email

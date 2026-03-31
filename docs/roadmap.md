@@ -1,357 +1,385 @@
 # Roadmap — Cookr (TFG)
 > Red Social Gastronómica con IA · Stack MERN + PWA · 2024-2025
+> **Actualizado:** 2026-03-29 — Nuevo modelo de desarrollo FE + BE en paralelo
+
+---
+
+## Modelo de desarrollo
+
+```
+Cada sprint = FE nuevo (mock) + BE del sprint anterior (real) + BD necesaria
+
+Sprint N:
+  ├── FE: nuevas vistas en mock
+  └── BE: vistas del sprint anterior conectadas a real + modelos MongoDB necesarios
+```
+
+> El despliegue online se mantiene al final (Fase 6).
 
 ---
 
 ## 1. Fases del Proyecto
 
-| Fase | Semanas | Tipo | Entregable |
-|---|---|---|---|
-| Fase 0: Setup | Sem 1 | Setup | Repo, estructura, ESLint, CI/CD básico |
-| Fase 1: Autenticación (FE) | Sem 2-3 | Frontend | Landing, Login, Registro, OAuth con NextAuth |
-| Fase 2: Core UI — Recetas (FE) | Sem 4-6 | Frontend | Home, feed, detail view, crear receta, buscar |
-| Fase 3: Features Avanzadas (FE) | Sem 7-9 | Frontend | Despensa, Chat IA, Grupos, Perfil, Ajustes |
-| Fase 4: Backend — API REST | Sem 10-12 | Backend | Express API, MongoDB, autenticación, endpoints |
-| Fase 5: Integración FE↔BE | Sem 13-14 | Integración | Conectar Axios/TanStack Query al API real, JWT |
-| Fase 6: APIs Externas + PWA | Sem 15-16 | Integración | Gemini, Edamam, Cloudinary, Service Worker, deploy |
-| Fase 7: QA y Documentación | Sem 17-18 | Pendiente | Tests, performance, memoria TFG, presentación |
-
-> **Importante:** Las fases 1-3 usan datos mock. Solo en la Fase 5 se conecta el backend.
-
----
-
-## 1.1 Pantallas → Fase y Sprint
-
-| Pantalla | Fase | Sprint |
+| Fase | Tipo | Contenido |
 |---|---|---|
-| Landing Page | Fase 1 (Auth) | Sprint 1 |
-| Registro / Inicio de Sesión | Fase 1 (Auth) | Sprint 1 |
-| Home / Feed | Fase 2 (Core) | Sprint 3 |
-| Vista Detalle Receta | Fase 2 (Core) | Sprint 3 |
-| Crear / Nuevo Post (Receta) | Fase 2 (Core) | Sprint 4 |
-| Despensa | Fase 3 (Avanzado) | Sprint 6 |
-| Chat IA | Fase 3 (Avanzado) | Sprint 6 |
-| Vista Grupo | Fase 3 (Avanzado) | Sprint 7 |
-| Perfil + Recetas Guardadas | Fase 3 (Avanzado) | Sprint 7 |
-| Ajustes | Fase 3 (Avanzado) | Sprint 8 |
-| Help / Preguntas | Fase 3 (Avanzado) | Sprint 8 |
+| Fase 0: Setup | Setup | Repo, estructura, ESLint, CI/CD básico — ✅ Completada |
+| Fase 1: Auth FE | Frontend | Landing, Login, Registro, OAuth — ✅ Completada |
+| Fase 2-5: FE + BE paralelo | FE + BE | Cada sprint: vistas nuevas mock + backend sprint anterior |
+| Fase 6: APIs Externas + PWA + Deploy | Integración | Gemini, Edamam, Cloudinary, Service Worker, Vercel + Azure |
+| Fase 7: QA y Documentación | QA | Tests, performance, memoria TFG, presentación |
 
 ---
 
-## 2. Épicas
+## 2. Pantallas → Sprint
 
-| ID | Épica | Descripción | Sprints |
-|---|---|---|---|
-| E1 | Autenticación | Registro, login, OAuth, sesiones y perfil básico | 1-2 |
-| E2 | Recetas | CRUD completo, búsqueda, filtros, detalle, fork | 3-4 |
-| E3 | Nutrición | Integración Edamam, cálculo automático, info nutricional | 4-5 |
-| E4 | Despensa | Inventario personal, añadir/quitar, caducidades | 5-6 |
-| E5 | Chat IA | Asistente Gemini con contexto de despensa | 6 |
-| E6 | Social | Grupos, seguir usuarios, notificaciones, likes | 7 |
-| E7 | PWA + UX | Modo manos libres, offline, instalación, animaciones | 8 |
-| E8 | Backend API | Express, MongoDB, Redis, todos los endpoints | 9-12 |
-| E9 | Integración | Conectar FE real, Cloudinary, Resend, deploy | 13-15 |
-
----
-
-## 3. Sprints detallados — Frontend (Sprints 1-8)
-
-### Sprint 1 — Setup + Autenticación
-
-| Historia de Usuario | Criterios de Aceptación | Puntos | Épica |
-|---|---|---|---|
-| Como usuario quiero registrarme con email y contraseña | Formulario valida en tiempo real con Zod. Feedback claro de errores | 5 pts | E1 |
-| Como usuario quiero iniciar sesión con Google | Botón OAuth visible. Redirige correctamente. Token guardado en Zustand | 3 pts | E1 |
-| Como usuario quiero ver la landing page | Hero, CTA, 3 features. Responsive. Animada con Framer Motion | 3 pts | E1 |
-| Como dev quiero ESLint + Prettier + alias de paths | npm run lint pasa sin errores. Alias @/ funciona. Pre-commit hook activo | 2 pts | E1 |
-
-### Sprint 2 — Perfil + Navegación Global
-
-| Historia de Usuario | Criterios de Aceptación | Puntos | Épica |
-|---|---|---|---|
-| Como usuario quiero editar mi perfil (nombre, foto, bio) | Upload Cloudinary (mock). Preview en tiempo real. Guardado con feedback | 5 pts | E1 |
-| Como usuario quiero una barra de navegación inferior mobile-first | Nav visible en todas las páginas excepto landing. Iconos Lucide. Active state | 3 pts | E7 |
-| Como usuario quiero ver mis recetas guardadas en el perfil | Grid de recetas guardadas. Estado vacío con CTA. Datos mock | 3 pts | E2 |
-
-### Sprint 3 — Home + Feed de Recetas
-
-| Historia de Usuario | Criterios de Aceptación | Puntos | Épica |
-|---|---|---|---|
-| Como usuario quiero ver un feed de recetas populares | Cards con imagen, título, autor, likes. Scroll infinito mock. Skeleton loaders | 8 pts | E2 |
-| Como usuario quiero buscar recetas por nombre o ingrediente | Barra de búsqueda con debounce. Resultados en tiempo real. Estado vacío | 5 pts | E2 |
-| Como usuario quiero filtrar recetas por dificultad, tiempo o tipo | Drawer de filtros. Multi-selección. Badge con número de filtros activos | 3 pts | E2 |
-
-### Sprint 4 — Detalle Receta + Crear Receta
-
-| Historia de Usuario | Criterios de Aceptación | Puntos | Épica |
-|---|---|---|---|
-| Como usuario quiero ver el detalle completo de una receta | Imagen hero. Tabs: ingredientes/pasos/info. Botón de like y guardar. Comentarios mock | 8 pts | E2 |
-| Como usuario quiero crear una receta con pasos e imágenes | Formulario multi-step. Añadir/reordenar pasos drag-and-drop. Preview antes de publicar | 8 pts | E2 |
-| Como usuario quiero activar el Modo Manos Libres | Botón activa TTS. Lee paso a paso. Wake Lock activado. Controles de voz visibles | 5 pts | E7 |
-
-### Sprints 5-8 — Resumen
-
-| Sprint | Épica | Historias principales |
+| Pantalla | Sprint FE (mock) | Sprint BE (real) |
 |---|---|---|
-| Sprint 5 | E3 + E4 FE | Info nutricional, itemDespensa, añadir/quitar, caducidades |
-| Sprint 6 | E5 + E4 | Chat Gemini mock, historial mensajes, contexto despensa |
-| Sprint 7 | E6 Social | Grupos: crear/unirse/salir, seguir usuarios, notificaciones UI |
-| Sprint 8 | E7 PWA + Ajustes | Service Worker, manifest, instalación, ajustes cuenta, Help |
-
-### Sprints 9-15 — Backend e Integración
-
-| Sprint | Épica | Historias principales |
-|---|---|---|
-| Sprint 9-10 | E8 Backend Auth + Recetas | Express setup, MongoDB, NextAuth backend, CRUD recetas |
-| Sprint 11 | E8 Backend Social | Endpoints grupos, notificaciones, seguidores, Redis cache |
-| Sprint 12 | E8 Backend AI + Despensa | Gemini API, Edamam, endpoints despensa y chat |
-| Sprint 13-14 | E9 Integración | Conectar FE, Axios interceptors, TanStack Query real |
-| Sprint 15 | E9 Deploy + QA | Vercel + Azure App Service + GitHub Actions CI/CD + Google OAuth URI producción + tests básicos |
+| Landing Page | Sprint 1 ✅ | — sin backend |
+| Registro / Login / Recuperar contraseña | Sprint 1 ✅ | Sprint 2 |
+| Home / Feed de recetas | Sprint 2 | Sprint 3 |
+| NavBar inferior | Sprint 2 | — sin backend |
+| Detalle de receta | Sprint 2 | Sprint 3 |
+| Buscar recetas | Sprint 3 | Sprint 4 |
+| Filtros de recetas | Sprint 3 | Sprint 4 |
+| Crear receta | Sprint 3 | Sprint 4 |
+| Perfil de usuario | Sprint 4 | Sprint 5 |
+| Recetas guardadas | Sprint 4 | Sprint 5 |
+| Despensa virtual | Sprint 5 | Sprint 6 |
+| Chat IA (Gemini) | Sprint 5 | Fase 6 |
+| Grupos / Comunidades | Sprint 6 | Sprint 7 |
+| Notificaciones | Sprint 6 | Sprint 7 |
+| Ajustes | Sprint 7 | Sprint 8 |
+| Help / Preguntas | Sprint 7 | Sprint 8 |
+| Modo Manos Libres (TTS) | Sprint 8 | — sin backend |
 
 ---
 
-## 4. Herramienta ágil — Linear
+## 3. Épicas
 
-- **Workspace:** TFG Gastronómica
-- **Projects:** Frontend Core / Backend API / Integración
-- **Cycles:** Sprints de 2 semanas
-- **Labels:** Frontend, Backend, Bug, Documentación, Bloqueo
-- **Estimates:** Puntos de historia (Fibonacci: 1, 2, 3, 5, 8)
+| ID | Épica | Descripción | Sprints FE | Sprints BE |
+|---|---|---|---|---|
+| E1 | Autenticación | Registro, login, OAuth, recuperar contraseña | 1 ✅ | 2 |
+| E2 | Recetas | CRUD completo, feed, detalle, búsqueda, filtros | 2-3 | 3-4 |
+| E3 | Nutrición | Edamam, cálculo automático, info nutricional | 5 | Fase 6 |
+| E4 | Despensa | Inventario personal, añadir/quitar, caducidades | 5 | 6 |
+| E5 | Chat IA | Asistente Gemini con contexto despensa | 5 | Fase 6 |
+| E6 | Social | Grupos, seguir usuarios, notificaciones, likes | 6 | 7 |
+| E7 | Perfil + UX | Perfil, recetas guardadas, ajustes | 4 | 5 |
+| E8 | PWA | Modo manos libres, offline, instalación | 8 | — |
+| E9 | Deploy | Vercel, Azure, CI/CD, OAuth producción | — | Fase 6 |
 
-### Formato de Issue en Linear
+---
 
-```
-Título: [E2] Como usuario, quiero ver el detalle de una receta
+## 4. Sprints detallados
 
-Tipo: Historia de Usuario
-Épica: E2 — Recetas
-Sprint: Sprint 4
-Estimación: 8 puntos
-Prioridad: Alta
-Labels: Frontend
+---
 
-DESCRIPCIÓN
-Como usuario autenticado,
-quiero ver la página de detalle de una receta
-para conocer ingredientes, pasos, nutrición y comentarios.
+### Sprint 1 — Auth FE ✅ COMPLETADO
 
-CRITERIOS DE ACEPTACIÓN
-✅ Imagen hero con gradiente y nombre de la receta visible
-✅ Tabs funcionales: Ingredientes | Pasos | Nutrición
-✅ Botón "Guardar" actualiza el estado en Zustand
-✅ Botón "Like" cambia icono con animación (optimistic UI)
-✅ Responsive: mobile ≤ 768px, desktop > 768px
-✅ Skeleton loader mientras carga
+**Tipo:** Solo Frontend mock
 
-COMPONENTES AFECTADOS
-/app/recetas/[id]/page.jsx
-/components/receta/RecetaHero.jsx
-/components/receta/TabsNutricion.jsx
+| Tarea | Estado | Puntos |
+|---|---|---|
+| Landing Page | ✅ | 3 pts |
+| Registro con email + Google OAuth | ✅ | 5 pts |
+| Login con email + Google OAuth | ✅ pendiente revisión visual | 3 pts |
+| Recuperar contraseña (3 vistas) | ✅ pendiente revisión visual | 3 pts |
+| Verificar email (2 vistas mock) | ✅ | 2 pts |
+| Setup ESLint + Prettier + alias | ✅ | 2 pts |
 
-NOTAS TÉCNICAS
-- Usar datos mock de /mocks/receta.json hasta Sprint 13
-- TanStack Query: queryKey: ['receta', id]
-```
+---
+
+### Sprint 2 — Home + Feed + Detalle FE / Auth BE
+
+**Tipo:** FE nuevas vistas mock + BE Sprint 1 real + BD Auth
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Home / Feed de recetas | Cards con imagen, título, autor, likes. Skeleton loaders. Scroll infinito mock | 8 pts | E2 |
+| Barra de navegación inferior | Visible en todas excepto landing. Iconos Lucide. Active state brand. Mobile-first | 3 pts | E2 |
+| Detalle de receta | Imagen hero. Tabs: ingredientes / pasos / nutrición. Like y guardar. Comentarios mock | 8 pts | E2 |
+
+#### BE — Auth real Sprint 1 conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| Setup Express + estructura backend | Proyecto Node/Express, capas, middlewares base (cors, helmet, morgan) | 3 pts |
+| MongoDB: modelo Usuario | nombre, correo, contraseña (bcrypt), foto, rol, cuentaVerificada, fechaRegistro, alergias, preferencias | 3 pts |
+| MongoDB: modelo Token | userId, token JWT firmado, tipo (verificacion / recuperacion), expira (TTL index), usado | 2 pts |
+| Endpoint POST /api/auth/registro | Zod validación, bcrypt hash, guardar Usuario, generar Token verificación | 5 pts |
+| Endpoint POST /api/auth/login | Verificar credenciales, bcrypt.compare, devolver JWT de sesión | 3 pts |
+| Endpoint POST /api/auth/verificar-email | Validar token JWT, cuentaVerificada=true, invalidar token | 2 pts |
+| Endpoint POST /api/auth/recuperar-contrasena | Generar token JWT 1h, guardar en Token, email mock por ahora | 3 pts |
+| Endpoint POST /api/auth/nueva-contrasena | Validar token, bcrypt nueva contraseña, invalidar token | 3 pts |
+| JWT Middleware | Verificar token en rutas protegidas, adjuntar usuario al request | 2 pts |
+| Zod validadores backend | Schemas registro, login, recuperación — segunda capa de validación | 2 pts |
+
+**BD necesaria este sprint:**
+- Colección `usuarios` — índice único en `correo`
+- Colección `tokens` — TTL index en `expira` (MongoDB borra automáticamente)
+
+---
+
+### Sprint 3 — Buscar + Filtrar + Crear Receta FE / Feed + Detalle BE
+
+**Tipo:** FE nuevas vistas mock + BE Sprint 2 FE real
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Buscar recetas | Barra búsqueda con debounce. Resultados en tiempo real. Estado vacío | 5 pts | E2 |
+| Filtrar recetas | Drawer filtros. Multi-selección. Badge número activos | 3 pts | E2 |
+| Crear receta | Formulario multi-step. Drag-and-drop pasos. Preview antes de publicar | 8 pts | E2 |
+
+#### BE — Feed + Detalle real Sprint 2 FE conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| MongoDB: modelo Receta | nombre, descripción, pasos, ingredientes, imagenUrl, autor, likes, dificultad, tiempo, filtros, esBorrador | 3 pts |
+| MongoDB: modelo Ingrediente | nombre, categoría, alérgenos, imagenUrl | 2 pts |
+| Endpoint GET /api/recetas | Feed paginado por cursor, filtros opcionales, ordenado popularidad | 5 pts |
+| Endpoint GET /api/recetas/:id | Detalle completo con datos del autor | 3 pts |
+| Endpoint POST /api/recetas/:id/like | Toggle like | 2 pts |
+| Redis cache feed popular | Cache 5 min para GET /api/recetas | 3 pts |
+| Conectar FE Auth con BE real | Sustituir mocks login/registro por llamadas reales | 5 pts |
+
+**BD necesaria este sprint:**
+- Colección `recetas` — índices en `autor`, `filtros`, `likes`
+- Colección `ingredientes`
+- Setup Upstash Redis
+
+---
+
+### Sprint 4 — Perfil + Recetas Guardadas FE / Buscar + Crear Receta BE
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Perfil de usuario | Avatar, nombre, bio. Editar inline. Upload foto mock | 5 pts | E7 |
+| Recetas guardadas | Grid 2col mobile / 3col desktop. Estado vacío con CTA | 3 pts | E7 |
+| Editar / eliminar receta propia | Botones en detalle si eres el autor. Confirmación borrado | 5 pts | E2 |
+
+#### BE — Buscar + Crear Receta real Sprint 3 FE conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| Endpoint GET /api/recetas/buscar | Búsqueda texto + filtros. Índice texto MongoDB | 5 pts |
+| Endpoint POST /api/recetas | Crear receta, Zod validación, Cloudinary mock URL | 5 pts |
+| Endpoint PUT /api/recetas/:id | Editar receta (solo autor) | 3 pts |
+| Endpoint DELETE /api/recetas/:id | Eliminar receta (solo autor) | 2 pts |
+| MongoDB: modelo RecetaGuardada | userId + recetaId + fechaGuardado | 2 pts |
+| Endpoint POST /api/recetas/:id/guardar | Toggle guardar receta | 2 pts |
+
+---
+
+### Sprint 5 — Despensa + Chat IA FE / Perfil BE
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Despensa virtual | Lista items. Añadir/quitar. Caducidades. Badge alerta | 8 pts | E4 |
+| Chat IA mock | Burbujas chat. Input mensaje. Historial local. Typing indicator | 8 pts | E5 |
+
+#### BE — Perfil real Sprint 4 FE conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| Endpoint GET /api/usuarios/:username | Perfil público | 3 pts |
+| Endpoint PUT /api/usuarios/perfil | Editar nombre, bio, foto mock | 3 pts |
+| Endpoint GET /api/usuarios/guardadas | Recetas guardadas del usuario | 3 pts |
+
+---
+
+### Sprint 6 — Grupos + Notificaciones FE / Despensa BE
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Vista Grupos | Feed grupos. Detalle con recetas. Unirse/salir | 8 pts | E6 |
+| Notificaciones | Lista notificaciones. Badge contador. Marcar leída | 5 pts | E6 |
+| Seguir usuarios | Botón seguir en perfil. Lista seguidores/seguidos | 3 pts | E6 |
+
+#### BE — Despensa real Sprint 5 FE conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| MongoDB: modelo Despensa | userId + items (ingrediente, cantidad, unidad, caducidad, esFavorito) | 3 pts |
+| Endpoint GET /api/despensa | Obtener despensa del usuario | 2 pts |
+| Endpoint POST /api/despensa | Añadir item | 2 pts |
+| Endpoint DELETE /api/despensa/:itemId | Quitar item | 2 pts |
+| Endpoint GET /api/despensa/recetas-posibles | Recetas con ingredientes disponibles | 5 pts |
+
+---
+
+### Sprint 7 — Ajustes + Help FE / Grupos + Notificaciones BE
+
+#### FE — Nuevas vistas mock
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Ajustes | Tema, notificaciones, privacidad, cerrar sesión, eliminar cuenta | 5 pts | E7 |
+| Help / FAQ | FAQ buscable. Sección tutorial | 3 pts | E7 |
+
+#### BE — Grupos + Notificaciones real Sprint 6 FE conectado
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| MongoDB: modelo Grupo | nombre, descripción, imagenUrl, filtros, miembros, numRecetas | 3 pts |
+| MongoDB: modelo Miembro | grupoId + userId + rol + fechaUnion | 2 pts |
+| MongoDB: modelo Notificacion | userId + tipo + mensaje + leida + fechaCreacion | 2 pts |
+| Endpoint GET /api/grupos | Feed grupos con filtros | 3 pts |
+| Endpoint POST /api/grupos/:id/unirse | Unirse a un grupo | 2 pts |
+| Endpoint GET /api/notificaciones | Notificaciones del usuario | 2 pts |
+| Endpoint PUT /api/notificaciones/:id/leer | Marcar como leída | 1 pt |
+| Endpoint POST /api/usuarios/:id/seguir | Toggle seguir usuario | 2 pts |
+
+---
+
+### Sprint 8 — PWA + Modo Manos Libres FE / Ajustes BE + Pulido
+
+#### FE
+
+| Historia | Criterios de aceptación | Puntos | Épica |
+|---|---|---|---|
+| Modo Manos Libres | TTS lee pasos. Wake Lock. Controles voz | 8 pts | E8 |
+| Service Worker | Caché recetas visitadas. Funciona offline | 5 pts | E8 |
+| PWA Manifest | Instalable en móvil. Icono. Modo standalone | 2 pts | E8 |
+
+#### BE — Ajustes + limpieza
+
+| Tarea | Descripción | Puntos |
+|---|---|---|
+| Endpoint PUT /api/usuarios/ajustes | Preferencias notificaciones, privacidad | 3 pts |
+| Endpoint DELETE /api/usuarios | Eliminar cuenta soft delete | 2 pts |
+| Rate limiting | express-rate-limit en rutas auth y IA | 2 pts |
+| Redis: revisar TTLs y caches | Optimización general | 3 pts |
+
+---
+
+### Fase 6 — APIs Externas + Deploy
+
+| Tarea | Descripción |
+|---|---|
+| Gemini API real | Conectar Chat IA + contexto despensa |
+| Edamam API | Cálculo nutricional al crear/editar recetas |
+| Cloudinary | Upload real imágenes recetas y avatares |
+| Resend | Emails verificación y recuperación contraseña |
+| next-pwa migración | next-pwa@5 → @ducanh2912/next-pwa (ver tech-debt.md DEBT-001) |
+| Next.js 14 → 15 | Migración + ESLint v9 (ver tech-debt.md DEBT-001) |
+| Vercel deploy | Frontend en producción |
+| Azure App Service | Backend en producción (ver fase-0-pendientes.md SETUP-006) |
+| GitHub Actions CI/CD | Workflow lint + deploy (ver fase-0-pendientes.md SETUP-001) |
+| OAuth producción | NEXTAUTH_URL + Google Cloud Console (ver api-changes.md API-003) |
+
+---
+
+### Fase 7 — QA y Documentación TFG
+
+| Tarea | Descripción |
+|---|---|
+| Tests E2E básicos | Flujos críticos: registro, login, crear receta, buscar |
+| Performance | Lighthouse, Core Web Vitals |
+| Memoria TFG | Documentación académica completa |
+| Presentación | Slides + demo en vivo |
 
 ---
 
 ## 5. Sistema de documentación para Claude
 
-### Ficheros de contexto
-
 | Fichero | Dónde | Cuándo adjuntarlo |
 |---|---|---|
-| `context.md` | `docs/context.md` | SIEMPRE al inicio de cada sesión |
-| `infraestructura.md` | `docs/infraestructura.md` | Cuando haya dudas de stack o arquitectura |
-| `roadmap.md` | `docs/roadmap.md` | Cuando haya dudas de planificación o criterios |
-| `ui-changes.md` | `docs/changes/` | Cuando vayas a cambiar algo visual |
-| `api-changes.md` | `docs/changes/` | Cuando cambie un endpoint o hook |
-| `domain-changes.md` | `docs/changes/` | Cuando cambie el modelo de datos |
+| `context.md` | `docs/` | SIEMPRE al inicio de cada sesión |
+| `infraestructura.md` | `docs/` | Dudas de stack o arquitectura |
+| `roadmap.md` | `docs/` | Dudas de planificación o criterios |
+| `folderStructure.md` | `docs/` | Dudas de estructura de carpetas |
+| `ui-changes.md` | `docs/changes/` | Cambios visuales |
+| `api-changes.md` | `docs/changes/` | Cambios de endpoints |
+| `domain-changes.md` | `docs/changes/` | Cambios de modelo de datos |
 
-### Sistema de IDs para cambios
+### Sistema de IDs
 
-| Prefijo | Tipo de cambio | Fichero |
+| Prefijo | Tipo | Fichero |
 |---|---|---|
 | `[UI-XXX]` | Vistas, componentes, layouts | `ui-changes.md` |
 | `[API-XXX]` | Endpoints, contratos, hooks | `api-changes.md` |
 | `[DOM-XXX]` | Modelo de dominio, schemas | `domain-changes.md` |
+| `[AUTH-XXX]` | TODOs de autenticación | `fase-1-pendientes.md` |
+| `[SETUP-XXX]` | Setup y deploy | `fase-0-pendientes.md` |
+| `[DEBT-XXX]` | Deuda técnica | `tech-debt.md` |
 
-### Estados de cambio
+### Estados
 
-| Estado | Significado | Acción |
-|---|---|---|
-| ⏳ Pendiente | Decidido, no implementado | Añadir al backlog de Linear |
-| 🔄 En Progreso | Implementándose en el sprint activo | Issue activa en Linear |
-| ✅ Completado | Implementado y en rama main | No requiere acción |
-| 🚫 Descartado | Se decidió no implementar | Documentar el motivo |
+| Estado | Significado |
+|---|---|
+| ⏳ Pendiente | Decidido, no implementado |
+| 🔄 En Progreso | En el sprint activo |
+| ✅ Completado | En rama main, aprobado por el autor |
+| 🚫 Descartado | No se implementa |
+| 👁️ Pendiente revisión | Implementado por Claude, pendiente aprobación |
 
-> **Regla de oro:** nunca edites una entrada completada. Si el cambio evoluciona, crea una nueva entrada ([UI-004] en vez de editar [UI-001]).
-
----
-
-## 6. Estructura de carpetas del proyecto
-
-```
-TFG_AlejandroHernandezGonzalez/
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── (auth)/registro/
-│   │   │   ├── (auth)/login/
-│   │   │   ├── recetas/[id]/
-│   │   │   ├── despensa/
-│   │   │   ├── chat/
-│   │   │   ├── grupos/
-│   │   │   └── perfil/[username]/
-│   │   ├── components/
-│   │   │   ├── ui/          ← shadcn/ui (no tocar)
-│   │   │   ├── receta/
-│   │   │   ├── despensa/
-│   │   │   ├── chat/
-│   │   │   └── shared/      ← Nav, Header, Skeleton...
-│   │   ├── hooks/           ← Custom hooks
-│   │   ├── store/           ← Zustand
-│   │   ├── lib/
-│   │   │   ├── axios.js     ← instancia configurada
-│   │   │   └── validations/ ← schemas Zod
-│   │   └── mocks/           ← JSON para desarrollo FE
-├── backend/                 ← vacío hasta Fase 4
-└── docs/
-    ├── context.md           ← actualizar cada sesión
-    ├── infraestructura.md
-    ├── roadmap.md
-    ├── changes/
-    │   ├── ui-changes.md
-    │   ├── api-changes.md
-    │   └── domain-changes.md
-    └── phase-reports/
-```
+> Claude nunca marca ✅ sin confirmación explícita del autor.
 
 ---
 
-## 7. Variables de entorno (.env.local)
+## 6. Variables de entorno
+
+### Frontend (.env.local)
 
 ```bash
-# Auth
 NEXTAUTH_SECRET=
 NEXTAUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-
-# Backend (Fase 4)
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=   # Fase 6
+```
 
-# Servicios externos (Fase 6)
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
-GEMINI_API_KEY=
-EDAMAM_APP_ID=
-EDAMAM_APP_KEY=
-RESEND_API_KEY=
+### Backend (.env)
+
+```bash
+PORT=4000
+NODE_ENV=development
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=
+UPSTASH_REDIS_URL=                   # Sprint 3+
+UPSTASH_REDIS_TOKEN=                 # Sprint 3+
+FRONTEND_URL=http://localhost:3000
+GEMINI_API_KEY=                      # Fase 6
+EDAMAM_APP_ID=                       # Fase 6
+EDAMAM_APP_KEY=                      # Fase 6
+RESEND_API_KEY=                      # Fase 6
+CLOUDINARY_URL=                      # Fase 6
 ```
 
 ---
 
-## 9. Estrategia de despliegue — Fase 6
+## 7. Despliegue — Fase 6
 
-### Pasos en orden (Sprint 15)
-
-**1. Activar Azure for Students**
-- azure.microsoft.com/free/students
-- Verificar con email de la universidad
-- Crédito: $100 sin tarjeta
-
-**2. Crear App Service en Azure Portal**
-- Nombre: api-cookr
-- Runtime: Node.js 20 LTS
-- Region: West Europe
-- Plan: Free F1
-- Sistema operativo: Linux
-
-**3. Descargar Publish Profile**
-- Azure Portal → api-cookr → Overview → Download publish profile
-- Guardar como secreto AZURE_WEBAPP_PUBLISH_PROFILE en GitHub
-
-**4. Configurar GitHub Actions**
-- Crear .github/workflows/ci-cd.yml
-- Jobs: lint → deploy-frontend (Vercel) → deploy-backend (Azure)
-- El workflow solo se activa en push a main
-
-**5. Configurar variables de entorno**
-- Vercel: Settings → Environment Variables
-- Azure: Portal → api-cookr → Configuration → App Settings
-
-**6. Actualizar Google Cloud Console**
-- Añadir URI de producción:
-  https://cookr.vercel.app/api/auth/callback/google
-
-**7. Verificar CORS en backend**
-- Permitir origen: https://cookr.vercel.app
-- Bloquear otros orígenes en producción
-
-### GitHub Actions workflow (ci-cd.yml)
-
-```yaml
-name: CI/CD Cookr
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-        working-directory: frontend
-      - run: npm run lint
-        working-directory: frontend
-      - run: npx tsc --noEmit
-        working-directory: frontend
-
-  deploy-frontend:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: frontend
-
-  deploy-backend:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-        working-directory: backend
-      - uses: azure/webapps-deploy@v3
-        with:
-          app-name: api-cookr
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: backend
 ```
+Frontend → Vercel (cookr.vercel.app)
+Backend  → Azure App Service Free F1 (api-cookr.azurewebsites.net)
+BD       → MongoDB Atlas M0
+Redis    → Upstash (tier gratuito)
+CI/CD    → GitHub Actions (push a main)
+```
+
+Ver `fase-0-pendientes.md` → SETUP-005, SETUP-006, SETUP-007
 
 ---
 
 ## 8. Commits — Conventional Commits
 
 ```
-feat(auth): añadir login con Google OAuth
+feat(auth): añadir endpoint POST /api/auth/registro
+feat(home): implementar feed de recetas con skeleton loaders
+feat(be): setup Express + estructura backend
 fix(recetas): corregir scroll infinito en iOS Safari
-style(home): ajustar espaciado cards en mobile
-refactor(hooks): extraer lógica de paginación a usePagination
-docs(api): documentar endpoint POST /api/recetas
-chore(deps): actualizar tanstack-query a 5.28.0
+docs(roadmap): actualizar modelo FE+BE paralelo
+chore(deps): actualizar tanstack-query
 ```

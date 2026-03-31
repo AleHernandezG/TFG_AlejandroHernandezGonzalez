@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NavBar Inferior — Documentación completa</title>
+  <style>
+    /* ─── Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    /* ─── Tipografía ────────────────────────────────────── */
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    /* ─── Código ────────────────────────────────────────── */
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    /* ─── Tablas ────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    /* ─── Cajas de información ──────────────────────────── */
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    /* ─── Badges ────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ok   { background: #dcfce7; color: #15803d; }
+    .warn { background: #fef9c3; color: #92400e; }
+    .pend { background: #fee2e2; color: #991b1b; }
+    .info { background: #dbeafe; color: #1e40af; }
+
+    /* ─── Portada ───────────────────────────────────────── */
+    .portada {
+      text-align: center;
+      padding: 64px 0 48px;
+      border-bottom: 2px solid #b45309;
+      margin-bottom: 48px;
+    }
+
+    .portada h1 {
+      font-size: 30pt;
+      border: none;
+      margin: 0 0 6px;
+      color: #b45309;
+    }
+
+    .portada .subtitulo { font-size: 14pt; color: #4b5563; margin: 0; }
+    .portada .meta      { font-size: 9.5pt; color: #9ca3af; margin-top: 20px; }
+
+    /* ─── Árbol de archivos ─────────────────────────────── */
+    .arbol {
+      background: #0f0f1a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 1.8;
+      margin: 12px 0 20px;
+    }
+
+    .arbol .dir  { color: #93c5fd; font-weight: 700; }
+    .arbol .file { color: #86efac; }
+    .arbol .note { color: #6c7086; font-style: italic; }
+    .arbol .new  { color: #f9e2af; }
+
+    /* ─── Flujo ─────────────────────────────────────────── */
+    .flujo {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 2;
+      margin: 12px 0 20px;
+    }
+
+    .flujo .nodo   { color: #1c3d5a; font-weight: 700; }
+    .flujo .ruta   { color: #b45309; }
+    .flujo .nota   { color: #6b7280; font-style: italic; }
+    .flujo .flecha { color: #9ca3af; }
+
+    /* ─── Índice ────────────────────────────────────────── */
+    .indice {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin: 0 0 40px;
+    }
+
+    .indice h3 { margin-top: 0; color: #b45309; }
+
+    .indice ol { margin: 0; padding-left: 20px; }
+    .indice li { margin: 5px 0; }
+    .indice a  { color: #1c3d5a; text-decoration: none; font-size: 10pt; }
+    .indice a:hover { text-decoration: underline; color: #b45309; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── PORTADA ─────────────────────────────────────────────── -->
+  <div class="portada">
+    <h1>NavBar Inferior</h1>
+    <p class="subtitulo">Barra de navegación global — Cookr</p>
+    <p class="meta">
+      Sprint 2 · TFG-17 · 2026-03-30<br>
+      <span class="badge ok">✔ Lint limpio</span>
+      &nbsp;
+      <span class="badge ok">✔ TSC limpio</span>
+      &nbsp;
+      <span class="badge warn">👁 Pendiente revisión visual</span>
+    </p>
+  </div>
+
+  <!-- ─── ÍNDICE ──────────────────────────────────────────────── -->
+  <div class="indice">
+    <h3>Contenido</h3>
+    <ol>
+      <li><a href="#s1">Resumen ejecutivo</a></li>
+      <li><a href="#s2">Patrones de referencia aplicados</a></li>
+      <li><a href="#s3">Arquitectura del componente</a></li>
+      <li><a href="#s4">Los 5 iconos — decisiones de diseño</a></li>
+      <li><a href="#s5">Sistema de colores</a></li>
+      <li><a href="#s6">Animaciones</a></li>
+      <li><a href="#s7">Comportamiento responsive</a></li>
+      <li><a href="#s8">Contexto de rutas</a></li>
+      <li><a href="#s9">TODOs y conexiones futuras</a></li>
+    </ol>
+  </div>
+
+  <!-- ─── 1. RESUMEN EJECUTIVO ─────────────────────────────────── -->
+  <h1 id="s1">1. Resumen ejecutivo</h1>
+
+  <table>
+    <tr><th colspan="2">Ficha técnica</th></tr>
+    <tr><td><strong>Tarea</strong></td><td>TFG-17 — NavBar inferior</td></tr>
+    <tr><td><strong>Sprint</strong></td><td>Sprint 2 — Home + Feed + Detalle FE / Auth BE</td></tr>
+    <tr><td><strong>Fecha</strong></td><td>2026-03-30</td></tr>
+    <tr><td><strong>Estado</strong></td><td><span class="badge warn">👁 Pendiente revisión visual del autor</span></td></tr>
+    <tr><td><strong>Lint / TSC</strong></td><td><span class="badge ok">✔ 0 errores · 0 warnings</span></td></tr>
+  </table>
+
+  <h3>Ficheros creados</h3>
+  <div class="arbol">
+<span class="dir">frontend/src/</span>
+├── <span class="dir">components/common/</span>
+│   └── <span class="new">navBarInferior.tsx</span>          <span class="note">← componente principal</span>
+└── <span class="dir">app/(main)/</span>
+    └── <span class="new">layout.tsx</span>                  <span class="note">← grupo de rutas con navbar</span>
+
+<span class="dir">docs/</span>
+└── <span class="new">navbar.html</span>                     <span class="note">← este fichero</span>
+  </div>
+
+  <!-- ─── 2. PATRONES DE REFERENCIA ───────────────────────────── -->
+  <h1 id="s2">2. Patrones de referencia aplicados</h1>
+
+  <h2>Análisis de apps de referencia</h2>
+
+  <table>
+    <tr>
+      <th>App</th>
+      <th>Patrón analizado</th>
+      <th>Decisión para Cookr</th>
+    </tr>
+    <tr>
+      <td><strong>Instagram</strong></td>
+      <td>Icono central diferenciado (crear contenido). Active state solo por color, sin background.</td>
+      <td>✅ Adoptado: icono central ChefHat con fondo circular <code>bg-brand</code>. La jerarquía visual queda clara sin necesitar texto especial.</td>
+    </tr>
+    <tr>
+      <td><strong>TikTok</strong></td>
+      <td>Icono central con color/gradiente. Contraste extremo activo vs inactivo.</td>
+      <td>✅ Adoptado: alto contraste entre <code>text-brand</code> (activo) y <code>text-muted-foreground</code> (inactivo). Descartado el gradiente — la paleta Cookr es más sobria.</td>
+    </tr>
+    <tr>
+      <td><strong>Spotify</strong></td>
+      <td>Etiquetas siempre visibles y cortas. Dot/pill indicador bajo el icono activo.</td>
+      <td>✅ Adoptado: etiquetas siempre visibles (máx. 8 caracteres). Descartado el dot por debajo; se usa background pill que envuelve icon + label (más táctil y legible en pantallas pequeñas).</td>
+    </tr>
+    <tr>
+      <td><strong>Linear / Raycast</strong></td>
+      <td>Minimalismo extremo. Active state con background pill suave, sin ruido visual.</td>
+      <td>✅ Adoptado: la pill de fondo usa <code>bg-brand/10</code> — color de marca muy tenue, indica activación sin romper la limpieza del bar. Es el patrón que más influyó en el diseño final.</td>
+    </tr>
+  </table>
+
+  <div class="caja caja-info">
+    <strong>Patrón dominante: Linear / Raycast</strong>
+    El background pill con <code>bg-brand/10</code> más el icono coloreado en <code>text-brand</code> es la combinación
+    que mejor encaja con Cookr: cálida, moderna y clara en una sola mano. La pill anima suavemente entre
+    ítems gracias al <code>layoutId</code> de Framer Motion, dando un feedback visual fluido sin ser llamativo.
+  </div>
+
+  <h2>Qué se descartó y por qué</h2>
+  <table>
+    <tr><th>Patrón</th><th>Motivo del descarte</th></tr>
+    <tr><td>Etiquetas solo en icono activo (Instagram mobile reciente)</td><td>Aumenta la carga cognitiva: el usuario debe recordar qué icono es cada sección. Las etiquetas siempre visibles son más accesibles y apropiadas para una app donde los 5 destinos son conceptualmente distintos.</td></tr>
+    <tr><td>Gradiente en icono central (TikTok)</td><td>La paleta Cookr es cálida y contenida. Un gradiente competiría visualmente con el hero brand. El círculo sólido <code>bg-brand</code> es suficientemente prominente.</td></tr>
+    <tr><td>Dot indicador bajo el icono (Spotify)</td><td>Ocupa espacio vertical extra en una barra ya ajustada. La pill de fondo comunica lo mismo con menos altura.</td></tr>
+  </table>
+
+  <!-- ─── 3. ARQUITECTURA ──────────────────────────────────────── -->
+  <h1 id="s3">3. Arquitectura del componente</h1>
+
+  <h2>Patrón arquitectónico</h2>
+
+  <div class="flujo">
+<span class="nodo">app/(main)/layout.tsx</span>             <span class="nota">← Server Component, grupo de rutas</span>
+  <span class="flecha">└──</span> <span class="nodo">NavBarInferior</span>              <span class="nota">← Client Component ('use client')</span>
+       <span class="flecha">├──</span> <span class="ruta">usePathname()</span>           <span class="nota">← detecta ruta activa en cliente</span>
+       <span class="flecha">├──</span> <span class="ruta">enlaces[]</span>               <span class="nota">← array de configuración de ítems</span>
+       <span class="flecha">└──</span> <span class="ruta">motion (Framer)</span>         <span class="nota">← animaciones layoutId + scale</span>
+  </div>
+
+  <p>El componente es un <strong>Client Component</strong> porque necesita <code>usePathname()</code>, que solo funciona en el cliente. El layout que lo envuelve es un <strong>Server Component</strong> — Next.js 14 permite esta combinación sin restricciones.</p>
+
+  <h2>Array de configuración <code>enlaces</code></h2>
+  <p>Todos los ítems se definen en un único array tipado <code>EnlaceNav[]</code>. Añadir o reordenar destinos no requiere tocar el JSX — basta con modificar el array:</p>
+
+  <pre><span class="kw">type</span> <span class="ty">EnlaceNav</span> = {
+  href:      <span class="ty">string</span>
+  Icono:     <span class="ty">LucideIcon</span>
+  etiqueta:  <span class="ty">string</span>
+  esCentral: <span class="ty">boolean</span>
+}
+
+<span class="kw">const</span> <span class="nm">enlaces</span>: <span class="ty">EnlaceNav[]</span> = [
+  { href: <span class="st">'/home'</span>,     Icono: Home,            etiqueta: <span class="st">'Inicio'</span>,   esCentral: <span class="kw">false</span> },
+  { href: <span class="st">'/despensa'</span>, Icono: ShoppingBasket,  etiqueta: <span class="st">'Despensa'</span>, esCentral: <span class="kw">false</span> },
+  { href: <span class="st">'/chat'</span>,     Icono: ChefHat,         etiqueta: <span class="st">'Cookr IA'</span>, esCentral: <span class="kw">true</span>  },
+  { href: <span class="st">'/discover'</span>, Icono: TrendingUp,      etiqueta: <span class="st">'Discover'</span>, esCentral: <span class="kw">false</span> },
+  { href: <span class="st">'/perfil'</span>,   Icono: CircleUserRound, etiqueta: <span class="st">'Perfil'</span>,   esCentral: <span class="kw">false</span> },
+]</pre>
+
+  <h2>Grupo de rutas <code>(main)</code></h2>
+  <p>El grupo <code>(main)</code> en Next.js App Router agrupa rutas que comparten un layout sin afectar la URL. Todas las rutas dentro de <code>app/(main)/</code> heredan el <code>NavBarInferior</code> automáticamente. Las rutas fuera del grupo (landing, auth) no lo ven.</p>
+
+  <div class="caja caja-aviso">
+    <strong>El grupo (main) está creado pero vacío.</strong>
+    Las páginas /home, /despensa, /chat, /discover y /perfil se añadirán en sus respectivos sprints (2–5).
+    Hasta entonces, los enlaces de la NavBar apuntarán a rutas 404. Esto es esperado.
+  </div>
+
+  <h2>Padding del contenido</h2>
+  <p>El <code>layout.tsx</code> envuelve los <code>children</code> en un <code>&lt;main&gt;</code> con:</p>
+  <pre><span class="nm">className</span>=<span class="st">"pb-[calc(4.5rem+env(safe-area-inset-bottom))]"</span></pre>
+  <p>Esto garantiza que el contenido de la página nunca quede oculto bajo la navbar fija, incluyendo los dispositivos con barra de inicio dinámica (iPhone SE, Pro Max, etc.).</p>
+
+  <!-- ─── 4. LOS 5 ICONOS ──────────────────────────────────────── -->
+  <h1 id="s4">4. Los 5 iconos — decisiones de diseño</h1>
+
+  <table>
+    <tr>
+      <th>Pos.</th>
+      <th>Icono Lucide</th>
+      <th>Etiqueta</th>
+      <th>Ruta</th>
+      <th>Razonamiento UX</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><code>Home</code></td>
+      <td>Inicio</td>
+      <td><code>/home</code></td>
+      <td>Icono universal de "volver al inicio". El usuario lo reconoce sin aprender. Representa el feed personal — lo más cercano a "mi espacio".</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code>ShoppingBasket</code></td>
+      <td>Despensa</td>
+      <td><code>/despensa</code></td>
+      <td>La cesta de la compra es el metáfora más directa para "mis ingredientes". Más gastronómica que un simple <code>Archive</code> o <code>Package</code>.</td>
+    </tr>
+    <tr>
+      <td>3 ★</td>
+      <td><code>ChefHat</code></td>
+      <td>Cookr IA</td>
+      <td><code>/chat</code></td>
+      <td><strong>Icono central diferenciado.</strong> El gorro de chef es el símbolo visual de Cookr. Colocarlo en el centro comunica que el asistente IA es la función estrella de la app. Fondo circular <code>bg-brand</code> para máxima prominencia.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code>TrendingUp</code></td>
+      <td>Discover</td>
+      <td><code>/discover</code></td>
+      <td>Tendencias / explorar. Señala "ver qué hay más allá de mis seguidos". El icono de trending up comunica popularidad y descubrimiento de forma inmediata.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><code>CircleUserRound</code></td>
+      <td>Perfil</td>
+      <td><code>/perfil</code></td>
+      <td>Icono de persona redondeado — convención universal para "mi cuenta". La versión <code>CircleUserRound</code> (con borde circular) da sensación de avatar, más cercana al contexto de perfil social.</td>
+    </tr>
+  </table>
+
+  <h2>Tratamiento especial del icono central</h2>
+  <p>El ítem de Cookr IA (posición 3) recibe un tratamiento visual diferenciado inspirado en Instagram y TikTok:</p>
+  <ul>
+    <li>Fondo circular <code>w-12 h-12 rounded-full bg-brand</code> — círculo del color principal de la marca</li>
+    <li>Icono en <code>text-brand-foreground</code> — contraste garantizado sobre el fondo brand en modo claro y oscuro</li>
+    <li>Sombra sutil <code>shadow-md</code> — eleva visualmente el botón del plano de la navbar</li>
+    <li>Animación <code>whileTap scale(0.88)</code> — feedback táctil inmediato al pulsar</li>
+    <li>No participa en el <code>layoutId</code> indicador — tiene su propia identidad visual permanente</li>
+  </ul>
+
+  <!-- ─── 5. SISTEMA DE COLORES ────────────────────────────────── -->
+  <h1 id="s5">5. Sistema de colores</h1>
+
+  <div class="caja caja-exito">
+    <strong>0 colores hardcodeados.</strong>
+    Todo el componente usa exclusivamente variables CSS definidas en <code>globals.css</code> a través de Tailwind.
+  </div>
+
+  <table>
+    <tr>
+      <th>Elemento visual</th>
+      <th>Clase Tailwind</th>
+      <th>Variable CSS</th>
+      <th>Valor oklch (light)</th>
+    </tr>
+    <tr>
+      <td>Fondo de la barra</td>
+      <td><code>bg-card</code></td>
+      <td><code>--card</code></td>
+      <td><code>oklch(0.995 0.002 75)</code></td>
+    </tr>
+    <tr>
+      <td>Borde superior</td>
+      <td><code>border-border</code></td>
+      <td><code>--border</code></td>
+      <td><code>oklch(0.90 0.015 70)</code></td>
+    </tr>
+    <tr>
+      <td>Icono activo</td>
+      <td><code>text-brand</code></td>
+      <td><code>--brand</code></td>
+      <td><code>oklch(0.55 0.14 55)</code></td>
+    </tr>
+    <tr>
+      <td>Etiqueta activa</td>
+      <td><code>text-brand font-semibold</code></td>
+      <td><code>--brand</code></td>
+      <td><code>oklch(0.55 0.14 55)</code></td>
+    </tr>
+    <tr>
+      <td>Icono inactivo</td>
+      <td><code>text-muted-foreground</code></td>
+      <td><code>--muted-foreground</code></td>
+      <td><code>oklch(0.50 0.03 55)</code></td>
+    </tr>
+    <tr>
+      <td>Etiqueta inactiva</td>
+      <td><code>text-muted-foreground font-medium</code></td>
+      <td><code>--muted-foreground</code></td>
+      <td><code>oklch(0.50 0.03 55)</code></td>
+    </tr>
+    <tr>
+      <td>Fondo icono central</td>
+      <td><code>bg-brand</code></td>
+      <td><code>--brand</code></td>
+      <td><code>oklch(0.55 0.14 55)</code></td>
+    </tr>
+    <tr>
+      <td>Icono central (color)</td>
+      <td><code>text-brand-foreground</code></td>
+      <td><code>--brand-foreground</code></td>
+      <td><code>oklch(0.98 0.005 75)</code></td>
+    </tr>
+    <tr>
+      <td>Pill indicador activo</td>
+      <td><code>bg-brand/10</code></td>
+      <td><code>--brand</code> al 10%</td>
+      <td><code>oklch(0.55 0.14 55 / 10%)</code></td>
+    </tr>
+  </table>
+
+  <p>El modo oscuro funciona automáticamente: todas las variables tienen definición en <code>.dark</code> en <code>globals.css</code>. No hay ningún ajuste específico para dark mode en el componente.</p>
+
+  <!-- ─── 6. ANIMACIONES ───────────────────────────────────────── -->
+  <h1 id="s6">6. Animaciones</h1>
+
+  <h2>layoutId — pill indicador activo</h2>
+  <p>Framer Motion comparte un único <code>layoutId="indicador-nav"</code> entre todos los ítems no-centrales. Cuando el usuario navega, la pill de fondo se desliza animadamente desde el ítem anterior al nuevo, creando una transición fluida sin lógica manual de posicionamiento:</p>
+
+  <pre><span class="kw">{estaActivo &&</span> (
+  &lt;<span class="fn">motion.div</span>
+    <span class="nm">layoutId</span>=<span class="st">"indicador-nav"</span>
+    <span class="nm">className</span>=<span class="st">"absolute inset-0 rounded-xl bg-brand/10"</span>
+    <span class="nm">transition</span>={{ type: <span class="st">'spring'</span>, stiffness: <span class="nu">400</span>, damping: <span class="nu">35</span> }}
+  /&gt;
+)}</pre>
+
+  <p>El resorte <code>stiffness: 400, damping: 35</code> produce un movimiento rápido con un pequeño rebote final — respuesta inmediata y física, no lineal.</p>
+
+  <h2>scale en iconos regulares</h2>
+  <p>Al activarse un ítem, el icono crece ligeramente para reforzar la sensación de selección:</p>
+
+  <pre>&lt;<span class="fn">motion.div</span>
+  <span class="nm">animate</span>={{ scale: estaActivo ? <span class="nu">1.08</span> : <span class="nu">1</span> }}
+  <span class="nm">transition</span>={{ duration: <span class="nu">0.15</span>, ease: <span class="st">'easeOut'</span> }}
+&gt;</pre>
+
+  <p>El scale de <code>1.08</code> es sutil — suficiente para dar feedback sin mover el layout circundante.</p>
+
+  <h2>whileTap en icono central</h2>
+  <p>El icono central responde al toque con un encogimiento de presión:</p>
+
+  <pre>&lt;<span class="fn">motion.div</span>
+  <span class="nm">whileTap</span>={{ scale: <span class="nu">0.88</span> }}
+  <span class="nm">transition</span>={{ duration: <span class="nu">0.12</span>, ease: <span class="st">'easeOut'</span> }}
+&gt;</pre>
+
+  <p>El <code>scale(0.88)</code> simula la deformación física de pulsar un botón. La duración de 120ms hace que la respuesta sea instantánea a nivel perceptivo.</p>
+
+  <div class="caja caja-info">
+    <strong>Nota de rendimiento:</strong>
+    Framer Motion anima <code>transform: scale()</code> y el layout de <code>layoutId</code>, ambos propiedades que el navegador puede componer en la GPU (composite layer). No hay reflows ni repaints causados por las animaciones del NavBar.
+  </div>
+
+  <!-- ─── 7. RESPONSIVE ────────────────────────────────────────── -->
+  <h1 id="s7">7. Comportamiento responsive</h1>
+
+  <h2>Ocultar en desktop (≥ 1024px)</h2>
+  <p>La clase <code>lg:hidden</code> en el elemento <code>&lt;nav&gt;</code> oculta completamente la barra en pantallas de escritorio. En desktop, la navegación se implementará en una barra lateral o cabecera superior (Sprint 4+).</p>
+
+  <h2>Ocultar en landing page</h2>
+  <p>La constante <code>RUTAS_SIN_NAVBAR = ['/']</code> hace que el componente devuelva <code>null</code> en la landing page. Esta es una capa de seguridad adicional: la landing también está fuera del grupo <code>(main)</code>, por lo que el componente técnicamente no se renderizaría allí de todas formas.</p>
+
+  <div class="caja caja-aviso">
+    <strong>Rutas de autenticación:</strong>
+    /login, /registro y el resto de rutas auth también están fuera del grupo (main), por lo que no ven el NavBar. No necesitan estar en RUTAS_SIN_NAVBAR.
+  </div>
+
+  <h2>Safe area insets (iPhone con notch)</h2>
+  <p>El elemento <code>&lt;nav&gt;</code> usa un estilo inline para el padding inferior:</p>
+
+  <pre><span class="nm">style</span>={{ paddingBottom: <span class="st">'env(safe-area-inset-bottom)'</span> }}</pre>
+
+  <p>En iPhones con Face ID / Dynamic Island, <code>env(safe-area-inset-bottom)</code> devuelve ~34px, evitando que los ítems queden debajo del indicador de home. En dispositivos sin notch devuelve 0px — sin impacto.</p>
+
+  <p>El layout también compensa este espacio en el contenido:</p>
+  <pre><span class="nm">className</span>=<span class="st">"pb-[calc(4.5rem+env(safe-area-inset-bottom))]"</span></pre>
+
+  <!-- ─── 8. CONTEXTO DE RUTAS ──────────────────────────────────── -->
+  <h1 id="s8">8. Contexto de rutas</h1>
+
+  <table>
+    <tr>
+      <th>Ruta</th>
+      <th>Etiqueta</th>
+      <th>Contenido</th>
+      <th>Sprint</th>
+    </tr>
+    <tr>
+      <td><code>/home</code></td>
+      <td>Inicio</td>
+      <td><strong>Feed personal:</strong> solo recetas de personas que el usuario sigue. Algoritmo cronológico o de relevancia personal. Cards con imagen, título, autor, likes.</td>
+      <td>Sprint 2 FE</td>
+    </tr>
+    <tr>
+      <td><code>/despensa</code></td>
+      <td>Despensa</td>
+      <td><strong>Inventario personal:</strong> lista de ingredientes del usuario con cantidades, unidades y fechas de caducidad. Función estrella: sugerencias de recetas con lo que tienes en casa.</td>
+      <td>Sprint 5 FE</td>
+    </tr>
+    <tr>
+      <td><code>/chat</code></td>
+      <td>Cookr IA</td>
+      <td><strong>Asistente culinario IA</strong> (Google Gemini) con contexto de la despensa virtual. Responde preguntas de cocina, sugiere recetas según ingredientes disponibles, adapta a alergias y preferencias.</td>
+      <td>Sprint 5 FE</td>
+    </tr>
+    <tr>
+      <td><code>/discover</code></td>
+      <td>Discover</td>
+      <td><strong>Feed global con dos pestañas:</strong><br>
+        — <em>Trending:</em> recetas populares globales + eventos temáticos (Navidad, temporada de setas…)<br>
+        — <em>Guardadas:</em> recetas que el usuario ha guardado, organizadas por categoría.<br>
+        Las pestañas son navegación interna (estado local), no rutas separadas.</td>
+      <td>Sprint 2 FE (Trending) / Sprint 4 FE (Guardadas)</td>
+    </tr>
+    <tr>
+      <td><code>/perfil</code></td>
+      <td>Perfil</td>
+      <td><strong>Perfil del usuario autenticado:</strong> avatar, nombre, bio, recetas propias, seguidores/seguidos. Acceso a ajustes desde aquí.</td>
+      <td>Sprint 4 FE</td>
+    </tr>
+  </table>
+
+  <div class="caja caja-info">
+    <strong>Diferencia clave: /home vs /discover</strong>
+    <code>/home</code> es el espacio personal del usuario (su red, su contenido). <code>/discover</code> es el espacio global
+    (qué está cocinando el mundo). Esta distinción es análoga a Instagram Stories (conocidos) vs Reels (global).
+  </div>
+
+  <!-- ─── 9. TODOS ──────────────────────────────────────────────── -->
+  <h1 id="s9">9. TODOs y conexiones futuras</h1>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descripción</th>
+      <th>Cuándo</th>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-001</span></td>
+      <td>Crear páginas reales dentro de <code>app/(main)/</code>: <code>home/page.tsx</code>, <code>recetas/[id]/page.tsx</code>. Sin ellas los enlaces hacen 404.</td>
+      <td>Sprint 2 FE (home + detalle receta)</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-002</span></td>
+      <td>Crear <code>app/(main)/despensa/page.tsx</code> y <code>app/(main)/chat/page.tsx</code>.</td>
+      <td>Sprint 5 FE</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-003</span></td>
+      <td>Crear <code>app/(main)/discover/page.tsx</code> con tabs internos (Trending / Guardadas).</td>
+      <td>Sprint 2–4 FE</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-004</span></td>
+      <td>Crear <code>app/(main)/perfil/page.tsx</code>.</td>
+      <td>Sprint 4 FE</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-005</span></td>
+      <td>Badge de notificaciones en el icono de Perfil (número de notificaciones no leídas). Requiere Zustand store <code>useNotificacionesStore</code>.</td>
+      <td>Sprint 6 FE (Notificaciones)</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-006</span></td>
+      <td>En desktop (≥ 1024px) añadir navegación lateral izquierda con los mismos ítems expandidos (icono + texto). El componente NavBar inferior seguirá oculto en desktop (<code>lg:hidden</code>).</td>
+      <td>Sprint 4+ — cuando se diseñe layout desktop</td>
+    </tr>
+    <tr>
+      <td><span class="badge pend">NAV-007</span></td>
+      <td>Proteger las rutas de <code>(main)</code> con <code>getServerSession</code> en el layout para redirigir a <code>/login</code> si no hay sesión. Ver <code>fase-1-pendientes.md [AUTH-005]</code>.</td>
+      <td>Fase 2 — cuando exista /feed y rutas protegidas</td>
+    </tr>
+  </table>
+
+  <div class="caja caja-exito">
+    <strong>Estado actual: componente funcional y listo para usar.</strong>
+    El NavBar renderiza correctamente, detecta la ruta activa, aplica los estilos y animaciones definidos,
+    y se integra en el layout (main). Pendiente únicamente la revisión visual del autor en el navegador.
+  </div>
+
+</body>
+</html>

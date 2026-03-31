@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cookr - Editorial Gourmet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#001e30",
+              "surface-tint": "#855400",
+              "tertiary": "#136490",
+              "outline-variant": "#d5c4b2",
+              "on-secondary-container": "#656464",
+              "on-error": "#ffffff",
+              "surface-container-high": "#e9e8e4",
+              "surface-container-highest": "#e3e2df",
+              "primary-fixed-dim": "#fcba65",
+              "on-secondary-fixed": "#1b1c1c",
+              "error": "#ba1a1a",
+              "on-primary-fixed-variant": "#653e00",
+              "inverse-surface": "#2f312e",
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#e4e2e1",
+              "surface-dim": "#dbdad6",
+              "secondary-fixed-dim": "#c8c6c6",
+              "on-surface": "#1b1c1a",
+              "on-error-container": "#93000a",
+              "error-container": "#ffdad6",
+              "primary-container": "#e8a855",
+              "surface-container": "#efeeea",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#f2f1ed",
+              "tertiary-fixed": "#cae6ff",
+              "background": "#faf9f5",
+              "tertiary-fixed-dim": "#8dcdff",
+              "secondary": "#5f5e5e",
+              "primary-fixed": "#ffddb7",
+              "on-tertiary": "#ffffff",
+              "surface": "#faf9f5",
+              "on-tertiary-fixed-variant": "#004b70",
+              "on-secondary-fixed-variant": "#474747",
+              "surface-container-low": "#f4f4f0",
+              "on-surface-variant": "#514538",
+              "on-primary": "#ffffff",
+              "secondary-fixed": "#e4e2e1",
+              "on-background": "#1b1c1a",
+              "on-primary-container": "#643e00",
+              "outline": "#837566",
+              "on-primary-fixed": "#2a1700",
+              "surface-bright": "#faf9f5",
+              "primary": "#855400",
+              "tertiary-container": "#7abbec",
+              "surface-variant": "#e3e2df",
+              "on-tertiary-container": "#004b6f",
+              "inverse-primary": "#fcba65"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #faf9f5; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-[#faf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-md shadow-[0px_12px_32px_rgba(27,28,26,0.06)] h-20 flex items-center px-8">
+<div class="grid grid-cols-3 items-center w-full max-w-7xl mx-auto">
+<!-- Branding -->
+<div class="text-2xl font-black tracking-widest text-[#855400] dark:text-[#e8a855] uppercase justify-self-start">
+                Cookr
+            </div>
+<!-- Search (Centered) -->
+<div class="justify-self-center">
+<div class="relative group">
+<input class="bg-surface-container-highest border-none rounded-full px-6 py-2 w-80 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="Buscar recetas..." type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-2 text-secondary scale-95 active:scale-90 transition-transform">search</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-4 justify-self-end">
+<span class="material-symbols-outlined text-[#855400] cursor-pointer hover:opacity-70">settings</span>
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="professional portrait of a smiling chef in a sunlit modern kitchen environment with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWCJuo0p-x26IZd9y_ooOziabbr4QGWXJ9BECy81qwUURzIiE9uujzh_hmZeBG4Bp7tDDlb264jEkAI73fbQizs2fH76Aue5PoecNaVHZygUCh_pfGM7R7G4cczqq2Q3hDrPoMULteT_PiqYXbtyhRp0PF9JUkUmQpSkoyAowk9zQy2bZwS2xbL76vcPPqdqADq1AYL80xBICgf-niRMpsTRi4r42pGsPq7EJp-4d97KJ0swRg7yzgPNjttLJyW-Q-iMEXSU_eJPw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col pt-24 pb-8 px-6 gap-4 border-r border-[#d5c4b2]/15 bg-[#faf9f5]">
+<nav class="flex flex-col gap-1 font-['Plus_Jakarta_Sans'] leading-relaxed text-sm">
+<a class="flex items-center gap-3 p-3 bg-[#f4f4f0] text-[#855400] font-bold rounded-xl cursor-pointer active:opacity-80 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+                Inicio
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#5f5e5e] hover:bg-[#f4f4f0]/50 hover:translate-x-1 rounded-xl cursor-pointer active:opacity-80 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
+                Despensa
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#5f5e5e] hover:bg-[#f4f4f0]/50 hover:translate-x-1 rounded-xl cursor-pointer active:opacity-80 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+                Cookr IA
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#5f5e5e] hover:bg-[#f4f4f0]/50 hover:translate-x-1 rounded-xl cursor-pointer active:opacity-80 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+                Discover
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#5f5e5e] hover:bg-[#f4f4f0]/50 hover:translate-x-1 rounded-xl cursor-pointer active:opacity-80 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                Perfil
+            </a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 lg:mr-80 pt-28 px-8 pb-12">
+<!-- Filter Bar -->
+<div class="flex items-center gap-3 mb-8 overflow-x-auto scrollbar-hide py-2">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary text-sm font-semibold shadow-md shadow-primary/10">Todas</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary text-sm font-medium hover:bg-surface-container-highest transition-colors">Vegano</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary text-sm font-medium hover:bg-surface-container-highest transition-colors">Keto</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary text-sm font-medium hover:bg-surface-container-highest transition-colors">Sin Gluten</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary text-sm font-medium hover:bg-surface-container-highest transition-colors">Mediterránea</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary text-sm font-medium hover:bg-surface-container-highest transition-colors">Postres</button>
+</div>
+<!-- Bento Grid -->
+<div class="bento-grid">
+<!-- Large Hero Post -->
+<article class="col-span-2 row-span-2 group relative overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.06)] flex flex-col">
+<div class="h-[400px] overflow-hidden">
+<img alt="Salmon salad" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="vibrant gourmet salmon salad bowl with fresh greens, citrus slices, and seeds, soft natural window light, editorial food photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpRumqHnHaBWEcHk8hlzibeqva0sSo2jBh6gnI___uEizNHkMi0vV2Fb19RlJEeGDZdIqDbxi4LHIuXFMcLg2xc8V6mVGF7Z2EZd3AXYGBQM9p69o8V27JAhgPVaDPLbb0ud25tupJMHPSpMwGskEyEnQDaoMMo4PSS-Fg4YEVA1HA6MrOpJPqPjL3iusoIkTnOn53D-cSE_Jlm1wXofEo0EycJ1ndUEe9L0LIRfhbrLmLMvA9Qq9PEKbCnmiok8EsIWKZK7lHkqw"/>
+</div>
+<div class="p-6 flex flex-col justify-between flex-grow">
+<div>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Elena Rodriguez" class="w-8 h-8 rounded-full object-cover" data-alt="portrait of a young female chef with a warm smile, wearing a white apron in a bright culinary studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2cTcP145TMXK1pmrbNJfjgLKOW8IrKvOWgHnnMIvi8BVjzYA52CulfBVixUN4eLg1qUBezEJNGhVdZLOaR9qjjUJW1JTeglkB8ggiSQje5jM8kcO3DVaw1CyRcdrpEH1d-imNfRECjNLY4PeHecEpozwZo22zLJdHDuomuVa0AKp98sQZoBuhZVMql0ZBaaszMMYGlywuYAkzL0bU4umI_mQq0T_MK8cMZikEcOb7m3OHxKuxhlYeV5MKFxnGWEjN_5uOP0GERLk"/>
+<span class="text-xs font-bold tracking-wider text-secondary">ELENA RODRÍGUEZ</span>
+</div>
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Salmón Glaseado con Cítricos y Ensalada de Verano</h2>
+<p class="text-secondary text-sm line-clamp-2 mb-4 leading-relaxed">Una receta fresca que combina la intensidad del salmón marinado con la ligereza de una ensalada cítrica artesanal.</p>
+</div>
+<div class="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/15">
+<div class="flex gap-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-sm font-bold">1.2k</span>
+</div>
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+<span class="text-sm font-bold">84</span>
+</div>
+</div>
+<button class="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary">
+                            Ver receta <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Small Card 1 -->
+<article class="group overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.06)] flex flex-col">
+<div class="h-48 overflow-hidden">
+<img alt="Pasta dish" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="rustic italian pasta with fresh basil and tomatoes on a ceramic plate, warm golden hour lighting, authentic mediterranean feel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJfnKMkARCvEQKx5yYWS3JQPk3HyTPGTIMwRwDtYlQO3DKuRiKkZwSXiBipoR-L3q5OHwWfdeKvrhTRjczDO0fu2NyK90Y6WxrLTS_GQ44bmMqfGErMAx6TxK5UsJqDtNGTz8uS9X5JPFxxsSLvSORdCIIxTwnAKcF-zIBdfU3qZvUGIENbCfWF7U--3gYiKUlChFKfRnxmNSH6iDXfEVDL4GGeQ3paSCvQlAZsgBqr-lL1_pIri7Dwl0iLeOnT6OO8WwQfr4GqSo"/>
+</div>
+<div class="p-5">
+<div class="flex items-center gap-2 mb-2">
+<img alt="Marco Rossi" class="w-6 h-6 rounded-full object-cover" data-alt="middle aged man with glasses smiling, professional culinary instructor profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAZfCgU-1-Q4YtMqAuxeJsvbq9vZgP8Q9FFkuswP_ZX0IliK1Fx8Y6091dweWzdtJ8Bpwvm9CUwlPY8huDs1JYDuxYR4tNs0gY31BxsQCpMRWkdiTxR1TWSVo93P3WVxovVRrG2Wnfkmd_FB9FuK-G1wLvHtuPsbPoRdzbFdGGWPv3r1sOHrUYEgX9-cNvvHiG7FrIJcOGBIeyEuF3VbiRsq-YuY5RuGt2T4CV6e3UV4xVxSzPYGxuGWhcMqnEracaytkeaF70GKY"/>
+<span class="text-[10px] font-bold tracking-wider text-secondary uppercase">MARCO ROSSI</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-3">Pasta al Pomodoro con Albahaca Fresca</h3>
+<div class="flex items-center gap-4 text-secondary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-bold">428</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-bold">12</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Small Card 2 -->
+<article class="group overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.06)] flex flex-col">
+<div class="h-48 overflow-hidden">
+<img alt="Pancakes" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="fluffy american pancakes topped with berries and maple syrup, bright airy breakfast setting, high-end lifestyle photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt4iwhF4c2kcEGRlm_te5oTkXZwO079Y3bJshTNsLcIBVoQ2DztFHNDHR4WunO_rj13CrldvgX2pxDAz6gfvwyqrHGz0g76Ph_sqyNjv0oM5kJTXg_2PAsxp53TPO1HYZ8re7tYfBzIzA9PJCB6PHNFnGiqFTEz4wQnhDVsKaz47EvRDwi4VawtNMaOpwfo-0E2KjeDw7oHT2hGPOu31pN1OeYXwV-U9olblRcu4BMaLXIl9QmnaQU5BnhV_lxWTw2l4SDpn6jA_Q"/>
+</div>
+<div class="p-5">
+<div class="flex items-center gap-2 mb-2">
+<img alt="Sarah J." class="w-6 h-6 rounded-full object-cover" data-alt="smiling woman with long hair, bright kitchen background, professional food blogger aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPWg1AE1njk9znhhCh-pLCf219kIrOPw6i_o5tSkVTbaRb0Fj7t8vg1JTRWaB9ne7MjT4JNCtI6maZanDzHZoB6tJIczy5sbK6La71IbqJbZcGCccFRpcyOkqO_p8wpxePdohCUJxKRbjRBaGicuuamB0yPNtup4s6q7MifwHuyJKpAfIOhCawF4mUIqzZiA5Na5KuYirzhmZeZ42h2q9xCoaQl1OltHcIsMzMm502JEqNFICbKb2KsBeRM4WQTYPLnQuiOrHFELs"/>
+<span class="text-[10px] font-bold tracking-wider text-secondary uppercase">SARAH J.</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-3">Pancakes de Avena y Arándanos</h3>
+<div class="flex items-center gap-4 text-secondary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-bold">892</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-bold">45</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Medium Horizontal Card -->
+<article class="col-span-1 group overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.06)] flex flex-col">
+<div class="h-48 overflow-hidden">
+<img alt="Table of food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="flat lay of diverse healthy dinner dishes on a light wooden table, warm community dinner atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv5-jxvpKfG1aL1d07IE8Je_TlmV7dJxsFzlS2UGpJuB_HqsnN49Lrfz6OqdcQ0a0i1UEbK3SSRB-bErTJ1lMMPE9BWo7hZDNOwDtX0IV_hKhZjUV9mx0sXzSKW1jPfq8xSx-C2EgAnWmrQmyFYWNwwMYBj-cE31ksQX8fvP1ieOeu6YUJNWJnWMI_lsfq6ryUO8mSXA1LvwlMJxQxpgeyWwhCPjDoeumUPWYZ1umz5rsEZY81ISIuENibEDVk10M3bExM8flTLdU"/>
+</div>
+<div class="p-5">
+<div class="flex items-center gap-2 mb-2">
+<img alt="Chef Alex" class="w-6 h-6 rounded-full object-cover" data-alt="portrait of a focused male chef in professional attire, blurred commercial kitchen background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuIRM-xwlTzzH0zkJypck49gQKf0ecPqKvbwyomncTobl38zrWuWt1W6ITq9BbpwyoITvuvxBpgldEfcXCKiJgIf2A7A82u3JMf1SW2AnHZyV_V3-evNKqbuLGWtx67u5NTLD3Zb57nXN3VW-Nik4EPLpX1E4fnzkMIqN6mWAWvTYXADUBSn6nZmwCjTipwPUSIUj4RCE9lvzuNF3T4XwvJjsqHenfAXOU6GHTPd5T0njABQT5dFuqENVvYtFz5IH_jiyQGex2fIU"/>
+<span class="text-[10px] font-bold tracking-wider text-secondary uppercase">CHEF ALEX</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight mb-3">Técnicas de Emplatado para Principiantes</h3>
+<div class="flex items-center gap-4 text-secondary">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-bold">2.4k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-bold">112</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Another Large Card -->
+<article class="col-span-2 group overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.06)] flex flex-col">
+<div class="flex flex-col md:flex-row h-full">
+<div class="md:w-1/2 overflow-hidden">
+<img alt="Roast chicken" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="whole roasted chicken with root vegetables on a vintage platter, dramatic lighting, warm rustic kitchen scene" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqpkiaVX0xct5akaQKP5iP-lgSzO5I5x1jiX8SUWjAvbC-NrMxsWPDToZSOXO09jVBL1LVRaGojUMsxXG2ohekTB51UQgDSKp3P5Wnr_v4B6vL64_jdRcuCbAzSjRzFfw5iTtdA1chpQhXOoJnpAIjiGf5Wh4kqrQ6D3_GRGBgEsSIymMd5H7GqQlPLaBHq9_RiECkIUuguxWfL3bCkXdOQLdxpODto7W8FH1240w2bGWxplHLbX_c_VioQbU1EniCjRBZtb1vw6A"/>
+</div>
+<div class="md:w-1/2 p-6 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-3">
+<img alt="Lucia M." class="w-6 h-6 rounded-full object-cover" data-alt="close up portrait of a young woman with a joyful expression, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-Nzvg4Xq8zo5HFBtSfLPHwFPHotUnCRx5jjDN_XFjtMTJ1uqaFbqi2yAc4idcylzuqIxXL25qb1pInWmBCW20TZW3MfYucHYwOr1BDBa6-MnBcJwXyVmV6nDNsTW4z0FNtbCmU4hLv2pIDAcXyZo2baneQZLJPp2yapAnMNHXm_ZjpBTHflybw7oxgax5Wm7IigOL74MDiLJ4uqwJL3RIYcz-gXWwXcmO9UjcoUGmxrq2M25L-xBJ6Fbe2bfGjcTWsIjJjAxx-0Q"/>
+<span class="text-[10px] font-bold tracking-wider text-secondary uppercase">LUCÍA M.</span>
+</div>
+<h3 class="text-2xl font-bold text-on-surface leading-tight mb-3">El Pollo al Horno Perfecto</h3>
+<p class="text-sm text-secondary mb-4">Descubre los secretos para una piel crujiente y una carne jugosa cada vez.</p>
+<div class="flex items-center gap-4 text-secondary mt-auto">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span class="text-xs font-bold">5.1k</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+<span class="text-xs font-bold">302</span>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Right Sidebar (Suggestions) -->
+<aside class="hidden lg:flex flex-col w-80 fixed right-0 top-0 h-screen pt-28 pb-8 px-8 gap-8 bg-[#faf9f5]">
+<!-- Trending Section -->
+<section>
+<h3 class="text-sm font-black tracking-widest text-[#855400] uppercase mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                Recetas Populares
+            </h3>
+<div class="flex flex-col gap-5">
+<div class="flex gap-4 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Salad" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" data-alt="close-up of a fresh greek salad with feta cheese and olives, bright daylight photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvJBvQmJqi5eoBUexs43BMWoxbqXOOV3yA5H-TxnJGti_xGfWQ1AKTxVUVVap8I_CeDfLT_nsiPj5uy_JsR6fen_yhyfpUfWXReOuMvV9b-I01FakH1ya_g68-GZbm0SxEgIJZlcytjkrt8XdwO2Mu5k3Tmwjy_bS6SP1zZ9EuEXU5H9w9ZMagzsC_WFLuAgtAsnczeth5Ie82biQbFfxhhyVzj48i3FjeTnCKj_KV_gdX3KitlKR9Eywcf_ayYleea0TBXvnOEAw"/>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Bowl de Quinoa y Aguacate</h4>
+<p class="text-xs text-secondary mt-1">Por Julia Child Jr.</p>
+<div class="flex items-center gap-3 mt-1 text-[10px] font-bold text-primary uppercase tracking-tighter">
+<span>15 MIN</span>
+<span>FÁCIL</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Pizza" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" data-alt="artisanal sourdough pizza with melted mozzarella and fresh basil, professional food styling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyw-Mkqc4AhMA4GFaClUf18xC4VcT4hUZJsVW8cc3p43XTLPKMGKRvdYeOWL8n1Z79MOA2ZHGw4X4Y0omeBpXzT09Jv03MYnLxM114-qBUB_MT_3XAHcG0nbB355XnbjXqkZSGSpU1DLxhImVlgoyfusDvWC0rcK3FPoIdX-N6SG8AmqkQwQDKVCViL1N-M46ZCjeGxXbyFtCDqf13T_M7_pmu0c_RxqY-WJkLPNmslPALPv6d9z6rlwQoYTi4Na-G3F29mf10AOE"/>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Pizza Napolitana Casera</h4>
+<p class="text-xs text-secondary mt-1">Por Luigi V.</p>
+<div class="flex items-center gap-3 mt-1 text-[10px] font-bold text-primary uppercase tracking-tighter">
+<span>45 MIN</span>
+<span>EXPERTO</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 group cursor-pointer">
+<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
+<img alt="Sushi" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" data-alt="selection of fresh nigiri sushi on a black stone plate, minimalist aesthetic photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0TjmQti4R2B7sfj2Whj6UgZ6gixC9v3ccunFYDUQmZUOGfhg8yQqhOEOsixfiuAFyT9eR-bIqRc07QTEnEqB2maI2p2x4SdWjTcC2YeEKkQhFfjWcJ9_X0rpe3gpxIlhb8tRZ408CaGFUS6VHG19R6TZV75CF7QlQGx6H2DKS2nShpJSJg8zgityKlEgStBCXFVlQ7UZNj-zomYaGYZstIetAQp4Bxq883HcfaSDsx4McZ27NWE_cWMHCiIMLk1edjxnGqqunZOI"/>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Sushi Roll Arcoíris</h4>
+<p class="text-xs text-secondary mt-1">Por Kenji O.</p>
+<div class="flex items-center gap-3 mt-1 text-[10px] font-bold text-primary uppercase tracking-tighter">
+<span>60 MIN</span>
+<span>MEDIO</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Chefs -->
+<section>
+<h3 class="text-sm font-black tracking-widest text-[#855400] uppercase mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">stars</span>
+                Chefs Destacados
+            </h3>
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<img alt="Chef 1" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a bearded male chef in a denim apron, warm studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvC0qlkQkufx5rlZXblYZoLFbue3qijlwM1GgfnxlPAcKeljvrbo4wLLksnhYImujWzJyCEmVD9ccc-TysvNdIZX0hf3QJv0f6SMZObDldKdJDy0_cgexeiSoZp-DF6X9vEiqN9incUYlUiMi36KyxlxRCGyyTudRu5YvR359gvOSeVso7jp2FGQVDKkcgz0LuwAjlF3znWiG7P20krY6b7tZyRASMHcZlQQFgm5mjMjzaDUh1mAAGafTyQxAqNYczcdBauuuJ04E"/>
+<div>
+<p class="text-xs font-bold text-on-surface">David Muñoz</p>
+<p class="text-[10px] text-secondary">2.4k seguidores</p>
+</div>
+</div>
+<button class="text-[10px] font-bold text-primary border border-primary/20 px-3 py-1 rounded-full hover:bg-primary hover:text-on-primary transition-colors">Seguir</button>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<img alt="Chef 2" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a female pastry chef with a dusting of flour on her apron, warm soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5jC6MuBuhu5vBmQigtQD-N4ScklnhA7Yz1YWbOaxkqxYRa49IjB7Db83OdSLW4yEGFx_hQfotLq0L3LWQ7RfM3qOYUKurADWeSd4ske7QpcCad1mKvLcgLURaeapvI56RzYVVVBLrAcFAkz99Ab-GYmxO9Sy9v3ScVlgT4Y2Iw2HQNuAUkE9AuVZpZClZCMOeuv8mkvTyVE0DvED46mbK9h6s1Xm9uMIhy3nnfbozjBpMRY4xR_n9p4EUawQRCisTzLTAZmBRp3Y"/>
+<div>
+<p class="text-xs font-bold text-on-surface">Ana Ros</p>
+<p class="text-[10px] text-secondary">1.8k seguidores</p>
+</div>
+</div>
+<button class="text-[10px] font-bold text-primary border border-primary/20 px-3 py-1 rounded-full hover:bg-primary hover:text-on-primary transition-colors">Seguir</button>
+</div>
+</div>
+</section>
+<!-- Newsletter / Footer -->
+</aside>
+<!-- Floating Action Button (FAB) - Global Context -->
+<div class="lg:hidden fixed bottom-8 right-8">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+</body></html>

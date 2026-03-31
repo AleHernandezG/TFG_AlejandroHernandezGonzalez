@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#1b1c1c",
+              "on-primary-fixed-variant": "#653e00",
+              "surface": "#faf9f5",
+              "secondary-fixed": "#e4e2e1",
+              "tertiary-container": "#7abbec",
+              "primary-fixed-dim": "#fcba65",
+              "on-surface-variant": "#514538",
+              "surface-container": "#efeeea",
+              "outline": "#837566",
+              "on-primary": "#ffffff",
+              "on-surface": "#1b1c1a",
+              "inverse-on-surface": "#f2f1ed",
+              "error": "#ba1a1a",
+              "surface-tint": "#855400",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#656464",
+              "tertiary": "#136490",
+              "on-background": "#1b1c1a",
+              "on-tertiary-fixed-variant": "#004b70",
+              "tertiary-fixed-dim": "#8dcdff",
+              "on-tertiary": "#ffffff",
+              "on-error-container": "#93000a",
+              "primary-fixed": "#ffddb7",
+              "on-error": "#ffffff",
+              "primary-container": "#e8a855",
+              "outline-variant": "#d5c4b2",
+              "on-primary-fixed": "#2a1700",
+              "inverse-primary": "#fcba65",
+              "on-primary-container": "#643e00",
+              "surface-variant": "#e3e2df",
+              "surface-bright": "#faf9f5",
+              "tertiary-fixed": "#cae6ff",
+              "on-secondary-fixed-variant": "#474747",
+              "secondary-fixed-dim": "#c8c6c6",
+              "secondary-container": "#e4e2e1",
+              "surface-dim": "#dbdad6",
+              "surface-container-high": "#e9e8e4",
+              "background": "#faf9f5",
+              "on-tertiary-fixed": "#001e30",
+              "on-tertiary-container": "#004b6f",
+              "inverse-surface": "#2f312e",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#f4f4f0",
+              "primary": "#855400",
+              "surface-container-highest": "#e3e2df",
+              "secondary": "#5f5e5e"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#faf9f5]/80 backdrop-blur-md dark:bg-zinc-900/80 shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-screen-xl mx-auto">
+<div class="flex-1 flex items-center">
+<button class="text-[#855400] dark:text-[#e8a855] hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</div>
+<div class="flex-none text-center">
+<h1 class="text-2xl font-bold tracking-wider text-[#855400] dark:text-[#e8a855]">Cookr</h1>
+</div>
+<div class="flex-1 flex justify-end">
+<!-- Spacing balance for centered title -->
+<div class="w-6"></div>
+</div>
+</div>
+</header>
+<main class="pt-20 pb-32 px-4 max-w-screen-xl mx-auto">
+<!-- Search Section -->
+<section class="mb-8">
+<div class="relative w-full max-w-md mx-auto">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary">search</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-highest border-none rounded-full text-on-surface focus:ring-2 focus:ring-primary-container outline-none transition-all placeholder:text-secondary" placeholder="¿Qué quieres cocinar hoy?" type="text"/>
+</div>
+</section>
+<!-- Category Chips -->
+<section class="mb-10 overflow-x-auto no-scrollbar">
+<div class="flex gap-3 pb-2 px-1">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-bold text-sm whitespace-nowrap shadow-md">Todas</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary font-bold text-sm whitespace-nowrap hover:bg-surface-container-highest transition-colors">Vegano</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary font-bold text-sm whitespace-nowrap hover:bg-surface-container-highest transition-colors">Keto</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary font-bold text-sm whitespace-nowrap hover:bg-surface-container-highest transition-colors">Sin gluten</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary font-bold text-sm whitespace-nowrap hover:bg-surface-container-highest transition-colors">Proteico</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-secondary font-bold text-sm whitespace-nowrap hover:bg-surface-container-highest transition-colors">Rápido</button>
+</div>
+</section>
+<!-- Feed List (Replaced with Post Cards from SCREEN_5 style) -->
+<div class="space-y-8 max-w-[390px] mx-auto">
+<!-- Post Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl shadow-[0px_12px_32px_rgba(27,28,26,0.04)] overflow-hidden">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a professional chef in white uniform smiling warmly in a bright kitchen setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAiejtmeUgLJGuRmoEAC29fAvwKnUXd8MlwN8Q02x7uZrriLG_8nrjg6tYEQlh2MSSmc-abpIM-JJHHc0Gpi7-ugD-tTOnsHkO8lc2z0-_8_fUZlJpkyU2QR5vvUWzpyaBFR6-IN3ucKQxZqSF4uuDNZaf5BzF6WBSz-xZ7VPRwUz72mn8avaca2tzKORqsnPVD-yAjLYHxkCJ2WsOyd3kke2KpDkcby74AzfC3qDtSn-ZdA0VcRas9duJ14HU3g-zCqnQpdC9XDM"/>
+<div>
+<p class="font-bold text-on-surface">Elena Rodriguez</p>
+<p class="text-xs text-secondary font-medium uppercase tracking-wider">hace 2h</p>
+</div>
+</div>
+</div>
+<div class="relative aspect-[4/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="vibrant mediterranean salad bowl with fresh greens, tomatoes, feta, and grilled chicken under warm natural sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmA2_V3JiAtgXtkrw63ZMRZ7JPHX8_Jf7Sqo3moUSwAuBo5kBJZQVbr3KxorF07J0Lz8Yz1otgNahhi0qO5ex1RE_Yz1kpLtJeI9tkeaOVfDLfeOOJbRHopKl1YhUfbLbNoUpQoEjkY_KbgWQD-ZJf7cJwXsQm94yvMuyvw1OBbXfqNs1-bfj2HT6qkV7Qn7UmgzMuEvvAMZ22mBpQuzqffQC1AhYOSw3wnU14stTvfxiL0m0QGqG-YmVE7OQ9F337WnX4VYOjVW8"/>
+</div>
+<div class="p-5 space-y-3">
+<div>
+<h2 class="text-xl font-bold text-on-surface leading-tight">Guiso de Lentejas Especiado</h2>
+<p class="text-sm text-secondary mt-1 leading-relaxed">Una receta sustanciosa y reconfortante perfecta para las noches de otoño. Servir con pan de masa madre.</p>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-sm font-bold text-on-surface">1.2k</span>
+</div>
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary">chat_bubble</span>
+<span class="text-sm font-bold text-on-surface">48</span>
+</div>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Post Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl shadow-[0px_12px_32px_rgba(27,28,26,0.04)] overflow-hidden">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="close up of a cheerful man with glasses cooking in a modern kitchen backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWf0wDY1eGe0f204mFV_zqHyQbgqbkWSXycrv8yDXQ1nF9MPyaoybBVXQyiSRtneCOMxAvj-HAxdksC9dPmQ4NvipIhNKqMjeXPn7R9d0STET-teoKQKsZOaAv72KsrNZky8D-fGFBOSTnrzOG0Qkm8f0MplWzngLdPf_VTGTPgCSXPLHn82Q89KM20OFvliDQLJws2LQ5yH82hI77jE52eZ6i00XT8Dtb8THNUnTLsx1r78dtjmSTWt4LSFQOjIZto19dcPdZyMY"/>
+<div>
+<p class="font-bold text-on-surface">Marcus Thorne</p>
+<p class="text-xs text-secondary font-medium uppercase tracking-wider">hace 5h</p>
+</div>
+</div>
+</div>
+<div class="relative aspect-[4/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="artisan thin-crust pizza with melting mozzarella and fresh basil leaves on a rustic wooden board" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBaDi7UTKiOQylI2V_XbBV7mWggKW5_4GAcPVk4ZAhwUtkgfm4Uuo7aKL6-FlMN8TR3MOWnz2dpxGM1llgCXVM1QzOEDAOlkQkA1TZb_ZiTQDI82yDs5of6AsPFswDkNzbMhrqmt-vxunSaXe9AqRBB-MOQVUlE1HW7iOdEC7BD7YvEqhS2zCqCx5VFSCEe7JeukTgaegcBs1goygnupnoixNY_fTWug2G7iTVzHKRitluK44ecrQlv0I5mC5p5wd21R5zpVX6dmI"/>
+</div>
+<div class="p-5 space-y-3">
+<div>
+<h2 class="text-xl font-bold text-on-surface leading-tight">Pizza de Albahaca al Horno</h2>
+<p class="text-sm text-secondary mt-1 leading-relaxed">El secreto es la masa fermentada en frío por 48 horas. Simple, elegante y perfectamente crujiente.</p>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary">favorite</span>
+<span class="text-sm font-bold text-on-surface">856</span>
+</div>
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary">chat_bubble</span>
+<span class="text-sm font-bold text-on-surface">24</span>
+</div>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Post Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl shadow-[0px_12px_32px_rgba(27,28,26,0.04)] overflow-hidden">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a woman laughing in a sunny cafe with soft focus interior design elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9WG7-3OnnwfQmmLU2pGBEr_jcWJaK9mDRKdxvmC82qwVaw_dlxaPKJjhecyNlp3N77FAGttlqMjvvYsqMs9ioRKjxsS4WFLLEfxAll_yfLPnS4jD_zkwy4seg38xCblileWMt2JQ4Cmjo6c3NxHniyljppWcROq7OghYcoSEI7CCl-YCect-7zFBKSx460h3SXOdlBmCC_e9aGXAJ18Faci8J0_HLRZrzQYZ0a6X1LGVSr7B15_W_h9fUWCQhkorWwDvuzS4Fbyc"/>
+<div>
+<p class="font-bold text-on-surface">Sarah Chen</p>
+<p class="text-xs text-secondary font-medium uppercase tracking-wider">Ayer</p>
+</div>
+</div>
+</div>
+<div class="relative aspect-[4/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="stack of fluffy buttermilk pancakes with dripping maple syrup and fresh blueberries on top" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClOyUlapAtP8lHtXezTsfMMYDwmAkaB0oSRhcc32xgZsW_a0reQa1OmlyKXzZV2qmqLiWDcS5Q3u0wmgIAoTyNrjkFdhcR3IIyxszNg0Yvohuhx_qo3Z2Hyyn3QmkerDISOxYNDVu3Kfe7w20yeXa1KaUPvfOsn68exovpm__Ta11TY0cgRqw2tf8LRLhC-zyT-52cXZjdyrnmZfgr-oroX2hT7oCiKL1qB1uCJt5jBBsdU3Q7H0FqwGVSxWMUMwP9ZHmB-hT6il8"/>
+</div>
+<div class="p-5 space-y-3">
+<div>
+<h2 class="text-xl font-bold text-on-surface leading-tight">Pancakes Nube Esponjosos</h2>
+<p class="text-sm text-secondary mt-1 leading-relaxed">Tradiciones de domingo por la mañana con un toque de ralladura de limón y compota de arándanos.</p>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary">favorite</span>
+<span class="text-sm font-bold text-on-surface">2.4k</span>
+</div>
+<div class="flex items-center gap-1.5 group cursor-pointer">
+<span class="material-symbols-outlined text-secondary">chat_bubble</span>
+<span class="text-sm font-bold text-on-surface">112</span>
+</div>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center pb-8">
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md rounded-full px-2 py-3 bg-[#ffffff]/80 backdrop-blur-md dark:bg-zinc-900/80 shadow-[0px_12px_32px_rgba(27,28,26,0.08)] flex justify-around items-center">
+<!-- Inicio (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#e8a855] text-white rounded-full p-3 scale-110 -translate-y-4 shadow-lg ring-4 ring-[#faf9f5] dark:ring-zinc-900" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-plus-jakarta text-[10px] uppercase tracking-[0.05em] font-bold">Inicio</span>
+</a>
+<!-- Despensa -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] dark:text-zinc-400 p-2 hover:text-[#855400] dark:hover:text-[#e8a855] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_basket">shopping_basket</span>
+<span class="font-plus-jakarta text-[10px] uppercase tracking-[0.05em] font-bold">Despensa</span>
+</a>
+<!-- Cookr IA -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] dark:text-zinc-400 p-2 hover:text-[#855400] dark:hover:text-[#e8a855] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="chef_hat">chef_hat</span>
+<span class="font-plus-jakarta text-[10px] uppercase tracking-[0.05em] font-bold">Cookr IA</span>
+</a>
+<!-- Discover -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] dark:text-zinc-400 p-2 hover:text-[#855400] dark:hover:text-[#e8a855] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-plus-jakarta text-[10px] uppercase tracking-[0.05em] font-bold">Discover</span>
+</a>
+<!-- Perfil -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] dark:text-zinc-400 p-2 hover:text-[#855400] dark:hover:text-[#e8a855] transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-plus-jakarta text-[10px] uppercase tracking-[0.05em] font-bold">Perfil</span>
+</a>
+</div>
+</nav>
+</body></html>

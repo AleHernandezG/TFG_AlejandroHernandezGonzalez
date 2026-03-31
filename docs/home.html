@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home / Feed — Documentación técnica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    ul, ol { margin: 8px 0 12px; padding-left: 22px; }
+    li { margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+    .badge-gray   { background: #f3f4f6; color: #374151; }
+    .badge-red    { background: #fee2e2; color: #991b1b; }
+
+    .callout {
+      border-left: 4px solid #b45309;
+      background: #fffbeb;
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+      font-size: 10pt;
+    }
+
+    .callout.info {
+      border-color: #1c3d5a;
+      background: #eff6ff;
+    }
+
+    .header-meta {
+      color: #6b7280;
+      font-size: 10pt;
+      margin-top: -12px;
+      margin-bottom: 24px;
+    }
+
+    .toc {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0 36px;
+    }
+
+    .toc h3 { margin-top: 0; color: #1c3d5a; }
+    .toc ol { margin: 0; }
+    .toc a { color: #b45309; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    .file-tree {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 8.5pt;
+      line-height: 1.8;
+      margin: 12px 0 18px;
+    }
+
+    .file-tree .dir  { color: #89b4fa; }
+    .file-tree .file { color: #a6e3a1; }
+    .file-tree .note { color: #6c7086; }
+  </style>
+</head>
+<body>
+
+<h1>Home / Feed de Recetas — Documentación técnica</h1>
+<p class="header-meta">
+  TFG-20 · Sprint 2 · Creado: 2026-03-31 · Estado: <span class="badge badge-orange">👁️ Pendiente revisión</span>
+</p>
+
+<div class="toc">
+  <h3>Índice</h3>
+  <ol>
+    <li><a href="#vision">Visión general</a></li>
+    <li><a href="#estructura">Estructura de archivos</a></li>
+    <li><a href="#layout">Layout y capas sticky</a></li>
+    <li><a href="#tipos">Tipos TypeScript</a></li>
+    <li><a href="#datos">Datos mock</a></li>
+    <li><a href="#header">HeaderHome</a></li>
+    <li><a href="#buscador">BuscadorFiltros</a></li>
+    <li><a href="#tarjeta">TarjetaPost</a></li>
+    <li><a href="#feed">FeedHome</a></li>
+    <li><a href="#page">page.tsx — Server Component</a></li>
+    <li><a href="#animaciones">Animaciones Framer Motion</a></li>
+    <li><a href="#colores">Paleta de colores usada</a></li>
+    <li><a href="#fase5">Preparación para Fase 5 (backend)</a></li>
+    <li><a href="#pendientes">TODOs y pendientes</a></li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="vision">1. Visión general</h2>
+
+<p>
+  La vista <strong>Home</strong> es el punto de entrada principal de la aplicación tras el login.
+  Implementa el <strong>feed personal de recetas</strong> (TFG-20) con datos mock hasta la Fase 5,
+  cuando se conectará el backend real. El diseño sigue los principios editoriales del DESIGN.md de
+  Stitch: paleta cálida, glassmorphism en elementos flotantes, imágenes con <code>rounded-2xl</code>
+  y separación por tono en lugar de bordes duros.
+</p>
+
+<table>
+  <tr><th>Propiedad</th><th>Valor</th></tr>
+  <tr><td>Ruta</td><td><code>/home</code></td></tr>
+  <tr><td>Layout group</td><td><code>(main)</code> — incluye NavBarInferior</td></tr>
+  <tr><td>Tarea Linear</td><td>TFG-20</td></tr>
+  <tr><td>Sprint</td><td>Sprint 2 (FE mock)</td></tr>
+  <tr><td>Estado</td><td>👁️ Pendiente revisión</td></tr>
+  <tr><td>Icono activo en navbar</td><td>Home → /home</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="estructura">2. Estructura de archivos</h2>
+
+<div class="file-tree">
+<span class="dir">frontend/src/</span>
+├── <span class="dir">app/(main)/home/</span>
+│   └── <span class="file">page.tsx</span>                  <span class="note">← Server Component raíz</span>
+│
+├── <span class="dir">components/common/</span>
+│   └── <span class="file">buscadorFiltros.tsx</span>        <span class="note">← Reutilizable (Home + Discover)</span>
+│
+└── <span class="dir">features/recetas/</span>
+    ├── <span class="dir">components/</span>
+    │   ├── <span class="file">headerHome.tsx</span>          <span class="note">← Logo Cookr + Bell</span>
+    │   ├── <span class="file">tarjetaPost.tsx</span>         <span class="note">← Card individual de receta</span>
+    │   ├── <span class="file">feedHome.tsx</span>            <span class="note">← Lista de cards + filtro</span>
+    │   └── <span class="file">index.ts</span>               <span class="note">← Barrel export</span>
+    ├── <span class="dir">data/</span>
+    │   └── <span class="file">datosFeed.ts</span>            <span class="note">← 7 posts mock + filtros</span>
+    └── <span class="dir">types/</span>
+        └── <span class="file">receta.types.ts</span>        <span class="note">← PostFeed, Autor, DatosReceta…</span>
+</div>
+
+<p>También se modificó <code>frontend/next.config.mjs</code> para añadir <code>picsum.photos</code>
+a los <code>remotePatterns</code> de <code>next/image</code> (imágenes de desarrollo).</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="layout">3. Layout y capas sticky</h2>
+
+<p>
+  La pantalla tiene cuatro capas apiladas verticalmente, gestionadas por CSS
+  <code>position: sticky</code> y <code>position: fixed</code>:
+</p>
+
+<table>
+  <tr><th>Capa</th><th>Componente</th><th>z-index</th><th>Posición</th></tr>
+  <tr>
+    <td>1ª</td>
+    <td><code>HeaderHome</code></td>
+    <td><code>z-40</code></td>
+    <td><code>sticky top-0</code></td>
+  </tr>
+  <tr>
+    <td>2ª</td>
+    <td><code>BuscadorFiltros</code></td>
+    <td><code>z-30</code></td>
+    <td><code>sticky top-[56px]</code> (altura del header)</td>
+  </tr>
+  <tr>
+    <td>3ª</td>
+    <td><code>FeedHome</code> (lista de cards)</td>
+    <td>natural</td>
+    <td>flujo normal, scrollable</td>
+  </tr>
+  <tr>
+    <td>4ª</td>
+    <td><code>NavBarInferior</code></td>
+    <td><code>z-50</code></td>
+    <td><code>fixed bottom-0</code> (ya existía)</td>
+  </tr>
+</table>
+
+<p>
+  El <code>LayoutPrincipal</code> de <code>(main)/layout.tsx</code> ya añade
+  <code>pb-[calc(4.5rem+env(safe-area-inset-bottom))]</code> al <code>&lt;main&gt;</code>,
+  por lo que el contenido del feed nunca queda tapado por la barra inferior.
+</p>
+
+<div class="callout">
+  <strong>Glassmorphism:</strong> Tanto el header como el buscador usan
+  <code>bg-background/80 backdrop-blur-md</code>. Esto permite que los colores cálidos de las
+  imágenes del feed "sangren" visualmente a través del header mientras el usuario hace scroll,
+  creando el efecto editorial del DESIGN.md.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="tipos">4. Tipos TypeScript</h2>
+
+<p>Fichero: <code>features/recetas/types/receta.types.ts</code></p>
+
+<pre>
+<span class="kw">export type</span> <span class="ty">DificultadReceta</span> = <span class="st">'Fácil'</span> | <span class="st">'Media'</span> | <span class="st">'Difícil'</span>
+
+<span class="kw">export type</span> <span class="ty">Autor</span> = {
+  nombre:    <span class="ty">string</span>
+  username:  <span class="ty">string</span>
+  avatarUrl: <span class="ty">string</span>
+}
+
+<span class="kw">export type</span> <span class="ty">DatosReceta</span> = {
+  titulo:      <span class="ty">string</span>
+  descripcion: <span class="ty">string</span>
+  imagenUrl:   <span class="ty">string</span>
+  tiempo:      <span class="ty">string</span>
+  dificultad:  <span class="ty">DificultadReceta</span>
+}
+
+<span class="kw">export type</span> <span class="ty">PostFeed</span> = {
+  id:               <span class="ty">string</span>
+  autor:            <span class="ty">Autor</span>
+  receta:           <span class="ty">DatosReceta</span>
+  likes:            <span class="ty">number</span>
+  comentarios:      <span class="ty">number</span>
+  guardado:         <span class="ty">boolean</span>
+  liked:            <span class="ty">boolean</span>
+  fechaPublicacion: <span class="ty">string</span>  <span class="cm">// ISO 8601</span>
+}
+
+<span class="kw">export type</span> <span class="ty">FiltroFeed</span> = {
+  id:       <span class="ty">string</span>
+  etiqueta: <span class="ty">string</span>
+}
+</pre>
+
+<p>
+  En Fase 5, cuando se conecte el backend, <strong>solo cambiará el origen del dato</strong>
+  (de <code>POSTS_MOCK</code> a <code>useRecetasFeed</code>). El tipo <code>PostFeed</code>
+  no se toca porque el servicio mapeará la respuesta de la API a esta misma forma.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="datos">5. Datos mock</h2>
+
+<p>Fichero: <code>features/recetas/data/datosFeed.ts</code></p>
+
+<p>Exporta dos constantes:</p>
+
+<table>
+  <tr><th>Constante</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>FILTROS_FEED</code></td>
+    <td><code>FiltroFeed[]</code></td>
+    <td>5 chips: Todas · Vegano · Keto · Sin gluten · Sin lactosa</td>
+  </tr>
+  <tr>
+    <td><code>POSTS_MOCK</code></td>
+    <td><code>PostFeed[]</code></td>
+    <td>7 posts con datos variados (dificultades, tiempos, estados liked/guardado)</td>
+  </tr>
+</table>
+
+<p>
+  Las fechas de publicación se calculan dinámicamente con <code>Date.now() - offset</code>
+  para que la función <code>tiempoRelativo()</code> siempre muestre valores coherentes.
+  Las imágenes usan <strong>picsum.photos</strong> con semillas fijas para reproducibilidad.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="header">6. HeaderHome</h2>
+
+<p>Fichero: <code>features/recetas/components/headerHome.tsx</code></p>
+<p><span class="badge badge-gray">Server Component</span> Sin interactividad — no necesita <code>'use client'</code>.</p>
+
+<table>
+  <tr><th>Elemento</th><th>Clases</th></tr>
+  <tr>
+    <td>Contenedor <code>&lt;header&gt;</code></td>
+    <td><code>sticky top-0 z-40 flex items-center justify-between border-b border-border bg-background/80 px-5 py-3 backdrop-blur-md</code></td>
+  </tr>
+  <tr>
+    <td>Logo "Cookr"</td>
+    <td><code>text-xl font-bold text-brand</code></td>
+  </tr>
+  <tr>
+    <td>Botón Bell</td>
+    <td><code>h-9 w-9 rounded-full hover:bg-muted</code> · icono <code>Bell</code> Lucide</td>
+  </tr>
+</table>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="buscador">7. BuscadorFiltros</h2>
+
+<p>Fichero: <code>components/common/buscadorFiltros.tsx</code></p>
+<p><span class="badge badge-blue">Client Component</span> Reutilizable — funciona en Home, Discover y vistas futuras.</p>
+
+<h3>Props</h3>
+
+<pre>
+<span class="kw">interface</span> <span class="ty">BuscadorFiltrosProps</span> {
+  placeholder?:    <span class="ty">string</span>         <span class="cm">// default: '¿Qué quieres cocinar hoy?'</span>
+  filtros:         <span class="ty">FiltroFeed[]</span>
+  filtroActivo:    <span class="ty">string</span>         <span class="cm">// id del filtro activo</span>
+  onFiltroChange:  <span class="nm">(id: string) =&gt; void</span>
+  onBuscar:        <span class="nm">(query: string) =&gt; void</span>
+  className?:      <span class="ty">string</span>         <span class="cm">// override sticky top-* según el contexto</span>
+}
+</pre>
+
+<h3>Estructura visual</h3>
+
+<table>
+  <tr><th>Elemento</th><th>Descripción</th></tr>
+  <tr>
+    <td>Contenedor</td>
+    <td><code>sticky z-30 bg-background/80 backdrop-blur-md</code> — glassmorphism</td>
+  </tr>
+  <tr>
+    <td>Input pill</td>
+    <td>Envuelto en <code>&lt;label&gt;</code>, fondo <code>bg-muted</code>, icono <code>Search</code> Lucide, <code>rounded-full</code></td>
+  </tr>
+  <tr>
+    <td>Chips de filtro</td>
+    <td>Scroll horizontal sin scrollbar visible. Activo: <code>bg-brand text-brand-foreground</code>. Inactivo: <code>bg-muted text-muted-foreground</code></td>
+  </tr>
+</table>
+
+<div class="callout info">
+  <strong>Scroll horizontal sin scrollbar:</strong> Se usa la combinación de clases Tailwind
+  <code>[scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden</code> para ocultar el scrollbar
+  en Firefox y WebKit sin afectar la funcionalidad de scroll táctil.
+</div>
+
+<h3>Uso en Home</h3>
+<pre>
+&lt;<span class="fn">BuscadorFiltros</span>
+  filtros={<span class="nm">FILTROS_FEED</span>}
+  filtroActivo={<span class="nm">filtroActivo</span>}
+  onFiltroChange={<span class="nm">setFiltroActivo</span>}
+  onBuscar={<span class="nm">setBusqueda</span>}
+  className=<span class="st">"top-[56px]"</span>   <span class="cm">{/* altura del HeaderHome */}</span>
+/&gt;
+</pre>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="tarjeta">8. TarjetaPost</h2>
+
+<p>Fichero: <code>features/recetas/components/tarjetaPost.tsx</code></p>
+<p><span class="badge badge-blue">Client Component</span> Gestiona estado de like/guardado de forma optimista.</p>
+
+<h3>Anatomía del componente</h3>
+
+<pre>
+&lt;<span class="ty">article</span> className=<span class="st">"border-b border-border bg-background px-4 py-4"</span>&gt;
+  &lt;<span class="cm">-- 1. Cabecera: Avatar + nombre + @username + tiempo relativo --</span>&gt;
+  &lt;<span class="cm">-- 2. Imagen: aspect-[4/3] rounded-2xl bg-[var(--warm-bg-accent)] --</span>&gt;
+  &lt;<span class="cm">-- 3. Título: text-xl font-bold text-foreground --</span>&gt;
+  &lt;<span class="cm">-- 4. Descripción: text-sm text-muted-foreground line-clamp-2 --</span>&gt;
+  &lt;<span class="cm">-- 5. Metadatos: tiempo · dificultad --</span>&gt;
+  &lt;<span class="cm">-- 6. Acciones: Heart + count | MessageCircle + count | Bookmark --</span>&gt;
+&lt;/<span class="ty">article</span>&gt;
+</pre>
+
+<h3>Estado local</h3>
+
+<table>
+  <tr><th>Estado</th><th>Tipo</th><th>Inicializado desde</th></tr>
+  <tr><td><code>liked</code></td><td><code>boolean</code></td><td><code>post.liked</code></td></tr>
+  <tr><td><code>likes</code></td><td><code>number</code></td><td><code>post.likes</code></td></tr>
+  <tr><td><code>guardado</code></td><td><code>boolean</code></td><td><code>post.guardado</code></td></tr>
+</table>
+
+<p>
+  El toggle de like es <strong>optimista</strong>: actualiza el estado local inmediatamente sin esperar
+  al servidor. En Fase 5, se añadirá <code>useMutation</code> de TanStack Query con rollback en error.
+</p>
+
+<h3>Animaciones de Like y Bookmark</h3>
+
+<pre>
+<span class="cm">// Like: rebote de escala al activar</span>
+animate={{ scale: liked ? [<span class="nu">1</span>, <span class="nu">1.3</span>, <span class="nu">1</span>] : <span class="nu">1</span> }}
+transition={{ duration: <span class="nu">0.25</span>, ease: <span class="st">'easeOut'</span> }}
+
+<span class="cm">// Bookmark: rebote más sutil</span>
+animate={{ scale: guardado ? [<span class="nu">1</span>, <span class="nu">1.2</span>, <span class="nu">1</span>] : <span class="nu">1</span> }}
+transition={{ duration: <span class="nu">0.2</span>, ease: <span class="st">'easeOut'</span> }}
+</pre>
+
+<h3>Estilos de iconos activos/inactivos</h3>
+
+<table>
+  <tr><th>Icono</th><th>Inactivo</th><th>Activo</th></tr>
+  <tr>
+    <td>Heart</td>
+    <td><code>text-muted-foreground</code> strokeWidth 1.8</td>
+    <td><code>fill-brand text-brand</code> strokeWidth 0</td>
+  </tr>
+  <tr>
+    <td>Bookmark</td>
+    <td><code>text-muted-foreground</code> strokeWidth 1.8</td>
+    <td><code>fill-brand text-brand</code> strokeWidth 0</td>
+  </tr>
+  <tr>
+    <td>MessageCircle</td>
+    <td><code>text-muted-foreground</code> (siempre)</td>
+    <td>—</td>
+  </tr>
+</table>
+
+<h3>Función de tiempo relativo</h3>
+
+<pre>
+<span class="kw">function</span> <span class="fn">tiempoRelativo</span>(fechaISO: <span class="ty">string</span>): <span class="ty">string</span> {
+  <span class="kw">const</span> diffMs  = <span class="nm">Date</span>.now() - <span class="kw">new</span> <span class="nm">Date</span>(fechaISO).<span class="fn">getTime</span>()
+  <span class="kw">const</span> diffMin = <span class="nm">Math</span>.<span class="fn">floor</span>(diffMs / <span class="nu">60_000</span>)
+  <span class="kw">if</span> (diffMin &lt; <span class="nu">60</span>) <span class="kw">return</span> <span class="st">`Hace ${diffMin}m`</span>
+  <span class="kw">const</span> diffH = <span class="nm">Math</span>.<span class="fn">floor</span>(diffMin / <span class="nu">60</span>)
+  <span class="kw">if</span> (diffH &lt; <span class="nu">24</span>) <span class="kw">return</span> <span class="st">`Hace ${diffH}h`</span>
+  <span class="kw">return</span> <span class="st">`Hace ${Math.floor(diffH / 24)}d`</span>
+}
+</pre>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="feed">9. FeedHome</h2>
+
+<p>Fichero: <code>features/recetas/components/feedHome.tsx</code></p>
+<p><span class="badge badge-blue">Client Component</span> Gestiona el estado de filtros y búsqueda, y renderiza el feed.</p>
+
+<h3>Estado interno</h3>
+
+<table>
+  <tr><th>Estado</th><th>Tipo</th><th>Uso</th></tr>
+  <tr><td><code>filtroActivo</code></td><td><code>string</code></td><td>ID del chip activo (default <code>'todas'</code>)</td></tr>
+  <tr><td><code>busqueda</code></td><td><code>string</code></td><td>Query del input de búsqueda</td></tr>
+</table>
+
+<h3>Filtrado de posts</h3>
+
+<pre>
+<span class="kw">const</span> postsFiltrados = <span class="nm">POSTS_MOCK</span>.<span class="fn">filter</span>((post) => {
+  <span class="kw">if</span> (busqueda === <span class="st">''</span>) <span class="kw">return</span> <span class="nu">true</span>
+  <span class="kw">const</span> q = busqueda.<span class="fn">toLowerCase</span>()
+  <span class="kw">return</span> (
+    post.receta.titulo.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q) ||
+    post.receta.descripcion.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q) ||
+    post.autor.nombre.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q)
+  )
+})
+</pre>
+
+<p>
+  El filtro por categoría (Vegano, Keto…) está preparado en el estado pero no aplica lógica
+  de exclusión sobre el mock actual, ya que los datos mock no tienen campo de categoría.
+  En Fase 5, la query al backend enviará el filtro como parámetro y el servicio filtrará
+  correctamente. Añadir el campo <code>categoria</code> a <code>DatosReceta</code> completará
+  el ciclo sin tocar la UI.
+</p>
+
+<h3>Animación staggered</h3>
+
+<pre>
+{postsFiltrados.<span class="fn">map</span>((post, i) => (
+  &lt;<span class="fn">motion.div</span>
+    key={post.id}
+    initial={{ opacity: <span class="nu">0</span>, y: <span class="nu">18</span> }}
+    animate={{ opacity: <span class="nu">1</span>, y: <span class="nu">0</span> }}
+    transition={{ duration: <span class="nu">0.3</span>, delay: i * <span class="nu">0.07</span>, ease: <span class="st">'easeOut'</span> }}
+  &gt;
+    &lt;<span class="fn">TarjetaPost</span> post={post} /&gt;
+  &lt;/<span class="fn">motion.div</span>&gt;
+))}
+</pre>
+
+<p>Cada card entra con un retraso incremental de <strong>70ms</strong>, creando un efecto
+de cascada suave que evoca la sensación de un feed que se va "descubriendo".</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="page">10. page.tsx — Server Component</h2>
+
+<p>Fichero: <code>app/(main)/home/page.tsx</code></p>
+
+<pre>
+<span class="kw">import</span> { <span class="fn">FeedHome</span>, <span class="fn">HeaderHome</span> } <span class="kw">from</span> <span class="st">'@/features/recetas/components'</span>
+
+<span class="kw">export const</span> <span class="nm">metadata</span> = {
+  title: <span class="st">'Inicio — Cookr'</span>,
+  description: <span class="st">'Tu feed personalizado de recetas.'</span>,
+}
+
+<span class="kw">export default function</span> <span class="fn">PaginaHome</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="ty">div</span> className=<span class="st">"min-h-screen bg-background"</span>&gt;
+      &lt;<span class="fn">HeaderHome</span> /&gt;   <span class="cm">{/* Server Component, sticky z-40 */}</span>
+      &lt;<span class="fn">FeedHome</span> /&gt;     <span class="cm">{/* Client Component, gestiona BuscadorFiltros + cards */}</span>
+    &lt;/<span class="ty">div</span>&gt;
+  )
+}
+</pre>
+
+<p>
+  <code>PaginaHome</code> es un <strong>Server Component</strong> puro. No contiene ningún hook,
+  estado ni manejador de eventos. La interactividad está encapsulada en <code>FeedHome</code>
+  (Client Component), respetando el patrón App Router de Next.js 14: empujar el límite
+  <code>'use client'</code> lo más abajo posible en el árbol.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="animaciones">11. Animaciones Framer Motion</h2>
+
+<table>
+  <tr><th>Componente</th><th>Tipo</th><th>Configuración</th></tr>
+  <tr>
+    <td>Cards del feed</td>
+    <td>Stagger entrada</td>
+    <td><code>opacity 0→1, y 18→0, delay i*0.07s, ease easeOut</code></td>
+  </tr>
+  <tr>
+    <td>Botón Like</td>
+    <td>Rebote de escala</td>
+    <td><code>scale [1, 1.3, 1], duration 0.25s</code></td>
+  </tr>
+  <tr>
+    <td>Botón Bookmark</td>
+    <td>Rebote de escala</td>
+    <td><code>scale [1, 1.2, 1], duration 0.2s</code></td>
+  </tr>
+</table>
+
+<div class="callout">
+  <strong>Compatibilidad Framer Motion v12:</strong> Se usa la API estándar de <code>motion.div</code>
+  con props <code>animate</code> y <code>transition</code>. No se necesita anotar variantes con el
+  tipo <code>Variants</code> porque se pasan objetos literales directamente (sin referencia a
+  variantes nombradas que podrían conflictar con el tipado estricto de v12).
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="colores">12. Paleta de colores usada</h2>
+
+<table>
+  <tr><th>Variable CSS</th><th>Uso en la vista Home</th></tr>
+  <tr><td><code>--background</code></td><td>Fondo de página y de cada tarjeta</td></tr>
+  <tr><td><code>--foreground</code></td><td>Títulos de receta, nombre del autor</td></tr>
+  <tr><td><code>--muted-foreground</code></td><td>Descripción, @username, contadores, tiempo</td></tr>
+  <tr><td><code>--muted</code></td><td>Fondo del input de búsqueda y chips inactivos</td></tr>
+  <tr><td><code>--brand</code></td><td>Logo "Cookr", chip activo fondo, like/bookmark activo</td></tr>
+  <tr><td><code>--brand-foreground</code></td><td>Texto sobre chip activo</td></tr>
+  <tr><td><code>--brand/10</code></td><td>Fondo del AvatarFallback</td></tr>
+  <tr><td><code>--warm-bg-accent</code></td><td>Placeholder de imagen mientras carga</td></tr>
+  <tr><td><code>--border</code></td><td>Separador entre tarjetas (border-b)</td></tr>
+</table>
+
+<p><strong>Colores hardcodeados usados: ninguno.</strong> Todas las clases de color usan variables
+CSS de <code>globals.css</code> a través de Tailwind.</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="fase5">13. Preparación para Fase 5 (backend)</h2>
+
+<p>La arquitectura actual permite conectar el backend <strong>sin tocar los componentes</strong>.
+El único cambio necesario será añadir una capa de servicio y un hook:</p>
+
+<pre>
+<span class="cm">// Fase 5 — añadir sin tocar los componentes existentes</span>
+
+<span class="cm">// 1. src/features/recetas/hooks/useRecetasFeed.ts</span>
+<span class="kw">export function</span> <span class="fn">useRecetasFeed</span>(filtro: <span class="ty">string</span>) {
+  <span class="kw">return</span> <span class="fn">useQuery</span>({
+    queryKey: [<span class="st">'feed'</span>, filtro],
+    queryFn:  () => <span class="nm">recetasService</span>.<span class="fn">obtenerFeed</span>(filtro),
+  })
+}
+
+<span class="cm">// 2. src/features/recetas/services/recetasService.ts</span>
+<span class="kw">export const</span> <span class="nm">recetasService</span> = {
+  <span class="fn">obtenerFeed</span>: (filtro: <span class="ty">string</span>) =>
+    <span class="nm">apiClient</span>.<span class="fn">get</span>&lt;<span class="ty">PostFeed[]</span>&gt;(<span class="st">`/recetas/feed?filtro=${filtro}`</span>),
+}
+
+<span class="cm">// 3. feedHome.tsx — sustituir POSTS_MOCK por el hook</span>
+<span class="kw">const</span> { data: posts = [] } = <span class="fn">useRecetasFeed</span>(filtroActivo)
+</pre>
+
+<p>
+  <code>TarjetaPost</code>, <code>HeaderHome</code> y <code>BuscadorFiltros</code>
+  <strong>no se modifican en Fase 5</strong>.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="pendientes">14. TODOs y pendientes</h2>
+
+<table>
+  <tr><th>ID</th><th>Descripción</th><th>Fase</th></tr>
+  <tr>
+    <td><code>HOME-001</code></td>
+    <td>Sustituir <code>POSTS_MOCK</code> por <code>useRecetasFeed</code> conectado al backend</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-002</code></td>
+    <td>Añadir campo <code>categoria</code> a <code>DatosReceta</code> y filtrar por chips realmente</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-003</code></td>
+    <td>Sustituir imágenes picsum.photos por imágenes reales de Cloudinary</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-004</code></td>
+    <td>Añadir <code>useMutation</code> en like/bookmark con rollback en error</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-005</code></td>
+    <td>Implementar paginación / infinite scroll con <code>useInfiniteQuery</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-006</code></td>
+    <td>Añadir Skeleton loader mientras carga el feed (shadcn <code>Skeleton</code>)</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-007</code></td>
+    <td>Botón Bell de <code>HeaderHome</code> conectar a <code>/notificaciones</code></td>
+    <td>Fase 6</td>
+  </tr>
+  <tr>
+    <td><code>HOME-008</code></td>
+    <td>Al hacer clic en una tarjeta, navegar a <code>/recetas/[id]</code> (TFG-21)</td>
+    <td>Sprint 2 FE</td>
+  </tr>
+</table>
+
+</body>
+</html>

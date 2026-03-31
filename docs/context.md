@@ -1,8 +1,9 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-03-24
-**Sprint Actual:** Sprint 1 — Setup + Autenticación (Mar 16 → Mar 29)
-**Fase:** Fase 1 de 7 — Autenticación (Frontend)
+**Fecha:** 2026-03-30
+**Sprint Actual:** Sprint 2 — Home + Feed + Detalle FE / Auth BE (Mar 30 → Abr 12)
+**Modelo:** FE nuevas vistas mock + BE sprint anterior real + BD necesaria
+**Fase:** Fase 2 de 7 — Recetas (FE mock) + Autenticación (BE real)
 
 ---
 
@@ -18,6 +19,83 @@ Cuando Claude crea una vista nueva, el estado en context.md y en el registro de 
 | Aprobado por el autor | `✅` | El autor ha revisado la vista en el navegador y da el visto bueno |
 
 **Regla:** Claude nunca marca una vista como `✅ Completado` en context.md hasta que el autor confirme explícitamente que la ha revisado y aprobado. Si el autor dice "ok", "aprobado", "bien" o similar, Claude actualiza el estado a `✅`.
+
+---
+
+## Modelo de desarrollo — Sprint paralelo FE + BE
+
+A partir del Sprint 2 cada sprint tiene dos frentes:
+
+**FRENTE FE (mock):**
+- Nuevas vistas con datos mock, sin conectar al backend
+- Mobile-first, paleta Cookr, patrón feature-based
+
+**FRENTE BE (real):**
+- Backend de las vistas del sprint anterior
+- Express + Mongoose + Zod + JWT
+- MongoDB modelos necesarios para ese sprint
+
+Regla: el FE nunca espera al BE para avanzar.
+El BE siempre va un sprint por detrás del FE.
+
+---
+
+## Flujo Stitch — referencia de diseño FE
+
+OBLIGATORIO antes de implementar cualquier vista FE:
+1. Crear diseño en Stitch by Google (stitch.withgoogle.com)
+2. Guardar en `docs/stitch/<nombreVista>/`:
+   - `<nombreVista>.png` → captura visual
+   - `<nombreVista>.html` → HTML generado por Stitch
+3. Adjuntar ambos al iniciar la sesión de implementación
+
+Claude Code usa Stitch **SOLO** como referencia visual de:
+- Layout y estructura (dónde va cada elemento)
+- Jerarquía visual (tamaños, pesos, protagonismo)
+- Composición de secciones
+
+Claude Code **NUNCA** usa de Stitch:
+- Código HTML directamente
+- Colores (usa paleta Cookr de globals.css)
+- Componentes (usa shadcn/ui + librerías del proyecto)
+- Fuentes (usa Geist configurada en el proyecto)
+- Clases CSS (usa variables Cookr + Tailwind)
+
+Nomenclatura de carpetas `docs/stitch/`:
+
+| Vista | Carpeta |
+|---|---|
+| Home / Feed | `home/` |
+| Detalle de receta | `detalleReceta/` |
+| Crear receta | `crearReceta/` |
+| Perfil | `perfil/` |
+| Despensa | `despensa/` |
+| Chat IA | `chat/` |
+| Grupos | `grupos/` |
+| Notificaciones | `notificaciones/` |
+| Ajustes | `ajustes/` |
+
+---
+
+## Reglas de arquitectura — capas de abstracción
+
+```
+FE: Componente → Hook → Service → apiClient → Backend
+BE: Route → Controller → Service → Repository → MongoDB
+```
+
+NUNCA:
+- Un componente llama a Axios directamente
+- Un hook conoce rutas de la API (`/api/recetas`)
+- Un controller accede a modelos Mongoose directamente
+- Lógica de negocio en routes o controllers
+
+SIEMPRE:
+- Nuevas llamadas HTTP → `src/services/<nombre>Service.ts`
+- Nuevo estado global → `src/stores/<nombre>Store.ts`
+- Nuevo acceso a BD → `backend/src/repositories/<nombre>Repository.ts`
+
+Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
 
 ---
 
@@ -41,11 +119,12 @@ Cuando Claude crea una vista nueva, el estado en context.md y en el registro de 
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
 - ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
 - ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (mock, Fase 6 para Resend real)
-- 👁️ Pendiente revisión — [UI-006] Login (/login) — TFG-16: layout split-screen espejado (form izquierda, imagen derecha), FormularioLogin con RHF + Zod, enlace "¿Olvidaste tu contraseña?", reutiliza BotonGoogle y DivisorOAuth
-- 👁️ Pendiente revisión — [UI-007] Flujo recuperación de contraseña (3 vistas mock):
+- ✅ [UI-006] Login (/login) — TFG-16: layout split-screen espejado (form izquierda, imagen derecha), FormularioLogin con RHF + Zod, enlace "¿Olvidaste tu contraseña?", reutiliza BotonGoogle y DivisorOAuth
+- ✅ [UI-007] Flujo recuperación de contraseña (3 vistas mock):
   - /recuperar-contrasena: layout igual que /login, solo campo email
   - /recuperar-contrasena/pendiente: pantalla "revisa tu correo" con cooldown reenvío 60s
   - /nueva-contrasena: layout como /registro (imagen izq, form der), 2 campos contraseña + confirmar + pantalla éxito in-page
+- 👁️ Pendiente revisión — [TFG-17] NavBar inferior: 5 iconos, icono central ChefHat con bg-brand, pill indicator con layoutId Framer Motion, safe area insets, oculta en / y lg+
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -194,18 +273,26 @@ Diseño de ambas páginas:
 | `/registro` | Página de registro | ✅ |
 | `/privacidad` | Política de privacidad | ✅ |
 | `/terminos` | Términos de uso | ✅ |
-| `/login` | Inicio de sesión | 👁️ Pendiente revisión |
-| `/recuperar-contrasena` | Solicitar recuperación (email) | 👁️ Pendiente revisión |
-| `/recuperar-contrasena/pendiente` | Confirmar envío de correo | 👁️ Pendiente revisión |
-| `/nueva-contrasena` | Establecer nueva contraseña | 👁️ Pendiente revisión |
+| `/login` | Inicio de sesión | ✅ |
+| `/recuperar-contrasena` | Solicitar recuperación (email) | ✅ |
+| `/recuperar-contrasena/pendiente` | Confirmar envío de correo | ✅ |
+| `/nueva-contrasena` | Establecer nueva contraseña | ✅ |
 | `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
 | `/verificar-email` | Verificación de token por enlace | ✅ mock |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
+| `/home` | Home / Feed de recetas | 👁️ Pendiente revisión |
+| NavBar inferior (`(main)/layout.tsx`) | Componente global | 👁️ Pendiente revisión |
+| `/recetas/[id]` | Detalle de receta | ⏳ Sprint 2 FE mock |
+| `BE /api/auth/registro` | Endpoint real | ⏳ Sprint 2 BE |
+| `BE /api/auth/login` | Endpoint real | ⏳ Sprint 2 BE |
+| `BE /api/auth/verificar-email` | Endpoint real | ⏳ Sprint 2 BE |
+| `BE /api/auth/recuperar-contrasena` | Endpoint real | ⏳ Sprint 2 BE |
+| `BE /api/auth/nueva-contrasena` | Endpoint real | ⏳ Sprint 2 BE |
 
 ## Estructura del Proyecto
 
 - /frontend → Next.js 14 App Router + TypeScript + Tailwind
-- /backend → vacío hasta Fase 4
+- /backend → Node.js + Express + TypeScript — activo desde Sprint 2
 - /docs → documentación y contexto
   - /docs/desarrollo → documentación técnica de cada módulo
   - /docs/phase-reports → sprints y tareas pendientes
@@ -219,6 +306,15 @@ Diseño de ambas páginas:
 - [SETUP-003] Variables Vercel → aplazado a Fase 6
 - ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
 - [SETUP-005] Paquetes deprecated (eslint@8, next-pwa@5) → aplazado a Fase 6, ver docs/tech-debt.md
+
+## Filtros del Feed — Decisión de diseño
+
+Los filtros de categoría que aparecen en `BuscadorFiltros` (Todas · Vegano · Keto · Sin gluten · Sin lactosa)
+son **predefinidos por el autor**. No son generados por el backend ni configurables por el usuario.
+
+En Sprint 3, cuando se implemente la vista "Filtrar recetas", se añadirán más chips predefinidos
+a la lista `FILTROS_FEED` en `features/recetas/data/datosFeed.ts`.
+El autor decide qué categorías existen — Claude no debe inventar nuevas sin confirmación explícita.
 
 ## Carrusel — Pendientes
 
@@ -241,7 +337,13 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 1 completado. Continuar Sprint 2: Perfil + Navegación Global (barra inferior mobile-first)
+Sprint 1 completado y aprobado al 100%.
+
+Sprint 2 activo — dos frentes:
+- **FE:** NavBar inferior (TFG-17) — 👁️ implementado, pendiente revisión visual
+- **FE:** Home/Feed (TFG-20) — requiere `docs/stitch/home/` antes de implementar
+- **FE:** Detalle receta (TFG-21) — requiere `docs/stitch/detalleReceta/` antes de implementar
+- **BE:** Setup Express + Auth real + MongoDB modelos Usuario y Token
 
 ## Paleta de colores — Cookr
 
