@@ -102,6 +102,36 @@ Impacto si no se corrige:
 
 ---
 
+## [DEBT-007] Flujo de registro — redirección a /completar-perfil post-auth
+
+Estado:   ⏳ Pendiente — detectado 2026-04-01
+Cuándo:   Al crear la vista /completar-perfil (alergias, gustos, dietas)
+Ficheros: `src/features/auth/components/formularioRegistro.tsx`
+          `src/features/auth/components/botonGoogle.tsx`
+          `src/lib/auth.ts` (pages.newUser)
+          Endpoint de verificación de email (backend)
+
+Qué hay que hacer:
+
+  1. En `formularioRegistro.tsx` pasar `urlRetorno="/completar-perfil"` al `BotonGoogle`
+     → Registro con Google saltará la verificación de email e irá directo a /completar-perfil
+  2. El endpoint de verificación de email debe redirigir a `/completar-perfil` en lugar de /home
+     → Registro sin Google: verificar email → /completar-perfil → /home
+  3. En `/completar-perfil`, al cargar comprobar desde el backend si el perfil ya está completo
+     y redirigir a /home si es así (Opción A acordada) — evita que usuarios ya registrados
+     con Google vuelvan a pasar por la vista si usan el botón "Registrarse con Google"
+
+Flujo objetivo:
+  Login                → /home
+  Registro sin Google  → /verificar-email/pendiente → /completar-perfil → /home
+  Registro con Google  → /completar-perfil → /home (skip verificación)
+
+Impacto si no se corrige:
+  Sin la comprobación del punto 3, un usuario ya registrado con Google que pulse
+  "Registrarse con Google" volvería a ver la vista de completar perfil.
+
+---
+
 ## [DEBT-006] TarjetaRecuperacionPendiente — lógica de reenvío inline
 
 Estado:   ⏳ Pendiente — detectado en auditoría 2026-03-31

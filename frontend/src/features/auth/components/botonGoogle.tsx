@@ -19,13 +19,12 @@ interface PropsBotonGoogle {
  */
 export function BotonGoogle({
   textoAccion = "Continúa con Google",
-  urlRetorno = "/",
+  urlRetorno = "/home",
 }: PropsBotonGoogle) {
   const [cargando, setCargando] = useState(false);
 
   const manejarClic = async () => {
     setCargando(true);
-    // TODO Fase 2: cambiar callbackUrl a "/feed" cuando exista la ruta
     await signIn("google", { callbackUrl: urlRetorno });
   };
 

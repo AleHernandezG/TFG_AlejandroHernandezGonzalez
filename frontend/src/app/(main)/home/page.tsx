@@ -1,4 +1,4 @@
-import { FeedHome, HeaderHome } from '@/features/recetas/components'
+import { FeedHome, HeaderHome, LayoutHomePc } from '@/features/recetas/components'
 
 export const metadata = {
   title: 'Inicio — Cookr',
@@ -7,9 +7,17 @@ export const metadata = {
 
 export default function PaginaHome() {
   return (
-    <div className="min-h-screen bg-background">
-      <HeaderHome />
-      <FeedHome />
-    </div>
+    <>
+      {/* ── Mobile layout (< lg) ─────────────────────── */}
+      <div className="min-h-screen bg-background lg:hidden">
+        <HeaderHome />
+        <FeedHome />
+      </div>
+
+      {/* ── Desktop layout (lg+) ─────────────────────── */}
+      <div className="hidden lg:block">
+        <LayoutHomePc />
+      </div>
+    </>
   )
 }

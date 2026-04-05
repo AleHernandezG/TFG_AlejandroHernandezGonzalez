@@ -280,7 +280,7 @@ Diseño de ambas páginas:
 | `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
 | `/verificar-email` | Verificación de token por enlace | ✅ mock |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
-| `/home` | Home / Feed de recetas | 👁️ Pendiente revisión |
+| `/home` | Home / Feed de recetas — mobile + PC responsive | 👁️ Pendiente revisión |
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | 👁️ Pendiente revisión |
 | `/recetas/[id]` | Detalle de receta | ⏳ Sprint 2 FE mock |
 | `BE /api/auth/registro` | Endpoint real | ⏳ Sprint 2 BE |

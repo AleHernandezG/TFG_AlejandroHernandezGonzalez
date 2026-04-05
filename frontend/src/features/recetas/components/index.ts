@@ -1,3 +1,10 @@
 export { FeedHome } from './feedHome'
 export { HeaderHome } from './headerHome'
 export { TarjetaPost } from './tarjetaPost'
+// PC desktop components
+export { LayoutHomePc } from './layoutHomePc'
+export { HeaderHomePc } from './headerHomePc'
+export { SidebarNavPc } from './sidebarNavPc'
+export { SidebarTendencias } from './sidebarTendencias'
+export { FeedHomePc } from './feedHomePc'
+export { TarjetaPostPc } from './tarjetaPostPc'

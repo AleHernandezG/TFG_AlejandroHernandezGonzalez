@@ -80,8 +80,7 @@ export function FormularioLogin() {
       console.log("[FormularioLogin] Intento de login (mock):", { correo: datos.correo });
       await new Promise((r) => setTimeout(r, 1000)); // simula latencia de red
 
-      // TODO Fase 2: redirigir a "/feed" cuando exista la ruta
-      router.push("/");
+      router.push("/home");
     } catch {
       setMensajeError(
         "Correo o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo."

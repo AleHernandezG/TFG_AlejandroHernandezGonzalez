@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#e4e2e1",
+                    "on-secondary-container": "#656464",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "tertiary-fixed-dim": "#8dcdff",
+                    "outline": "#837566",
+                    "tertiary-container": "#7abbec",
+                    "primary-fixed": "#ffddb7",
+                    "secondary-fixed": "#e4e2e1",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#faf9f5",
+                    "surface-container-low": "#f4f4f0",
+                    "primary-fixed-dim": "#fcba65",
+                    "on-secondary-fixed-variant": "#474747",
+                    "surface-tint": "#855400",
+                    "on-tertiary-fixed": "#001e30",
+                    "on-background": "#1b1c1a",
+                    "on-primary-fixed-variant": "#653e00",
+                    "tertiary": "#136490",
+                    "outline-variant": "#d5c4b2",
+                    "inverse-surface": "#2f312e",
+                    "on-tertiary-fixed-variant": "#004b70",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#cae6ff",
+                    "surface": "#faf9f5",
+                    "on-primary-container": "#643e00",
+                    "surface-container": "#efeeea",
+                    "error": "#ba1a1a",
+                    "on-surface": "#1b1c1a",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#004b6f",
+                    "on-surface-variant": "#514538",
+                    "surface-dim": "#dbdad6",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f2f1ed",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "inverse-primary": "#fcba65",
+                    "secondary": "#5f5e5e",
+                    "primary-container": "#e8a855",
+                    "surface-container-high": "#e9e8e4",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e3e2df",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "primary": "#855400",
+                    "background": "#faf9f5",
+                    "surface-variant": "#e3e2df",
+                    "on-primary-fixed": "#2a1700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="relative min-h-screen pb-32">
+<!-- Hero Section -->
+<section class="relative h-[397px] w-full overflow-hidden">
+<img alt="Pasta Pesto" class="h-full w-full object-cover" data-alt="Close-up of fresh pesto pasta with basil leaves and parmesan in a rustic ceramic bowl on a warm wooden kitchen table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVz4S62aakTeXPvQ2tlsLPK1efBV-NdelPJmjvQZs1bsOqo2vUo8e8aR7ESezxNt-Mq1tqPFZT9Rueylu4QcWIiQV20VblvKOzgAGsCzp17gJgyQii48dHSqlttIzUjbakaVZg8ovAQ-HAJtRN5upTPmwMbYdUk2XoUuKif0kfqatT7KBzMG6YmcgY4-v2xbXZkx2ygg6Z7MDjBsQqlw2UqCkq8PKq2U5S0hLMgnLtVEVsJ4ujZBl8WZDJ-Wi1XGl01NhxvCiQKBo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-black/20"></div>
+<!-- Top Controls -->
+<div class="fixed top-0 left-0 right-0 z-50 px-4 py-4 flex justify-between items-center pointer-events-none">
+<button class="pointer-events-auto h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<button class="pointer-events-auto h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="bookmark" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+</section>
+<!-- Recipe Header Content -->
+<div class="relative -mt-8 px-6 pt-8 bg-surface rounded-t-[2rem] z-10">
+<div class="flex flex-wrap gap-2 mb-4 items-center"><!-- Style Tags -->
+<span class="flex items-center gap-1 px-3 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold tracking-wider uppercase rounded-full">
+<span class="material-symbols-outlined text-[14px]">restaurant</span>Italiana
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold tracking-wider uppercase rounded-full">
+<span class="material-symbols-outlined text-[14px]">dinner_dining</span>Pasta
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold tracking-wider uppercase rounded-full">
+<span class="material-symbols-outlined text-[14px]">bolt</span>Fácil
+</span>
+<!-- Allergen Icons -->
+<div class="flex items-center gap-2 ml-auto">
+<div class="group relative flex items-center gap-1.5 px-2 py-1 bg-error-container/30 text-error rounded-full border border-error/10">
+<div class="w-5 h-5 rounded-full bg-error/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">no_grain</span>
+</div>
+<span class="text-[9px] font-extrabold uppercase tracking-tighter">Sin Gluten</span>
+</div>
+<div class="group relative flex items-center gap-1.5 px-2 py-1 bg-tertiary-container/30 text-on-tertiary-container rounded-full border border-tertiary-container/20">
+<div class="w-5 h-5 rounded-full bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<span class="text-[9px] font-extrabold uppercase tracking-tighter">Sin Lácteos</span>
+</div>
+<div class="group relative flex items-center gap-1.5 px-2 py-1 bg-amber-100 text-amber-900 rounded-full border border-amber-200">
+<div class="w-5 h-5 rounded-full bg-amber-200/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<span class="text-[9px] font-extrabold uppercase tracking-tighter">Sin Frutos Secos</span>
+</div>
+</div></div>
+<h1 class="text-3xl font-extrabold text-on-surface leading-tight tracking-tight mb-4">Pasta al Pesto Genovese con Piñones Tostados</h1>
+<!-- Author Row -->
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<img alt="Author Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-surface-container" data-alt="Portrait of a smiling young chef in a white apron standing in a brightly lit professional kitchen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWLd6tWREyjpmiIuxNLFsQ0Q6iv0uEJZ9XYE6vudgFwcbDSwroZpj2l2-Tdg3NDfaw3lfpXC-XOzpjnJgSaytdfErpj-mY0ElFlNMcZauv7fYstPXd9GytwyBMSmGwqDT5ZumELfGiUt4j-j_59RUa4ITVRaI8Hv_eFwBoTZb6d5d6cUheDZ57bJUJ9URmkbBUAtLW3DCHIzh4wBjD7qywhIRaFB7KdO14h54TwVtwkxp-1p8ZiAMB6sa4_NBtn-GJcyeLawpIdZo"/>
+<div>
+<p class="text-sm font-bold text-on-surface">Chef Marco Rossi</p>
+<p class="text-xs text-on-surface-variant">Publicado hace 2 días</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-red-500" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-bold mt-1 text-on-surface-variant">1.2k</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[10px] font-bold mt-1 text-on-surface-variant">48</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="share">share</span>
+<span class="text-[10px] font-bold mt-1 text-on-surface-variant">Compartir</span>
+</div>
+</div>
+</div>
+<!-- Sticky Tabs Bar -->
+<div class="sticky top-0 bg-surface/80 backdrop-blur-xl z-30 -mx-6 px-6 py-2 flex items-center gap-8 mb-6">
+<button class="relative py-2 text-sm font-extrabold text-on-surface">
+                    Ingredientes
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-full"></div>
+</button>
+<button class="py-2 text-sm font-semibold text-on-surface-variant">
+                    Nutrición
+                </button>
+</div>
+<!-- Tab 1: Ingredients Content -->
+<div class="mb-10">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl mb-6"><span class="text-sm font-bold text-on-surface">Porciones</span><span class="text-sm font-extrabold text-on-surface bg-surface-container-lowest px-4 py-1.5 rounded-full shadow-sm">4 porciones</span></div>
+<ul class="space-y-4 mb-6"><li class="flex items-start gap-3"><span class="text-primary mt-1 text-xs">•</span><div class="flex flex-1 justify-between items-center border-b border-surface-container pb-2"><span class="text-sm text-on-surface font-medium">Pasta Linguine</span><span class="text-sm font-bold text-on-surface-variant">500g</span></div></li><li class="flex items-start gap-3"><span class="text-primary mt-1 text-xs">•</span><div class="flex flex-1 justify-between items-center border-b border-surface-container pb-2"><span class="text-sm text-on-surface font-medium">Albahaca fresca</span><span class="text-sm font-bold text-on-surface-variant">2 tazas</span></div></li><li class="flex items-start gap-3"><span class="text-primary mt-1 text-xs">•</span><div class="flex flex-1 justify-between items-center border-b border-surface-container pb-2"><span class="text-sm text-on-surface font-medium">Piñones tostados</span><span class="text-sm font-bold text-on-surface-variant">50g</span></div></li><li class="flex items-start gap-3"><span class="text-primary mt-1 text-xs">•</span><div class="flex flex-1 justify-between items-center border-b border-surface-container pb-2"><span class="text-sm text-on-surface font-medium">Queso Parmesano</span><span class="text-sm font-bold text-on-surface-variant">100g</span></div></li></ul>
+</div>
+<!-- Tab 2 Preview: Nutrition (as requested 2x2 grid) -->
+<div class="mb-10 p-6 bg-surface-container-low rounded-xl">
+<h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-4">Información Nutricional</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm text-center">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Calorías</p>
+<p class="text-xl font-extrabold text-on-surface">452</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm text-center">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Proteínas</p>
+<p class="text-xl font-extrabold text-on-surface">12g</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm text-center">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Carbohidratos</p>
+<p class="text-xl font-extrabold text-on-surface">54g</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm text-center">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Grasas</p>
+<p class="text-xl font-extrabold text-on-surface">22g</p>
+</div>
+</div>
+</div>
+<!-- Steps Section -->
+<div class="mb-10">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-extrabold text-on-surface">Pasos</h2>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]" data-icon="headphones">headphones</span>
+                        Modo manos libres
+                    </div>
+</div>
+<div class="space-y-8">
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-black text-sm">1</div>
+<div class="flex-1">
+<p class="text-sm leading-relaxed text-on-surface-variant font-medium">Pon a hervir una olla grande con agua salada. Cuando llegue al punto de ebullición, añade la pasta y cocina hasta que esté al dente.</p>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-black text-sm">2</div>
+<div class="flex-1">
+<p class="text-sm leading-relaxed text-on-surface-variant font-medium">Mientras se cocina la pasta, coloca la albahaca, los piñones, el ajo y el queso parmesano en un procesador de alimentos. Tritura hasta obtener una pasta gruesa.</p>
+</div>
+</div>
+<div class="w-full h-px bg-surface-container"></div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed-variant font-black text-sm">3</div>
+<div class="flex-1">
+<p class="text-sm leading-relaxed text-on-surface-variant font-medium">Añade lentamente el aceite de oliva virgen extra mientras el motor está en marcha hasta que el pesto esté emulsionado y cremoso.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Comments Section -->
+<div class="mb-10">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-extrabold text-on-surface">Comentarios</h2>
+<button class="text-sm font-bold text-primary">Ver todos</button>
+</div>
+<div class="space-y-4">
+<div class="flex gap-3">
+<img alt="User" class="w-8 h-8 rounded-full object-cover" data-alt="Portrait of a young woman with curly hair smiling outdoors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA6WjROOzY8eWk1fmVZ4wDD9HpODuE3l38D47pbZ5NqgzthQ_XMVVN-IIO1N4bsRR_KLhQAbFO-ROG6kJG91XTdey33LcbtdSA5tq14GesIR5w84RhzdbO5X4IQ7mpHhRH1Qw8VjHlAU1ImSbrJHTwuqzpUeQTDUmfgLZPaxy4aBkQT30ma0epHybYfZD788or7nWv3HNxkAy7ZZedFOcOnPdxPPJCMmKLBt-yiJjSUNa4QLe7L_6DI6hCC-TuAaif52zjntsPYTc"/>
+<div class="flex-1 bg-surface-container-low p-3 rounded-xl">
+<p class="text-xs font-bold text-on-surface mb-1">Lucía Fernández</p>
+<p class="text-xs text-on-surface-variant leading-normal">¡Quedó espectacular! El truco de tostar los piñones antes de triturarlos le da un toque ahumado increíble.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<img alt="User" class="w-8 h-8 rounded-full object-cover" data-alt="Portrait of a bearded man with glasses in a casual studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx7kmMNkyU2bKiwPVtaOMlwxd6mry_bLxOkGengbrCUMCDwsS8sPXZxnlXB6xENvzfoXEG8YwVP8k024fqEv9vnhZCkKRxmWIqJE0srld8ODjtd4lkF8vasm1rCeASBEyj5qbU92T2uFTzIVnRbKp9C7wt26gBh9C1lwMbM4ymJtfdocUqLp6PnKVtIzuemaLEURZ4ncyvyOHyepGhd-ZSTrm9anF2VM5YH7OFyQI4DrEvnmjRtQw7b1o2H83WInQ-PqTnogSX7JQ"/>
+<div class="flex-1 bg-surface-container-low p-3 rounded-xl">
+<p class="text-xs font-bold text-on-surface mb-1">Daniel García</p>
+<p class="text-xs text-on-surface-variant leading-normal">Fácil y rápida. La hice para cenar y a todos les encantó. La repetiré seguro.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Similar Recipes Section -->
+<div class="mb-12">
+<h2 class="text-2xl font-extrabold text-on-surface mb-6">Te puede gustar</h2>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar -mx-6 px-6">
+<div class="min-w-[180px] w-[180px] group">
+<div class="relative h-44 rounded-xl overflow-hidden mb-3">
+<img alt="Lasagna" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Gourmet lasagna dish with thick tomato sauce and melted cheese layers served in a white bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs0f6E-Ol6cTMQ1Tx8evPfHoEzNV1rUZZBA0hKfcKHV7vEHYXaSQVC_fszxIUXU7m9UMa7vQVWbXCl8NNgaGwX5sIYal8WzyRTloLCy4PG2DO-WElQzOH9AvFE7pT4igPAOH4GD4UMuJ1gmMzw8sih8957ZqF8lVEGujI_kpCpYpRcZYCwLk8Qtm1oAi6bCNNcq65oYD65OCthB7BdEuQ93qmsfvDNZKZfvmWGC5rsE4vyclYPaJqhgHvU0Z6ExojRz8ceEHDj3-8"/>
+<div class="absolute top-2 right-2 h-7 w-7 bg-white/40 backdrop-blur-md rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1">Lasaña Boloñesa</h4>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Chef" class="w-5 h-5 rounded-full object-cover" data-alt="Close up of a professional male chef smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWjK274xAS_IIPZjAAMCSuV9zMn8I71rRTsF6iNYdW_41By4GDsErOCyxzltjEmdGjyZRzioiS2BZ4aXJyOrttdCehjYbP6hHE-3L5OimExilrd11iPMizyCBBnM_xqNEGLjaua3ld40tIfs8dtNQg_7VKDj7JrLqj64-zZrdaBN_RfkVhuX2maJHOkr8zDsxOzrgUyccvmTWrGenx8zWGu_MNrFwf6d52WCFuOwhOaWcRKVgxLK8sJdWMfJAxPomiuHlUO3B0o4E"/>
+<span class="text-[10px] font-medium text-on-surface-variant">Chef Giovanni</span>
+</div>
+</div>
+<div class="min-w-[180px] w-[180px] group">
+<div class="relative h-44 rounded-xl overflow-hidden mb-3">
+<img alt="Carbonara" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Elegant pasta carbonara with crispy pancetta and golden egg yolk on top" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPTsAKTVaG2Us83y-mdVkiWjznMT3sSjLhMn4_dIWG6XcUB1q7KbOgpE7PRJzes9yEWKMEyrJEXTCzIKG_3369vEycx3-an7nQr_a0yd27iju8zHJrANAOpqHIadX0RWIzOBV4K3B80EjVbD0Azbk9wiIsce-KqIYflwB_Vef8rGZPYMRqUpgmF3OefLD_n3xxlnJ4UKYHc17ji6jUbuKOg98xInAneNGzMrttz4WC84AW7Su5-CSMRFrWIsGxEp0OC430020w0BY"/>
+<div class="absolute top-2 right-2 h-7 w-7 bg-white/40 backdrop-blur-md rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1">Carbonara Auténtica</h4>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Chef" class="w-5 h-5 rounded-full object-cover" data-alt="Close up portrait of a young female chef" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU_Fds87xuVBYKLIbpJ9EP__lt0JZfbqS7PPOM5j2mtB-MhlZ-Nq3-mayIsr3zSfYBdcJ0IcSaUToH-1dgxXYMXESZkn3mcEQsIr2vzVpV7LOarHBp1_EogrgqAegfUs9rPhbsFsYO3bcNFoJ81siiuUOfqRhnVwBL9Wg3TfpUWzB8xQlM4-uELvZCWOkUYry36kqWitsYQhx_JVPS1itWW98i6vji5ZDfK1fha4N_0auN-I0j2HMcnX3IDIiOC6iF7g2szjjimGc"/>
+<span class="text-[10px] font-medium text-on-surface-variant">Chef Elena</span>
+</div>
+</div>
+<div class="min-w-[180px] w-[180px] group">
+<div class="relative h-44 rounded-xl overflow-hidden mb-3">
+<img alt="Arrabbiata" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Spicy arrabbiata pasta with red chili flakes and fresh parsley in a cast iron skillet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs0iySB9RYCAOelYX6gGofMXFF-a09rvQgB5Pa_KO14-eEjiCS7Wtl2i5P7rWyFaASs2Lk6xpN-bCOoc1QlBXD2o1ozL0bx-Ekx0S079s7jRkjDxgfksN17R3-Vy63Zh00MSgZvgXIMwPxeijXn9KRxFkNBdxbty2LSF0Z5fhBWjw-nAI54ehcZfzEkOgblESK1DJXDdnFN88PCpnGA8pFcHqQO7n28MB4LarqiAktG9RqRjTDoAJf_GmdgLpbiThRX_ekg5WkYH8"/>
+<div class="absolute top-2 right-2 h-7 w-7 bg-white/40 backdrop-blur-md rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[16px]" data-icon="favorite">favorite</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-on-surface line-clamp-1">Penne Arrabbiata</h4>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Chef" class="w-5 h-5 rounded-full object-cover" data-alt="Portrait of a male home cook with a warm smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZkRfpBWegkHtvFxUWKNMPg4tAZHhPCvg_bHXKeIbbE_ssQg-882T_xvV8Wrj9ou1IcLOv0T9CHFKDDkhkCc0bRQi8zODmJyhWA8ixSTHif0TZwPAub4Si53bTVVHUtLmM_WuB4jDNPn5Ju3euwSmdeSxRcNF2vVqPgniI1V1Z4MW3vx_XGS0fpQ0zpTjtwrt1-5byXRChpbrwW5naVYIv9yisVDHgA8SDSKL9w1KjBooAjSX0D6YfTH5NQZird7ljT16fQA5Q1nE"/>
+<span class="text-[10px] font-medium text-on-surface-variant">Chef Luca</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-full px-4 py-2 z-50 flex justify-around items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<button class="flex flex-col items-center justify-center text-stone-500 p-3 hover:text-orange-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-stone-500 p-3 hover:text-orange-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
+</button>
+<!-- Center Chef Hat prominent -->
+<button class="flex items-center justify-center bg-orange-100 text-orange-900 rounded-full w-14 h-14 -mt-10 border-4 border-surface shadow-lg transition-all duration-300 scale-110">
+<span class="material-symbols-outlined text-[32px]" data-icon="cooking" style="font-variation-settings: 'FILL' 1;">cooking</span>
+</button>
+<button class="flex flex-col items-center justify-center text-stone-500 p-3 hover:text-orange-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+</button>
+<button class="flex flex-col items-center justify-center text-stone-500 p-3 hover:text-orange-700 transition-all duration-300">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</nav>
+</body></html>

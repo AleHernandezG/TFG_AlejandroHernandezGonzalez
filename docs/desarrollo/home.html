@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home / Feed — Documentación técnica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    ul, ol { margin: 8px 0 12px; padding-left: 22px; }
+    li { margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+    .badge-gray   { background: #f3f4f6; color: #374151; }
+    .badge-red    { background: #fee2e2; color: #991b1b; }
+    .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+    .callout {
+      border-left: 4px solid #b45309;
+      background: #fffbeb;
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+      font-size: 10pt;
+    }
+
+    .callout.info {
+      border-color: #1c3d5a;
+      background: #eff6ff;
+    }
+
+    .callout.success {
+      border-color: #065f46;
+      background: #d1fae5;
+    }
+
+    .header-meta {
+      color: #6b7280;
+      font-size: 10pt;
+      margin-top: -12px;
+      margin-bottom: 24px;
+    }
+
+    .toc {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0 36px;
+    }
+
+    .toc h3 { margin-top: 0; color: #1c3d5a; }
+    .toc ol { margin: 0; }
+    .toc a { color: #b45309; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    .file-tree {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 8.5pt;
+      line-height: 1.8;
+      margin: 12px 0 18px;
+    }
+
+    .file-tree .dir  { color: #89b4fa; }
+    .file-tree .file { color: #a6e3a1; }
+    .file-tree .new  { color: #f9e2af; }
+    .file-tree .note { color: #6c7086; }
+
+    .section-pc {
+      border-left: 4px solid #7c3aed;
+      padding-left: 12px;
+    }
+
+    .changelog-entry {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      font-size: 10pt;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Home / Feed de Recetas — Documentación técnica</h1>
+<p class="header-meta">
+  TFG-20 · Sprint 2 · Creado: 2026-03-31 · <strong>Actualizado: 2026-04-01</strong> ·
+  Estado: <span class="badge badge-orange">👁️ Pendiente revisión</span>
+  &nbsp;|&nbsp; <span class="badge badge-purple">PC Responsive</span>
+</p>
+
+<div class="callout success">
+  <strong>[UI-015] Actualización 2026-04-01:</strong> Se añadió layout responsive completo para
+  pantallas de escritorio (<code>lg+</code>). Nuevos componentes: <code>LayoutHomePc</code>,
+  <code>HeaderHomePc</code>, <code>SidebarNavPc</code>, <code>SidebarTendencias</code>,
+  <code>TarjetaPostPc</code>, <code>FeedHomePc</code> y <code>datosTendencias.ts</code>.
+  El layout mobile (original) permanece sin cambios funcionales.
+</div>
+
+<div class="toc">
+  <h3>Índice</h3>
+  <ol>
+    <li><a href="#vision">Visión general</a></li>
+    <li><a href="#estructura">Estructura de archivos</a></li>
+    <li><a href="#layout">Layout responsive — Mobile vs Desktop</a></li>
+    <li><a href="#tipos">Tipos TypeScript</a></li>
+    <li><a href="#datos">Datos mock</a></li>
+    <li><a href="#header">HeaderHome (mobile)</a></li>
+    <li><a href="#buscador">BuscadorFiltros</a></li>
+    <li><a href="#tarjeta">TarjetaPost (mobile)</a></li>
+    <li><a href="#feed">FeedHome (mobile)</a></li>
+    <li><a href="#page">page.tsx — Server Component</a></li>
+    <li><a href="#header-pc">HeaderHomePc (desktop)</a></li>
+    <li><a href="#sidebar-nav">SidebarNavPc (desktop)</a></li>
+    <li><a href="#sidebar-tendencias">SidebarTendencias (desktop)</a></li>
+    <li><a href="#tarjeta-pc">TarjetaPostPc — variantes bento (desktop)</a></li>
+    <li><a href="#feed-pc">FeedHomePc — grid bento (desktop)</a></li>
+    <li><a href="#layout-pc">LayoutHomePc — ensamblado PC</a></li>
+    <li><a href="#animaciones">Animaciones Framer Motion</a></li>
+    <li><a href="#colores">Paleta de colores usada</a></li>
+    <li><a href="#fase5">Preparación para Fase 5 (backend)</a></li>
+    <li><a href="#pendientes">TODOs y pendientes</a></li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="vision">1. Visión general</h2>
+
+<p>
+  La vista <strong>Home</strong> es el punto de entrada principal de la aplicación tras el login.
+  Implementa el <strong>feed personal de recetas</strong> (TFG-20) con datos mock hasta la Fase 5,
+  cuando se conectará el backend real. El diseño sigue los principios editoriales del DESIGN.md de
+  Stitch: paleta cálida, glassmorphism en elementos flotantes, imágenes con <code>rounded-2xl</code>
+  y separación por tono en lugar de bordes duros.
+</p>
+
+<p>
+  A partir del <strong>2026-04-01</strong>, la vista es completamente <strong>responsive</strong>:
+  en dispositivos <code>lg+</code> (≥ 1024px) se renderiza un layout editorial de tres columnas
+  (sidebar nav · feed bento · sidebar tendencias), mientras que en mobile (<code>&lt; lg</code>)
+  se mantiene el layout original de columna única con scroll vertical.
+</p>
+
+<table>
+  <tr><th>Propiedad</th><th>Valor</th></tr>
+  <tr><td>Ruta</td><td><code>/home</code></td></tr>
+  <tr><td>Layout group</td><td><code>(main)</code> — incluye NavBarInferior (oculto en lg+)</td></tr>
+  <tr><td>Tarea Linear</td><td>TFG-20</td></tr>
+  <tr><td>Sprint</td><td>Sprint 2 (FE mock)</td></tr>
+  <tr><td>Estado</td><td>👁️ Pendiente revisión</td></tr>
+  <tr><td>Breakpoint responsive</td><td><code>lg</code> (1024px) — Tailwind <code>lg:</code> prefix</td></tr>
+  <tr><td>Icono activo en navbar</td><td>Home → /home (mobile) · SidebarNavPc (desktop)</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="estructura">2. Estructura de archivos</h2>
+
+<div class="file-tree">
+<span class="dir">frontend/src/</span>
+├── <span class="dir">app/(main)/home/</span>
+│   └── <span class="file">page.tsx</span>                      <span class="note">← Server Component raíz — renderiza mobile o desktop</span>
+│
+├── <span class="dir">components/common/</span>
+│   └── <span class="file">buscadorFiltros.tsx</span>            <span class="note">← Reutilizable (Home mobile + Discover + futuras)</span>
+│
+└── <span class="dir">features/recetas/</span>
+    ├── <span class="dir">components/</span>
+    │   │
+    │   ├── <span class="note">── MOBILE ───────────────────────────────────────────</span>
+    │   ├── <span class="file">headerHome.tsx</span>              <span class="note">← Título "Cookr" centrado, sin sticky</span>
+    │   ├── <span class="file">tarjetaPost.tsx</span>             <span class="note">← Card individual — columna única</span>
+    │   ├── <span class="file">feedHome.tsx</span>                <span class="note">← BuscadorFiltros + lista de cards</span>
+    │   │
+    │   ├── <span class="note">── DESKTOP (lg+) ────────────────────────────────────</span>
+    │   ├── <span class="new">headerHomePc.tsx</span>            <span class="note">← Header fijo h-20: logo · search · avatar</span>
+    │   ├── <span class="new">sidebarNavPc.tsx</span>            <span class="note">← Sidebar izquierdo fijo w-64: navegación</span>
+    │   ├── <span class="new">sidebarTendencias.tsx</span>       <span class="note">← Sidebar derecho fijo w-80: populares + chefs</span>
+    │   ├── <span class="new">tarjetaPostPc.tsx</span>           <span class="note">← Card bento: variantes hero / small / wide</span>
+    │   ├── <span class="new">feedHomePc.tsx</span>              <span class="note">← Grid bento 3 cols + chips de filtro</span>
+    │   ├── <span class="new">layoutHomePc.tsx</span>            <span class="note">← Wrapper Client: estado busqueda/filtro</span>
+    │   └── <span class="file">index.ts</span>                   <span class="note">← Barrel export (mobile + desktop)</span>
+    │
+    ├── <span class="dir">data/</span>
+    │   ├── <span class="file">datosFeed.ts</span>                <span class="note">← 7 posts mock + FILTROS_FEED (compartido)</span>
+    │   └── <span class="new">datosTendencias.ts</span>          <span class="note">← RecetaPopular[] + ChefDestacado[] (sidebar PC)</span>
+    │
+    └── <span class="dir">types/</span>
+        └── <span class="file">receta.types.ts</span>            <span class="note">← PostFeed, Autor, DatosReceta, FiltroFeed…</span>
+</div>
+
+<p>
+  Los ficheros en <span style="color:#b45309;font-weight:700;">amarillo</span> son nuevos (añadidos 2026-04-01).
+  También se modificó <code>frontend/next.config.mjs</code> para añadir <code>picsum.photos</code>
+  a los <code>remotePatterns</code> de <code>next/image</code>.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="layout">3. Layout responsive — Mobile vs Desktop</h2>
+
+<h3>Mobile (&lt; lg · &lt; 1024px)</h3>
+
+<p>
+  Columna única con scroll vertical. Ningún elemento es sticky: tanto el header como el
+  buscador desaparecen al hacer scroll (decisión de diseño <strong>[UI-014]</strong>).
+  Solo el <code>NavBarInferior</code> permanece anclado en la parte inferior.
+</p>
+
+<table>
+  <tr><th>Capa</th><th>Componente</th><th>z-index</th><th>Posición</th></tr>
+  <tr>
+    <td>1ª</td>
+    <td><code>HeaderHome</code></td>
+    <td>natural</td>
+    <td>flujo normal, <strong>desaparece al scroll</strong></td>
+  </tr>
+  <tr>
+    <td>2ª</td>
+    <td><code>BuscadorFiltros</code> (dentro de FeedHome)</td>
+    <td>natural</td>
+    <td>flujo normal, <strong>desaparece al scroll</strong></td>
+  </tr>
+  <tr>
+    <td>3ª</td>
+    <td><code>FeedHome</code> (lista de cards)</td>
+    <td>natural</td>
+    <td>scrollable</td>
+  </tr>
+  <tr>
+    <td>4ª</td>
+    <td><code>NavBarInferior</code></td>
+    <td><code>z-50</code></td>
+    <td><code>fixed bottom-0</code> (ya existía)</td>
+  </tr>
+</table>
+
+<h3>Desktop (lg+ · ≥ 1024px)</h3>
+
+<p>
+  Layout editorial de tres columnas fijas. El <code>NavBarInferior</code> se oculta
+  automáticamente (<code>lg:hidden</code> ya incluido en su implementación). La navegación
+  se realiza a través del <code>SidebarNavPc</code>.
+</p>
+
+<table>
+  <tr><th>Capa</th><th>Componente</th><th>z-index</th><th>Dimensiones</th><th>Posición</th></tr>
+  <tr>
+    <td>Header</td>
+    <td><code>HeaderHomePc</code></td>
+    <td><code>z-50</code></td>
+    <td>100% ancho · <code>h-20</code></td>
+    <td><code>fixed top-0 left-0 right-0</code></td>
+  </tr>
+  <tr>
+    <td>Sidebar izq.</td>
+    <td><code>SidebarNavPc</code></td>
+    <td><code>z-40</code></td>
+    <td><code>w-64</code> · 100% alto</td>
+    <td><code>fixed left-0 top-0</code> · <code>pt-24</code></td>
+  </tr>
+  <tr>
+    <td>Contenido central</td>
+    <td><code>FeedHomePc</code> (dentro de <code>main</code>)</td>
+    <td>natural</td>
+    <td>fluido entre sidebars</td>
+    <td><code>pl-64 pr-80 pt-28</code> para compensar fixed elements</td>
+  </tr>
+  <tr>
+    <td>Sidebar der.</td>
+    <td><code>SidebarTendencias</code></td>
+    <td><code>z-40</code></td>
+    <td><code>w-80</code> · 100% alto</td>
+    <td><code>fixed right-0 top-0</code> · <code>pt-28</code></td>
+  </tr>
+</table>
+
+<div class="callout info">
+  <strong>Glassmorphism en desktop:</strong> El <code>HeaderHomePc</code> usa
+  <code>bg-background/80 backdrop-blur-md</code>, igual que el header mobile original.
+  Los sidebars usan <code>bg-background</code> sólido (sin blur) para no competir
+  visualmente con el feed central.
+</div>
+
+<div class="callout">
+  <strong>Rendimiento de layout:</strong> Los tres elementos fijos del desktop (<code>HeaderHomePc</code>,
+  <code>SidebarNavPc</code>, <code>SidebarTendencias</code>) son promovidos a su propia capa de
+  composición por el navegador gracias a <code>position: fixed</code>, evitando repaints
+  durante el scroll del feed central.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="tipos">4. Tipos TypeScript</h2>
+
+<p>Fichero: <code>features/recetas/types/receta.types.ts</code> — compartido por mobile y desktop.</p>
+
+<pre>
+<span class="kw">export type</span> <span class="ty">DificultadReceta</span> = <span class="st">'Fácil'</span> | <span class="st">'Media'</span> | <span class="st">'Difícil'</span>
+
+<span class="kw">export type</span> <span class="ty">Autor</span> = {
+  nombre:    <span class="ty">string</span>
+  username:  <span class="ty">string</span>
+  avatarUrl: <span class="ty">string</span>
+}
+
+<span class="kw">export type</span> <span class="ty">DatosReceta</span> = {
+  titulo:      <span class="ty">string</span>
+  descripcion: <span class="ty">string</span>
+  imagenUrl:   <span class="ty">string</span>
+  tiempo:      <span class="ty">string</span>
+  dificultad:  <span class="ty">DificultadReceta</span>
+}
+
+<span class="kw">export type</span> <span class="ty">PostFeed</span> = {
+  id:               <span class="ty">string</span>
+  autor:            <span class="ty">Autor</span>
+  receta:           <span class="ty">DatosReceta</span>
+  likes:            <span class="ty">number</span>
+  comentarios:      <span class="ty">number</span>
+  guardado:         <span class="ty">boolean</span>
+  liked:            <span class="ty">boolean</span>
+  fechaPublicacion: <span class="ty">string</span>  <span class="cm">// ISO 8601</span>
+}
+
+<span class="kw">export type</span> <span class="ty">FiltroFeed</span> = {
+  id:       <span class="ty">string</span>
+  etiqueta: <span class="ty">string</span>
+}
+</pre>
+
+<p>
+  Los tipos para el sidebar desktop se definen en <code>features/recetas/data/datosTendencias.ts</code>
+  (co-localizados con los datos, ya que son tipos exclusivos del mock de PC):
+</p>
+
+<pre>
+<span class="kw">export type</span> <span class="ty">RecetaPopular</span> = {
+  id:         <span class="ty">string</span>
+  titulo:     <span class="ty">string</span>
+  autor:      <span class="ty">string</span>
+  tiempo:     <span class="ty">string</span>
+  dificultad: <span class="ty">string</span>
+  imagenUrl:  <span class="ty">string</span>
+}
+
+<span class="kw">export type</span> <span class="ty">ChefDestacado</span> = {
+  id:         <span class="ty">string</span>
+  nombre:     <span class="ty">string</span>
+  seguidores: <span class="ty">string</span>
+  avatarUrl:  <span class="ty">string</span>
+}
+</pre>
+
+<p>
+  En Fase 5, cuando se conecte el backend, <strong>solo cambiará el origen del dato</strong>.
+  El tipo <code>PostFeed</code> no se toca porque el servicio mapeará la respuesta de la API
+  a esta misma forma.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="datos">5. Datos mock</h2>
+
+<h3>datosFeed.ts — compartido mobile y desktop</h3>
+<p>Fichero: <code>features/recetas/data/datosFeed.ts</code></p>
+
+<table>
+  <tr><th>Constante</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>FILTROS_FEED</code></td>
+    <td><code>FiltroFeed[]</code></td>
+    <td>5 chips: Todas · Vegano · Keto · Sin gluten · Sin lactosa (predefinidos por el autor)</td>
+  </tr>
+  <tr>
+    <td><code>POSTS_MOCK</code></td>
+    <td><code>PostFeed[]</code></td>
+    <td>7 posts con datos variados — usados por <code>FeedHome</code> (mobile) y <code>FeedHomePc</code> (desktop)</td>
+  </tr>
+</table>
+
+<h3>datosTendencias.ts — exclusivo desktop</h3>
+<p>Fichero: <code>features/recetas/data/datosTendencias.ts</code> <span class="badge badge-purple">Nuevo</span></p>
+
+<table>
+  <tr><th>Constante</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>RECETAS_POPULARES</code></td>
+    <td><code>RecetaPopular[]</code></td>
+    <td>3 recetas trending para el sidebar derecho (Bowl de Quinoa, Pizza Napolitana, Sushi Roll)</td>
+  </tr>
+  <tr>
+    <td><code>CHEFS_DESTACADOS</code></td>
+    <td><code>ChefDestacado[]</code></td>
+    <td>2 chefs sugeridos para seguir (David Muñoz, Ana Ros)</td>
+  </tr>
+</table>
+
+<p>
+  Las fechas de publicación de <code>POSTS_MOCK</code> se calculan dinámicamente con
+  <code>Date.now() - offset</code> para que <code>tiempoRelativo()</code> siempre muestre
+  valores coherentes. Las imágenes usan <strong>picsum.photos</strong> con semillas fijas.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="header">6. HeaderHome (mobile)</h2>
+
+<p>Fichero: <code>features/recetas/components/headerHome.tsx</code></p>
+<p>
+  <span class="badge badge-gray">Server Component</span>
+  <span class="badge badge-orange">Solo mobile (lg:hidden implícito por page.tsx)</span>
+</p>
+
+<div class="changelog-entry">
+  <strong>[UI-014]</strong> Cambios aplicados el 2026-04-01: eliminado <code>sticky top-0 z-40</code>
+  (scroll away behavior), eliminado botón Bell/notificaciones, cambiado <code>justify-between</code>
+  → <code>justify-center</code> para centrar el título "Cookr".
+</div>
+
+<table>
+  <tr><th>Elemento</th><th>Clases actuales</th></tr>
+  <tr>
+    <td>Contenedor <code>&lt;header&gt;</code></td>
+    <td><code>flex items-center justify-center border-b border-border bg-background/80 px-5 py-3 backdrop-blur-md</code></td>
+  </tr>
+  <tr>
+    <td>Logo "Cookr"</td>
+    <td><code>text-xl font-bold text-brand</code></td>
+  </tr>
+</table>
+
+<p>
+  El header mobile <strong>no es sticky</strong>: desaparece al hacer scroll junto con el contenido.
+  Esto amplía el espacio útil de lectura del feed. Solo el <code>NavBarInferior</code>
+  permanece anclado en la parte inferior (comportamiento previo sin cambios).
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="buscador">7. BuscadorFiltros</h2>
+
+<p>Fichero: <code>components/common/buscadorFiltros.tsx</code></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  Reutilizable — funciona en Home mobile, Discover y vistas futuras.
+  En desktop, la búsqueda se realiza desde el input integrado en <code>HeaderHomePc</code>.
+</p>
+
+<div class="changelog-entry">
+  <strong>[UI-014]</strong> Cambio aplicado el 2026-04-01: eliminado <code>sticky z-30</code>
+  del contenedor. El componente ahora forma parte del flujo natural de la página y desaparece
+  al hacer scroll.
+</div>
+
+<h3>Props</h3>
+
+<pre>
+<span class="kw">interface</span> <span class="ty">BuscadorFiltrosProps</span> {
+  placeholder?:   <span class="ty">string</span>         <span class="cm">// default: '¿Qué quieres cocinar hoy?'</span>
+  filtros:        <span class="ty">FiltroFeed[]</span>
+  filtroActivo:   <span class="ty">string</span>         <span class="cm">// id del filtro activo</span>
+  onFiltroChange: <span class="nm">(id: string) =&gt; void</span>
+  onBuscar:       <span class="nm">(query: string) =&gt; void</span>
+  className?:     <span class="ty">string</span>         <span class="cm">// override para contextos futuros (Discover, etc.)</span>
+}
+</pre>
+
+<h3>Estructura visual</h3>
+
+<table>
+  <tr><th>Elemento</th><th>Descripción</th></tr>
+  <tr>
+    <td>Contenedor</td>
+    <td><code>space-y-2 bg-background/80 px-4 py-2 backdrop-blur-md</code> — glassmorphism, sin sticky</td>
+  </tr>
+  <tr>
+    <td>Input pill</td>
+    <td>Envuelto en <code>&lt;label&gt;</code>, fondo <code>bg-muted</code>, icono <code>Search</code> Lucide, <code>rounded-full</code></td>
+  </tr>
+  <tr>
+    <td>Chips de filtro</td>
+    <td>Scroll horizontal sin scrollbar visible. Activo: <code>bg-brand text-brand-foreground</code>. Inactivo: <code>bg-muted text-muted-foreground</code></td>
+  </tr>
+</table>
+
+<div class="callout info">
+  <strong>Scroll horizontal sin scrollbar:</strong> Se usa la combinación de clases Tailwind
+  <code>[scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden</code> para ocultar el scrollbar
+  en Firefox y WebKit sin afectar la funcionalidad de scroll táctil.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="tarjeta">8. TarjetaPost (mobile)</h2>
+
+<p>Fichero: <code>features/recetas/components/tarjetaPost.tsx</code></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-orange">Solo mobile</span>
+  Gestiona estado de like/guardado de forma optimista.
+</p>
+
+<h3>Anatomía del componente</h3>
+
+<pre>
+&lt;<span class="ty">article</span> className=<span class="st">"border-b border-border bg-background px-4 py-4"</span>&gt;
+  <span class="cm">{/* 1. Cabecera: Avatar + nombre + @username + tiempo relativo */}</span>
+  <span class="cm">{/* 2. Imagen: aspect-[4/3] rounded-2xl bg-[var(--warm-bg-accent)] */}</span>
+  <span class="cm">{/* 3. Título: text-xl font-bold text-foreground */}</span>
+  <span class="cm">{/* 4. Descripción: text-sm text-muted-foreground line-clamp-2 */}</span>
+  <span class="cm">{/* 5. Metadatos: tiempo · dificultad */}</span>
+  <span class="cm">{/* 6. Acciones: Heart + count | MessageCircle + count | Bookmark */}</span>
+&lt;/<span class="ty">article</span>&gt;
+</pre>
+
+<h3>Estado local</h3>
+
+<table>
+  <tr><th>Estado</th><th>Tipo</th><th>Inicializado desde</th></tr>
+  <tr><td><code>liked</code></td><td><code>boolean</code></td><td><code>post.liked</code></td></tr>
+  <tr><td><code>likes</code></td><td><code>number</code></td><td><code>post.likes</code></td></tr>
+  <tr><td><code>guardado</code></td><td><code>boolean</code></td><td><code>post.guardado</code></td></tr>
+</table>
+
+<p>
+  El toggle de like es <strong>optimista</strong>: actualiza el estado local inmediatamente sin esperar
+  al servidor. En Fase 5, se añadirá <code>useMutation</code> de TanStack Query con rollback en error.
+</p>
+
+<h3>Animaciones de Like y Bookmark</h3>
+
+<pre>
+<span class="cm">// Like: rebote de escala al activar</span>
+animate={{ scale: liked ? [<span class="nu">1</span>, <span class="nu">1.3</span>, <span class="nu">1</span>] : <span class="nu">1</span> }}
+transition={{ duration: <span class="nu">0.25</span>, ease: <span class="st">'easeOut'</span> }}
+
+<span class="cm">// Bookmark: rebote más sutil</span>
+animate={{ scale: guardado ? [<span class="nu">1</span>, <span class="nu">1.2</span>, <span class="nu">1</span>] : <span class="nu">1</span> }}
+transition={{ duration: <span class="nu">0.2</span>, ease: <span class="st">'easeOut'</span> }}
+</pre>
+
+<h3>Estilos de iconos activos/inactivos</h3>
+
+<table>
+  <tr><th>Icono</th><th>Inactivo</th><th>Activo</th></tr>
+  <tr>
+    <td>Heart</td>
+    <td><code>text-muted-foreground</code> strokeWidth 1.8</td>
+    <td><code>fill-brand text-brand</code> strokeWidth 0</td>
+  </tr>
+  <tr>
+    <td>Bookmark</td>
+    <td><code>text-muted-foreground</code> strokeWidth 1.8</td>
+    <td><code>fill-brand text-brand</code> strokeWidth 0</td>
+  </tr>
+  <tr>
+    <td>MessageCircle</td>
+    <td><code>text-muted-foreground</code> (siempre)</td>
+    <td>—</td>
+  </tr>
+</table>
+
+<h3>Función de tiempo relativo</h3>
+
+<pre>
+<span class="kw">function</span> <span class="fn">tiempoRelativo</span>(fechaISO: <span class="ty">string</span>): <span class="ty">string</span> {
+  <span class="kw">const</span> diffMs  = <span class="nm">Date</span>.now() - <span class="kw">new</span> <span class="nm">Date</span>(fechaISO).<span class="fn">getTime</span>()
+  <span class="kw">const</span> diffMin = <span class="nm">Math</span>.<span class="fn">floor</span>(diffMs / <span class="nu">60_000</span>)
+  <span class="kw">if</span> (diffMin &lt; <span class="nu">60</span>) <span class="kw">return</span> <span class="st">`Hace ${diffMin}m`</span>
+  <span class="kw">const</span> diffH = <span class="nm">Math</span>.<span class="fn">floor</span>(diffMin / <span class="nu">60</span>)
+  <span class="kw">if</span> (diffH &lt; <span class="nu">24</span>) <span class="kw">return</span> <span class="st">`Hace ${diffH}h`</span>
+  <span class="kw">return</span> <span class="st">`Hace ${Math.floor(diffH / 24)}d`</span>
+}
+</pre>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="feed">9. FeedHome (mobile)</h2>
+
+<p>Fichero: <code>features/recetas/components/feedHome.tsx</code></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-orange">Solo mobile</span>
+  Gestiona el estado de filtros y búsqueda, y renderiza el feed en columna única.
+</p>
+
+<h3>Estado interno</h3>
+
+<table>
+  <tr><th>Estado</th><th>Tipo</th><th>Uso</th></tr>
+  <tr><td><code>filtroActivo</code></td><td><code>string</code></td><td>ID del chip activo (default <code>'todas'</code>)</td></tr>
+  <tr><td><code>busqueda</code></td><td><code>string</code></td><td>Query del input de búsqueda (viene de BuscadorFiltros)</td></tr>
+</table>
+
+<h3>Filtrado de posts</h3>
+
+<pre>
+<span class="kw">const</span> postsFiltrados = <span class="nm">POSTS_MOCK</span>.<span class="fn">filter</span>((post) => {
+  <span class="kw">if</span> (busqueda === <span class="st">''</span>) <span class="kw">return</span> <span class="nu">true</span>
+  <span class="kw">const</span> q = busqueda.<span class="fn">toLowerCase</span>()
+  <span class="kw">return</span> (
+    post.receta.titulo.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q) ||
+    post.receta.descripcion.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q) ||
+    post.autor.nombre.<span class="fn">toLowerCase</span>().<span class="fn">includes</span>(q)
+  )
+})
+</pre>
+
+<p>
+  El filtro por categoría (Vegano, Keto…) está preparado en el estado pero no aplica lógica
+  de exclusión sobre el mock actual, ya que los datos mock no tienen campo de categoría.
+  El mismo filtro se replica en <code>FeedHomePc</code> (desktop) con idéntica lógica.
+  En Fase 5, el backend recibirá el filtro como parámetro de query.
+</p>
+
+<h3>Animación staggered</h3>
+
+<pre>
+{postsFiltrados.<span class="fn">map</span>((post, i) => (
+  &lt;<span class="fn">motion.div</span>
+    key={post.id}
+    initial={{ opacity: <span class="nu">0</span>, y: <span class="nu">18</span> }}
+    animate={{ opacity: <span class="nu">1</span>, y: <span class="nu">0</span> }}
+    transition={{ duration: <span class="nu">0.3</span>, delay: i * <span class="nu">0.07</span>, ease: <span class="st">'easeOut'</span> }}
+  &gt;
+    &lt;<span class="fn">TarjetaPost</span> post={post} /&gt;
+  &lt;/<span class="fn">motion.div</span>&gt;
+))}
+</pre>
+
+<p>Cada card entra con un retraso incremental de <strong>70ms</strong>, creando un efecto
+de cascada suave que evoca la sensación de un feed que se va "descubriendo".</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="page">10. page.tsx — Server Component</h2>
+
+<p>Fichero: <code>app/(main)/home/page.tsx</code></p>
+
+<p>
+  <code>PaginaHome</code> es un <strong>Server Component</strong> puro. No contiene ningún hook,
+  estado ni manejador de eventos. Actúa como selector responsive: renderiza el layout mobile
+  o el layout desktop dependiendo del breakpoint <code>lg</code> mediante clases Tailwind.
+</p>
+
+<pre>
+<span class="kw">import</span> { <span class="fn">FeedHome</span>, <span class="fn">HeaderHome</span>, <span class="fn">LayoutHomePc</span> } <span class="kw">from</span> <span class="st">'@/features/recetas/components'</span>
+
+<span class="kw">export const</span> <span class="nm">metadata</span> = {
+  title: <span class="st">'Inicio — Cookr'</span>,
+  description: <span class="st">'Tu feed personalizado de recetas. Descubre, guarda y cocina.'</span>,
+}
+
+<span class="kw">export default function</span> <span class="fn">PaginaHome</span>() {
+  <span class="kw">return</span> (
+    &lt;&gt;
+      <span class="cm">{/* ── Mobile layout (visible únicamente si viewport &lt; lg) ── */}</span>
+      &lt;<span class="ty">div</span> className=<span class="st">"min-h-screen bg-background lg:hidden"</span>&gt;
+        &lt;<span class="fn">HeaderHome</span> /&gt;
+        &lt;<span class="fn">FeedHome</span> /&gt;
+      &lt;/<span class="ty">div</span>&gt;
+
+      <span class="cm">{/* ── Desktop layout (visible únicamente si viewport ≥ lg) ── */}</span>
+      &lt;<span class="ty">div</span> className=<span class="st">"hidden lg:block"</span>&gt;
+        &lt;<span class="fn">LayoutHomePc</span> /&gt;
+      &lt;/<span class="ty">div</span>&gt;
+    &lt;/&gt;
+  )
+}
+</pre>
+
+<div class="callout info">
+  <strong>Por qué CSS y no JS:</strong> Usar <code>hidden lg:block</code> / <code>lg:hidden</code>
+  en lugar de <code>useWindowSize()</code> garantiza que el HTML correcto se genera en el servidor
+  y no hay flash de contenido incorrecto (FOUC) en el cliente. Ambos layouts están presentes en
+  el DOM pero solo uno es visible en cada breakpoint.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="header-pc" class="section-pc">11. HeaderHomePc (desktop)</h2>
+
+<p>Fichero: <code>features/recetas/components/headerHomePc.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-purple">Solo desktop (lg+)</span>
+  Recibe el estado de búsqueda desde <code>LayoutHomePc</code> y lo distribuye al <code>FeedHomePc</code>.
+</p>
+
+<h3>Props</h3>
+
+<pre>
+<span class="kw">interface</span> <span class="ty">HeaderHomePcProps</span> {
+  busqueda: <span class="ty">string</span>
+  onBuscar: <span class="nm">(query: string) =&gt; void</span>
+}
+</pre>
+
+<h3>Estructura</h3>
+
+<table>
+  <tr><th>Columna (grid-cols-3)</th><th>Contenido</th><th>Clases clave</th></tr>
+  <tr>
+    <td>Izquierda</td>
+    <td>"Cookr" — logo de marca</td>
+    <td><code>text-2xl font-black uppercase tracking-widest text-brand justify-self-start</code></td>
+  </tr>
+  <tr>
+    <td>Centro</td>
+    <td>Input de búsqueda pill</td>
+    <td><code>w-80 rounded-full bg-muted py-2 pl-5 pr-10</code> + icono <code>Search</code> absoluto</td>
+  </tr>
+  <tr>
+    <td>Derecha</td>
+    <td>Botón Settings + Avatar</td>
+    <td>icono <code>Settings</code> Lucide · <code>Avatar</code> shadcn (<em>placeholder "U" hasta Fase 4</em>)</td>
+  </tr>
+</table>
+
+<p>
+  El header es <code>fixed top-0 left-0 right-0 z-50 h-20 hidden lg:grid</code>.
+  El efecto glassmorphism (<code>bg-background/80 backdrop-blur-md</code>) permite que los colores
+  del feed sean visibles a través del header mientras el usuario hace scroll.
+</p>
+
+<div class="callout">
+  <strong>TODO [HOME-009] Fase 4:</strong> Sustituir el <code>AvatarFallback</code> estático
+  ("U") por el avatar real del usuario desde la sesión de NextAuth.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="sidebar-nav" class="section-pc">12. SidebarNavPc (desktop)</h2>
+
+<p>Fichero: <code>features/recetas/components/sidebarNavPc.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-purple">Solo desktop (lg+)</span>
+  Necesita <code>'use client'</code> por el uso de <code>usePathname()</code> para detectar la ruta activa.
+</p>
+
+<h3>Rutas de navegación</h3>
+
+<p>Espeja exactamente las rutas del <code>NavBarInferior</code>, garantizando consistencia entre mobile y desktop:</p>
+
+<table>
+  <tr><th>Ruta</th><th>Icono (Lucide)</th><th>Etiqueta</th></tr>
+  <tr><td><code>/home</code></td><td><code>Home</code></td><td>Inicio</td></tr>
+  <tr><td><code>/despensa</code></td><td><code>ShoppingBasket</code></td><td>Despensa</td></tr>
+  <tr><td><code>/chat</code></td><td><code>Bot</code></td><td>Cookr IA</td></tr>
+  <tr><td><code>/discover</code></td><td><code>Compass</code></td><td>Discover</td></tr>
+  <tr><td><code>/perfil</code></td><td><code>User</code></td><td>Perfil</td></tr>
+</table>
+
+<h3>Active state</h3>
+
+<pre>
+<span class="kw">const</span> activo = rutaActual === href || rutaActual.<span class="fn">startsWith</span>(<span class="st">`${href}/`</span>)
+
+<span class="cm">// Estado activo</span>
+<span class="st">"bg-warm-bg-accent font-bold text-brand"</span>
+<span class="nm">strokeWidth={2.5}</span>
+
+<span class="cm">// Estado inactivo</span>
+<span class="st">"font-medium text-muted-foreground hover:bg-warm-bg hover:translate-x-0.5"</span>
+<span class="nm">strokeWidth={1.8}</span>
+</pre>
+
+<p>
+  El efecto <code>hover:translate-x-0.5</code> imita el comportamiento del Stitch de referencia,
+  donde los ítems del sidebar se deslizan levemente hacia la derecha al pasar el ratón.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="sidebar-tendencias" class="section-pc">13. SidebarTendencias (desktop)</h2>
+
+<p>Fichero: <code>features/recetas/components/sidebarTendencias.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-gray">Sin 'use client'</span>
+  <span class="badge badge-purple">Solo desktop (lg+)</span>
+  Renderiza datos estáticos del mock — no necesita estado ni eventos.
+</p>
+
+<h3>Secciones</h3>
+
+<table>
+  <tr><th>Sección</th><th>Icono</th><th>Contenido</th></tr>
+  <tr>
+    <td>Recetas Populares</td>
+    <td><code>TrendingUp</code> Lucide</td>
+    <td>3 ítems: thumbnail <code>w-16 h-16 rounded-xl</code> + título + autor + tiempo/dificultad</td>
+  </tr>
+  <tr>
+    <td>Chefs Destacados</td>
+    <td><code>Star</code> Lucide</td>
+    <td>2 chefs: <code>Avatar</code> shadcn + nombre + seguidores + botón "Seguir"</td>
+  </tr>
+</table>
+
+<h3>Botón "Seguir"</h3>
+
+<pre>
+<span class="st">"rounded-full border border-brand/20 px-3 py-1 text-[10px]
+ font-bold text-brand hover:bg-brand hover:text-brand-foreground"</span>
+</pre>
+
+<p>
+  En Fase 5, el botón "Seguir" conectará con el endpoint <code>POST /api/usuarios/:id/seguir</code>
+  con toggle optimista. Por ahora es un elemento visual estático.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="tarjeta-pc" class="section-pc">14. TarjetaPostPc — variantes bento (desktop)</h2>
+
+<p>Fichero: <code>features/recetas/components/tarjetaPostPc.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-purple">Solo desktop</span>
+  Un único componente con tres variantes visuales para el grid bento.
+  Estado de like/guardado idéntico al <code>TarjetaPost</code> mobile.
+</p>
+
+<h3>Variantes</h3>
+
+<table>
+  <tr><th>Variante</th><th>CSS grid</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>'hero'</code></td>
+    <td><code>col-span-2 row-span-2</code></td>
+    <td>Imagen grande <code>h-[400px]</code>, título XL, descripción 2 líneas, botón "Ver receta →"</td>
+  </tr>
+  <tr>
+    <td><code>'small'</code></td>
+    <td><code>col-span-1</code></td>
+    <td>Imagen <code>h-48</code>, autor, título compacto, contadores</td>
+  </tr>
+  <tr>
+    <td><code>'wide'</code></td>
+    <td><code>col-span-2</code></td>
+    <td>Horizontal: imagen izquierda (50%) + contenido derecho (50%), <code>min-h-[220px]</code></td>
+  </tr>
+</table>
+
+<h3>Shadow de tarjeta (Ambient Shadow del DESIGN.md)</h3>
+
+<pre>
+<span class="cm">/* Equivalencia oklch del rgba(27,28,26,0.06) del Stitch */</span>
+shadow-[<span class="nm">0px_12px_32px_oklch(0.22_0.02_50_/_0.06)</span>]
+</pre>
+
+<h3>Hover en imágenes</h3>
+
+<pre>
+<span class="cm">// Zoom suave al pasar el ratón — mismo patrón en las tres variantes</span>
+className=<span class="st">"... transition-transform duration-700 group-hover:scale-105"</span>
+</pre>
+
+<p>
+  El <code>AccionesBar</code> es una función interna del componente que renderiza
+  Heart + contador · MessageCircle + contador · Bookmark, con prop <code>compact</code>
+  para reducir el tamaño de iconos en las variantes <code>small</code> y <code>wide</code>.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="feed-pc" class="section-pc">15. FeedHomePc — grid bento (desktop)</h2>
+
+<p>Fichero: <code>features/recetas/components/feedHomePc.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-purple">Solo desktop</span>
+  Recibe el estado de búsqueda y filtro desde <code>LayoutHomePc</code>; no tiene estado propio.
+</p>
+
+<h3>Props</h3>
+
+<pre>
+<span class="kw">interface</span> <span class="ty">FeedHomePcProps</span> {
+  busqueda:       <span class="ty">string</span>
+  filtroActivo:   <span class="ty">string</span>
+  onFiltroChange: <span class="nm">(id: string) =&gt; void</span>
+}
+</pre>
+
+<h3>Patrón de variantes bento</h3>
+
+<pre>
+<span class="cm">// Secuencia de variantes para los primeros 7 posts:</span>
+<span class="cm">// [HERO col-span-2 row-span-2][SMALL] ← fila 1</span>
+<span class="cm">// [HERO continúa             ][SMALL] ← fila 2</span>
+<span class="cm">// [SMALL][WIDE col-span-2         ] ← fila 3</span>
+<span class="cm">// [SMALL][SMALL]                    ← fila 4 (posts 6-7)</span>
+<span class="kw">const</span> <span class="nm">VARIANTES</span>: <span class="ty">VarianteTarjeta[]</span> = [
+  <span class="st">'hero'</span>, <span class="st">'small'</span>, <span class="st">'small'</span>, <span class="st">'small'</span>, <span class="st">'wide'</span>, <span class="st">'small'</span>, <span class="st">'small'</span>,
+]
+</pre>
+
+<p>
+  El auto-placement de CSS grid (<code>grid-cols-3</code>) gestiona automáticamente
+  el posicionamiento: el hero con <code>col-span-2 row-span-2</code> ocupa las columnas 1-2
+  en las filas 1-2; los smalls se colocan en la columna 3; el wide ocupa columnas 2-3 en la fila 3.
+</p>
+
+<h3>Chips de filtro desktop</h3>
+
+<p>
+  Mismos <code>FILTROS_FEED</code> que en mobile. El chip activo usa
+  <code>shadow-brand/20</code> en el shadow para un efecto de "brillo" de marca
+  que evoca el DESIGN.md ("Signature feel" con luster en Primary CTA).
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="layout-pc" class="section-pc">16. LayoutHomePc — ensamblado PC</h2>
+
+<p>Fichero: <code>features/recetas/components/layoutHomePc.tsx</code> <span class="badge badge-purple">Nuevo</span></p>
+<p>
+  <span class="badge badge-blue">Client Component</span>
+  <span class="badge badge-purple">Solo desktop</span>
+  Wrapper que posee el estado compartido entre el header y el feed,
+  y ensambla los cuatro elementos del layout PC.
+</p>
+
+<pre>
+<span class="st">'use client'</span>
+
+<span class="kw">export function</span> <span class="fn">LayoutHomePc</span>() {
+  <span class="kw">const</span> [busqueda,     setBusqueda]     = <span class="fn">useState</span>(<span class="st">''</span>)
+  <span class="kw">const</span> [filtroActivo, setFiltroActivo] = <span class="fn">useState</span>(<span class="st">'todas'</span>)
+
+  <span class="kw">return</span> (
+    &lt;&gt;
+      &lt;<span class="fn">HeaderHomePc</span>   busqueda={busqueda} onBuscar={setBusqueda} /&gt;
+      &lt;<span class="fn">SidebarNavPc</span>   /&gt;
+      &lt;<span class="ty">main</span> className=<span class="st">"min-h-screen bg-background pb-12 pl-64 pr-80 pt-28"</span>&gt;
+        &lt;<span class="ty">div</span> className=<span class="st">"px-8"</span>&gt;
+          &lt;<span class="fn">FeedHomePc</span>
+            busqueda={busqueda}
+            filtroActivo={filtroActivo}
+            onFiltroChange={setFiltroActivo}
+          /&gt;
+        &lt;/<span class="ty">div</span>&gt;
+      &lt;/<span class="ty">main</span>&gt;
+      &lt;<span class="fn">SidebarTendencias</span> /&gt;
+    &lt;/&gt;
+  )
+}
+</pre>
+
+<h3>Flujo de estado</h3>
+
+<table>
+  <tr><th>Estado</th><th>Propietario</th><th>Destinos</th></tr>
+  <tr>
+    <td><code>busqueda</code></td>
+    <td><code>LayoutHomePc</code></td>
+    <td>→ <code>HeaderHomePc</code> (muestra valor) · → <code>FeedHomePc</code> (filtra posts)</td>
+  </tr>
+  <tr>
+    <td><code>filtroActivo</code></td>
+    <td><code>LayoutHomePc</code></td>
+    <td>→ <code>FeedHomePc</code> (chip activo + prepara filtro backend)</td>
+  </tr>
+</table>
+
+<p>
+  Elevar el estado a <code>LayoutHomePc</code> es necesario porque en desktop la búsqueda
+  está en el header y el resultado está en el feed — dos subárboles distintos que necesitan
+  compartir la misma fuente de verdad.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="animaciones">17. Animaciones Framer Motion</h2>
+
+<table>
+  <tr><th>Componente</th><th>Tipo</th><th>Configuración</th></tr>
+  <tr>
+    <td>Cards del feed mobile (<code>FeedHome</code>)</td>
+    <td>Stagger entrada</td>
+    <td><code>opacity 0→1, y 18→0, delay i*0.07s, ease easeOut</code></td>
+  </tr>
+  <tr>
+    <td>Botón Like (<code>TarjetaPost</code> + <code>TarjetaPostPc</code>)</td>
+    <td>Rebote de escala</td>
+    <td><code>scale [1, 1.3, 1], duration 0.25s</code></td>
+  </tr>
+  <tr>
+    <td>Botón Bookmark (<code>TarjetaPost</code> + <code>TarjetaPostPc</code>)</td>
+    <td>Rebote de escala</td>
+    <td><code>scale [1, 1.2, 1], duration 0.2s</code></td>
+  </tr>
+  <tr>
+    <td>Hover imagen tarjetas desktop (<code>TarjetaPostPc</code>)</td>
+    <td>Zoom CSS</td>
+    <td><code>group-hover:scale-105, duration-700</code> (CSS, no Framer Motion)</td>
+  </tr>
+</table>
+
+<div class="callout">
+  <strong>Compatibilidad Framer Motion v12:</strong> Se usa la API estándar de <code>motion.div</code>
+  con props <code>animate</code> y <code>transition</code>. No se necesita anotar variantes con el
+  tipo <code>Variants</code> porque se pasan objetos literales directamente.
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="colores">18. Paleta de colores usada</h2>
+
+<table>
+  <tr><th>Variable CSS</th><th>Uso en la vista Home</th></tr>
+  <tr><td><code>--background</code></td><td>Fondo de página, main desktop, sidebars PC</td></tr>
+  <tr><td><code>--foreground</code></td><td>Títulos de receta, nombre del autor, nav items</td></tr>
+  <tr><td><code>--card</code></td><td>Fondo de tarjetas bento desktop (<code>TarjetaPostPc</code>)</td></tr>
+  <tr><td><code>--muted-foreground</code></td><td>Descripción, @username, contadores, tiempo, nav inactivo</td></tr>
+  <tr><td><code>--muted</code></td><td>Fondo del input de búsqueda y chips inactivos (mobile + desktop)</td></tr>
+  <tr><td><code>--brand</code></td><td>Logo "Cookr" (mobile + desktop), chip activo, like/bookmark activo, nav activo, subtítulos sidebar</td></tr>
+  <tr><td><code>--brand-foreground</code></td><td>Texto sobre chip activo, hover botón "Seguir"</td></tr>
+  <tr><td><code>--brand/10</code></td><td>Fondo del AvatarFallback en todas las tarjetas</td></tr>
+  <tr><td><code>--brand/20</code></td><td>Border del botón "Seguir", shadow del chip activo desktop</td></tr>
+  <tr><td><code>--warm-bg</code></td><td>Hover estado inactivo en SidebarNavPc, fondo hover chef cards</td></tr>
+  <tr><td><code>--warm-bg-accent</code></td><td>Estado activo SidebarNavPc, placeholder thumbnails sidebar, hover chef cards activo</td></tr>
+  <tr><td><code>--border</code></td><td>Separador entre tarjetas mobile, borde sidebar izquierdo, divisor acciones hero card</td></tr>
+  <tr><td><code>--border/40</code></td><td>Borde del sidebar nav (sutil, regla No-Line)</td></tr>
+</table>
+
+<p><strong>Colores hardcodeados usados: ninguno.</strong> Todas las clases de color usan variables
+CSS de <code>globals.css</code> a través de Tailwind.</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="fase5">19. Preparación para Fase 5 (backend)</h2>
+
+<p>La arquitectura actual permite conectar el backend <strong>sin tocar los componentes UI</strong>.
+Los cambios de Fase 5 se limitan a añadir hooks y servicios:</p>
+
+<pre>
+<span class="cm">// Fase 5 — añadir sin tocar los componentes existentes</span>
+
+<span class="cm">// 1. src/features/recetas/hooks/useRecetasFeed.ts</span>
+<span class="kw">export function</span> <span class="fn">useRecetasFeed</span>(filtro: <span class="ty">string</span>) {
+  <span class="kw">return</span> <span class="fn">useQuery</span>({
+    queryKey: [<span class="st">'feed'</span>, filtro],
+    queryFn:  () => <span class="nm">recetasService</span>.<span class="fn">obtenerFeed</span>(filtro),
+  })
+}
+
+<span class="cm">// 2. src/features/recetas/services/recetasService.ts</span>
+<span class="kw">export const</span> <span class="nm">recetasService</span> = {
+  <span class="fn">obtenerFeed</span>: (filtro: <span class="ty">string</span>) =>
+    <span class="nm">apiClient</span>.<span class="fn">get</span>&lt;<span class="ty">PostFeed[]</span>&gt;(<span class="st">`/recetas/feed?filtro=${filtro}`</span>),
+}
+
+<span class="cm">// 3. feedHome.tsx y feedHomePc.tsx — sustituir POSTS_MOCK por el hook</span>
+<span class="kw">const</span> { data: posts = [] } = <span class="fn">useRecetasFeed</span>(filtroActivo)
+
+<span class="cm">// 4. datosTendencias.ts → useRecetasPopulares / useChefsDestacados (Fase 5/6)</span>
+</pre>
+
+<p>
+  <code>TarjetaPost</code>, <code>TarjetaPostPc</code>, <code>HeaderHome</code>, <code>HeaderHomePc</code>,
+  <code>SidebarNavPc</code> y <code>BuscadorFiltros</code>
+  <strong>no se modifican en Fase 5</strong>.
+</p>
+
+<!-- ─────────────────────────────────────────────── -->
+<h2 id="pendientes">20. TODOs y pendientes</h2>
+
+<h3>Mobile</h3>
+
+<table>
+  <tr><th>ID</th><th>Descripción</th><th>Fase</th></tr>
+  <tr>
+    <td><code>HOME-001</code></td>
+    <td>Sustituir <code>POSTS_MOCK</code> en <code>FeedHome</code> por <code>useRecetasFeed</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-002</code></td>
+    <td>Añadir campo <code>categoria</code> a <code>DatosReceta</code> y filtrar chips realmente</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-003</code></td>
+    <td>Sustituir imágenes picsum.photos por imágenes reales de Cloudinary</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-004</code></td>
+    <td>Añadir <code>useMutation</code> en like/bookmark con rollback en error</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-005</code></td>
+    <td>Implementar paginación / infinite scroll con <code>useInfiniteQuery</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-006</code></td>
+    <td>Añadir Skeleton loader mientras carga el feed (shadcn <code>Skeleton</code>)</td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-007</code></td>
+    <td>Botón Bell en <code>HeaderHome</code> conectar a <code>/notificaciones</code> (actualmente eliminado)</td>
+    <td>Fase 6</td>
+  </tr>
+  <tr>
+    <td><code>HOME-008</code></td>
+    <td>Al hacer clic en una tarjeta mobile, navegar a <code>/recetas/[id]</code> (TFG-21)</td>
+    <td>Sprint 2 FE</td>
+  </tr>
+</table>
+
+<h3>Desktop (PC)</h3>
+
+<table>
+  <tr><th>ID</th><th>Descripción</th><th>Fase</th></tr>
+  <tr>
+    <td><code>HOME-009</code></td>
+    <td>Sustituir AvatarFallback "U" en <code>HeaderHomePc</code> por foto real de sesión NextAuth</td>
+    <td>Fase 4</td>
+  </tr>
+  <tr>
+    <td><code>HOME-010</code></td>
+    <td>Sustituir <code>POSTS_MOCK</code> en <code>FeedHomePc</code> por <code>useRecetasFeed</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-011</code></td>
+    <td>Conectar <code>RECETAS_POPULARES</code> a endpoint <code>GET /api/recetas?popular=true</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-012</code></td>
+    <td>Conectar <code>CHEFS_DESTACADOS</code> a endpoint <code>GET /api/usuarios?destacado=true</code></td>
+    <td>Fase 5</td>
+  </tr>
+  <tr>
+    <td><code>HOME-013</code></td>
+    <td>Botón "Seguir" en <code>SidebarTendencias</code> → <code>POST /api/usuarios/:id/seguir</code></td>
+    <td>Fase 5/6</td>
+  </tr>
+  <tr>
+    <td><code>HOME-014</code></td>
+    <td>Al hacer clic en tarjeta bento, navegar a <code>/recetas/[id]</code></td>
+    <td>Sprint 2 FE</td>
+  </tr>
+  <tr>
+    <td><code>HOME-015</code></td>
+    <td>Considerar skeleton loaders para el grid bento y los sidebars PC</td>
+    <td>Fase 5</td>
+  </tr>
+</table>
+
+</body>
+</html>

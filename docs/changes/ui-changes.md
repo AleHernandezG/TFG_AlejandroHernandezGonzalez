@@ -6,6 +6,34 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-015] — Home responsive: layout de escritorio (lg+)
+Fecha: 2026-04-01 | Estado: 👁️ Pendiente revisión | Sprint: 2
+
+Nuevos componentes PC creados siguiendo Stitch `docs/stitch/home/PC/`:
+
+**Nuevos ficheros:**
+- `features/recetas/data/datosTendencias.ts` — mock RecetaPopular[] + ChefDestacado[] para sidebars
+- `features/recetas/components/headerHomePc.tsx` — header fijo h-20: logo | search | avatar (lg+)
+- `features/recetas/components/sidebarNavPc.tsx` — sidebar izquierdo fijo w-64: Inicio/Despensa/CocinaIA/Discover/Perfil (lg+)
+- `features/recetas/components/sidebarTendencias.tsx` — sidebar derecho fijo w-80: Recetas Populares + Chefs Destacados (lg+)
+- `features/recetas/components/tarjetaPostPc.tsx` — tarjeta bento con 3 variantes: hero (col-span-2 row-span-2), small (col-span-1), wide (col-span-2 horizontal)
+- `features/recetas/components/feedHomePc.tsx` — grid bento 3 cols + chips filtros (usa POSTS_MOCK y FILTROS_FEED)
+- `features/recetas/components/layoutHomePc.tsx` — wrapper Client que posee busqueda + filtroActivo y ensambla la vista PC
+
+**Ficheros modificados:**
+- `app/(main)/home/page.tsx` — renderiza `<div class="lg:hidden">` (mobile) y `<div class="hidden lg:block">` (desktop)
+- `features/recetas/components/index.ts` — barrel exports de los nuevos componentes PC
+
+**Reglas de diseño aplicadas (Stitch PC como referencia de layout):**
+- Paleta 100% Cookr (sin colores hardcodeados)
+- No-Line Rule: separaciones por color de fondo, no bordes 1px
+- Ambient shadow: `shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]` en tarjetas
+- Glassmorphism: `bg-background/80 backdrop-blur-md` en header PC
+- Bento grid: CSS grid-cols-3 con auto-placement natural → hero row-span-2 + smalls + wide
+- NavBarInferior ya tenía `lg:hidden` — no necesita cambios
+
+---
+
 ## [UI-014] — Comportamiento scroll en Home: header y buscador no sticky
 Fecha: 2026-04-01 | Estado: 👁️ Pendiente revisión | Sprint: 2
 
