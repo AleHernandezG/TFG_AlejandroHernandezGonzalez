@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Minus, Plus } from 'lucide-react'
 import type { Ingrediente, MacrosReceta } from '../types/receta.types'
 
@@ -12,10 +11,10 @@ type Props = {
 }
 
 const MACROS_CONFIG = [
-  { key: 'calorias'  as const, label: 'Calorías',      unidad: 'kcal' },
-  { key: 'proteinas' as const, label: 'Proteínas',     unidad: 'g'    },
-  { key: 'carbos'    as const, label: 'Carbohidratos', unidad: 'g'    },
-  { key: 'grasas'    as const, label: 'Grasas',        unidad: 'g'    },
+  { key: 'calorias' as const, label: 'Calorías', unidad: 'kcal' },
+  { key: 'proteinas' as const, label: 'Proteínas', unidad: 'g' },
+  { key: 'carbos' as const, label: 'Carbohidratos', unidad: 'g' },
+  { key: 'grasas' as const, label: 'Grasas', unidad: 'g' },
 ]
 
 export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
@@ -28,29 +27,29 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
   }
 
   return (
-    <div className="px-5 pt-4 pb-6">
+    <div className="px-5 pb-6 pt-4">
       {/* ── Ingredientes ──────────────────────────────── */}
-      <h2 className="text-xl font-extrabold text-foreground mb-4">Ingredientes</h2>
+      <h2 className="mb-4 text-xl font-extrabold text-foreground">Ingredientes</h2>
 
       {/* Ajustador porciones */}
-      <div className="flex items-center justify-between mb-4 bg-[var(--warm-bg)] rounded-2xl px-4 py-3">
+      <div className="mb-4 flex items-center justify-between rounded-2xl bg-[var(--warm-bg)] px-4 py-3">
         <span className="text-sm font-bold text-foreground">Porciones</span>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPorciones((p) => Math.max(1, p - 1))}
             disabled={porciones <= 1}
             aria-label="Reducir porciones"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm disabled:opacity-40 transition-opacity"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-opacity disabled:opacity-40"
           >
             <Minus size={16} />
           </button>
-          <span className="text-base font-extrabold text-foreground w-5 text-center">
+          <span className="w-5 text-center text-base font-extrabold text-foreground">
             {porciones}
           </span>
           <button
             onClick={() => setPorciones((p) => p + 1)}
             aria-label="Aumentar porciones"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-opacity"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-opacity"
           >
             <Plus size={16} />
           </button>
@@ -58,17 +57,14 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
       </div>
 
       {/* Lista ingredientes */}
-      <ul className="divide-y divide-border/40 mb-4">
+      <ul className="divide-border/40 mb-4 divide-y">
         {ingredientes.map((ing, i) => (
           <li key={i} className="flex items-center gap-3 py-3">
-            <Checkbox id={`ing-${i}`} className="shrink-0" />
-            <label
-              htmlFor={`ing-${i}`}
-              className="flex-1 text-sm font-medium text-foreground cursor-pointer"
-            >
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+            <span className="flex-1 text-sm font-medium text-foreground">
               {ing.nombre}
-            </label>
-            <span className="text-sm font-bold text-muted-foreground shrink-0">
+            </span>
+            <span className="shrink-0 text-sm font-bold text-muted-foreground">
               {escalarCantidad(ing.cantidad)} {ing.unidad}
             </span>
           </li>
@@ -76,27 +72,29 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
       </ul>
 
       {/* Link Añadir a despensa */}
-      <button className="text-brand text-sm font-bold hover:opacity-80 transition-opacity mb-8">
-        + Añadir a mi despensa
+      <button className="mb-8 flex w-full items-center justify-center text-sm font-bold text-brand transition-opacity hover:opacity-80">
+        Comparar con mi despensa
       </button>
 
       {/* ── Nutrición ─────────────────────────────────── */}
-      <h2 className="text-xl font-extrabold text-foreground mb-1">Información nutricional</h2>
-      <p className="text-xs text-muted-foreground mb-4">Por porción</p>
+      <h2 className="mb-1 text-xl font-extrabold text-foreground">Información nutricional</h2>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Total de la receta para {porciones} porciones
+      </p>
 
       <div className="grid grid-cols-2 gap-3">
         {MACROS_CONFIG.map(({ key, label, unidad }) => (
           <div
             key={key}
-            className="bg-[var(--warm-bg)] rounded-2xl p-4 flex flex-col gap-0.5 shadow-sm"
+            className="flex flex-col gap-0.5 rounded-2xl bg-[var(--warm-bg)] p-4 shadow-sm"
           >
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-tighter">
+            <span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">
               {label}
             </span>
-            <span className="text-2xl font-extrabold text-foreground leading-none">
+            <span className="text-2xl font-extrabold leading-none text-foreground">
               {Math.round(macros[key] * factor)}
+              <span className="text-xs text-muted-foreground">{unidad}</span>
             </span>
-            <span className="text-xs text-muted-foreground">{unidad}</span>
           </div>
         ))}
       </div>
