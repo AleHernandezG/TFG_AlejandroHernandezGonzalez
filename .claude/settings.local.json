@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls -la \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\app\\\\\\(main\\)\\\\recetas\")",
+      "Bash(find \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\" -type d -name \"\\(main\\)\")",
+      "Bash(find \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\app\\\\\\(main\\)\" -type f)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add checkbox --yes)",
+      "Bash(npx next:*)"
     ]
   }
 }

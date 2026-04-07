@@ -125,6 +125,7 @@ Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
   - /recuperar-contrasena/pendiente: pantalla "revisa tu correo" con cooldown reenvío 60s
   - /nueva-contrasena: layout como /registro (imagen izq, form der), 2 campos contraseña + confirmar + pantalla éxito in-page
 - 👁️ Pendiente revisión — [TFG-17] NavBar inferior: 5 iconos, icono central ChefHat con bg-brand, pill indicator con layoutId Framer Motion, safe area insets, oculta en / y lg+
+- 👁️ Pendiente revisión — [TFG-21] Vista Detalle de Receta: ruta /recetas/[id], hero glassmorphism, cabecera con chips/alérgenos/stats, tabs ingredientes+nutrición, pasos, comentarios, carrusel similares, layout bento 2 columnas en desktop. ChipAlergeno reutilizable creado. 10 funcionalidades pendientes documentadas.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 

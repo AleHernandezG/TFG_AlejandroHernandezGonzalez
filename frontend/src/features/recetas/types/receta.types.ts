@@ -29,3 +29,34 @@ export type FiltroFeed = {
   id: string
   etiqueta: string
 }
+
+export type Ingrediente = {
+  nombre: string
+  cantidad: number
+  unidad: string
+}
+
+export type Comentario = {
+  autorNombre: string
+  avatarUrl: string | null
+  texto: string
+  fecha: string // ISO 8601
+}
+
+export type MacrosReceta = {
+  calorias: number
+  proteinas: number
+  carbos: number
+  grasas: number
+}
+
+export type RecetaDetalle = PostFeed & {
+  categorias: string[]
+  pasos: string[]
+  ingredientes: Ingrediente[]
+  alergenos: string[] // ids del map ALERGENOS en chipAlergeno
+  macros: MacrosReceta
+  listaComentarios: Comentario[] // diferente de PostFeed.comentarios (number)
+  similares: PostFeed[]
+  porciones: number // porciones base para escalar ingredientes
+}
