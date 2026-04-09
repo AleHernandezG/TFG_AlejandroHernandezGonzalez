@@ -1,6 +1,6 @@
 # Estructura de Carpetas — `frontend/src`
 
-> **Última actualización:** 2026-03-22 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
+> **Última actualización:** 2026-04-09 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
 
 ## Árbol
 
@@ -35,6 +35,34 @@ src/
 │   │   ├── data/               # Datos mock / constantes del feature
 │   │   └── types/              # Tipos específicos del feature
 │   ├── recetas/                # Sprint 2+ — feed, detalle, crear, buscar
+│   │   ├── components/
+│   │   │   ├── home/           # Componentes exclusivos de /home (feed)
+│   │   │   │   ├── feedHome.tsx
+│   │   │   │   ├── feedHomePc.tsx
+│   │   │   │   ├── headerHome.tsx
+│   │   │   │   ├── headerHomePc.tsx
+│   │   │   │   ├── layoutHomePc.tsx
+│   │   │   │   ├── sidebarNavPc.tsx
+│   │   │   │   ├── sidebarTendencias.tsx
+│   │   │   │   ├── tarjetaPost.tsx
+│   │   │   │   ├── tarjetaPostPc.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── detalleReceta/  # Componentes exclusivos de /recetas/[id]
+│   │   │   │   ├── cabeceraReceta.tsx
+│   │   │   │   ├── carruselSimilares.tsx
+│   │   │   │   ├── comentariosReceta.tsx
+│   │   │   │   ├── detalleRecetaCliente.tsx
+│   │   │   │   ├── heroReceta.tsx
+│   │   │   │   ├── pasosReceta.tsx
+│   │   │   │   ├── tabsReceta.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── index.ts        # Barrel raíz — re-exporta home/ y detalleReceta/
+│   │   ├── data/
+│   │   │   ├── datosFeed.ts
+│   │   │   ├── datosDetalle.ts
+│   │   │   └── datosTendencias.ts
+│   │   └── types/
+│   │       └── receta.types.ts
 │   ├── perfil/                 # Sprint 4+
 │   ├── despensa/               # Sprint 5+
 │   ├── chat/                   # Sprint 5+
@@ -78,23 +106,39 @@ Cada dominio de negocio tiene su propia carpeta en `features/`. Dentro:
 
 **Barrel export:** cada `components/` debe tener un `index.ts` que re-exporte todos los componentes.
 
+Cuando un feature tiene vistas diferenciadas (ej: `home` vs `detalleReceta`), los componentes se organizan en subcarpetas por vista, cada una con su propio `index.ts`. El `index.ts` raíz re-exporta desde las subcarpetas.
+
 ```ts
 // features/landing/components/index.ts — nombres en español (camelCase)
 export { SeccionHero } from "./seccionHero";
 export { BentoCaracteristicas } from "./bentoCaracteristicas";
-export { BentoTestimonios } from "./bentoTestimonios";
 
 // features/auth/components/index.ts
 export { FormularioRegistro } from "./formularioRegistro";
 export { BotonGoogle } from "./botonGoogle";
-export { DivisorOAuth } from "./divisorOAuth";
+
+// features/recetas/components/index.ts — re-exporta subcarpetas por vista
+export * from "./home";         // feedHome, headerHome, tarjetaPost, layoutHomePc…
+export * from "./detalleReceta"; // detalleRecetaCliente, heroReceta, tabsReceta…
+
+// features/recetas/components/home/index.ts
+export { FeedHome } from "./feedHome";
+export { TarjetaPost } from "./tarjetaPost";
+// …
+
+// features/recetas/components/detalleReceta/index.ts
+export { DetalleRecetaCliente } from "./detalleRecetaCliente";
+export { HeroReceta } from "./heroReceta";
+// …
 ```
 
-**Import desde fuera:**
+**Import desde fuera — siempre por el barrel raíz del feature:**
 
 ```ts
 import { SeccionHero } from "@/features/landing/components";
 import { BotonGoogle } from "@/features/auth/components";
+// El barrel raíz expone todo: no importar directamente desde la subcarpeta
+import { FeedHome, DetalleRecetaCliente } from "@/features/recetas/components";
 ```
 
 ### 3. Componentes compartidos → `components/`
@@ -225,15 +269,15 @@ Todos los imports usan `@/` como raíz de `src/`.
 
 ## Features Actuales
 
-| Feature    | Estado          | Descripción |
-| ---------- | --------------- | ----------- |
-| `landing`  | ✅              | SeccionHero, BentoCaracteristicas, BentoTestimonios, datos mock |
-| `auth`     | 👁️ revisión    | FormularioRegistro, FormularioLogin, FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente, TarjetaRecuperacionPendiente, BotonGoogle, DivisorOAuth — Sprint 1 completado, pendiente revisión autor |
-| `recetas`  | ⏳ Sprint 2     | Feed, NavBar, Detalle — requiere Stitch previo |
-| `perfil`   | ⏳ Sprint 4     | Pendiente |
-| `despensa` | ⏳ Sprint 5     | Pendiente |
-| `chat`     | ⏳ Sprint 5     | Pendiente |
-| `grupos`   | ⏳ Sprint 6     | Pendiente |
+| Feature | Estado | Componentes |
+| --- | --- | --- |
+| `landing` | ✅ | SeccionHero, BentoCaracteristicas, BentoTestimonios |
+| `auth` | 👁️ revisión | FormularioRegistro, FormularioLogin, BotonGoogle, DivisorOAuth, +4 |
+| `recetas` | 👁️ revisión | `home/` ×9 (FeedHome, TarjetaPost…) · `detalleReceta/` ×7 (HeroReceta, TabsReceta…) |
+| `perfil` | ⏳ Sprint 4 | Pendiente |
+| `despensa` | ⏳ Sprint 5 | Pendiente |
+| `chat` | ⏳ Sprint 5 | Pendiente |
+| `grupos` | ⏳ Sprint 6 | Pendiente |
 
 ## Añadir un Nuevo Feature
 

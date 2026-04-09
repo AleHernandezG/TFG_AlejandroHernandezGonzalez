@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import type { PostFeed } from '../types/receta.types'
+import type { PostFeed } from '../../types/receta.types'
 
 type Props = {
   recetas: PostFeed[]

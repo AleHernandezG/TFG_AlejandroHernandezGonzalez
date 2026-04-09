@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
-import type { Ingrediente, MacrosReceta } from '../types/receta.types'
+import type { Ingrediente, MacrosReceta } from '../../types/receta.types'
 
 type Props = {
   ingredientes: Ingrediente[]

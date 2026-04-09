@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { FILTROS_FEED, POSTS_MOCK } from '../data/datosFeed'
+import { FILTROS_FEED, POSTS_MOCK } from '../../data/datosFeed'
 import { TarjetaPostPc, type VarianteTarjeta } from './tarjetaPostPc'
 
 // Bento grid layout pattern for first 7 posts:

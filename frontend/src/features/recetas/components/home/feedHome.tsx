@@ -3,7 +3,7 @@
 import { BuscadorFiltros } from '@/components/common/buscadorFiltros'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { FILTROS_FEED, POSTS_MOCK } from '../data/datosFeed'
+import { FILTROS_FEED, POSTS_MOCK } from '../../data/datosFeed'
 import { TarjetaPost } from './tarjetaPost'
 
 export function FeedHome() {

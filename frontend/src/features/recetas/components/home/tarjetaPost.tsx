@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
-import type { PostFeed } from '../types/receta.types'
+import type { PostFeed } from '../../types/receta.types'
 
 function tiempoRelativo(fechaISO: string): string {
   const diffMs = Date.now() - new Date(fechaISO).getTime()

@@ -7,7 +7,7 @@ import { TabsReceta } from './tabsReceta'
 import { PasosReceta } from './pasosReceta'
 import { ComentariosReceta } from './comentariosReceta'
 import { CarruselSimilares } from './carruselSimilares'
-import type { RecetaDetalle } from '../types/receta.types'
+import type { RecetaDetalle } from '../../types/receta.types'
 
 type Props = {
   receta: RecetaDetalle

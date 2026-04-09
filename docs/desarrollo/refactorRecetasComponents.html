@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Refactor: Subcarpetas features/recetas — Cookr</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.65; }
+    a { color: #f97316; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .badge { background: #f97316; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.green { background: #22c55e; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.75rem; }
+    h2 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    h2 .icon { font-size: 1.1rem; }
+    h3 { font-size: 0.85rem; font-weight: 600; color: #a3a3a3; text-transform: uppercase; letter-spacing: 0.06em; margin: 1.25rem 0 0.6rem; }
+    p { font-size: 0.92rem; color: #a3a3a3; }
+
+    /* Reason box */
+    .reason { background: #1e1e1e; border-left: 3px solid #f97316; padding: 0.9rem 1.1rem; border-radius: 0 8px 8px 0; font-size: 0.88rem; color: #d4d4d4; margin-top: 0.75rem; }
+
+    /* Before / After grid */
+    .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+    @media (max-width: 600px) { .diff { grid-template-columns: 1fr; } }
+    .diff-box { background: #111; border-radius: 8px; padding: 1rem; }
+    .diff-box.before { border: 1px solid #3f3f3f; }
+    .diff-box.after { border: 1px solid #22c55e44; }
+    .diff-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+    .diff-box.before .diff-label { color: #ef4444; }
+    .diff-box.after .diff-label { color: #22c55e; }
+    pre { font-size: 0.78rem; color: #d4d4d4; line-height: 1.6; white-space: pre-wrap; font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+    pre .dim { color: #555; }
+    pre .hi { color: #f97316; }
+    pre .green { color: #22c55e; }
+
+    /* File table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.75rem; }
+    th { text-align: left; padding: 0.5rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #737373; border-bottom: 1px solid #2a2a2a; }
+    td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #1f1f1f; color: #d4d4d4; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    code { background: #262626; padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; color: #f97316; }
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 999px; text-transform: uppercase; }
+    .tag.home { background: #1e3a5f; color: #60a5fa; }
+    .tag.detalle { background: #2d1f5e; color: #c084fc; }
+
+    /* Rule box */
+    .rule { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.85rem; margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .rule-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+    .rule-row .check { color: #22c55e; font-weight: 700; flex-shrink: 0; }
+    .rule-row .cross { color: #ef4444; font-weight: 700; flex-shrink: 0; }
+
+    /* Commit box */
+    .commit-box { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1.25rem; margin-top: 0.75rem; }
+    .commit-box pre { color: #d4d4d4; font-size: 0.83rem; }
+    .commit-title { color: #22c55e; font-weight: 700; }
+    .commit-body { color: #a3a3a3; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Refactor — Subcarpetas por vista en <code style="font-size:0.95rem;color:#f97316">features/recetas/components</code></h1>
+  </div>
+  <span class="badge green">Sprint 2</span>
+</header>
+
+<main>
+
+  <!-- MOTIVO -->
+  <section>
+    <h2><span class="icon">🎯</span> Motivo del cambio</h2>
+    <p>
+      El feature <code>recetas</code> acumuló 16 componentes en una sola carpeta plana.
+      Al mezclar componentes del feed (<code>/home</code>) con los del detalle (<code>/recetas/[id]</code>)
+      era difícil localizar un componente concreto para modificarlo o revisarlo.
+    </p>
+    <div class="reason">
+      Regla adoptada: cuando un feature agrupa componentes de vistas diferenciadas,
+      se organizan en <strong>subcarpetas por vista</strong> dentro de <code>components/</code>.
+      Cada subcarpeta tiene su propio <code>index.ts</code> barrel.
+      El barrel raíz del feature re-exporta ambas subcarpetas con <code>export *</code>
+      para que las páginas no necesiten cambiar sus imports.
+    </div>
+  </section>
+
+  <!-- ANTES / DESPUÉS -->
+  <section>
+    <h2><span class="icon">📁</span> Estructura antes y después</h2>
+    <div class="diff">
+      <div class="diff-box before">
+        <div class="diff-label">Antes — todo plano</div>
+        <pre>components/
+  cabeceraReceta.tsx
+  carruselSimilares.tsx
+  comentariosReceta.tsx
+  detalleRecetaCliente.tsx
+  feedHome.tsx
+  feedHomePc.tsx
+  headerHome.tsx
+  headerHomePc.tsx
+  heroReceta.tsx
+  layoutHomePc.tsx
+  pasosReceta.tsx
+  sidebarNavPc.tsx
+  sidebarTendencias.tsx
+  tabsReceta.tsx
+  tarjetaPost.tsx
+  tarjetaPostPc.tsx
+  index.ts</pre>
+      </div>
+      <div class="diff-box after">
+        <div class="diff-label">Después — subcarpetas por vista</div>
+        <pre>components/
+  <span class="green">home/</span>
+    feedHome.tsx
+    feedHomePc.tsx
+    headerHome.tsx
+    headerHomePc.tsx
+    layoutHomePc.tsx
+    sidebarNavPc.tsx
+    sidebarTendencias.tsx
+    tarjetaPost.tsx
+    tarjetaPostPc.tsx
+    <span class="hi">index.ts</span>
+  <span class="green">detalleReceta/</span>
+    cabeceraReceta.tsx
+    carruselSimilares.tsx
+    comentariosReceta.tsx
+    detalleRecetaCliente.tsx
+    heroReceta.tsx
+    pasosReceta.tsx
+    tabsReceta.tsx
+    <span class="hi">index.ts</span>
+  <span class="hi">index.ts</span>  ← re-exporta ambas</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHEROS AFECTADOS -->
+  <section>
+    <h2><span class="icon">📝</span> Ficheros modificados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Fichero</th>
+          <th>Cambio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>components/home/*.tsx</code> (×9) <span class="tag home">home</span></td>
+          <td>Movidos con <code>git mv</code>. Imports <code>../types/</code> y <code>../data/</code> actualizados a <code>../../types/</code> y <code>../../data/</code></td>
+        </tr>
+        <tr>
+          <td><code>components/detalleReceta/*.tsx</code> (×7) <span class="tag detalle">detalle</span></td>
+          <td>Movidos con <code>git mv</code>. Import <code>../types/</code> actualizado a <code>../../types/</code></td>
+        </tr>
+        <tr>
+          <td><code>components/home/index.ts</code> <span class="tag home">nuevo</span></td>
+          <td>Barrel con los 9 componentes del feed</td>
+        </tr>
+        <tr>
+          <td><code>components/detalleReceta/index.ts</code> <span class="tag detalle">nuevo</span></td>
+          <td>Barrel con los 7 componentes del detalle</td>
+        </tr>
+        <tr>
+          <td><code>components/index.ts</code></td>
+          <td>Simplificado a <code>export * from './home'</code> + <code>export * from './detalleReceta'</code></td>
+        </tr>
+        <tr>
+          <td><code>docs/folderStructure.md</code></td>
+          <td>Árbol actualizado con subcarpetas, regla de subcarpetas por vista, tabla Features Actuales</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PÁGINAS SIN CAMBIOS -->
+  <section>
+    <h2><span class="icon">✅</span> Páginas — ningún cambio necesario</h2>
+    <p>El barrel raíz mantiene los mismos exports. Las páginas no tuvieron que modificarse.</p>
+    <div class="rule" style="margin-top:0.75rem">
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span><code>app/(main)/home/page.tsx</code> — sigue importando de <code>@/features/recetas/components</code> sin cambios</span>
+      </div>
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span><code>app/(main)/recetas/[id]/page.tsx</code> — sigue importando de <code>@/features/recetas/components</code> sin cambios</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGLA PARA FUTUROS DESARROLLOS -->
+  <section>
+    <h2><span class="icon">📐</span> Regla para futuros desarrollos</h2>
+    <div class="rule">
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span>Si un feature tiene vistas diferenciadas → crear subcarpeta por vista dentro de <code>components/</code></span>
+      </div>
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span>Cada subcarpeta tiene su propio <code>index.ts</code> barrel</span>
+      </div>
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span>El barrel raíz re-exporta las subcarpetas con <code>export *</code></span>
+      </div>
+      <div class="rule-row">
+        <span class="check">✓</span>
+        <span>Imports externos siempre desde el barrel raíz: <code>@/features/recetas/components</code></span>
+      </div>
+      <div class="rule-row">
+        <span class="cross">✗</span>
+        <span>Nunca importar directamente desde la subcarpeta: <code>@/features/recetas/components/home/feedHome</code></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFICACIÓN -->
+  <section>
+    <h2><span class="icon">🔬</span> Verificación</h2>
+    <div class="rule">
+      <div class="rule-row"><span class="check">✓</span><span><code>npm run lint</code> — 0 errores, 0 warnings</span></div>
+      <div class="rule-row"><span class="check">✓</span><span><code>npm run build</code> — 15 rutas generadas, build limpio</span></div>
+      <div class="rule-row"><span class="check">✓</span><span><code>tsc --noEmit</code> — 0 errores de tipos</span></div>
+      <div class="rule-row"><span class="check">✓</span><span>Historial git preservado con <code>git mv</code></span></div>
+    </div>
+  </section>
+
+  <!-- PROMPT GITHUB -->
+  <section>
+    <h2><span class="icon">💬</span> Prompt para el commit de GitHub</h2>
+    <div class="commit-box">
+      <pre><span class="commit-title">refactor(recetas): organizar components/ en subcarpetas por vista</span>
+
+<span class="commit-body">- Mueve los 9 componentes del feed a features/recetas/components/home/
+- Mueve los 7 componentes del detalle a features/recetas/components/detalleReceta/
+- Crea index.ts barrel en cada subcarpeta
+- Actualiza el barrel raíz para re-exportar con export *
+- Corrige imports relativos (../types → ../../types, ../data → ../../data)
+- Actualiza docs/folderStructure.md con árbol y regla de subcarpetas por vista
+- Las páginas consumidoras no requieren ningún cambio
+- Lint, build y tsc limpios (0 errores)</span></pre>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

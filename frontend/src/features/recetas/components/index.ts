@@ -1,18 +1,4 @@
-export { FeedHome } from './feedHome'
-export { HeaderHome } from './headerHome'
-export { TarjetaPost } from './tarjetaPost'
-// PC desktop components
-export { LayoutHomePc } from './layoutHomePc'
-export { HeaderHomePc } from './headerHomePc'
-export { SidebarNavPc } from './sidebarNavPc'
-export { SidebarTendencias } from './sidebarTendencias'
-export { FeedHomePc } from './feedHomePc'
-export { TarjetaPostPc } from './tarjetaPostPc'
-// Detalle receta
-export { DetalleRecetaCliente } from './detalleRecetaCliente'
-export { HeroReceta } from './heroReceta'
-export { CabeceraReceta } from './cabeceraReceta'
-export { TabsReceta } from './tabsReceta'
-export { PasosReceta } from './pasosReceta'
-export { ComentariosReceta } from './comentariosReceta'
-export { CarruselSimilares } from './carruselSimilares'
+// Vista /home — Feed de recetas (mobile + PC)
+export * from './home'
+// Vista /recetas/[id] — Detalle de receta
+export * from './detalleReceta'

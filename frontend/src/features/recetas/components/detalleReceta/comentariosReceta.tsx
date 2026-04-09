@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import type { Comentario } from '../types/receta.types'
+import type { Comentario } from '../../types/receta.types'
 
 function tiempoRelativo(fechaIso: string): string {
   const diff = Date.now() - new Date(fechaIso).getTime()

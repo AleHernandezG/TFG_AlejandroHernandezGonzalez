@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
-import type { PostFeed } from '../types/receta.types'
+import type { PostFeed } from '../../types/receta.types'
 
 export type VarianteTarjeta = 'hero' | 'small' | 'wide'
 

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Image from 'next/image'
 import { Star, TrendingUp } from 'lucide-react'
-import { CHEFS_DESTACADOS, RECETAS_POPULARES } from '../data/datosTendencias'
+import { CHEFS_DESTACADOS, RECETAS_POPULARES } from '../../data/datosTendencias'
 
 export function SidebarTendencias() {
   return (
