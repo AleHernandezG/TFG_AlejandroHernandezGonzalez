@@ -7,8 +7,20 @@ import { FILTROS_FEED, POSTS_MOCK } from '../../data/datosFeed'
 import { TarjetaPost } from './tarjetaPost'
 
 export function FeedHome() {
-  const [filtroActivo, setFiltroActivo] = useState('todas')
+  const [filtrosActivos, setFiltrosActivos] = useState<string[]>(['todas'])
   const [busqueda, setBusqueda] = useState('')
+
+  function toggleFiltro(id: string) {
+    setFiltrosActivos((prev) => {
+      if (id === 'todas') return ['todas']
+      const sinTodas = prev.filter((f) => f !== 'todas')
+      if (sinTodas.includes(id)) {
+        const nuevo = sinTodas.filter((f) => f !== id)
+        return nuevo.length === 0 ? ['todas'] : nuevo
+      }
+      return [...sinTodas, id]
+    })
+  }
 
   const postsFiltrados = POSTS_MOCK.filter((post) => {
     if (busqueda === '') return true
@@ -24,8 +36,8 @@ export function FeedHome() {
     <>
       <BuscadorFiltros
         filtros={FILTROS_FEED}
-        filtroActivo={filtroActivo}
-        onFiltroChange={setFiltroActivo}
+        filtrosActivos={filtrosActivos}
+        onFiltroChange={toggleFiltro}
         onBuscar={setBusqueda}
       />
 

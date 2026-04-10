@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estado de Tareas — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* Resumen contadores */
+    .counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; }
+    .counter { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 1rem; text-align: center; }
+    .counter .num { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .counter .label { font-size: 0.72rem; color: #737373; margin-top: 0.35rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .counter.done .num { color: #22c55e; }
+    .counter.review .num { color: #f97316; }
+    .counter.alta .num { color: #ef4444; }
+    .counter.media .num { color: #eab308; }
+    .counter.baja .num { color: #3b82f6; }
+
+    /* Sección */
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .sprint-badge { font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .sprint-badge.actual { background: #f97316; color: #fff; }
+    .sprint-badge.s3 { background: #eab30822; color: #eab308; border: 1px solid #eab30844; }
+    .sprint-badge.s4 { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .sprint-badge.s5 { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf644; }
+    .sprint-badge.fase6 { background: #6b728022; color: #9ca3af; border: 1px solid #6b728044; }
+
+    /* Tabla de tareas */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.7rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.83rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    /* ID */
+    .id { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    /* Estado */
+    .status { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+    .status.done { color: #22c55e; }
+    .status.review { color: #f97316; }
+    .status.pending { color: #737373; }
+
+    /* Urgencia */
+    .urg { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+    .urg.alta { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+    .urg.media { background: #eab30822; color: #fbbf24; border: 1px solid #eab30833; }
+    .urg.baja { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+
+    /* Descripción corta */
+    .desc { color: #d4d4d4; }
+    .desc small { display: block; margin-top: 0.2rem; color: #525252; font-size: 0.76rem; }
+    .desc .source { display: block; margin-top: 0.3rem; color: #3b82f6; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; opacity: 0.8; }
+
+    /* Leyenda */
+    .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: #111; border-top: 1px solid #222; }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: #737373; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Estado de Tareas — Cookr TFG</h1>
+    <div class="meta">Generado: 2026-04-09 · Sprint 2 activo (Mar 30 → Abr 12) · Fase 2 de 7</div>
+  </div>
+</header>
+
+<nav>
+  <a href="#sprint2">Sprint 2 actual</a>
+  <a href="#sprint3">Sprint 3</a>
+  <a href="#sprint4">Sprint 4</a>
+  <a href="#sprint5plus">Sprint 5+</a>
+  <a href="#techdebt">Tech Debt</a>
+  <a href="#fase6">Fase 6 deploy</a>
+  <a href="#completadas">Completadas</a>
+</nav>
+
+<main>
+
+  <!-- CONTADORES -->
+  <div class="counters">
+    <div class="counter review"><div class="num">4</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">12</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">13</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">20</div><div class="label">Completadas</div></div>
+  </div>
+
+  <!-- SPRINT 2 — ALTA URGENCIA -->
+  <section id="sprint2">
+    <div class="section-header">
+      <span class="section-icon">🔥</span>
+      <h2>Sprint 2 — Tareas activas ahora</h2>
+      <span class="sprint-badge actual">Sprint 2 · activo</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">TFG-17</td>
+          <td class="desc">
+            <strong>Revisar NavBar inferior en el navegador</strong>
+            <small>Claude la implementó pero el autor aún no la ha revisado visualmente. Hasta que no dé el visto bueno no se marca como ✅.</small>
+            <span class="source">📄 docs/context.md</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">TFG-21 / UI-014 / UI-015</td>
+          <td class="desc">
+            <strong>Revisar Home (mobile + PC) y Detalle de Receta en el navegador</strong>
+            <small>Ambas vistas implementadas. El autor tiene que abrirlas en el navegador y aprobarlas para marcarlas ✅ y pasar al siguiente sprint.</small>
+            <span class="source">📄 docs/context.md · docs/changes/ui-changes.md</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-002</td>
+          <td class="desc">
+            <strong>Crear rama develop en git</strong>
+            <small>Recomendado antes de continuar con el Sprint 2 BE para no mezclar todo en main. Solo requiere dos comandos git.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-001</td>
+          <td class="desc">
+            <strong>Cambiar callbackUrl del botón Google de "/" a "/home"</strong>
+            <small>Ahora mismo al iniciar sesión con Google te lleva a la landing. Hay que cambiarlo a /home ahora que esa ruta ya existe.</small>
+            <span class="source">📄 docs/context.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-005</td>
+          <td class="desc">
+            <strong>Proteger las rutas autenticadas (/home, /recetas/[id])</strong>
+            <small>Actualmente cualquiera puede entrar a /home sin estar logueado. Hay que crear un layout que redirija a /login si no hay sesión activa.</small>
+            <span class="source">📄 docs/context.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-001</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Usuario</strong>
+            <small>El backend necesita este schema de Mongoose para poder registrar y autenticar usuarios. Bloquea todos los endpoints BE de auth.</small>
+            <span class="source">📄 docs/changes/domain-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-002</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Token</strong>
+            <small>Necesario para guardar los tokens de verificación de email y de recuperación de contraseña con expiración automática (TTL index).</small>
+            <span class="source">📄 docs/changes/domain-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-004</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/registro</strong>
+            <small>Endpoint para crear cuenta con correo/contraseña. Hashea la contraseña con bcrypt y genera un token de verificación de email.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-005</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/login</strong>
+            <small>Endpoint para iniciar sesión con correo y contraseña. Comprueba bcrypt y devuelve un JWT de sesión.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-006</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/verificar-email</strong>
+            <small>Valida el token del enlace que llega al correo y marca la cuenta como verificada en MongoDB.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-007</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/recuperar-contrasena</strong>
+            <small>Genera un token de recuperación de 1h y (en Fase 6 con Resend) lo envía por correo.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-008 / API-009</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/nueva-contrasena + JWT Middleware</strong>
+            <small>Permite resetear la contraseña con un token válido. El middleware JWT protegerá las rutas privadas de la API.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 3 — MEDIA -->
+  <section id="sprint3">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Sprint 3 — Próximo sprint</h2>
+      <span class="sprint-badge s3">Sprint 3</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">DET-001</td>
+          <td class="desc">
+            <strong>Guardar receta (persistente)</strong>
+            <small>El botón de guardar en el detalle de receta ya existe visualmente pero solo guarda en memoria local. Hay que conectarlo al backend con un endpoint toggle y Zustand.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-002</td>
+          <td class="desc">
+            <strong>Like persistente en recetas</strong>
+            <small>El contador de likes existe en la UI pero es local. Hay que conectarlo al backend con optimistic update de TanStack Query.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-009</td>
+          <td class="desc">
+            <strong>Carrusel de recetas similares funcional</strong>
+            <small>El carrusel muestra datos mock. Cuando haya datos reales, habrá que crear el endpoint GET /api/recetas/:id/similares. El componente no cambia.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-001</td>
+          <td class="desc">
+            <strong>Imágenes reales en el carrusel de la landing</strong>
+            <small>El hero carousel de la landing usa fondos de gradiente + emojis como placeholder. Hay que añadir fotografías reales de comida vía Unsplash o assets propios.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-002</td>
+          <td class="desc">
+            <strong>Transición Ken Burns en el carrusel (opcional)</strong>
+            <small>Mejora visual: zoom lento mientras hace fade entre slides. Opcional, solo si queda tiempo.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3 opcional</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-003</td>
+          <td class="desc">
+            <strong>Controles accesibles prev/next en carrusel</strong>
+            <small>El carrusel solo tiene puntos indicadores. Hay que añadir botones prev/next y aria-live para lectores de pantalla.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 4 — MEDIA -->
+  <section id="sprint4">
+    <div class="section-header">
+      <span class="section-icon">🔧</span>
+      <h2>Sprint 4 — Refactors y capa de servicios</h2>
+      <span class="sprint-badge s4">Sprint 4</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">API-010</td>
+          <td class="desc">
+            <strong>Crear apiClient.ts — instancia Axios centralizada</strong>
+            <small>Actualmente no existe ningún cliente Axios compartido. Este fichero añade la base URL, el header JWT automático y el interceptor de 401 → /login. Lo necesitan todos los services.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-011</td>
+          <td class="desc">
+            <strong>Crear authService.ts — capa de servicio HTTP para auth</strong>
+            <small>Centraliza todas las llamadas de auth (registro, login, verificar, recuperar, nueva contraseña). Los componentes ya no harán fetch directamente.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-012</td>
+          <td class="desc">
+            <strong>Crear useAuth.ts — hook de abstracción de auth</strong>
+            <small>Extrae la lógica de envío de los 6 formularios de auth a un hook reutilizable. Cumple el patrón: Componente → Hook → Service → apiClient.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-002</td>
+          <td class="desc">
+            <strong>Conectar formulario de registro con el backend real</strong>
+            <small>Ahora el envío es mock (setTimeout). En Sprint 4 hay que sustituirlo por una llamada real a POST /api/auth/registro con manejo de errores (409, 422, 500).</small>
+            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-003</td>
+          <td class="desc">
+            <strong>Añadir CredentialsProvider a NextAuth</strong>
+            <small>NextAuth ahora solo tiene Google OAuth. Hay que añadir el proveedor de email/contraseña que llame al backend real para el login.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-004</td>
+          <td class="desc">
+            <strong>Enriquecer la sesión NextAuth con datos del backend</strong>
+            <small>Ahora la sesión solo tiene el email de Google. Hay que añadir avatar, nombre y rol del usuario para mostrarlos en la app.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-008 / UI-009</td>
+          <td class="desc">
+            <strong>Refactor de capas: FormularioRegistro y FormularioLogin</strong>
+            <small>Extraer la lógica de envío inline a los hooks useRegistro() y useLogin() de useAuth.ts. Depende de que existan apiClient + authService primero.</small>
+            <span class="source">📄 docs/changes/ui-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-007</td>
+          <td class="desc">
+            <strong>Redirigir a /completar-perfil tras el registro (Google y correo)</strong>
+            <small>Ahora el registro con Google va a "/" y el de correo va a /verificar-email/pendiente → /home. Hay que crear la vista /completar-perfil (alergias, dietas, preferencias) y ajustar los flujos: registro correo → verificar email → /completar-perfil → /home · registro Google → /completar-perfil → /home. Requiere comprobar desde el backend si el perfil ya está completo para no repetir la vista.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-004</td>
+          <td class="desc">
+            <strong>Ver comentarios completos de una receta</strong>
+            <small>Ahora se ven 3 comentarios de muestra. Hay que crear un Sheet/Drawer con paginación infinita y un endpoint GET /api/recetas/:id/comentarios.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-005</td>
+          <td class="desc">
+            <strong>Añadir comentario en una receta</strong>
+            <small>No existe input de comentario todavía. Hay que añadir un textarea + mutación TanStack Query y requerir sesión activa (NextAuth).</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 5+ — BAJA -->
+  <section id="sprint5plus">
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <h2>Sprint 5 en adelante — No urgente</h2>
+      <span class="sprint-badge s5">Sprint 5+</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">UI-010 / UI-011 / UI-012 / UI-013</td>
+          <td class="desc">
+            <strong>Refactor de capas: formularios de recuperación y verificación</strong>
+            <small>Extraer lógica de envío de FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente y TarjetaRecuperacionPendiente a useAuth.ts.</small>
+            <span class="source">📄 docs/changes/ui-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-003</td>
+          <td class="desc">
+            <strong>Compartir receta (Web Share API)</strong>
+            <small>El botón de compartir existe pero no tiene handler. Hay que implementar navigator.share() con fallback a copiar URL al portapapeles.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-006</td>
+          <td class="desc">
+            <strong>Añadir ingredientes de una receta a la despensa</strong>
+            <small>El link "Añadir a mi despensa" existe en la tab de ingredientes pero no hace nada. Requiere el feature Despensa (Sprint 6).</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-007</td>
+          <td class="desc">
+            <strong>Modo Manos Libres (síntesis de voz)</strong>
+            <small>El botón de auriculares existe pero no hace nada. Hay que implementar Web Speech API para narrar los pasos de la receta con control por voz.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 8</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-008</td>
+          <td class="desc">
+            <strong>Cargar receta real por ID desde el backend</strong>
+            <small>Ahora /recetas/[id] siempre muestra los mismos datos mock. En Fase 5 hay que sustituirlo por una llamada real a GET /api/recetas/:id.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-010</td>
+          <td class="desc">
+            <strong>Metadatos dinámicos por receta (SEO / Open Graph)</strong>
+            <small>Ahora el título de /recetas/[id] es siempre "Detalle de receta — Cookr". Hay que generar metadatos dinámicos con el título real de cada receta para compartir en redes.</small>
+            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">LANDING-001</td>
+          <td class="desc">
+            <strong>Configurar imágenes reales en el carrusel hero (landing)</strong>
+            <small>Relacionado con CAROUSEL-001. Hay que añadir el campo imageUrl a heroSlides y usar next/image en lugar del emoji placeholder.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- TECH DEBT -->
+  <section id="techdebt">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <h2>Tech Debt — Deuda técnica detectada</h2>
+      <span class="sprint-badge s4">Resolver en Sprint 4-6</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es y qué viola</th><th>Cuándo resolver</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">DEBT-001<br><small style="color:#525252">→ UI-008</small></td>
+          <td class="desc">
+            <strong>FormularioRegistro — lógica de envío inline en el componente</strong>
+            <small>La función alEnviar está directamente en el componente visual. Viola el patrón Componente → Hook → Service → apiClient. Al conectar el backend habría que modificar el componente UI.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-002<br><small style="color:#525252">→ UI-009</small></td>
+          <td class="desc">
+            <strong>FormularioLogin — lógica de envío inline en el componente</strong>
+            <small>Mismo problema que DEBT-001. Si cambia la URL de login o la librería HTTP, hay que buscar el componente UI en lugar de tocar el hook/service.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-003<br><small style="color:#525252">→ UI-010</small></td>
+          <td class="desc">
+            <strong>FormularioRecuperarContrasena — lógica de envío inline</strong>
+            <small>La lógica de envío del email de recuperación queda acoplada al componente, dificultando el reuso y los tests.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-004<br><small style="color:#525252">→ UI-011</small></td>
+          <td class="desc">
+            <strong>FormularioNuevaContrasena — lógica de envío inline</strong>
+            <small>El token de recuperación y la lógica de cambio de contraseña quedan acoplados al componente visual.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-005<br><small style="color:#525252">→ UI-012</small></td>
+          <td class="desc">
+            <strong>TarjetaVerificacionPendiente — lógica de reenvío inline</strong>
+            <small>Si se cambia el proveedor de email (Resend por otro), hay que buscar el componente UI en lugar de tocar únicamente el service.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5 / Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-006<br><small style="color:#525252">→ UI-013</small></td>
+          <td class="desc">
+            <strong>TarjetaRecuperacionPendiente — lógica de reenvío inline</strong>
+            <small>El cooldown de 60 s y la lógica de reintento de envío del correo quedan atados a la tarjeta visual en lugar de a un hook/service.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5 / Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-007</td>
+          <td class="desc">
+            <strong>Flujo post-registro no pasa por /completar-perfil</strong>
+            <small>Actualmente el registro con Google va a "/" y el de correo va a /home. Hay que crear la vista /completar-perfil (alergias, dietas, preferencias) e integrarla en ambos flujos. La vista debe comprobar si el perfil ya está completo para no mostrarse de nuevo a usuarios ya registrados con Google.</small>
+            <span class="source">📄 docs/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FASE 6 — DEPLOY -->
+  <section id="fase6">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <h2>Fase 6 — Deploy e infraestructura (no tocar antes)</h2>
+      <span class="sprint-badge fase6">Fase 6 · Sprint 15</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">SETUP-001</td>
+          <td class="desc">
+            <strong>GitHub Actions — CI/CD (lint + typecheck automático)</strong>
+            <small>Configurar el workflow que ejecuta lint y tsc en cada push a main. No es urgente mientras se trabaja en local.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-003</td>
+          <td class="desc">
+            <strong>Variables de entorno en Vercel</strong>
+            <small>Añadir NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GEMINI_API_KEY etc. en el panel de Vercel. Solo hay que hacerlo el día del deploy.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-005</td>
+          <td class="desc">
+            <strong>Actualizar paquetes deprecated (eslint@8, next-pwa@5)</strong>
+            <small>Hay warnings en npm install pero no bloquean nada. Están atados a Next.js 14. Se actualizarán con la migración a Next.js 15 en Fase 6.</small>
+            <span class="source">📄 docs/tech-debt.md (DEBT-008)</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-006</td>
+          <td class="desc">
+            <strong>Deploy completo: Azure App Service + Vercel + CI/CD</strong>
+            <small>Secuencia completa del deploy. FE en Vercel (cookr.vercel.app), BE en Azure App Service Free F1. Todo documentado paso a paso en fase-0-pendientes.md.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-007 / API-003</td>
+          <td class="desc">
+            <strong>OAuth Google para producción + NEXTAUTH_URL</strong>
+            <small>Añadir cookr.vercel.app como URI autorizada en Google Cloud Console y actualizar NEXTAUTH_URL en Vercel. Hacerlo el mismo día del deploy. No tocar antes.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-002</td>
+          <td class="desc">
+            <strong>Configurar CORS en el backend para producción</strong>
+            <small>En producción el backend solo acepta peticiones desde cookr.vercel.app. En desarrollo acepta localhost:3000. Hay que configurarlo en backend/src/app.js al hacer el deploy.</small>
+            <span class="source">📄 docs/changes/api-changes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- COMPLETADAS -->
+  <section id="completadas">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Completadas y aprobadas</h2>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="id">Sprint 1 — Landing</td><td class="desc">TFG-14: Landing page completa — 4 iteraciones (base → UI → footer → renombrado español → tipografía creativa). SeccionHero, BentoCaracteristicas, BentoTestimonios, TarjetaTestimonio, PiePagina, datos mock, Framer Motion. Documentado en docs/desarrollo/landingPage.md</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">Sprint 1 — Registro</td><td class="desc">TFG-15: /registro completo — RHF + Zod (nombre/correo/contraseña/confirmación), Google OAuth funcional, toggle contraseña, estados idle/cargando/exito/error, animaciones Framer Motion, NextAuth + route handler, layout split-screen con fondo-auth.jpg. Documentado en docs/desarrollo/registro.html</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">SETUP-004</td><td class="desc">Google Cloud Console — credenciales OAuth configuradas</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-001</td><td class="desc">Layout split-screen en /registro con imagen gastronómica</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-002</td><td class="desc">Paleta de colores Cookr completa — 0 colores hardcodeados</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-003</td><td class="desc">Páginas legales /privacidad y /terminos (RGPD)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-004</td><td class="desc">Tipografía creativa en SeccionHero (badge, wavy underline, gradient)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-005</td><td class="desc">Flujo verificación email: /verificar-email/pendiente + /verificar-email (mock)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-006 / TFG-16</td><td class="desc">Login /login — split-screen espejado, RHF + Zod, toggle contraseña</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">UI-007</td><td class="desc">Flujo recuperación contraseña: 3 vistas /recuperar-contrasena, /pendiente, /nueva-contrasena</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">Landing</td><td class="desc">Landing Page — SeccionHero, BentoCaracteristicas, BentoTestimonios, carrusel, datos mock</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">TFG-15</td><td class="desc">Registro /registro — RHF + Zod, Google OAuth, flujo verificación email</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">NextAuth</td><td class="desc">NextAuth configurado: opcionesAuth + route handler /api/auth/[...nextauth]</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">Rebrand</td><td class="desc">Rebrand completo a Cookr en todo el frontend</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">Refactor</td><td class="desc">Refactor: components/recetas → subcarpetas home/ y detalleReceta/</td><td><span class="status done">✅ Completado · 2026-04-09</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="legend">
+      <div class="legend-item"><span style="color:#22c55e">✅</span> Aprobado por el autor en el navegador</div>
+      <div class="legend-item"><span style="color:#f97316">👁️</span> Implementado, pendiente revisión visual del autor</div>
+      <div class="legend-item"><span style="color:#737373">⏳</span> Pendiente de implementar</div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -7,7 +7,7 @@ import type { FiltroFeed } from '@/features/recetas/types/receta.types'
 interface BuscadorFiltrosProps {
   placeholder?: string
   filtros: FiltroFeed[]
-  filtroActivo: string
+  filtrosActivos: string[]
   onFiltroChange: (id: string) => void
   onBuscar: (query: string) => void
   className?: string
@@ -16,7 +16,7 @@ interface BuscadorFiltrosProps {
 export function BuscadorFiltros({
   placeholder = '¿Qué quieres cocinar hoy?',
   filtros,
-  filtroActivo,
+  filtrosActivos,
   onFiltroChange,
   onBuscar,
   className,
@@ -39,10 +39,10 @@ export function BuscadorFiltros({
         />
       </label>
 
-      {/* Chips de filtro */}
+      {/* Chips de filtro — multi-select */}
       <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filtros.map((filtro) => {
-          const activo = filtro.id === filtroActivo
+          const activo = filtrosActivos.includes(filtro.id)
           return (
             <button
               key={filtro.id}

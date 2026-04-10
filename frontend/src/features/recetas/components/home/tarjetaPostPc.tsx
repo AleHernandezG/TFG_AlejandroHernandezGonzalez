@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
 import type { PostFeed } from '../../types/receta.types'
 
@@ -86,7 +87,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   // ── Hero (col-span-2 row-span-2) ──────────────────────────────
   if (variante === 'hero') {
     return (
-      <article className="group col-span-2 row-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <article className="group relative col-span-2 row-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+        {/* Overlay link — cubre toda la tarjeta; los botones quedan por encima con z-10 */}
+        <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
         <div className="relative h-[400px] overflow-hidden">
           <Image
             src={post.receta.imagenUrl}
@@ -119,12 +122,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
             </p>
           </div>
 
-          <div className="mt-auto border-t border-border/20 pt-4">
+          <div className="relative z-10 mt-auto border-t border-border/20 pt-4">
             <div className="flex items-center justify-between">
               <AccionesBar />
-              <button className="ml-4 shrink-0 text-xs font-bold uppercase tracking-widest text-brand transition-opacity hover:opacity-70">
-                Ver receta →
-              </button>
             </div>
           </div>
         </div>
@@ -135,7 +135,8 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   // ── Wide (col-span-2, horizontal) ─────────────────────────────
   if (variante === 'wide') {
     return (
-      <article className="group col-span-2 flex min-h-[220px] overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <article className="group relative col-span-2 flex min-h-[220px] overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+        <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
         <div className="relative w-1/2 overflow-hidden">
           <Image
             src={post.receta.imagenUrl}
@@ -166,7 +167,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
             {post.receta.descripcion}
           </p>
 
-          <AccionesBar compact />
+          <div className="relative z-10">
+            <AccionesBar compact />
+          </div>
         </div>
       </article>
     )
@@ -174,7 +177,8 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
 
   // ── Small (col-span-1, default) ───────────────────────────────
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
       <div className="relative h-48 overflow-hidden">
         <Image
           src={post.receta.imagenUrl}
@@ -202,7 +206,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
           {post.receta.titulo}
         </h3>
 
-        <AccionesBar compact />
+        <div className="relative z-10">
+          <AccionesBar compact />
+        </div>
       </div>
     </article>
   )

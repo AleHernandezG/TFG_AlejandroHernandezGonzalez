@@ -124,8 +124,8 @@ Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
   - /recuperar-contrasena: layout igual que /login, solo campo email
   - /recuperar-contrasena/pendiente: pantalla "revisa tu correo" con cooldown reenvío 60s
   - /nueva-contrasena: layout como /registro (imagen izq, form der), 2 campos contraseña + confirmar + pantalla éxito in-page
-- 👁️ Pendiente revisión — [TFG-17] NavBar inferior: 5 iconos, icono central ChefHat con bg-brand, pill indicator con layoutId Framer Motion, safe area insets, oculta en / y lg+
-- 👁️ Pendiente revisión — [TFG-21] Vista Detalle de Receta: ruta /recetas/[id], hero glassmorphism, cabecera con chips/alérgenos/stats, tabs ingredientes+nutrición, pasos, comentarios, carrusel similares, layout bento 2 columnas en desktop. ChipAlergeno reutilizable creado. 10 funcionalidades pendientes documentadas.
+- ✅ Aprobado autor — [TFG-17] NavBar inferior: 5 iconos, icono central ChefHat con bg-brand, pill indicator con layoutId Framer Motion, safe area insets, oculta en / y lg+
+- ✅ Aprobado autor — [TFG-21 / UI-014 / UI-015] Home (mobile + PC) y Detalle de Receta. Cambios adicionales aprobados: click en tarjeta navega a /recetas/[id], multi-select en chips de filtros, icono ajustes eliminado del header PC. Fixes: hydration error en tiempos relativos (UI-016). Pendiente: chips completos de alérgenos/dietas/dificultad (HOME-001).
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -281,9 +281,9 @@ Diseño de ambas páginas:
 | `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
 | `/verificar-email` | Verificación de token por enlace | ✅ mock |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
-| `/home` | Home / Feed de recetas — mobile + PC responsive | 👁️ Pendiente revisión |
-| NavBar inferior (`(main)/layout.tsx`) | Componente global | 👁️ Pendiente revisión |
-| `/recetas/[id]` | Detalle de receta | ⏳ Sprint 2 FE mock |
+| `/home` | Home / Feed de recetas — mobile + PC responsive | ✅ Aprobado autor |
+| NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
+| `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
 | `BE /api/auth/registro` | Endpoint real | ⏳ Sprint 2 BE |
 | `BE /api/auth/login` | Endpoint real | ⏳ Sprint 2 BE |
 | `BE /api/auth/verificar-email` | Endpoint real | ⏳ Sprint 2 BE |

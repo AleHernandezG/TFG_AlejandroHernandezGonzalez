@@ -28,7 +28,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 18,
     guardado: false,
     liked: false,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+    fechaPublicacion: '2026-04-10T09:25:00.000Z',
   },
   {
     id: '2',
@@ -49,7 +49,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 7,
     guardado: true,
     liked: true,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    fechaPublicacion: '2026-04-10T08:00:00.000Z',
   },
   {
     id: '3',
@@ -70,7 +70,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 31,
     guardado: false,
     liked: false,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    fechaPublicacion: '2026-04-10T05:00:00.000Z',
   },
   {
     id: '4',
@@ -91,7 +91,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 22,
     guardado: false,
     liked: false,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
+    fechaPublicacion: '2026-04-10T02:00:00.000Z',
   },
   {
     id: '5',
@@ -112,7 +112,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 47,
     guardado: true,
     liked: false,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 14).toISOString(),
+    fechaPublicacion: '2026-04-09T20:00:00.000Z',
   },
   {
     id: '6',
@@ -133,7 +133,7 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 14,
     guardado: false,
     liked: true,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    fechaPublicacion: '2026-04-09T14:00:00.000Z',
   },
   {
     id: '7',
@@ -154,6 +154,6 @@ export const POSTS_MOCK: PostFeed[] = [
     comentarios: 58,
     guardado: false,
     liked: false,
-    fechaPublicacion: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(),
+    fechaPublicacion: '2026-04-09T06:00:00.000Z',
   },
 ]

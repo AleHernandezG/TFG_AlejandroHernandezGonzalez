@@ -47,7 +47,7 @@ export function ComentariosReceta({ comentarios, total }: Props) {
             <div className="flex-1 bg-[var(--warm-bg)] rounded-2xl rounded-tl-sm px-3.5 py-3">
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-xs font-bold text-foreground">{c.autorNombre}</span>
-                <span className="text-[10px] text-muted-foreground">{tiempoRelativo(c.fecha)}</span>
+                <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>{tiempoRelativo(c.fecha)}</span>
               </div>
               <p className="text-xs text-foreground/80 leading-relaxed">{c.texto}</p>
             </div>

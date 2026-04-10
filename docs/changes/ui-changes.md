@@ -6,6 +6,55 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-019] — Home: click en tarjeta → DetalleReceta + multi-select filtros + quitar ajustes PC ✅
+
+Fecha: 2026-04-10 | Estado: ✅ Completado | Sprint: 2
+
+**Cambios aplicados:**
+
+**Navegación desde tarjeta:**
+
+- `tarjetaPost.tsx` (mobile) — imagen + título + descripción + metadatos envueltos en `<Link href="/recetas/{id}">`. Botones de like/guardar/comentarios quedan fuera del Link como hermanos.
+- `tarjetaPostPc.tsx` (PC, variantes hero/wide/small) — `<Link>` con `position: absolute; inset-0; z-0` sobre el `<article>` (patrón overlay). `AccionesBar` envuelta en `<div relative z-10>` para quedar por encima del link y seguir siendo pulsable.
+
+**Multi-select en filtros:**
+
+- `buscadorFiltros.tsx` — prop `filtroActivo: string` → `filtrosActivos: string[]`; active check cambia a `filtrosActivos.includes(filtro.id)`.
+- `feedHome.tsx` — estado `useState('todas')` → `useState<string[]>(['todas'])`; función `toggleFiltro()`: seleccionar "Todas" limpia el resto; deseleccionar el último chip vuelve a "Todas".
+- `feedHomePc.tsx` — prop actualizado a `filtrosActivos: string[]`.
+- `layoutHomePc.tsx` — estado y `toggleFiltro()` añadidos; pasa `filtrosActivos` a `FeedHomePc`.
+
+**Header PC:**
+
+- `headerHomePc.tsx` — eliminado botón `<Settings>` e import de `Settings` de lucide-react.
+
+**Pendiente (documentado en fase-2-pendientes.md):**
+
+- Los chips de filtro actuales (Todas/Vegano/Keto/Sin gluten/Sin lactosa) son placeholders. Cuando el autor facilite el listado completo de alérgenos + dietas + dificultad, se sustituirán los datos de `FILTROS_FEED` y se añadirá separación visual por categoría (alérgenos / dietas / dificultad). Ver tarea pendiente en docs/phase-reports/fase-2-pendientes.md.
+
+---
+
+## [UI-016] — Fix hydration: tiempos relativos con `suppressHydrationWarning` + fechas mock fijas ✅
+
+Fecha: 2026-04-10 | Estado: ✅ Completado | Sprint: 2
+
+**Problema:** React lanzaba un error de hidratación porque el texto de tiempo relativo ("Hace 35m") calculado en servidor no coincidía con el calculado en cliente (milisegundos después). Había dos causas combinadas:
+
+1. Los datos mock usaban `new Date(Date.now() - ...)` al evaluar el módulo → cada carga generaba fechas distintas.
+2. Las funciones `tiempoRelativo()` usan `Date.now()` en render → el valor cambia entre SSR y CSR.
+
+**Solución aplicada:**
+
+- `features/recetas/data/datosFeed.ts` — 7 fechas `Date.now()` sustituidas por strings ISO fijos (`'2026-04-10T09:25:00.000Z'`, etc.)
+- `features/recetas/data/datosDetalle.ts` — 4 fechas `Date.now()` sustituidas por strings ISO fijos
+- `features/recetas/components/home/tarjetaPost.tsx` — `suppressHydrationWarning` en el `<p>` del tiempo
+- `features/recetas/components/detalleReceta/cabeceraReceta.tsx` — `suppressHydrationWarning` en el `<span>` del tiempo
+- `features/recetas/components/detalleReceta/comentariosReceta.tsx` — `suppressHydrationWarning` en el `<span>` del tiempo
+
+**Regla para el futuro:** Cualquier elemento que muestre tiempo relativo calculado con `Date.now()` en render DEBE llevar `suppressHydrationWarning`. Cuando los datos vengan del backend las fechas serán ISO fijos (problema 1 desaparece), pero el problema 2 persiste → `suppressHydrationWarning` es permanente en estos elementos.
+
+---
+
 ## [UI-015] — Home responsive: layout de escritorio (lg+)
 Fecha: 2026-04-01 | Estado: 👁️ Pendiente revisión | Sprint: 2
 

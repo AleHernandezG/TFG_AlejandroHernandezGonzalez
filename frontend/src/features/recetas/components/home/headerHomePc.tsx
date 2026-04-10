@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Search, Settings } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 interface HeaderHomePcProps {
   busqueda: string
@@ -33,12 +33,6 @@ export function HeaderHomePc({ busqueda, onBuscar }: HeaderHomePcProps) {
 
       {/* Acciones */}
       <div className="flex items-center gap-4 justify-self-end">
-        <button
-          aria-label="Ajustes"
-          className="text-muted-foreground transition-colors hover:text-brand"
-        >
-          <Settings className="h-5 w-5" strokeWidth={1.8} />
-        </button>
         <Avatar className="h-9 w-9">
           {/* Phase 4: replace fallback with session user avatar */}
           <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand">

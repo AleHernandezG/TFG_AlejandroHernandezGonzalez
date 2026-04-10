@@ -15,11 +15,11 @@ const VARIANTES: VarianteTarjeta[] = [
 
 interface FeedHomePcProps {
   busqueda: string
-  filtroActivo: string
+  filtrosActivos: string[]
   onFiltroChange: (id: string) => void
 }
 
-export function FeedHomePc({ busqueda, filtroActivo, onFiltroChange }: FeedHomePcProps) {
+export function FeedHomePc({ busqueda, filtrosActivos, onFiltroChange }: FeedHomePcProps) {
   const postsFiltrados = POSTS_MOCK.filter((post) => {
     if (busqueda === '') return true
     const q = busqueda.toLowerCase()
@@ -35,7 +35,7 @@ export function FeedHomePc({ busqueda, filtroActivo, onFiltroChange }: FeedHomeP
       {/* ── Filter chips ──────────────────────────────── */}
       <div className="mb-8 flex items-center gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {FILTROS_FEED.map((filtro) => {
-          const activo = filtro.id === filtroActivo
+          const activo = filtrosActivos.includes(filtro.id)
           return (
             <button
               key={filtro.id}

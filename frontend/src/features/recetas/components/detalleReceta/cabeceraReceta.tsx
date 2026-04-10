@@ -81,7 +81,7 @@ export function CabeceraReceta({ receta }: Props) {
           </Avatar>
           <div className="flex flex-col leading-none gap-0.5">
             <span className="text-sm font-bold text-foreground">{receta.autor.nombre}</span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground" suppressHydrationWarning>
               {tiempoRelativo(receta.fechaPublicacion)}
             </span>
           </div>

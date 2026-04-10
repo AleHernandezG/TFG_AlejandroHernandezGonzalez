@@ -7,10 +7,22 @@ import { SidebarNavPc } from './sidebarNavPc'
 import { SidebarTendencias } from './sidebarTendencias'
 
 // Desktop-only layout wrapper (rendered only on lg+, see home/page.tsx)
-// Owns busqueda + filtroActivo state and distributes them to HeaderHomePc and FeedHomePc
+// Owns busqueda + filtrosActivos state and distributes them to HeaderHomePc and FeedHomePc
 export function LayoutHomePc() {
   const [busqueda, setBusqueda] = useState('')
-  const [filtroActivo, setFiltroActivo] = useState('todas')
+  const [filtrosActivos, setFiltrosActivos] = useState<string[]>(['todas'])
+
+  function toggleFiltro(id: string) {
+    setFiltrosActivos((prev) => {
+      if (id === 'todas') return ['todas']
+      const sinTodas = prev.filter((f) => f !== 'todas')
+      if (sinTodas.includes(id)) {
+        const nuevo = sinTodas.filter((f) => f !== id)
+        return nuevo.length === 0 ? ['todas'] : nuevo
+      }
+      return [...sinTodas, id]
+    })
+  }
 
   return (
     <>
@@ -25,8 +37,8 @@ export function LayoutHomePc() {
         <div className="px-8">
           <FeedHomePc
             busqueda={busqueda}
-            filtroActivo={filtroActivo}
-            onFiltroChange={setFiltroActivo}
+            filtrosActivos={filtrosActivos}
+            onFiltroChange={toggleFiltro}
           />
         </div>
       </main>

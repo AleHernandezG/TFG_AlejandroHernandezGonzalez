@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
 import type { PostFeed } from '../../types/receta.types'
 
@@ -46,39 +47,41 @@ export function TarjetaPost({ post }: TarjetaPostProps) {
           <p className="truncate text-sm font-semibold leading-tight text-foreground">
             {post.autor.nombre}
           </p>
-          <p className="text-xs leading-tight text-muted-foreground">
+          <p className="text-xs leading-tight text-muted-foreground" suppressHydrationWarning>
             @{post.autor.username} · {tiempoRelativo(post.fechaPublicacion)}
           </p>
         </div>
       </div>
 
-      {/* Imagen de la receta */}
-      <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[var(--warm-bg-accent)]">
-        <Image
-          src={post.receta.imagenUrl}
-          alt={post.receta.titulo}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 640px"
-        />
-      </div>
+      {/* Imagen + contenido clickable → DetalleReceta */}
+      <Link href={`/recetas/${post.id}`} className="block">
+        <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[var(--warm-bg-accent)]">
+          <Image
+            src={post.receta.imagenUrl}
+            alt={post.receta.titulo}
+            fill
+            className="object-cover transition-transform duration-300 hover:scale-[1.02]"
+            sizes="(max-width: 768px) 100vw, 640px"
+          />
+        </div>
 
-      {/* Título */}
-      <h2 className="mb-1 text-xl font-bold leading-snug text-foreground">
-        {post.receta.titulo}
-      </h2>
+        {/* Título */}
+        <h2 className="mb-1 text-xl font-bold leading-snug text-foreground">
+          {post.receta.titulo}
+        </h2>
 
-      {/* Descripción — máximo 2 líneas */}
-      <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-        {post.receta.descripcion}
-      </p>
+        {/* Descripción — máximo 2 líneas */}
+        <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          {post.receta.descripcion}
+        </p>
 
-      {/* Metadatos: tiempo + dificultad */}
-      <div className="mb-3 flex gap-2 text-xs text-muted-foreground">
-        <span>{post.receta.tiempo}</span>
-        <span>·</span>
-        <span>{post.receta.dificultad}</span>
-      </div>
+        {/* Metadatos: tiempo + dificultad */}
+        <div className="mb-3 flex gap-2 text-xs text-muted-foreground">
+          <span>{post.receta.tiempo}</span>
+          <span>·</span>
+          <span>{post.receta.dificultad}</span>
+        </div>
+      </Link>
 
       {/* Acciones */}
       <div className="flex items-center gap-5">
