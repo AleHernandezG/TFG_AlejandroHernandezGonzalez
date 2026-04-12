@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backend Auth — Guía completa para entender el código</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-ok   { background: #dcfce7; color: #166534; }
+    .badge-pend { background: #fef9c3; color: #854d0e; }
+    .badge-mock { background: #f3e8ff; color: #6b21a8; }
+    .badge-fase { background: #dbeafe; color: #1e40af; }
+
+    ul, ol { padding-left: 24px; margin: 8px 0 12px; }
+    li { margin-bottom: 4px; }
+
+    .flecha {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+      font-size: 10pt;
+    }
+
+    .flecha .capa {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .flecha .desc {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .indice {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin: 20px 0 36px;
+    }
+
+    .indice h3 { margin-top: 0; color: #1c3d5a; }
+    .indice ol { margin: 0; }
+    .indice li { margin-bottom: 6px; }
+    .indice a { color: #b45309; text-decoration: none; }
+    .indice a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<h1>Backend Auth — Guía completa</h1>
+<p>
+  <strong>Sprint:</strong> 2 &nbsp;·&nbsp;
+  <strong>Stack:</strong> Node.js · Express · TypeScript · Mongoose · Zod · bcryptjs · JWT &nbsp;·&nbsp;
+  <strong>Estado:</strong> <span class="badge badge-ok">✅ Operativo</span>
+</p>
+
+<div class="caja caja-info">
+  <strong>¿Para quién es esta guía?</strong>
+  Explica desde cero qué hace cada fichero del backend, por qué está organizado así y qué ocurre
+  por dentro cuando el usuario se registra, inicia sesión o recupera su contraseña.
+  No es necesario tener experiencia previa con backends.
+</div>
+
+<!-- ─── ÍNDICE ──────────────────────────────────────────── -->
+<div class="indice">
+  <h3>Índice</h3>
+  <ol>
+    <li><a href="#vision">Visión general — ¿qué hace este backend?</a></li>
+    <li><a href="#estructura">Estructura de carpetas</a></li>
+    <li><a href="#capas">El patrón de capas — por qué el código está dividido así</a></li>
+    <li><a href="#bloque1">Bloque 1 — Arranque del servidor</a></li>
+    <li><a href="#bloque2">Bloque 2 — Modelos de datos (MongoDB)</a></li>
+    <li><a href="#bloque3">Bloque 3 — Repositorios</a></li>
+    <li><a href="#bloque4">Bloque 4 — Utilidades (JWT y Zod)</a></li>
+    <li><a href="#bloque5">Bloque 5 — Middlewares</a></li>
+    <li><a href="#bloque6">Bloque 6 — Service, Controller y Routes</a></li>
+    <li><a href="#endpoints">Los 5 endpoints — flujo completo</a></li>
+    <li><a href="#seguridad">Conceptos de seguridad</a></li>
+    <li><a href="#todos">TODOs pendientes (Fase 6)</a></li>
+  </ol>
+</div>
+
+<!-- ─── 1. VISIÓN GENERAL ──────────────────────────────── -->
+<h2 id="vision">1. Visión general — ¿qué hace este backend?</h2>
+
+<p>
+  El backend es una <strong>API REST</strong>: un servidor que escucha peticiones HTTP y devuelve datos en formato JSON.
+  El frontend (Next.js) le envía peticiones y él responde.
+</p>
+
+<p>Este sprint implementa todo lo relacionado con <strong>autenticación</strong>:</p>
+
+<table>
+  <thead><tr><th>Endpoint</th><th>¿Qué hace?</th></tr></thead>
+  <tbody>
+    <tr><td><code>POST /api/auth/registro</code></td><td>Crea una cuenta nueva con email y contraseña</td></tr>
+    <tr><td><code>POST /api/auth/login</code></td><td>Inicia sesión y devuelve un token de acceso (JWT)</td></tr>
+    <tr><td><code>POST /api/auth/verificar-email</code></td><td>Confirma que el email del usuario es real</td></tr>
+    <tr><td><code>POST /api/auth/recuperar-contrasena</code></td><td>Genera un enlace para cambiar la contraseña</td></tr>
+    <tr><td><code>POST /api/auth/nueva-contrasena</code></td><td>Establece la nueva contraseña usando el enlace</td></tr>
+  </tbody>
+</table>
+
+<p>
+  El servidor arranca en <code>localhost:4000</code> en desarrollo.
+  Hay también un endpoint de diagnóstico: <code>GET /api/health</code> → devuelve <code>{"estado":"ok"}</code>.
+</p>
+
+<!-- ─── 2. ESTRUCTURA ──────────────────────────────────── -->
+<h2 id="estructura">2. Estructura de carpetas</h2>
+
+<pre><span class="nm">backend/</span>
+├── <span class="nm">src/</span>
+│   ├── <span class="fn">server.ts</span>          <span class="cm">← Punto de entrada. Arranca todo.</span>
+│   ├── <span class="fn">app.ts</span>             <span class="cm">← Configura Express (middlewares, rutas)</span>
+│   │
+│   ├── <span class="nm">lib/</span>               <span class="cm">← Utilidades internas</span>
+│   │   ├── <span class="fn">db.ts</span>          <span class="cm">← Conecta con MongoDB Atlas</span>
+│   │   ├── <span class="fn">jwt.ts</span>         <span class="cm">← Crea y verifica tokens JWT</span>
+│   │   └── <span class="fn">validadores.ts</span> <span class="cm">← Schemas Zod (qué datos acepta cada endpoint)</span>
+│   │
+│   ├── <span class="nm">models/</span>            <span class="cm">← Definen la estructura de los datos en MongoDB</span>
+│   │   ├── <span class="fn">usuario.model.ts</span>
+│   │   └── <span class="fn">token.model.ts</span>
+│   │
+│   ├── <span class="nm">repositories/</span>      <span class="cm">← Todo el acceso a MongoDB pasa por aquí</span>
+│   │   ├── <span class="fn">usuarioRepository.ts</span>
+│   │   └── <span class="fn">tokenRepository.ts</span>
+│   │
+│   ├── <span class="nm">middlewares/</span>       <span class="cm">← Código que se ejecuta antes de llegar al endpoint</span>
+│   │   ├── <span class="fn">validarBody.ts</span>  <span class="cm">← Comprueba que el body tiene el formato correcto</span>
+│   │   ├── <span class="fn">autenticacion.ts</span> <span class="cm">← Verifica que el usuario está logueado (JWT)</span>
+│   │   └── <span class="fn">errores.ts</span>      <span class="cm">← Captura errores no controlados</span>
+│   │
+│   ├── <span class="nm">services/</span>          <span class="cm">← Lógica de negocio (las reglas de la app)</span>
+│   │   └── <span class="fn">authService.ts</span>
+│   │
+│   ├── <span class="nm">controllers/</span>       <span class="cm">← Reciben la petición y llaman al service</span>
+│   │   └── <span class="fn">authController.ts</span>
+│   │
+│   └── <span class="nm">routes/</span>            <span class="cm">← Definen las URLs disponibles</span>
+│       └── <span class="fn">auth.routes.ts</span>
+│
+├── <span class="fn">.env</span>               <span class="cm">← Variables secretas (NUNCA se sube a Git)</span>
+├── <span class="fn">package.json</span>       <span class="cm">← Dependencias y scripts</span>
+└── <span class="fn">tsconfig.json</span>      <span class="cm">← Configuración de TypeScript</span></pre>
+
+<!-- ─── 3. CAPAS ────────────────────────────────────────── -->
+<h2 id="capas">3. El patrón de capas — por qué el código está dividido así</h2>
+
+<p>
+  Cuando llega una petición al servidor, <strong>no va directamente a MongoDB</strong>.
+  Pasa por varias capas en orden. Cada capa tiene una única responsabilidad.
+  Esto hace que el código sea más fácil de mantener y cambiar.
+</p>
+
+<div class="flecha"><div class="capa">Route</div><span>→</span><div class="desc">Define la URL. Aplica middlewares.</div></div>
+<div class="flecha"><div class="capa">Controller</div><span>→</span><div class="desc">Recibe la petición. Llama al service. Devuelve JSON.</div></div>
+<div class="flecha"><div class="capa">Service</div><span>→</span><div class="desc">Las reglas de la app. ¿Puede registrarse? ¿Es válida la contraseña?</div></div>
+<div class="flecha"><div class="capa">Repository</div><span>→</span><div class="desc">Toda la comunicación con MongoDB. Buscar, crear, actualizar.</div></div>
+<div class="flecha"><div class="capa">MongoDB</div><span>→</span><div class="desc">La base de datos en la nube (Atlas).</div></div>
+
+<div class="caja caja-aviso">
+  <strong>¿Por qué no acceder a MongoDB directamente desde el controller?</strong>
+  Porque si mañana cambiamos MongoDB por PostgreSQL, solo tenemos que tocar los repositories.
+  El resto del código no sabe ni nota el cambio. Separación de responsabilidades.
+</div>
+
+<p><strong>Ejemplo práctico:</strong> cuando el usuario pulsa "Registrarse":</p>
+<ol>
+  <li><code>auth.routes.ts</code> — recibe <code>POST /api/auth/registro</code>, valida el body con Zod</li>
+  <li><code>authController.ts</code> — llama a <code>authService.registrarse()</code></li>
+  <li><code>authService.ts</code> — comprueba que el correo no existe, hashea la contraseña, crea el token</li>
+  <li><code>usuarioRepository.ts</code> — ejecuta <code>Usuario.create(datos)</code> en MongoDB</li>
+  <li><code>tokenRepository.ts</code> — ejecuta <code>Token.create(datos)</code> en MongoDB</li>
+  <li>La respuesta sube de vuelta: <code>201 { mensaje: "Revisa tu correo..." }</code></li>
+</ol>
+
+<!-- ─── 4. BLOQUE 1 ────────────────────────────────────── -->
+<h2 id="bloque1">4. Bloque 1 — Arranque del servidor</h2>
+
+<h3>server.ts — el punto de entrada</h3>
+<p>Es el primer fichero que se ejecuta. Hace dos cosas en orden:</p>
+<ol>
+  <li>Conecta con MongoDB (<code>conectarDB()</code>)</li>
+  <li>Arranca el servidor HTTP en el puerto 4000</li>
+</ol>
+<pre><span class="kw">import</span> <span class="st">"dotenv/config"</span>;          <span class="cm">// carga el .env en process.env</span>
+<span class="kw">import</span> app <span class="kw">from</span> <span class="st">"./app"</span>;
+<span class="kw">import</span> { conectarDB } <span class="kw">from</span> <span class="st">"./lib/db"</span>;
+
+<span class="kw">async function</span> <span class="fn">arrancar</span>() {
+  <span class="kw">await</span> <span class="fn">conectarDB</span>();            <span class="cm">// primero conecta a la BD</span>
+  app.<span class="fn">listen</span>(<span class="nu">4000</span>, () => {
+    console.<span class="fn">log</span>(<span class="st">"🚀 Servidor en http://localhost:4000"</span>);
+  });
+}
+
+<span class="fn">arrancar</span>();</pre>
+
+<h3>app.ts — configuración de Express</h3>
+<p>Aquí se configura todo lo que Express hace con cada petición antes de llegar a las rutas:</p>
+<table>
+  <thead><tr><th>Middleware</th><th>¿Qué hace?</th></tr></thead>
+  <tbody>
+    <tr><td><code>helmet()</code></td><td>Añade cabeceras HTTP de seguridad automáticamente (protege contra ataques comunes)</td></tr>
+    <tr><td><code>morgan("dev")</code></td><td>Muestra en consola cada petición recibida: método, URL, status, tiempo</td></tr>
+    <tr><td><code>cors({...})</code></td><td>Solo acepta peticiones del frontend (<code>localhost:3000</code>). Bloquea otros orígenes.</td></tr>
+    <tr><td><code>express.json()</code></td><td>Transforma el body JSON de la petición en un objeto JavaScript accesible en <code>req.body</code></td></tr>
+  </tbody>
+</table>
+
+<h3>lib/db.ts — conexión a MongoDB</h3>
+<p>
+  Usa Mongoose para conectarse a MongoDB Atlas usando la URI del <code>.env</code>.
+  Si la conexión falla, el proceso termina con <code>process.exit(1)</code>
+  — no tiene sentido arrancar un servidor de datos sin base de datos.
+</p>
+
+<!-- ─── 5. MODELOS ─────────────────────────────────────── -->
+<h2 id="bloque2">5. Bloque 2 — Modelos de datos (MongoDB)</h2>
+
+<p>
+  Los modelos definen la <strong>estructura de los documentos</strong> que se guardan en MongoDB.
+  Son como plantillas: "un usuario siempre tiene nombre, correo, rol...".
+  Se definen con <strong>Mongoose</strong> (librería que conecta Node.js con MongoDB).
+</p>
+
+<h3>usuario.model.ts — colección <code>usuarios</code></h3>
+
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+  <tbody>
+    <tr><td><code>nombre</code></td><td>String</td><td>Nombre del usuario. Entre 2 y 50 caracteres.</td></tr>
+    <tr><td><code>correo</code></td><td>String (único)</td><td>Email. Índice único — no puede haber dos iguales. Siempre en minúsculas.</td></tr>
+    <tr><td><code>contrasena</code></td><td>String (oculto)</td><td>Hash bcrypt. Tiene <code>select: false</code> — no se devuelve en queries por defecto. Nunca en texto plano.</td></tr>
+    <tr><td><code>foto</code></td><td>String (URL)</td><td>URL de Cloudinary. Opcional. Se asigna en Fase 6.</td></tr>
+    <tr><td><code>rol</code></td><td>enum</td><td><code>"usuario"</code> o <code>"admin"</code>. Por defecto <code>"usuario"</code>.</td></tr>
+    <tr><td><code>cuentaVerificada</code></td><td>Boolean</td><td>Empieza en <code>false</code>. Se pone a <code>true</code> al verificar el email.</td></tr>
+    <tr><td><code>proveedor</code></td><td>enum</td><td><code>"local"</code> (registro con email) o <code>"google"</code> (OAuth).</td></tr>
+    <tr><td><code>googleId</code></td><td>String</td><td>Solo para usuarios de Google. Es su ID en Google.</td></tr>
+    <tr><td><code>alergias</code></td><td>String[]</td><td>IDs de alérgenos seleccionados en <code>/completar-perfil</code>.</td></tr>
+    <tr><td><code>preferencias</code></td><td>String[]</td><td>IDs de dietas seleccionadas en <code>/completar-perfil</code>.</td></tr>
+    <tr><td><code>fechaRegistro</code></td><td>Date</td><td>Automático al crear. No editable.</td></tr>
+  </tbody>
+</table>
+
+<div class="caja caja-codigo">
+  <strong>¿Qué es <code>select: false</code>?</strong>
+  Cuando haces <code>Usuario.findOne({ correo })</code>, MongoDB devuelve todos los campos
+  <em>excepto</em> los marcados con <code>select: false</code>. Así la contraseña nunca
+  aparece por accidente en una respuesta. Para obtenerla explícitamente hay que usar
+  <code>.select("+contrasena")</code> — solo en el login.
+</div>
+
+<h3>token.model.ts — colección <code>tokens</code></h3>
+
+<p>
+  Los tokens son códigos temporales que se envían por email. Sirven para dos cosas:
+  verificar que el email es real, o permitir cambiar la contraseña.
+</p>
+
+<table>
+  <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+  <tbody>
+    <tr><td><code>userId</code></td><td>ObjectId</td><td>Referencia al usuario al que pertenece este token.</td></tr>
+    <tr><td><code>token</code></td><td>String</td><td>Cadena aleatoria de 64 caracteres hex. Único en toda la colección.</td></tr>
+    <tr><td><code>tipo</code></td><td>enum</td><td><code>"verificacion"</code> (24h) o <code>"recuperacion"</code> (1h).</td></tr>
+    <tr><td><code>expira</code></td><td>Date</td><td>Fecha de caducidad. MongoDB tiene un <strong>TTL index</strong> aquí — borra automáticamente el documento cuando llega esa fecha.</td></tr>
+    <tr><td><code>usado</code></td><td>Boolean</td><td>Una vez usado, se marca como <code>true</code> para que no se pueda reutilizar.</td></tr>
+  </tbody>
+</table>
+
+<div class="caja caja-info">
+  <strong>¿Qué es un TTL index?</strong>
+  Es un índice especial de MongoDB que actúa como un temporizador automático.
+  Cuando el campo <code>expira</code> llega al pasado, MongoDB borra el documento solo.
+  No hay que ejecutar ningún proceso de limpieza — MongoDB lo hace en segundo plano.
+  Es como una fecha de caducidad en un yogur: pasada esa fecha, desaparece.
+</div>
+
+<!-- ─── 6. REPOSITORIOS ────────────────────────────────── -->
+<h2 id="bloque3">6. Bloque 3 — Repositorios</h2>
+
+<p>
+  Los repositorios son la <strong>única capa que habla con MongoDB</strong>.
+  Son objetos con métodos simples y específicos. El service los llama pero no sabe
+  cómo están implementados — solo sabe qué devuelven.
+</p>
+
+<h3>usuarioRepository.ts</h3>
+<pre><span class="kw">export const</span> <span class="nm">usuarioRepository</span> = {
+  <span class="fn">crear</span>: (datos) => <span class="ty">Usuario</span>.<span class="fn">create</span>(datos),
+
+  <span class="fn">buscarPorCorreo</span>: (correo) =>
+    <span class="ty">Usuario</span>.<span class="fn">findOne</span>({ correo }),                  <span class="cm">// SIN contraseña</span>
+
+  <span class="fn">buscarPorCorreoConContrasena</span>: (correo) =>
+    <span class="ty">Usuario</span>.<span class="fn">findOne</span>({ correo }).<span class="fn">select</span>(<span class="st">"+contrasena"</span>), <span class="cm">// CON contraseña (solo login)</span>
+
+  <span class="fn">existePorCorreo</span>: <span class="kw">async</span> (correo) =>
+    !!(<span class="kw">await</span> <span class="ty">Usuario</span>.<span class="fn">exists</span>({ correo })),         <span class="cm">// devuelve true/false</span>
+
+  <span class="fn">actualizarVerificacion</span>: (id) =>
+    <span class="ty">Usuario</span>.<span class="fn">findByIdAndUpdate</span>(id, { cuentaVerificada: <span class="kw">true</span> }),
+
+  <span class="fn">actualizarContrasena</span>: (id, contrasenaHash) =>
+    <span class="ty">Usuario</span>.<span class="fn">findByIdAndUpdate</span>(id, { contrasena: contrasenaHash }),
+};</pre>
+
+<h3>tokenRepository.ts</h3>
+<pre><span class="kw">export const</span> <span class="nm">tokenRepository</span> = {
+  <span class="fn">crear</span>: (datos) => <span class="ty">Token</span>.<span class="fn">create</span>(datos),
+
+  <span class="fn">buscarPorToken</span>: (token) =>
+    <span class="ty">Token</span>.<span class="fn">findOne</span>({ token, usado: <span class="kw">false</span> }),  <span class="cm">// solo tokens no usados</span>
+
+  <span class="fn">invalidar</span>: (id) =>
+    <span class="ty">Token</span>.<span class="fn">findByIdAndUpdate</span>(id, { usado: <span class="kw">true</span> }),
+};</pre>
+
+<!-- ─── 7. UTILIDADES ──────────────────────────────────── -->
+<h2 id="bloque4">7. Bloque 4 — Utilidades (JWT y Zod)</h2>
+
+<h3>lib/jwt.ts — tokens de sesión</h3>
+<p>
+  JWT (JSON Web Token) es un estándar para crear <strong>tokens de sesión firmados</strong>.
+  Cuando el usuario hace login correctamente, el servidor le da un JWT.
+  En cada petición posterior, el frontend envía ese JWT en la cabecera HTTP —
+  el servidor lo verifica y sabe quién es sin consultar la base de datos.
+</p>
+
+<div class="caja caja-info">
+  <strong>¿Cómo funciona un JWT?</strong>
+  Tiene 3 partes separadas por puntos: <code>header.payload.signature</code><br>
+  — <strong>Header:</strong> tipo de token y algoritmo de firma (HS256)<br>
+  — <strong>Payload:</strong> datos del usuario (<code>id</code>, <code>correo</code>, <code>rol</code>)<br>
+  — <strong>Signature:</strong> firma digital con el <code>JWT_SECRET</code><br><br>
+  Cualquiera puede leer el payload (no tiene datos sensibles), pero solo el servidor
+  puede crear tokens válidos porque es el único que conoce el <code>JWT_SECRET</code>.
+</div>
+
+<pre><span class="cm">// Crear un token al hacer login:</span>
+<span class="fn">firmarToken</span>({ id: <span class="st">"abc123"</span>, correo: <span class="st">"user@cookr.es"</span>, rol: <span class="st">"usuario"</span> })
+<span class="cm">// → "eyJhbGci......" (cadena larga)</span>
+
+<span class="cm">// Verificar el token que envía el frontend:</span>
+<span class="fn">verificarToken</span>(<span class="st">"eyJhbGci......"</span>)
+<span class="cm">// → { id: "abc123", correo: "user@cookr.es", rol: "usuario" }</span></pre>
+
+<h3>lib/validadores.ts — schemas Zod</h3>
+<p>
+  Zod es una librería de <strong>validación de datos</strong>. Define qué forma debe tener
+  el body de cada endpoint antes de procesarlo. Si el body no cumple el schema,
+  el middleware devuelve 400 automáticamente — el service nunca llega a ejecutarse.
+</p>
+<p>Es la <strong>segunda barrera de validación</strong> (la primera es el frontend con React Hook Form).</p>
+
+<table>
+  <thead><tr><th>Schema</th><th>Campos que valida</th></tr></thead>
+  <tbody>
+    <tr><td><code>esquemaRegistro</code></td><td>nombre (2-50 chars), correo (email válido), contraseña (min 8, 1 letra, 1 número)</td></tr>
+    <tr><td><code>esquemaLogin</code></td><td>correo (email), contraseña (no vacía)</td></tr>
+    <tr><td><code>esquemaRecuperar</code></td><td>correo (email)</td></tr>
+    <tr><td><code>esquemaNuevaContrasena</code></td><td>token (no vacío), contraseña (min 8, 1 letra, 1 número)</td></tr>
+    <tr><td><code>esquemaVerificarEmail</code></td><td>token (no vacío)</td></tr>
+  </tbody>
+</table>
+
+<!-- ─── 8. MIDDLEWARES ─────────────────────────────────── -->
+<h2 id="bloque5">8. Bloque 5 — Middlewares</h2>
+
+<p>
+  Un <strong>middleware</strong> es una función que se ejecuta <em>entre</em> que llega la petición
+  y que llega al controller. Puede leer la petición, modificarla, o cortarla con un error.
+  Express los encadena en orden.
+</p>
+
+<h3>validarBody.ts — validación Zod automática</h3>
+<p>
+  Es un middleware genérico: recibe un schema Zod y devuelve un middleware de Express.
+  Si el body no pasa la validación, responde 400 con los errores detallados.
+  Si pasa, reemplaza <code>req.body</code> con los datos ya transformados (ej: correo en lowercase)
+  y llama a <code>next()</code> para continuar.
+</p>
+<pre><span class="cm">// Ejemplo de error que devuelve si el correo es inválido:</span>
+{
+  <span class="st">"error"</span>: <span class="st">"Datos inválidos"</span>,
+  <span class="st">"errores"</span>: [
+    { <span class="st">"campo"</span>: <span class="st">"correo"</span>, <span class="st">"mensaje"</span>: <span class="st">"Correo no válido"</span> }
+  ]
+}</pre>
+
+<h3>autenticacion.ts — JWT middleware (requerirAuth)</h3>
+<p>
+  Protege rutas que requieren estar logueado. Lee la cabecera <code>Authorization: Bearer TOKEN</code>,
+  verifica la firma del JWT y adjunta el usuario a <code>req.usuario</code> para que
+  los controllers puedan acceder a él. Si el token es inválido o falta, devuelve 401.
+</p>
+<p><em>En este sprint no hay rutas protegidas aún — se usará a partir del Sprint 3.</em></p>
+
+<h3>errores.ts — error handler global</h3>
+<p>
+  En Express, un middleware con 4 parámetros <code>(err, req, res, next)</code> es especial:
+  captura cualquier error que ningún otro código haya manejado y devuelve 500.
+  Evita que el servidor se caiga o devuelva mensajes de error de Node.js sin format.
+</p>
+
+<!-- ─── 9. SERVICE CONTROLLER ROUTES ───────────────────── -->
+<h2 id="bloque6">9. Bloque 6 — Service, Controller y Routes</h2>
+
+<h3>authService.ts — las reglas de negocio</h3>
+<p>
+  Es el corazón del backend. Contiene toda la lógica: qué puede hacer el usuario,
+  qué condiciones deben cumplirse, qué pasos hay que ejecutar en orden.
+  <strong>No sabe nada de HTTP</strong> (no conoce <code>req</code> ni <code>res</code>).
+  Solo recibe datos, hace cosas, devuelve resultados o lanza errores.
+</p>
+
+<table>
+  <thead><tr><th>Método</th><th>¿Qué hace?</th></tr></thead>
+  <tbody>
+    <tr><td><code>registrarse()</code></td><td>Comprueba que el correo no existe. Hashea contraseña. Crea usuario. Crea token de verificación.</td></tr>
+    <tr><td><code>iniciarSesion()</code></td><td>Busca el usuario. Compara contraseña con bcrypt. Verifica que la cuenta está verificada. Devuelve JWT.</td></tr>
+    <tr><td><code>verificarEmail()</code></td><td>Busca el token. Comprueba que no está usado ni expirado. Marca usuario como verificado. Invalida token.</td></tr>
+    <tr><td><code>solicitarRecuperacion()</code></td><td>Busca el usuario. Crea token de recuperación 1h. Respuesta genérica (no revela si existe el correo).</td></tr>
+    <tr><td><code>restablecerContrasena()</code></td><td>Valida token de recuperación. Hashea nueva contraseña. Actualiza usuario. Invalida token.</td></tr>
+  </tbody>
+</table>
+
+<h3>authController.ts — thin controller</h3>
+<p>
+  El controller es deliberadamente <strong>fino</strong> (thin): no tiene lógica de negocio.
+  Solo recibe el <code>req</code>, llama al método correcto del service y devuelve el resultado como JSON.
+  Si el service lanza un error, lo captura y devuelve el status HTTP adecuado.
+</p>
+<pre><span class="fn">async registro</span>(req, res) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> resultado = <span class="kw">await</span> authService.<span class="fn">registrarse</span>(req.body);
+    res.<span class="fn">status</span>(<span class="nu">201</span>).<span class="fn">json</span>(resultado);
+  } <span class="kw">catch</span> (error) {
+    <span class="fn">manejarError</span>(res, error);  <span class="cm">// usa el .status del error si existe</span>
+  }
+}</pre>
+
+<h3>auth.routes.ts — las URLs</h3>
+<p>
+  Define qué middleware y qué controller se ejecutan para cada URL.
+  El middleware <code>validarBody</code> siempre va <em>antes</em> del controller.
+</p>
+<pre>router.<span class="fn">post</span>(<span class="st">"/registro"</span>,             <span class="fn">validarBody</span>(esquemaRegistro),   authController.<span class="fn">registro</span>);
+router.<span class="fn">post</span>(<span class="st">"/login"</span>,                <span class="fn">validarBody</span>(esquemaLogin),      authController.<span class="fn">login</span>);
+router.<span class="fn">post</span>(<span class="st">"/verificar-email"</span>,      <span class="fn">validarBody</span>(esquemaVerificar),  authController.<span class="fn">verificarEmail</span>);
+router.<span class="fn">post</span>(<span class="st">"/recuperar-contrasena"</span>, <span class="fn">validarBody</span>(esquemaRecuperar),  authController.<span class="fn">recuperarContrasena</span>);
+router.<span class="fn">post</span>(<span class="st">"/nueva-contrasena"</span>,     <span class="fn">validarBody</span>(esquemaNueva),      authController.<span class="fn">nuevaContrasena</span>);</pre>
+
+<!-- ─── 10. ENDPOINTS ──────────────────────────────────── -->
+<h2 id="endpoints">10. Los 5 endpoints — flujo completo</h2>
+
+<h3>POST /api/auth/registro</h3>
+<table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Zod valida <code>{ nombre, correo, contrasena }</code></td></tr>
+    <tr><td>2</td><td>Se comprueba que el correo no existe en MongoDB</td></tr>
+    <tr><td>3</td><td>Se hashea la contraseña con bcrypt (10 rondas)</td></tr>
+    <tr><td>4</td><td>Se crea el documento Usuario en MongoDB con <code>cuentaVerificada: false</code></td></tr>
+    <tr><td>5</td><td>Se genera un token aleatorio de 64 chars hex y se guarda en Token (expira en 24h)</td></tr>
+    <tr><td>6</td><td>TODO Fase 6: enviar email con ese token</td></tr>
+    <tr><td>7</td><td>Responde <code>201 { mensaje: "Revisa tu correo..." }</code></td></tr>
+  </tbody>
+</table>
+
+<h3>POST /api/auth/login</h3>
+<table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Zod valida <code>{ correo, contrasena }</code></td></tr>
+    <tr><td>2</td><td>Se busca el usuario por correo, incluyendo la contraseña (<code>.select("+contrasena")</code>)</td></tr>
+    <tr><td>3</td><td>Si no existe → <code>401 Credenciales incorrectas</code> (mismo error para no revelar si existe)</td></tr>
+    <tr><td>4</td><td><code>bcrypt.compare()</code> compara la contraseña del body con el hash guardado</td></tr>
+    <tr><td>5</td><td>Si no coincide → <code>401 Credenciales incorrectas</code></td></tr>
+    <tr><td>6</td><td>Si <code>cuentaVerificada === false</code> → <code>403 Debes verificar tu correo</code></td></tr>
+    <tr><td>7</td><td>Se firma un JWT con <code>{ id, correo, rol }</code> y expira en 7 días</td></tr>
+    <tr><td>8</td><td>Responde <code>200 { token: "JWT...", usuario: { id, nombre, correo, foto, rol } }</code></td></tr>
+  </tbody>
+</table>
+
+<h3>POST /api/auth/verificar-email</h3>
+<table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Zod valida que llega un campo <code>token</code></td></tr>
+    <tr><td>2</td><td>Se busca el token en MongoDB (<code>usado: false</code>)</td></tr>
+    <tr><td>3</td><td>Si no existe o no es de tipo <code>"verificacion"</code> → <code>400</code></td></tr>
+    <tr><td>4</td><td>Si <code>expira &lt; ahora</code> → <code>400 El enlace ha expirado</code></td></tr>
+    <tr><td>5</td><td>Se actualiza el usuario: <code>cuentaVerificada: true</code></td></tr>
+    <tr><td>6</td><td>Se invalida el token: <code>usado: true</code></td></tr>
+    <tr><td>7</td><td>Responde <code>200 { mensaje: "Email verificado..." }</code></td></tr>
+  </tbody>
+</table>
+
+<h3>POST /api/auth/recuperar-contrasena</h3>
+<table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Zod valida el <code>correo</code></td></tr>
+    <tr><td>2</td><td>Se busca el usuario. Si no existe, se responde igual (no se revela que el correo no existe)</td></tr>
+    <tr><td>3</td><td>Se genera token de recuperación (expira en 1h) y se guarda</td></tr>
+    <tr><td>4</td><td>TODO Fase 6: enviar email con enlace de recuperación</td></tr>
+    <tr><td>5</td><td>Responde siempre <code>200 { mensaje: "Si existe una cuenta..." }</code></td></tr>
+  </tbody>
+</table>
+
+<div class="caja caja-aviso">
+  <strong>¿Por qué la respuesta es siempre la misma aunque el correo no exista?</strong>
+  Es una medida de seguridad. Si dijera "este correo no está registrado", un atacante
+  podría probar correos para descubrir qué usuarios existen en la app.
+  Con la respuesta genérica, no obtiene información útil.
+</div>
+
+<h3>POST /api/auth/nueva-contrasena</h3>
+<table>
+  <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Zod valida <code>{ token, contrasena }</code></td></tr>
+    <tr><td>2</td><td>Se busca el token de recuperación (<code>usado: false</code>)</td></tr>
+    <tr><td>3</td><td>Se verifica que es de tipo <code>"recuperacion"</code> y no está expirado</td></tr>
+    <tr><td>4</td><td>Se hashea la nueva contraseña con bcrypt</td></tr>
+    <tr><td>5</td><td>Se actualiza la contraseña del usuario en MongoDB</td></tr>
+    <tr><td>6</td><td>Se invalida el token</td></tr>
+    <tr><td>7</td><td>Responde <code>200 { mensaje: "Contraseña actualizada..." }</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ─── 11. SEGURIDAD ─────────────────────────────────── -->
+<h2 id="seguridad">11. Conceptos de seguridad</h2>
+
+<h3>bcryptjs — hash de contraseñas</h3>
+<p>
+  Las contraseñas nunca se guardan en texto plano. Se usa <strong>bcrypt</strong>,
+  un algoritmo de hash diseñado específicamente para contraseñas. Tiene dos características clave:
+</p>
+<ul>
+  <li><strong>Es lento a propósito:</strong> las 10 rondas hacen que hashear tarde ~100ms.
+  Eso hace que un ataque de fuerza bruta sea inviable (millones de intentos tardarían años).</li>
+  <li><strong>Tiene "salt" incorporado:</strong> aunque dos usuarios tengan la misma contraseña,
+  sus hashes serán distintos porque bcrypt añade un valor aleatorio antes de hashear.</li>
+</ul>
+<pre><span class="cm">// Guardar contraseña:</span>
+<span class="kw">const</span> hash = <span class="kw">await</span> bcrypt.<span class="fn">hash</span>(<span class="st">"miContrasena123"</span>, <span class="nu">10</span>);
+<span class="cm">// → "$2b$10$X7k3mP..." (cadena irreversible)</span>
+
+<span class="cm">// Verificar en el login:</span>
+<span class="kw">const</span> valida = <span class="kw">await</span> bcrypt.<span class="fn">compare</span>(<span class="st">"miContrasena123"</span>, hash);
+<span class="cm">// → true ✅</span></pre>
+
+<h3>JWT_SECRET — la llave del servidor</h3>
+<p>
+  Es una cadena aleatoria larga que solo conoce el servidor. Se usa para <strong>firmar</strong>
+  los tokens JWT. Si alguien modifica el payload del token (ej: cambia su rol a "admin"),
+  la firma no coincidirá y el servidor lo rechazará.
+  Está en el <code>.env</code> y nunca debe publicarse.
+</p>
+
+<h3>bcryptjs vs bcrypt</h3>
+<p>
+  Usamos <code>bcryptjs</code> (JavaScript puro) en lugar de <code>bcrypt</code>
+  (que requiere compilación nativa de C++). En Windows, compilar módulos nativos
+  puede dar problemas. <code>bcryptjs</code> es compatible, más fácil de instalar
+  y suficientemente rápido para un TFG.
+</p>
+
+<!-- ─── 12. TODOS ──────────────────────────────────────── -->
+<h2 id="todos">12. TODOs pendientes (Fase 6)</h2>
+
+<table>
+  <thead><tr><th>ID</th><th>Fichero</th><th>Descripción</th><th>Fase</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>AUTH-005</code></td>
+      <td><code>authService.ts → registrarse()</code></td>
+      <td>Enviar email de verificación con el token usando <strong>Resend</strong></td>
+      <td><span class="badge badge-fase">Fase 6</span></td>
+    </tr>
+    <tr>
+      <td><code>AUTH-RECUP</code></td>
+      <td><code>authService.ts → solicitarRecuperacion()</code></td>
+      <td>Enviar email con enlace de recuperación usando <strong>Resend</strong></td>
+      <td><span class="badge badge-fase">Fase 6</span></td>
+    </tr>
+    <tr>
+      <td><code>AUTH-002</code></td>
+      <td><code>formularioRegistro.tsx</code> (FE)</td>
+      <td>Sustituir el mock del formulario por llamada real a <code>POST /api/auth/registro</code></td>
+      <td><span class="badge badge-fase">Sprint 3</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="caja caja-exito">
+  <strong>¿Qué está funcionando ahora mismo?</strong>
+  El servidor arranca, conecta con MongoDB Atlas y tiene los 5 endpoints operativos.
+  El frontend todavía usa datos mock — la conexión real FE ↔ BE se hace en Sprint 3.
+  En Fase 6 se añaden los emails reales con Resend.
+</div>
+
+</body>
+</html>
