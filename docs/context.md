@@ -284,6 +284,7 @@ Diseño de ambas páginas:
 | `/home` | Home / Feed de recetas — mobile + PC responsive | ✅ Aprobado autor |
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
 | `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
+| `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
 | `BE /api/auth/registro` | Endpoint real | ⏳ Sprint 2 BE |
 | `BE /api/auth/login` | Endpoint real | ⏳ Sprint 2 BE |
 | `BE /api/auth/verificar-email` | Endpoint real | ⏳ Sprint 2 BE |

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cookr - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#837566",
+                        "surface-container-highest": "#e3e2df",
+                        "surface-container-high": "#e9e8e4",
+                        "on-secondary-container": "#656464",
+                        "primary": "#855400",
+                        "surface-variant": "#e3e2df",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#001e30",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#004b6f",
+                        "surface": "#faf9f5",
+                        "background": "#faf9f5",
+                        "primary-fixed-dim": "#fcba65",
+                        "on-primary-fixed-variant": "#653e00",
+                        "surface-container": "#efeeea",
+                        "surface-bright": "#faf9f5",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#7abbec",
+                        "surface-container-low": "#f4f4f0",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#514538",
+                        "tertiary-fixed": "#cae6ff",
+                        "on-background": "#1b1c1a",
+                        "primary-container": "#e8a855",
+                        "surface-dim": "#dbdad6",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface-tint": "#855400",
+                        "tertiary": "#136490",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1b1c1a",
+                        "outline-variant": "#d5c4b2",
+                        "inverse-surface": "#2f312e",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#2a1700",
+                        "tertiary-fixed-dim": "#8dcdff",
+                        "secondary-container": "#e4e2e1",
+                        "secondary": "#5f5e5e",
+                        "on-tertiary-fixed-variant": "#004b70",
+                        "primary-fixed": "#ffddb7",
+                        "on-primary-container": "#643e00",
+                        "inverse-primary": "#fcba65",
+                        "inverse-on-surface": "#f2f1ed"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- Top Navigation Anchor -->
+<header class="bg-[#faf9f5]/80 backdrop-blur-xl fixed top-0 w-full z-50">
+<div class="flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#f4f4f0] transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[#855400]">arrow_back</span>
+</div>
+<h1 class="font-headline tracking-[0.05em] uppercase text-[12px] font-bold text-[#855400]">Onboarding</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="flex-grow pt-24 pb-40 px-6 max-w-md mx-auto w-full">
+<!-- Hero Editorial Text -->
+<div class="mb-10">
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight mb-2">Cuéntanos sobre ti</h2>
+<p class="text-secondary text-lg leading-relaxed">Así personalizamos tu experiencia</p>
+</div>
+<!-- Section 1: Allergies -->
+<section class="mb-12">
+<h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">¿Tienes alguna alergia o intolerancia?</h3>
+<div class="relative mb-6">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-secondary text-xl">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-full py-4 pl-12 pr-6 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Ej: Frutos secos" type="text"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Gluten</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Lácteos</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Huevo</button>
+<!-- Active Chip -->
+<button class="px-5 py-2.5 rounded-full bg-primary-container text-on-primary-container text-sm font-bold flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Frutos secos
+                </button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Pescado</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Marisco</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Soja</button>
+</div>
+</section>
+<!-- Section 2: Dietary Preferences -->
+<section class="mb-12">
+<h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">¿Qué tipo de cocina prefieres?</h3>
+<div class="relative mb-6">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-secondary text-xl">restaurant</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-full py-4 pl-12 pr-6 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Ej: Vegetariano" type="text"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<!-- Active Chip -->
+<button class="px-5 py-2.5 rounded-full bg-primary-container text-on-primary-container text-sm font-bold flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Vegetariano
+                </button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Vegano</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Keto</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Mediterránea</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Paleo</button>
+<button class="px-5 py-2.5 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-container-highest transition-colors">Sin Azúcar</button>
+</div>
+</section>
+<!-- Section 3: Biography (Added per request) -->
+<section class="mb-12">
+<h3 class="text-sm font-bold uppercase tracking-wider text-on-surface-variant mb-4">Cuéntanos un poco más sobre ti (opcional)</h3>
+<textarea class="w-full bg-surface-container-low border-none rounded-xl py-4 px-6 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/20 transition-all min-h-[120px] resize-none" placeholder="Comparte tus gustos culinarios, si te gusta cocinar en casa o si buscas recetas rápidas..."></textarea>
+</section>
+</main>
+<!-- Fixed Bottom Actions -->
+<footer class="fixed bottom-0 left-0 right-0 p-6 bg-surface/90 backdrop-blur-md z-50">
+<div class="max-w-md mx-auto space-y-4">
+<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-full text-lg shadow-lg shadow-primary/20 active:scale-95 transition-all duration-200">
+                Listo
+            </button>
+<p class="text-center text-on-secondary-fixed-variant text-[12px] font-medium">
+                Puedes cambiar esto más tarde en ajustes
+            </p>
+</div>
+</footer>
+</body></html>

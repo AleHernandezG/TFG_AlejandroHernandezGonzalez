@@ -97,10 +97,10 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">4</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">12</div><div class="label">Urgencia alta</div></div>
+    <div class="counter alta"><div class="num">9</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">13</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">20</div><div class="label">Completadas</div></div>
+    <div class="counter baja"><div class="num">14</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">22</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -142,28 +142,28 @@
             <small>Recomendado antes de continuar con el Sprint 2 BE para no mezclar todo en main. Solo requiere dos comandos git.</small>
             <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">AUTH-001</td>
           <td class="desc">
             <strong>Cambiar callbackUrl del botón Google de "/" a "/home"</strong>
-            <small>Ahora mismo al iniciar sesión con Google te lleva a la landing. Hay que cambiarlo a /home ahora que esa ruta ya existe.</small>
+            <small>Ya estaba implementado: urlRetorno = "/home" en botonGoogle.tsx. Comentario JSDoc actualizado.</small>
             <span class="source">📄 docs/context.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">AUTH-005</td>
           <td class="desc">
             <strong>Proteger las rutas autenticadas (/home, /recetas/[id])</strong>
-            <small>Actualmente cualquiera puede entrar a /home sin estar logueado. Hay que crear un layout que redirija a /login si no hay sesión activa.</small>
+            <small>Aplazado intencionalmente durante desarrollo para no requerir autenticación al revisar vistas. Se implementará antes del deploy (Fase 6).</small>
             <span class="source">📄 docs/context.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
-          <td><span class="urg alta">Alta</span></td>
+          <td><span class="status pending">⏳ Aplazado a Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
           <td class="id">DOM-001</td>

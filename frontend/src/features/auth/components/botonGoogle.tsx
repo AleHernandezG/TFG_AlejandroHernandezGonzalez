@@ -14,8 +14,7 @@ interface PropsBotonGoogle {
 
 /**
  * Botón que lanza el flujo OAuth de Google vía NextAuth.
- * Funcional desde Sprint 1. El callbackUrl apunta a "/" hasta que
- * exista una ruta autenticada (/feed) en Fase 2.
+ * Funcional desde Sprint 1. Por defecto redirige a /home tras autenticar.
  */
 export function BotonGoogle({
   textoAccion = "Continúa con Google",

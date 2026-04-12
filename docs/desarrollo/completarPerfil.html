@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Completar Perfil — Documentación técnica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eff6ff; }
+
+    .caja {
+      border-radius: 6px;
+      padding: 13px 16px;
+      margin: 14px 0;
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .caja-info   { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    .caja-aviso  { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .caja-exito  { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .caja-error  { background: #fef2f2; border-left: 4px solid #ef4444; }
+    .caja-codigo { background: #faf5ff; border-left: 4px solid #8b5cf6; }
+
+    .caja strong { display: block; margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-ok   { background: #dcfce7; color: #166534; }
+    .badge-pend { background: #fef9c3; color: #854d0e; }
+    .badge-mock { background: #f3e8ff; color: #6b21a8; }
+
+    ul, ol { padding-left: 24px; margin: 8px 0 12px; }
+    li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<h1>Completar Perfil — Documentación técnica</h1>
+<p>
+  <strong>Ruta:</strong> <code>/completar-perfil</code> &nbsp;·&nbsp;
+  <strong>Sprint:</strong> 2 &nbsp;·&nbsp;
+  <strong>Estado:</strong> <span class="badge badge-pend">👁️ Pendiente revisión</span> &nbsp;·&nbsp;
+  <strong>Última actualización:</strong> 2026-04-12
+</p>
+
+<div class="caja caja-info">
+  <strong>Propósito</strong>
+  Vista de onboarding post-registro. El usuario selecciona sus alergias/intolerancias y preferencias de dieta
+  para personalizar su experiencia en Cookr. Se muestra una sola vez tras el registro.
+  Los datos se guardan en el perfil del usuario (mock hasta Fase 5).
+</div>
+
+<!-- ─── 1. Arquitectura ─────────────────────────────────────── -->
+<h2>1. Arquitectura de capas</h2>
+
+<pre><code class="kw">page</code><code>.tsx</code> (Server Component — <code class="st">/completar-perfil</code>)
+  └─ <code class="fn">FormularioCompletarPerfil</code> (Client Component — <code class="nm">features/auth/components</code>)
+       ├─ <code class="fn">SelectorChips</code> (componente reutilizable — <code class="nm">components/common</code>)
+       └─ <code class="nm">ALERGENOS_OPCIONES</code>, <code class="nm">DIETAS_OPCIONES</code> (config estática — <code class="nm">config/opcionesUsuario.ts</code>)</pre>
+
+<p>
+  La ruta está fuera del grupo <code>(main)</code> — no tiene <code>NavBarInferior</code>.
+  Es un flujo de onboarding independiente, igual que <code>/registro</code> o <code>/login</code>.
+</p>
+
+<!-- ─── 2. Ficheros ─────────────────────────────────────────── -->
+<h2>2. Ficheros del módulo</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fichero</th>
+      <th>Tipo</th>
+      <th>Responsabilidad</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>src/app/completar-perfil/page.tsx</code></td>
+      <td>Server Component</td>
+      <td>Shell de ruta. Importa y renderiza <code>FormularioCompletarPerfil</code>. Define metadata.</td>
+    </tr>
+    <tr>
+      <td><code>src/features/auth/components/formularioCompletarPerfil.tsx</code></td>
+      <td>Client Component</td>
+      <td>Estado de selección (<code>alergenos</code>, <code>dietas</code>). Orquesta la pantalla completa. CTA "Listo" → <code>router.push('/home')</code>.</td>
+    </tr>
+    <tr>
+      <td><code>src/components/common/selectorChips.tsx</code></td>
+      <td>Client Component (reutilizable)</td>
+      <td>Selector múltiple por chips. Animación Framer Motion. Límite opcional (<code>max</code>).</td>
+    </tr>
+    <tr>
+      <td><code>src/config/opcionesUsuario.ts</code></td>
+      <td>Config estática</td>
+      <td>Fuente de verdad de las 14 opciones de alérgenos y 12 de dietas.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ─── 3. SelectorChips ───────────────────────────────────── -->
+<h2>3. Componente SelectorChips</h2>
+
+<p>Componente genérico de selección múltiple por chips. Pensado para reutilizarse en:</p>
+<ul>
+  <li><code>/completar-perfil</code> — alérgenos y dietas (onboarding)</li>
+  <li><code>/ajustes</code> — modificar preferencias (Sprint 7)</li>
+  <li>Filtros de búsqueda de recetas (Sprint 3)</li>
+</ul>
+
+<h3>Props</h3>
+<pre><span class="kw">interface</span> <span class="ty">PropsSelectorChips</span> {
+  opciones:      <span class="kw">readonly</span> <span class="ty">OpcionChip</span>[];   <span class="cm">// { id, label, icono? }</span>
+  seleccionados: <span class="ty">string</span>[];            <span class="cm">// IDs activos (estado en el padre)</span>
+  onChange:      (sel: <span class="ty">string</span>[]) => <span class="kw">void</span>;
+  max?:          <span class="ty">number</span>;              <span class="cm">// límite opcional</span>
+}</pre>
+
+<h3>Comportamiento</h3>
+<ul>
+  <li>Chip inactivo pulsado → se añade al array <code>seleccionados</code>.</li>
+  <li>Chip activo pulsado → se elimina del array.</li>
+  <li>Si <code>max</code> definido y alcanzado → chips inactivos quedan deshabilitados (<code>opacity-40 cursor-not-allowed</code>).</li>
+</ul>
+
+<h3>Estilos</h3>
+<table>
+  <thead>
+    <tr><th>Estado</th><th>Clases Tailwind</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Inactivo</td>
+      <td><code>bg-muted text-muted-foreground border border-border rounded-full px-3 py-1.5 text-sm font-medium</code></td>
+    </tr>
+    <tr>
+      <td>Activo</td>
+      <td><code>bg-brand text-brand-foreground border border-brand rounded-full px-3 py-1.5 text-sm font-medium</code></td>
+    </tr>
+    <tr>
+      <td>Deshabilitado</td>
+      <td><code>opacity-40 cursor-not-allowed</code> (sobre estilos inactivo)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Animación</h3>
+<p>
+  Al activar un chip: <code>scale([1, 1.05, 1])</code> vía Framer Motion, <code>duration: 150ms</code>.
+  Al pulsar (<code>whileTap</code>): <code>scale(1.05)</code>.
+</p>
+
+<h3>Iconos</h3>
+<p>
+  Si la opción tiene <code>icono</code> (ruta <code>string</code>), se renderiza con <code>next/image</code>
+  a <code>16×16 px</code>. Las imágenes de alérgenos están en <code>/public/alergenos/*.webp</code>.
+  Las dietas no tienen icono.
+</p>
+
+<!-- ─── 4. Config opcionesUsuario ─────────────────────────── -->
+<h2>4. Config — opcionesUsuario.ts</h2>
+
+<p>
+  Ubicado en <code>src/config/opcionesUsuario.ts</code>.
+  Exporta dos arrays <code>as const</code>:
+</p>
+
+<table>
+  <thead>
+    <tr><th>Constante</th><th>Ítems</th><th>Tiene icono</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>ALERGENOS_OPCIONES</code></td>
+      <td>14 (gluten, lácteos, huevo, frutos secos, pescado, marisco, soja, cacahuetes, mostaza, sésamo, apio, sulfitos, moluscos, altramuz)</td>
+      <td>Sí — <code>/alergenos/{id}.webp</code></td>
+    </tr>
+    <tr>
+      <td><code>DIETAS_OPCIONES</code></td>
+      <td>12 (vegetariano, vegano, keto, sin gluten, mediterránea, paleo, sin lactosa, halal, kosher, bajo en calorías, alto en proteínas, low carb)</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  También exporta los tipos derivados <code>IdAlergeno</code> e <code>IdDieta</code>
+  para tipar los arrays de selección en el backend.
+</p>
+
+<!-- ─── 5. Estructura de pantalla ─────────────────────────── -->
+<h2>5. Estructura de pantalla</h2>
+
+<pre><span class="cm">/* Layout: min-h-svh, flex col, sin NavBar inferior */</span>
+
+<span class="hl">HEADER</span>
+  "Paso 2 de 2"  ← text-sm text-muted-foreground
+  [══════════════]  ← barra progreso bg-brand w-full h-1
+  "Cuéntanos sobre ti"  ← text-2xl font-bold
+  "Así personalizamos tu experiencia"  ← text-sm text-muted-foreground
+
+<span class="hl">SECCIÓN ALÉRGENOS</span>
+  "¿Tienes alguna alergia o intolerancia?"  ← text-base font-semibold
+  &lt;SelectorChips opciones={ALERGENOS_OPCIONES} /&gt;
+    [🌾 Gluten] [🥛 Lácteos] [🥚 Huevo] ...  ← chips con imagen WebP
+
+<span class="hl">SEPARADOR</span>
+  div h-px bg-border/50
+
+<span class="hl">SECCIÓN DIETAS</span>
+  "¿Qué tipo de cocina prefieres?"  ← text-base font-semibold
+  &lt;SelectorChips opciones={DIETAS_OPCIONES} /&gt;
+    [Vegetariano] [Vegano] [Keto] ...  ← chips solo label
+
+<span class="hl">FOOTER</span>
+  "Puedes cambiar esto en cualquier momento desde Ajustes"
+  [Listo]  ← bg-brand rounded-full w-full</pre>
+
+<!-- ─── 6. TODOs Fase 5 ─────────────────────────────────────── -->
+<h2>6. TODOs — Fase 5</h2>
+
+<div class="caja caja-aviso">
+  <strong>Mock hasta Fase 5</strong>
+  El botón "Listo" actualmente redirige a <code>/home</code> sin persistir los datos.
+  En Fase 5, antes del <code>router.push</code>, se añadirá la llamada al servicio:
+  <br /><br />
+  <code>await usuariosService.actualizarPerfil(&#123; alergenos, dietas &#125;)</code>
+  <br /><br />
+  El componente <strong>no cambiará estructuralmente</strong> — solo se añade esa línea.
+</div>
+
+<table>
+  <thead>
+    <tr><th>ID</th><th>Fichero</th><th>Descripción</th><th>Fase</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>PERFIL-001</code></td>
+      <td><code>formularioCompletarPerfil.tsx</code></td>
+      <td>Llamar a <code>usuariosService.actualizarPerfil()</code> antes de <code>router.push</code></td>
+      <td>Fase 5</td>
+    </tr>
+    <tr>
+      <td><code>PERFIL-002</code></td>
+      <td><code>page.tsx</code></td>
+      <td>Añadir guard: si el perfil ya está completo, redirigir a <code>/home</code> (evita reentrada)</td>
+      <td>Fase 5</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ─── 7. Flujo de navegación ────────────────────────────── -->
+<h2>7. Flujo de navegación</h2>
+
+<pre><span class="cm">// Flujo objetivo (DEBT-007)</span>
+Login               → /home
+Registro sin Google → /verificar-email/pendiente → /completar-perfil → /home
+Registro con Google → /completar-perfil → /home</pre>
+
+<div class="caja caja-aviso">
+  <strong>DEBT-007 parcialmente resuelto</strong>
+  La vista <code>/completar-perfil</code> está creada.
+  Pendiente: redirigir desde <code>botonGoogle.tsx</code> con <code>urlRetorno="/completar-perfil"</code>
+  y desde el endpoint de verificación de email (Fase 4 / Fase 6).
+</div>
+
+<!-- ─── 8. Reglas de diseño ────────────────────────────────── -->
+<h2>8. Reglas de diseño aplicadas</h2>
+
+<ul>
+  <li>Mobile-first, base 390 px. Sin NavBar inferior.</li>
+  <li>100% paleta Cookr — sin colores hardcodeados (<code>bg-brand</code>, <code>bg-muted</code>, <code>text-foreground</code>…).</li>
+  <li>Sin bordes de 1px para seccionar — separador tonal con <code>bg-border/50</code>.</li>
+  <li>Chips con <code>flex-wrap gap-2</code>, fluyen en líneas naturales.</li>
+  <li>Animación Framer Motion <code>scale(1.05)</code> en activación, <code>duration: 150ms</code>.</li>
+  <li>Estado de selección con <code>useState</code> local — sin Zustand hasta conectar backend.</li>
+</ul>
+
+</body>
+</html>

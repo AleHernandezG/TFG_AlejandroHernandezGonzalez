@@ -6,3 +6,4 @@ export { BotonGoogle } from "./botonGoogle";
 export { DivisorOAuth } from "./divisorOAuth";
 export { TarjetaVerificacionPendiente } from "./tarjetaVerificacionPendiente";
 export { TarjetaRecuperacionPendiente } from "./tarjetaRecuperacionPendiente";
+export { FormularioCompletarPerfil } from "./formularioCompletarPerfil";
