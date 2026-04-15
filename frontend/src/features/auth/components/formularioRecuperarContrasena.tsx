@@ -24,6 +24,7 @@ import {
   type DatosRecuperarContrasena,
   type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
+import { authService } from "@/services/authService";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -69,11 +70,8 @@ export function FormularioRecuperarContrasena() {
     setMensajeError(null);
 
     try {
-      // TODO [AUTH-008] Fase 6: llamar a POST /api/auth/recuperar-contrasena
-      // El backend generará un token firmado (JWT 1h), lo guardará en MongoDB
-      // y lo enviará por email vía Resend con el enlace /nueva-contrasena?token=xxx
-      console.log("[FormularioRecuperarContrasena] Solicitud mock:", { correo: datos.correo });
-      await new Promise((r) => setTimeout(r, 1000));
+      // El backend siempre devuelve 200 (nunca revela si el correo existe)
+      await authService.recuperarContrasena({ correo: datos.correo });
       router.push(`/recuperar-contrasena/pendiente?email=${encodeURIComponent(datos.correo)}`);
     } catch {
       setMensajeError(

@@ -23,6 +23,8 @@ import {
   type DatosNuevaContrasena,
   type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
+import { authService } from "@/services/authService";
+import axios from "axios";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -76,19 +78,20 @@ export function FormularioNuevaContrasena({ token }: Props) {
     setMensajeError(null);
 
     try {
-      // TODO [AUTH-009] Fase 4+6: llamar a POST /api/auth/nueva-contrasena
-      // El backend validará el token (firma + expiración), actualizará la contraseña
-      // con bcrypt e invalidará el token para que no pueda reutilizarse.
-      console.log("[FormularioNuevaContrasena] Cambio de contraseña mock:", {
-        token,
-        longitud: datos.contrasena.length,
+      await authService.nuevaContrasena({
+        token, // prop recibida del padre (query string ?token=...)
+        contrasena: datos.contrasena,
       });
-      await new Promise((r) => setTimeout(r, 1000));
       setEstadoEnvio("exito");
-    } catch {
-      setMensajeError(
-        "No se pudo cambiar la contraseña. El enlace puede haber expirado."
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const msg = error.response?.data?.error;
+        setMensajeError(
+          msg ?? "No se pudo cambiar la contraseña. El enlace puede haber expirado."
+        );
+      } else {
+        setMensajeError("No se pudo cambiar la contraseña. El enlace puede haber expirado.");
+      }
       setEstadoEnvio("error");
     }
   };

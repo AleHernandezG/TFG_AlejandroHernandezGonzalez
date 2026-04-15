@@ -7,30 +7,25 @@ import { manejadorErrores } from "./middlewares/errores";
 
 const app = express();
 
-// ─── Seguridad y logging ───────────────────────────────────
-app.use(helmet());
-app.use(morgan("dev"));
+app.use(helmet()); //Esto es pa mas seguridad en las cabeceras HTTP
+app.use(morgan("dev")); //Muestra las peticiones en consola para debuggear
 
-// ─── CORS ──────────────────────────────────────────────────
+// Solo acepta peticiones de una URL específica (la del frontend) y permite enviar cookies (credenciales)
 app.use(
   cors({
     origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
     credentials: true,
-  })
+  }),
 );
 
-// ─── Body parsing ──────────────────────────────────────────
-app.use(express.json());
+app.use(express.json()); // Pa parsear el cuerpo de las peticiones como JSON
+app.use("/api/auth", authRoutes); //Añade el prefijo /api/auth a todas las rutas definidas en authRoutes
 
-// ─── Rutas ─────────────────────────────────────────────────
-app.use("/api/auth", authRoutes);
-
-// ─── Health check ──────────────────────────────────────────
+// Sirve para comprobar que todo está funcionando bien
 app.get("/api/health", (_req, res) => {
   res.json({ estado: "ok", entorno: process.env.NODE_ENV });
 });
 
-// ─── Error handler global (debe ir al final) ───────────────
-app.use(manejadorErrores);
+app.use(manejadorErrores); // Middleware para manejar errores de forma centralizada. Si alguna ruta lanza un error, este middleware lo captura y responde con un mensaje adecuado.
 
 export default app;

@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { signIn } from "next-auth/react";
 import { BotonGoogle } from "./botonGoogle";
 import { DivisorOAuth } from "./divisorOAuth";
 import {
@@ -74,19 +75,28 @@ export function FormularioLogin() {
     setEstadoEnvio("cargando");
     setMensajeError(null);
 
-    try {
-      // TODO [AUTH-007] Fase 4: sustituir por signIn("credentials", { correo, contrasena })
-      // con CredentialsProvider real en NextAuth + validación contra backend
-      console.log("[FormularioLogin] Intento de login (mock):", { correo: datos.correo });
-      await new Promise((r) => setTimeout(r, 1000)); // simula latencia de red
+    const resultado = await signIn("credentials", {
+      correo: datos.correo,
+      contrasena: datos.contrasena,
+      redirect: false,
+    });
 
+    if (resultado?.ok) {
       router.push("/home");
-    } catch {
+      return;
+    }
+
+    // resultado.error contiene el mensaje lanzado en authorize()
+    if (resultado?.error === "Debes verificar tu correo antes de iniciar sesión") {
+      setMensajeError(
+        "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada."
+      );
+    } else {
       setMensajeError(
         "Correo o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo."
       );
-      setEstadoEnvio("error");
     }
+    setEstadoEnvio("error");
   };
 
   // ── Formulario ──────────────────────────────────────────────────────────────

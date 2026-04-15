@@ -126,6 +126,13 @@ Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
   - /nueva-contrasena: layout como /registro (imagen izq, form der), 2 campos contraseña + confirmar + pantalla éxito in-page
 - ✅ Aprobado autor — [TFG-17] NavBar inferior: 5 iconos, icono central ChefHat con bg-brand, pill indicator con layoutId Framer Motion, safe area insets, oculta en / y lg+
 - ✅ Aprobado autor — [TFG-21 / UI-014 / UI-015] Home (mobile + PC) y Detalle de Receta. Cambios adicionales aprobados: click en tarjeta navega a /recetas/[id], multi-select en chips de filtros, icono ajustes eliminado del header PC. Fixes: hydration error en tiempos relativos (UI-016). Pendiente: chips completos de alérgenos/dietas/dificultad (HOME-001).
+- ✅ [AUTH-FE-BE] Capa de servicios FE creada: `apiClient.ts` + `authService.ts` en `frontend/src/services/`
+- ✅ [AUTH-FE-BE] `lib/auth.ts` actualizado: CredentialsProvider real conectado a `POST /api/auth/login`
+- ✅ [AUTH-FE-BE] `formularioRegistro.tsx` conectado a `POST /api/auth/registro` (maneja 409)
+- ✅ [AUTH-FE-BE] `formularioLogin.tsx` conectado a NextAuth CredentialsProvider (maneja 401/403)
+- ✅ [AUTH-FE-BE] `formularioRecuperarContrasena.tsx` conectado a `POST /api/auth/recuperar-contrasena`
+- ✅ [AUTH-FE-BE] `formularioNuevaContrasena.tsx` conectado a `POST /api/auth/nueva-contrasena`
+- ✅ [AUTH-FE-BE] `NEXT_PUBLIC_API_URL` añadido a `.env.local`
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -252,11 +259,21 @@ Diseño de ambas páginas:
 ## Auth — TODOs marcados en código
 
 - 🔴 [AUTH-001] `botonGoogle.tsx` — cambiar `callbackUrl` de `"/"` a `"/feed"` → Fase 2
-- 🔴 [AUTH-002] `formularioRegistro.tsx` — sustituir mock por `POST /api/usuarios/registro` → Fase 4
-- 🔴 [AUTH-003] `lib/auth.ts` — añadir `CredentialsProvider` para email/contraseña real → Fase 4
+- ✅ [AUTH-002] `formularioRegistro.tsx` — `POST /api/auth/registro` conectado
+- ✅ [AUTH-003] `lib/auth.ts` — `CredentialsProvider` añadido
 - 🔴 [AUTH-004] `lib/auth.ts` — enriquecer callback `session` con avatar, rol e ID del backend → Fase 4
 - 🔴 [AUTH-005] Backend — endpoint `POST /api/auth/enviar-verificacion`: generar token firmado (JWT 24h), persistirlo en MongoDB, enviarlo vía Resend → Fase 4 + Fase 6
 - 🔴 [AUTH-006] Backend — endpoint `POST /api/auth/verificar-email`: validar token, marcar usuario como verificado en MongoDB, invalidar token → Fase 4
+- ✅ [AUTH-007] `formularioLogin.tsx` — `signIn("credentials", ...)` conectado
+- ✅ [AUTH-008] `formularioRecuperarContrasena.tsx` — `POST /api/auth/recuperar-contrasena` conectado
+- ✅ [AUTH-009] `formularioNuevaContrasena.tsx` — `POST /api/auth/nueva-contrasena` conectado
+
+## Limitación conocida — login con credenciales
+
+El endpoint POST /api/auth/login verifica `cuentaVerificada` antes de devolver el token.
+Hasta que Resend esté activo (Fase 6), los usuarios se crean en DB pero no pueden hacer
+login con email/contraseña sin verificar manualmente la cuenta en MongoDB Atlas.
+El login con Google OAuth sigue funcionando sin restricciones.
 
 ## Reportes asociados
 
@@ -285,11 +302,13 @@ Diseño de ambas páginas:
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
 | `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
-| `BE /api/auth/registro` | Endpoint real | ⏳ Sprint 2 BE |
-| `BE /api/auth/login` | Endpoint real | ⏳ Sprint 2 BE |
-| `BE /api/auth/verificar-email` | Endpoint real | ⏳ Sprint 2 BE |
-| `BE /api/auth/recuperar-contrasena` | Endpoint real | ⏳ Sprint 2 BE |
-| `BE /api/auth/nueva-contrasena` | Endpoint real | ⏳ Sprint 2 BE |
+| `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |
+| `frontend/src/services/authService.ts` | Servicio HTTP de auth (5 métodos) | ✅ |
+| `BE /api/auth/registro` | Endpoint real | ✅ Sprint 2 BE |
+| `BE /api/auth/login` | Endpoint real | ✅ Sprint 2 BE |
+| `BE /api/auth/verificar-email` | Endpoint real | ✅ Sprint 2 BE |
+| `BE /api/auth/recuperar-contrasena` | Endpoint real | ✅ Sprint 2 BE |
+| `BE /api/auth/nueva-contrasena` | Endpoint real | ✅ Sprint 2 BE |
 
 ## Estructura del Proyecto
 

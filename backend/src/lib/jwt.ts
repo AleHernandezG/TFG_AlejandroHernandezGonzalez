@@ -8,8 +8,9 @@ interface PayloadToken {
 
 export function firmarToken(
   payload: PayloadToken,
-  expiresIn: string | number = "7d"
+  expiresIn: string | number = "7d",
 ): string {
+  //Este string de arriba es lo que se devuelve
   const secreto = process.env.JWT_SECRET;
   if (!secreto) throw new Error("JWT_SECRET no está definida");
 
@@ -17,6 +18,7 @@ export function firmarToken(
 }
 
 export function verificarToken(token: string): PayloadToken {
+  //Este PayloadToken (vamos el Token) de arriba es lo que se devuelve
   const secreto = process.env.JWT_SECRET;
   if (!secreto) throw new Error("JWT_SECRET no está definida");
 

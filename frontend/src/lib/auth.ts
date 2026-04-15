@@ -1,51 +1,94 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { authService } from "@/services/authService";
+import axios from "axios";
 
-/**
- * Opciones de configuración para NextAuth.
- * Se exportan para poder reutilizarlas en el route handler y en
- * getServerSession() desde Server Components / API Routes.
- *
- * TODO Fase 4: añadir CredentialsProvider cuando el backend tenga
- * el endpoint POST /api/auth/registro y POST /api/auth/login.
- */
+// ─── Extensión de tipos NextAuth ──────────────────────────────────────────────
+declare module "next-auth" {
+  interface Session {
+    user: DefaultSession["user"] & {
+      id?: string;
+      rol?: string;
+      backendToken?: string;
+    };
+  }
+  interface JWT {
+    backendToken?: string;
+    rol?: string;
+  }
+}
+
 export const opcionesAuth: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        correo: { label: "Correo", type: "email" },
+        contrasena: { label: "Contraseña", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.correo || !credentials?.contrasena) return null;
+
+        try {
+          const { token, usuario } = await authService.login({
+            correo: credentials.correo,
+            contrasena: credentials.contrasena,
+          });
+
+          return {
+            id: usuario.id,
+            name: usuario.nombre,
+            email: usuario.correo,
+            image: usuario.foto ?? null,
+            // Campos extra — se propagan en el callback jwt
+            backendToken: token,
+            rol: usuario.rol,
+          };
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            throw new Error(
+              error.response?.data?.error ?? "Error de autenticación",
+            );
+          }
+          throw new Error("Error de autenticación");
+        }
+      },
+    }),
   ],
 
-  /** Redirige a nuestras páginas personalizadas en lugar de las de NextAuth */
   pages: {
     signIn: "/login",
-    newUser: "/registro",
+    newUser: "/completar-perfil",
     error: "/login",
   },
 
-  /** Estrategia JWT — sin base de datos por ahora (Fase 1-3) */
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
 
   callbacks: {
-    /**
-     * Enriquece la sesión con datos del token.
-     * TODO Fase 4: añadir id de usuario del backend aquí.
-     */
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        (session.user as { id?: string }).id = token.sub;
-      }
-      return session;
-    },
-
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.backendToken = (user as any).backendToken;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.rol = (user as any).rol;
       }
       return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub;
+        session.user.backendToken = token.backendToken as string | undefined;
+        session.user.rol = token.rol as string | undefined;
+      }
+      return session;
     },
   },
 };

@@ -26,6 +26,8 @@ import {
   type DatosRegistro,
   type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
+import { authService } from "@/services/authService";
+import axios from "axios";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -78,20 +80,24 @@ export function FormularioRegistro() {
     setMensajeError(null);
 
     try {
-      // TODO Fase 4: sustituir por llamada real a POST /api/usuarios/registro en el backend
-      // const respuesta = await axios.post("/api/usuarios/registro", datos);
-      console.log("[FormularioRegistro] Datos de registro (mock):", {
+      await authService.registro({
         nombre: datos.nombre,
         correo: datos.correo,
+        contrasena: datos.contrasena,
+        // confirmarContrasena no se envía al backend — ya validado por Zod
       });
-      await new Promise((r) => setTimeout(r, 1000)); // simula latencia de red
-      // Redirige a la pantalla de verificación pendiente pasando el email como query param
-      // TODO [AUTH-005] Fase 6: el backend enviará el correo real vía Resend antes de esta redirección
       router.push(`/verificar-email/pendiente?email=${encodeURIComponent(datos.correo)}`);
-    } catch {
-      setMensajeError(
-        "No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos."
-      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const msg = error.response?.data?.error;
+        setMensajeError(
+          msg === "Este correo ya está registrado"
+            ? "Este correo ya tiene una cuenta. ¿Quieres iniciar sesión?"
+            : "No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos."
+        );
+      } else {
+        setMensajeError("No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos.");
+      }
       setEstadoEnvio("error");
     }
   };

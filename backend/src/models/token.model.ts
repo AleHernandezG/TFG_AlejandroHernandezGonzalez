@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IToken extends Document {
-  userId: Types.ObjectId;
+  userId: Types.ObjectId; //Para ver quien es el usuario a quien corresponde el token
   token: string;
-  tipo: "verificacion" | "recuperacion";
+  tipo: "verificacion" | "recuperacion"; //Cambia el tiempo que esta activo
   expira: Date;
   usado: boolean;
   creadoEn: Date;

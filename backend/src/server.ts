@@ -7,7 +7,7 @@ const PUERTO = Number(process.env.PORT) || 4000;
 async function arrancar(): Promise<void> {
   await conectarDB();
   app.listen(PUERTO, () => {
-    console.log(`🚀 Servidor arrancado en http://localhost:${PUERTO}`);
+    console.log(`Servidor arrancado en http://localhost:${PUERTO}`);
   });
 }
 

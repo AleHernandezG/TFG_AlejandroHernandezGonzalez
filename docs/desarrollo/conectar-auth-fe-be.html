@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conexión Auth FE → BE — Cookr</title>
+  <style>
+    :root {
+      --brand: #d97706;
+      --bg: #0f0e0c;
+      --surface: #1a1916;
+      --surface2: #222118;
+      --border: #2e2c26;
+      --text: #f0ede6;
+      --muted: #8a8070;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #facc15;
+      --blue: #60a5fa;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 40px 20px 80px;
+    }
+    .page { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 28px;
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-block;
+      background: color-mix(in srgb, var(--brand) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent);
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 16px;
+    }
+    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: .95rem; }
+
+    /* Section */
+    section { margin-bottom: 48px; }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: .95rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    p { color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+    p strong { color: var(--text); }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    /* File tag */
+    .file {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: #b0a898;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: .78rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .tag-new { color: var(--green); border-color: color-mix(in srgb, var(--green) 30%, transparent); background: color-mix(in srgb, var(--green) 8%, transparent); }
+    .tag-mod { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 30%, transparent); background: color-mix(in srgb, var(--blue) 8%, transparent); }
+
+    /* Status pill */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+    .pill-ok  { background: color-mix(in srgb, var(--green)  10%, transparent); color: var(--green);  border: 1px solid color-mix(in srgb, var(--green)  30%, transparent); }
+    .pill-warn{ background: color-mix(in srgb, var(--yellow) 10%, transparent); color: var(--yellow); border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent); }
+    .pill-err { background: color-mix(in srgb, var(--red)    10%, transparent); color: var(--red);    border: 1px solid color-mix(in srgb, var(--red)    30%, transparent); }
+
+    /* Code block */
+    pre {
+      background: #111009;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: .8rem;
+      overflow-x: auto;
+      color: #c9c0b0;
+      margin-bottom: 12px;
+    }
+    code { font-family: inherit; }
+    .kw  { color: #c792ea; }
+    .str { color: #c3e88d; }
+    .cm  { color: #546e7a; font-style: italic; }
+    .fn  { color: #82aaff; }
+    .ty  { color: #ffcb6b; }
+    .nb  { color: #f78c6c; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 0 12px 10px;
+    }
+    td {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    td:first-child { font-family: 'Cascadia Code', monospace; font-size: .8rem; color: #b0a898; }
+    td:last-child { color: var(--muted); font-size: .83rem; }
+    tr:hover td { background: var(--surface); }
+
+    /* Env table */
+    .env-row td:nth-child(2) { font-size: .82rem; }
+    .env-ok   { color: var(--green) !important; }
+    .env-miss { color: var(--red)   !important; font-weight: 600; }
+    .env-opt  { color: var(--muted) !important; }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .flow-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: .82rem;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+    .flow-node.accent { border-color: color-mix(in srgb, var(--brand) 40%, transparent); color: var(--brand); }
+    .flow-arrow {
+      font-size: .9rem;
+      color: var(--muted);
+      margin: 0 2px;
+      transform: rotate(90deg);
+      display: block;
+      text-align: center;
+      padding: 2px 0 2px 22px;
+    }
+
+    /* Alert box */
+    .alert {
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: .85rem;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 10px;
+    }
+    .alert-warn { background: color-mix(in srgb, var(--yellow) 8%, transparent); border: 1px solid color-mix(in srgb, var(--yellow) 30%, transparent); color: #d4aa30; }
+    .alert-info { background: color-mix(in srgb, var(--blue)   8%, transparent); border: 1px solid color-mix(in srgb, var(--blue)   30%, transparent); color: var(--blue); }
+    .alert-ok   { background: color-mix(in srgb, var(--green)  8%, transparent); border: 1px solid color-mix(in srgb, var(--green)  30%, transparent); color: var(--green); }
+    .alert-icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* Separator */
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    ul { padding-left: 20px; margin-bottom: 12px; }
+    li { color: var(--muted); font-size: .88rem; margin-bottom: 4px; }
+    li strong { color: var(--text); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="badge">Sprint 2 · Auth FE → BE</div>
+    <h1>Conexión Auth FE → BE real</h1>
+    <p class="subtitle">
+      Documentación de todos los cambios realizados para conectar el frontend de autenticación
+      con los endpoints reales del backend Express. Build ✅ · Lint ✅ · 0 errores.
+    </p>
+  </header>
+
+  <!-- ── 1. CONTEXTO ── -->
+  <section>
+    <h2>1. Contexto y punto de partida</h2>
+    <p>
+      El backend de auth ya estaba operativo desde el Sprint 2 BE (Express en puerto 4000, 5 endpoints).
+      El frontend tenía los 4 formularios de auth con <strong>mocks de <code>setTimeout</code></strong> simulando latencia.
+      La carpeta <code>frontend/src/services/</code> existía pero vacía.
+    </p>
+    <p>
+      El objetivo era crear la capa de servicios y conectar cada formulario al backend
+      <strong>sin tocar la UI</strong> (solo las funciones <code>alEnviar</code>).
+    </p>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📐</span>
+      <span>
+        <strong>Arquitectura obligatoria:</strong>
+        Componente → Hook → <strong>Service → apiClient</strong> → Backend.
+        Ningún componente importa Axios directamente ni conoce URLs de la API.
+      </span>
+    </div>
+  </section>
+
+  <!-- ── 2. ARCHIVOS CREADOS ── -->
+  <section>
+    <h2>2. Archivos nuevos</h2>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-new">NUEVO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/src/services/apiClient.ts</code>
+      </div>
+      <p>Instancia Axios centralizada. Toda la comunicación HTTP del FE pasa por aquí.</p>
+      <pre><code><span class="kw">import</span> axios <span class="kw">from</span> <span class="str">"axios"</span>;
+
+<span class="kw">export const</span> <span class="fn">apiClient</span> = axios.<span class="fn">create</span>({
+  baseURL: process.env.<span class="ty">NEXT_PUBLIC_API_URL</span> ?? <span class="str">"http://localhost:4000/api"</span>,
+  headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> },
+  withCredentials: <span class="nb">false</span>, <span class="cm">// BE usa JWT en header, no cookies</span>
+});</code></pre>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-new">NUEVO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/src/services/authService.ts</code>
+      </div>
+      <p>5 métodos, uno por endpoint del BE. Los componentes y hooks nunca conocen URLs ni Axios.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>Endpoint BE</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>authService.registro()</td>
+            <td>POST /auth/registro</td>
+            <td>Crea usuario, devuelve mensaje</td>
+          </tr>
+          <tr>
+            <td>authService.login()</td>
+            <td>POST /auth/login</td>
+            <td>Devuelve JWT + datos de usuario</td>
+          </tr>
+          <tr>
+            <td>authService.recuperarContrasena()</td>
+            <td>POST /auth/recuperar-contrasena</td>
+            <td>Genera token de recuperación en DB</td>
+          </tr>
+          <tr>
+            <td>authService.nuevaContrasena()</td>
+            <td>POST /auth/nueva-contrasena</td>
+            <td>Valida token, actualiza hash bcrypt</td>
+          </tr>
+          <tr>
+            <td>authService.verificarEmail()</td>
+            <td>POST /auth/verificar-email</td>
+            <td>Valida token, marca cuenta verificada</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-new">NUEVO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/.env.local</code>
+      </div>
+      <p>Variable de entorno pública para que el FE sepa dónde está el BE. Ver sección 5 para el estado de todas las variables.</p>
+      <pre><code>NEXT_PUBLIC_API_URL=http://localhost:4000/api</code></pre>
+    </div>
+  </section>
+
+  <!-- ── 3. ARCHIVOS MODIFICADOS ── -->
+  <section>
+    <h2>3. Archivos modificados</h2>
+
+    <!-- auth.ts -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/src/lib/auth.ts</code>
+      </div>
+      <p>Tres cambios principales:</p>
+      <ul>
+        <li>
+          <strong>Extensión de tipos NextAuth</strong> — se añaden <code>id</code>, <code>rol</code>
+          y <code>backendToken</code> a la interfaz <code>Session</code> y <code>JWT</code>.
+        </li>
+        <li>
+          <strong>CredentialsProvider</strong> — nuevo provider que llama a <code>authService.login()</code>
+          en <code>authorize()</code>. Propaga el token JWT del backend a la sesión de NextAuth.
+        </li>
+        <li>
+          <strong><code>pages.newUser</code></strong> cambiado de <code>/registro</code> a
+          <code>/completar-perfil</code> — los usuarios nuevos de Google OAuth van al onboarding.
+        </li>
+      </ul>
+      <pre><code><span class="cm">// Extensión de tipos</span>
+<span class="kw">declare module</span> <span class="str">"next-auth"</span> {
+  <span class="kw">interface</span> <span class="ty">Session</span> {
+    user: DefaultSession[<span class="str">"user"</span>] & {
+      id?: <span class="ty">string</span>;
+      rol?: <span class="ty">string</span>;
+      backendToken?: <span class="ty">string</span>;
+    };
+  }
+}
+
+<span class="cm">// CredentialsProvider — llama al BE real</span>
+<span class="fn">CredentialsProvider</span>({
+  <span class="kw">async</span> <span class="fn">authorize</span>(credentials) {
+    <span class="kw">const</span> { token, usuario } = <span class="kw">await</span> authService.<span class="fn">login</span>({
+      correo: credentials.correo,
+      contrasena: credentials.contrasena,
+    });
+    <span class="kw">return</span> { id: usuario.id, backendToken: token, ... };
+  }
+})</code></pre>
+    </div>
+
+    <!-- formularioRegistro -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">formularioRegistro.tsx — función alEnviar</code>
+      </div>
+      <ul>
+        <li>Sustituido <code>setTimeout</code> por <code>authService.registro()</code></li>
+        <li>Error 409 (<em>"Este correo ya está registrado"</em>) → mensaje específico al usuario</li>
+        <li>Redirige a <code>/verificar-email/pendiente?email=...</code> tras éxito</li>
+        <li><code>confirmarContrasena</code> no se envía al BE — ya validado por Zod en el cliente</li>
+      </ul>
+    </div>
+
+    <!-- formularioLogin -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">formularioLogin.tsx — función alEnviar</code>
+      </div>
+      <ul>
+        <li>Sustituido <code>setTimeout</code> por <code>signIn("credentials", { redirect: false })</code></li>
+        <li>Si <code>resultado.ok</code> → <code>router.push("/home")</code></li>
+        <li>Si <code>resultado.error === "Debes verificar tu correo..."</code> → mensaje específico</li>
+        <li>Cualquier otro error → mensaje genérico de credenciales incorrectas</li>
+        <li><strong>No</strong> importa <code>authService</code> directamente — el login pasa por NextAuth</li>
+      </ul>
+    </div>
+
+    <!-- formularioRecuperarContrasena -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">formularioRecuperarContrasena.tsx — función alEnviar</code>
+      </div>
+      <ul>
+        <li>Sustituido <code>setTimeout</code> por <code>authService.recuperarContrasena()</code></li>
+        <li>El BE siempre devuelve 200 (nunca revela si el correo existe) — cualquier error es de red</li>
+        <li>Redirige a <code>/recuperar-contrasena/pendiente?email=...</code> tras éxito</li>
+      </ul>
+    </div>
+
+    <!-- formularioNuevaContrasena -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">formularioNuevaContrasena.tsx — función alEnviar</code>
+      </div>
+      <ul>
+        <li>Sustituido <code>setTimeout</code> por <code>authService.nuevaContrasena({ token, contrasena })</code></li>
+        <li><code>token</code> llega como prop desde la página padre (query string <code>?token=...</code>)</li>
+        <li>Error 400 → muestra mensaje del backend (<em>"Token inválido o expirado"</em>)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 4. FLUJO COMPLETO ── -->
+  <section>
+    <h2>4. Flujo completo — registro + login con credenciales</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Flujo Registro</h3>
+        <div class="flow">
+          <div class="flow-step"><div class="flow-node">Usuario rellena /registro</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">Zod valida en cliente</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node accent">authService.registro()</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">POST /api/auth/registro</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">Zod BE + bcrypt + MongoDB</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">→ /verificar-email/pendiente</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Flujo Login (credenciales)</h3>
+        <div class="flow">
+          <div class="flow-step"><div class="flow-node">Usuario rellena /login</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">Zod valida en cliente</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node accent">signIn("credentials")</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">NextAuth → authorize()</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node accent">authService.login()</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">POST /api/auth/login</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">JWT → sesión NextAuth</div></div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-step"><div class="flow-node">→ /home</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. VARIABLES DE ENTORNO ── -->
+  <section>
+    <h2>5. Estado de variables de entorno — qué falta rellenar</h2>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <span>
+        <strong>El backend NO tiene archivo <code>.env</code></strong> — solo existe <code>.env.example</code>.
+        Sin él el servidor no arranca. Es lo más urgente.
+      </span>
+    </div>
+
+    <h3 style="margin-bottom:12px;margin-top:20px;">Frontend — <code>frontend/.env.local</code></h3>
+    <table>
+      <thead><tr><th>Variable</th><th>Estado</th><th>Qué poner</th></tr></thead>
+      <tbody class="env-row">
+        <tr>
+          <td>NEXTAUTH_URL</td>
+          <td><span class="pill pill-ok">✅ OK</span></td>
+          <td class="env-ok">http://localhost:3000 — correcto</td>
+        </tr>
+        <tr>
+          <td>NEXTAUTH_SECRET</td>
+          <td><span class="pill pill-err">❌ Vacío</span></td>
+          <td class="env-miss">Genera con: <code>openssl rand -base64 32</code> (o node crypto)</td>
+        </tr>
+        <tr>
+          <td>GOOGLE_CLIENT_ID</td>
+          <td><span class="pill pill-err">❌ Vacío</span></td>
+          <td class="env-miss">El que tenías antes de que Google OAuth funcionara</td>
+        </tr>
+        <tr>
+          <td>GOOGLE_CLIENT_SECRET</td>
+          <td><span class="pill pill-err">❌ Vacío</span></td>
+          <td class="env-miss">El que tenías antes de que Google OAuth funcionara</td>
+        </tr>
+        <tr>
+          <td>NEXT_PUBLIC_API_URL</td>
+          <td><span class="pill pill-ok">✅ OK</span></td>
+          <td class="env-ok">http://localhost:4000/api — correcto</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-bottom:12px;margin-top:28px;">Backend — <code>backend/.env</code> <span style="color:var(--red);font-size:.8rem;">(no existe — créalo)</span></h3>
+    <p>Copia <code>backend/.env.example</code> a <code>backend/.env</code> y rellena:</p>
+    <table>
+      <thead><tr><th>Variable</th><th>Estado</th><th>Qué poner</th></tr></thead>
+      <tbody class="env-row">
+        <tr>
+          <td>PORT</td>
+          <td><span class="pill pill-warn">⚠️ Falta archivo</span></td>
+          <td>4000 (ya viene en el example)</td>
+        </tr>
+        <tr>
+          <td>NODE_ENV</td>
+          <td><span class="pill pill-warn">⚠️ Falta archivo</span></td>
+          <td>development (ya viene en el example)</td>
+        </tr>
+        <tr>
+          <td>MONGODB_URI</td>
+          <td><span class="pill pill-err">❌ Crítico</span></td>
+          <td class="env-miss">URI de MongoDB Atlas con tu usuario y contraseña</td>
+        </tr>
+        <tr>
+          <td>JWT_SECRET</td>
+          <td><span class="pill pill-err">❌ Crítico</span></td>
+          <td class="env-miss">Genera con: <code>node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</code></td>
+        </tr>
+        <tr>
+          <td>FRONTEND_URL</td>
+          <td><span class="pill pill-warn">⚠️ Falta archivo</span></td>
+          <td>http://localhost:3000 (ya viene en el example)</td>
+        </tr>
+        <tr>
+          <td>UPSTASH_REDIS_URL</td>
+          <td><span class="pill" style="background:transparent;color:var(--muted);border-color:var(--border)">⏳ Sprint 3+</span></td>
+          <td class="env-opt">No necesario ahora — dejar vacío</td>
+        </tr>
+        <tr>
+          <td>UPSTASH_REDIS_TOKEN</td>
+          <td><span class="pill" style="background:transparent;color:var(--muted);border-color:var(--border)">⏳ Sprint 3+</span></td>
+          <td class="env-opt">No necesario ahora — dejar vacío</td>
+        </tr>
+        <tr>
+          <td>RESEND_API_KEY</td>
+          <td><span class="pill" style="background:transparent;color:var(--muted);border-color:var(--border)">⏳ Fase 6</span></td>
+          <td class="env-opt">No necesario ahora — dejar vacío</td>
+        </tr>
+        <tr>
+          <td>GEMINI_API_KEY</td>
+          <td><span class="pill" style="background:transparent;color:var(--muted);border-color:var(--border)">⏳ Fase 5</span></td>
+          <td class="env-opt">No necesario ahora — dejar vacío</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info" style="margin-top:18px;">
+      <span class="alert-icon">💡</span>
+      <span>
+        Pasos rápidos: <strong>1)</strong> copia <code>backend/.env.example → backend/.env</code>,
+        <strong>2)</strong> rellena <code>MONGODB_URI</code> y <code>JWT_SECRET</code>,
+        <strong>3)</strong> rellena <code>NEXTAUTH_SECRET</code>, <code>GOOGLE_CLIENT_ID</code>,
+        <code>GOOGLE_CLIENT_SECRET</code> en <code>frontend/.env.local</code>.
+        Con eso el flujo completo funcionará.
+      </span>
+    </div>
+  </section>
+
+  <!-- ── 6. LIMITACIONES CONOCIDAS ── -->
+  <section>
+    <h2>6. Limitaciones conocidas hasta Fase 6</h2>
+
+    <div class="card">
+      <h3>🔒 Login con email/contraseña → 403 hasta verificar manualmente</h3>
+      <p>
+        El endpoint <code>POST /api/auth/login</code> comprueba <code>cuentaVerificada: true</code>
+        antes de devolver el token. Como Resend (emails) se activa en Fase 6, los usuarios nuevos
+        no reciben el correo de verificación. Para probar el login durante desarrollo:
+      </p>
+      <pre><code><span class="cm">// En MongoDB Atlas → colección usuarios → editar documento:</span>
+{ cuentaVerificada: <span class="nb">true</span> }</code></pre>
+      <p>El login con Google OAuth no tiene esta restricción y funciona sin cambios.</p>
+    </div>
+
+    <div class="card">
+      <h3>📧 Recuperar contraseña / Verificar email → token en DB, sin email</h3>
+      <p>
+        El token se genera y guarda en MongoDB correctamente, pero no llega al usuario por correo
+        hasta Fase 6. Para probar <code>nueva-contrasena</code> durante desarrollo, recupera el token
+        directamente de la colección <code>tokens</code> en Atlas.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>👤 <code>formularioCompletarPerfil.tsx</code> — mock hasta Fase 5</h3>
+      <p>
+        El formulario de onboarding (alérgenos + dietas) no llama aún al backend.
+        Se implementará cuando exista <code>usuariosService.actualizarPerfil()</code> en Fase 5.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── 7. VERIFICACIÓN ── -->
+  <section>
+    <h2>7. Cómo verificar que todo funciona</h2>
+
+    <p>Con ambas variables de entorno rellenadas, arranca los dos servidores:</p>
+    <pre><code><span class="cm"># Terminal 1 — Backend</span>
+cd backend && npm run dev
+
+<span class="cm"># Terminal 2 — Frontend</span>
+cd frontend && npm run dev</code></pre>
+
+    <table>
+      <thead><tr><th>Acción</th><th>Resultado esperado</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>POST /api/health</td>
+          <td><code>{"estado":"ok","entorno":"development"}</code></td>
+        </tr>
+        <tr>
+          <td>Registro con correo nuevo</td>
+          <td>Usuario creado en MongoDB Atlas → redirige a /verificar-email/pendiente</td>
+        </tr>
+        <tr>
+          <td>Registro con correo duplicado</td>
+          <td>Mensaje: "Este correo ya tiene una cuenta. ¿Quieres iniciar sesión?"</td>
+        </tr>
+        <tr>
+          <td>Login sin verificar</td>
+          <td>Mensaje: "Debes verificar tu correo antes de iniciar sesión"</td>
+        </tr>
+        <tr>
+          <td>Login con cuentaVerificada: true</td>
+          <td>Redirige a /home, sesión NextAuth activa con backendToken</td>
+        </tr>
+        <tr>
+          <td>Recuperar contraseña</td>
+          <td>Token creado en colección tokens → redirige a /recuperar-contrasena/pendiente</td>
+        </tr>
+        <tr>
+          <td>Login con Google OAuth</td>
+          <td>Funciona igual que antes → redirige a /completar-perfil (usuarios nuevos)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-ok" style="margin-top:16px;">
+      <span class="alert-icon">✅</span>
+      <span>
+        <strong>Build y lint verificados:</strong>
+        <code>npm run build</code> → 16 rutas generadas, 0 errores TypeScript.
+        <code>npm run lint</code> → 0 warnings ESLint.
+      </span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
