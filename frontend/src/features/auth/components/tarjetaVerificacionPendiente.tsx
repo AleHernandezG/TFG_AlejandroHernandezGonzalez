@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Mail, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react'
+import { Mail, RefreshCw, ArrowLeft, AlertCircle, FlaskConical } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+// TODO [Fase 6]: eliminar esta importación cuando Resend esté integrado
+import { apiClient } from '@/services/apiClient'
 
 const COOLDOWN_SEGUNDOS = 60
 
@@ -24,9 +27,13 @@ interface Props {
  * TODO [AUTH-005] Fase 6: llamar a POST /api/auth/enviar-verificacion.
  */
 export function TarjetaVerificacionPendiente({ email }: Props) {
+  const router = useRouter()
   const [segundosRestantes, setSegundosRestantes] = useState(0)
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
+  // TODO [Fase 6]: eliminar este estado cuando Resend esté integrado
+  const [verificandoDev, setVerificandoDev] = useState(false)
+  const [errorDev, setErrorDev] = useState<string | null>(null)
 
   // Arranca el cooldown cuando se reenvía
   const iniciarCooldown = useCallback(() => {
@@ -38,6 +45,19 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
     const id = setTimeout(() => setSegundosRestantes((s) => s - 1), 1000)
     return () => clearTimeout(id)
   }, [segundosRestantes])
+
+  // TODO [Fase 6]: eliminar esta función cuando Resend esté integrado
+  const handleVerificarDev = async () => {
+    setVerificandoDev(true)
+    setErrorDev(null)
+    try {
+      await apiClient.post('/dev/verificar-usuario', { correo: email })
+      router.push('/login')
+    } catch {
+      setErrorDev('No se pudo verificar. ¿Está el backend corriendo?')
+      setVerificandoDev(false)
+    }
+  }
 
   const handleReenviar = async () => {
     setReenviando(true)
@@ -94,6 +114,33 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
             >
               Correo reenviado correctamente.
             </motion.p>
+          )}
+
+          {/* TODO [Fase 6]: eliminar este bloque cuando Resend esté integrado */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="w-full space-y-1.5">
+              <Button
+                variant="outline"
+                className="w-full border-dashed border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-600 dark:text-yellow-400"
+                onClick={handleVerificarDev}
+                disabled={verificandoDev || !email}
+              >
+                {verificandoDev ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+                    Verificando…
+                  </>
+                ) : (
+                  <>
+                    <FlaskConical className="mr-2 h-4 w-4" aria-hidden />
+                    [DEV] Verificar cuenta ahora
+                  </>
+                )}
+              </Button>
+              {errorDev && (
+                <p className="text-center text-xs text-destructive">{errorDev}</p>
+              )}
+            </div>
           )}
 
           {/* Botón reenviar */}

@@ -608,9 +608,99 @@
     </div>
   </section>
 
-  <!-- ── 7. VERIFICACIÓN ── -->
+  <!-- ── 7. HERRAMIENTAS TEMPORALES DE DESARROLLO ── -->
   <section>
-    <h2>7. Cómo verificar que todo funciona</h2>
+    <h2>7. Herramientas temporales de desarrollo ⚠️ Eliminar en Fase 6</h2>
+
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <span>
+        Estos cambios son <strong>solo para facilitar las pruebas manuales</strong> mientras Resend no está integrado.
+        En producción son inofensivos (el endpoint no se monta, el botón no aparece),
+        pero deben eliminarse antes de cerrar Fase 6.
+      </span>
+    </div>
+
+    <!-- Turbopack -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/package.json</code>
+      </div>
+      <h3>Turbopack activado en dev</h3>
+      <p>
+        Cambio: <code>"dev": "next dev"</code> → <code>"dev": "next dev --turbopack"</code><br>
+        Reduce el tiempo de compilación de rutas en desarrollo de ~5-8 s a ~100-300 ms.
+        <strong>No afecta a producción</strong> — Turbopack solo actúa con <code>next dev</code>.
+        Si genera algún comportamiento inesperado, basta con quitar el flag.
+      </p>
+      <p><strong>Qué eliminar en Fase 6:</strong> revertir a <code>"dev": "next dev"</code> si se prefiere
+      la configuración estándar, aunque puede mantenerse si no da problemas.</p>
+    </div>
+
+    <!-- Endpoint dev backend -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-new">NUEVO</span>
+        <code style="font-size:.85rem;color:var(--text)">backend/src/routes/dev.routes.ts</code>
+      </div>
+      <h3>Endpoint POST /api/dev/verificar-usuario</h3>
+      <p>
+        Marca <code>cuentaVerificada: true</code> en el usuario indicado por correo,
+        sin necesitar el token del email. Solo se monta cuando <code>NODE_ENV === "development"</code>.
+      </p>
+      <pre><code><span class="cm">// Body: { "correo": "usuario@ejemplo.com" }</span>
+<span class="cm">// Respuesta: { "mensaje": "Usuario verificado correctamente." }</span>
+<span class="cm">// En producción este endpoint no existe (el if en app.ts lo bloquea)</span></code></pre>
+      <p><strong>Qué eliminar en Fase 6:</strong></p>
+      <ul>
+        <li>Borrar <code>backend/src/routes/dev.routes.ts</code></li>
+        <li>En <code>backend/src/app.ts</code>: eliminar el <code>import devRoutes</code> y el bloque <code>if (NODE_ENV === "development")</code></li>
+      </ul>
+    </div>
+
+    <!-- Botón dev frontend -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-mod">MODIFICADO</span>
+        <code style="font-size:.85rem;color:var(--text)">frontend/src/features/auth/components/tarjetaVerificacionPendiente.tsx</code>
+      </div>
+      <h3>Botón [DEV] Verificar cuenta ahora</h3>
+      <p>
+        Aparece en la página <code>/verificar-email/pendiente</code> únicamente cuando
+        <code>process.env.NODE_ENV === "development"</code>. Llama al endpoint dev del backend
+        y redirige al login si tiene éxito. En producción el bloque no se renderiza.
+      </p>
+      <p><strong>Qué eliminar en Fase 6:</strong> buscar los 3 comentarios <code>TODO [Fase 6]</code>
+      en ese archivo y eliminar:</p>
+      <ul>
+        <li>El <code>import { apiClient }</code> añadido</li>
+        <li>El <code>import { useRouter }</code> si no se usa en otro sitio</li>
+        <li>Los estados <code>verificandoDev</code> y <code>errorDev</code></li>
+        <li>La función <code>handleVerificarDev</code></li>
+        <li>El bloque JSX del botón <code>[DEV]</code></li>
+      </ul>
+    </div>
+
+    <!-- Test script -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="file tag-new">NUEVO</span>
+        <code style="font-size:.85rem;color:var(--text)">backend/test-auth.mjs</code>
+      </div>
+      <h3>Script de test de endpoints</h3>
+      <p>
+        Script Node.js (sin dependencias extra) que prueba los 9 casos de los 5 endpoints de auth.
+        Resultado obtenido: <strong>9/9 pasados</strong>. No forma parte del código de la app.
+      </p>
+      <pre><code>node backend/test-auth.mjs</code></pre>
+      <p><strong>Qué eliminar:</strong> puede borrarse o mantenerse como utilidad de diagnóstico. No afecta al build.</p>
+    </div>
+  </section>
+
+  <!-- ── 8. VERIFICACIÓN ── -->
+  <section>
+    <h2>8. Cómo verificar que todo funciona</h2>
 
     <p>Con ambas variables de entorno rellenadas, arranca los dos servidores:</p>
     <pre><code><span class="cm"># Terminal 1 — Backend</span>
