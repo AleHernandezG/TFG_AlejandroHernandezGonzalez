@@ -1,8 +1,12 @@
-# Estructura de Carpetas — `frontend/src`
+# Estructura de Carpetas — Cookr TFG
 
-> **Última actualización:** 2026-04-09 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
+> **Última actualización:** 2026-04-17 · **Stack:** Next.js 14 App Router · TypeScript · Tailwind · shadcn/ui
 
-## Árbol
+> Reglas de arquitectura, nomenclatura, barrel exports y patrón de capas → `docs/rules.md`
+
+---
+
+## Árbol frontend — `frontend/src`
 
 ```
 src/
@@ -21,20 +25,34 @@ src/
 │
 ├── lib/
 │   ├── utils.ts                # Requerido por shadcn/ui (NO mover)
-│   └── auth.ts                 # opcionesAuth — NextAuth config centralizada
+│   └── auth.ts                 # opcionesAuth — NextAuth config centralizada (NO mover)
 │
 ├── components/
-│   ├── ui/                     # Primitivas de shadcn/ui (NO mover)
-│   └── common/                 # Componentes reutilizables globales (Footer, Navbar…)
+│   ├── ui/                     # Primitivas de shadcn/ui (NO añadir componentes propios aquí)
+│   └── common/                 # Componentes reutilizables globales (PiePagina, NavBar…)
 │
 ├── features/                   # Módulos por dominio — patrón "feature-based"
-│   ├── <feature>/
-│   │   ├── components/         # Componentes propios del feature
-│   │   │   └── index.ts        # Barrel export
-│   │   ├── hooks/              # Hooks específicos del feature
-│   │   ├── data/               # Datos mock / constantes del feature
-│   │   └── types/              # Tipos específicos del feature
-│   ├── recetas/                # Sprint 2+ — feed, detalle, crear, buscar
+│   ├── landing/
+│   │   └── components/
+│   │       ├── seccionHero.tsx
+│   │       ├── bentoCaracteristicas.tsx
+│   │       ├── bentoTestimonios.tsx
+│   │       ├── tarjetaTestimonio.tsx
+│   │       └── index.ts
+│   ├── auth/
+│   │   ├── components/
+│   │   │   ├── formularioRegistro.tsx
+│   │   │   ├── formularioLogin.tsx
+│   │   │   ├── formularioRecuperarContrasena.tsx
+│   │   │   ├── formularioNuevaContrasena.tsx
+│   │   │   ├── tarjetaVerificacionPendiente.tsx
+│   │   │   ├── tarjetaRecuperacionPendiente.tsx
+│   │   │   ├── botonGoogle.tsx
+│   │   │   ├── divisorOAuth.tsx
+│   │   │   └── index.ts
+│   │   └── types/
+│   │       └── autenticacion.ts
+│   ├── recetas/
 │   │   ├── components/
 │   │   │   ├── home/           # Componentes exclusivos de /home (feed)
 │   │   │   │   ├── feedHome.tsx
@@ -58,7 +76,7 @@ src/
 │   │   │   │   └── index.ts
 │   │   │   └── index.ts        # Barrel raíz — re-exporta home/ y detalleReceta/
 │   │   ├── data/
-│   │   │   ├── datosFeed.ts
+│   │   │   ├── datosFeed.ts    # Incluye constante FILTROS_FEED
 │   │   │   ├── datosDetalle.ts
 │   │   │   └── datosTendencias.ts
 │   │   └── types/
@@ -68,192 +86,48 @@ src/
 │   ├── chat/                   # Sprint 5+
 │   └── grupos/                 # Sprint 6+
 │
-├── hooks/                      # Custom hooks globales compartidos
-│
+├── hooks/                      # Custom hooks globales (usados por 2+ features)
 ├── stores/                     # Zustand stores globales
-│
-├── services/                   # Axios instances, TanStack Query wrappers
-│
+├── services/                   # apiClient.ts + *Service.ts
+│   ├── apiClient.ts
+│   └── authService.ts
 ├── types/                      # Tipos TypeScript compartidos entre features
-│
-├── config/                     # Configuración de la app, constantes globales
-│
-└── lib/
-    ├── utils.ts                # Utilidades requeridas por shadcn/ui (NO mover)
-    └── auth.ts                 # opcionesAuth — NextAuth config centralizada (NO mover)
+└── config/                     # Constantes y variables de entorno tipadas
 ```
 
-## Reglas
+---
 
-### 1. Rutas y layouts → `app/`
-
-Todo lo que Next.js necesita para routing va en `app/`. Seguir la convención de App Router:
-
-- `app/(grupo)/ruta/page.tsx` para páginas
-- `app/(grupo)/ruta/layout.tsx` para layouts parciales
-- `app/api/` para route handlers
-
-### 2. Feature-based → `features/<nombre>/`
-
-Cada dominio de negocio tiene su propia carpeta en `features/`. Dentro:
-
-| Subcarpeta     | Uso                                           |
-| -------------- | --------------------------------------------- |
-| `components/`  | Componentes específicos del feature            |
-| `hooks/`       | Custom hooks del feature                       |
-| `data/`        | Datos mock, constantes, fixtures              |
-| `types/`       | Interfaces y tipos del feature                |
-
-**Barrel export:** cada `components/` debe tener un `index.ts` que re-exporte todos los componentes.
-
-Cuando un feature tiene vistas diferenciadas (ej: `home` vs `detalleReceta`), los componentes se organizan en subcarpetas por vista, cada una con su propio `index.ts`. El `index.ts` raíz re-exporta desde las subcarpetas.
-
-```ts
-// features/landing/components/index.ts — nombres en español (camelCase)
-export { SeccionHero } from "./seccionHero";
-export { BentoCaracteristicas } from "./bentoCaracteristicas";
-
-// features/auth/components/index.ts
-export { FormularioRegistro } from "./formularioRegistro";
-export { BotonGoogle } from "./botonGoogle";
-
-// features/recetas/components/index.ts — re-exporta subcarpetas por vista
-export * from "./home";         // feedHome, headerHome, tarjetaPost, layoutHomePc…
-export * from "./detalleReceta"; // detalleRecetaCliente, heroReceta, tabsReceta…
-
-// features/recetas/components/home/index.ts
-export { FeedHome } from "./feedHome";
-export { TarjetaPost } from "./tarjetaPost";
-// …
-
-// features/recetas/components/detalleReceta/index.ts
-export { DetalleRecetaCliente } from "./detalleRecetaCliente";
-export { HeroReceta } from "./heroReceta";
-// …
-```
-
-**Import desde fuera — siempre por el barrel raíz del feature:**
-
-```ts
-import { SeccionHero } from "@/features/landing/components";
-import { BotonGoogle } from "@/features/auth/components";
-// El barrel raíz expone todo: no importar directamente desde la subcarpeta
-import { FeedHome, DetalleRecetaCliente } from "@/features/recetas/components";
-```
-
-### 3. Componentes compartidos → `components/`
-
-- **`components/ui/`** — exclusivo para shadcn/ui. No crear componentes propios aquí.
-- **`components/common/`** — componentes reutilizables que no pertenecen a un solo feature (ej: `Footer`, `Navbar`, `LoadingSpinner`).
-
-### 4. Global compartido
-
-| Carpeta      | Uso                                                     |
-| ------------ | ------------------------------------------------------- |
-| `hooks/`     | Hooks usados por 2+ features (ej: `useMediaQuery`)      |
-| `stores/`    | Zustand stores globales (ej: `useAuthStore`)            |
-| `services/`  | Clientes API, Axios instances, TanStack Query helpers   |
-| `types/`     | Tipos compartidos entre features                        |
-| `config/`    | Constantes, variables de entorno tipadas                |
-
-### 5. `lib/` — solo utilidades de librerías
-
-`lib/utils.ts` es requerido por shadcn/ui (alias `@/lib/utils`). No añadir más archivos aquí; las utilidades del proyecto deben ir en `hooks/`, `services/` o `config/` según el caso.
-
-## Árbol backend
+## Árbol backend — `backend/src`
 
 ```
-backend/               # Node.js + Express — activo desde Sprint 2
-├── src/
-│   ├── controllers/
-│   ├── models/        # Mongoose schemas
-│   ├── repositories/  # Toda la comunicación con MongoDB/Redis
-│   ├── routes/
-│   ├── middlewares/
-│   ├── services/
-│   └── lib/           # db.ts, redis.ts, jwt.ts
-├── .env
-└── package.json
+backend/src/
+├── controllers/           # Reciben request, devuelven response
+├── models/                # Schemas Mongoose — importa interfaces de types/
+│   ├── usuarioMongo.ts    # IUsuarioDoc extends IUsuario, Document
+│   └── tokenMongo.ts      # ITokenDoc extends IToken, Document
+├── repositories/          # Toda la comunicación con MongoDB
+│   ├── usuarioRepository.ts
+│   └── tokenRepository.ts
+├── routes/                # Definición de endpoints y middlewares
+├── middlewares/           # Validación, autenticación, errores
+├── services/              # Lógica de negocio
+├── types/                 # Interfaces de dominio puras (sin acoplamiento a Mongoose)
+│   ├── usuario.ts         # IUsuario
+│   └── token.ts           # IToken
+└── lib/                   # db.ts, jwt.ts, validadores.ts
 ```
-
-## Patrón de capas — Backend
-
-Flujo obligatorio: **Route → Controller → Service → Repository → MongoDB/Redis**
-
-### Capa 1 — Routes
-
-Responsabilidad: definir endpoints y aplicar middlewares.
-NO pueden contener lógica de negocio ni acceder a modelos.
-
-### Capa 2 — Controllers
-
-Responsabilidad: recibir request validado, llamar al service,
-devolver response. Sin lógica de negocio.
-
-### Capa 3 — Services
-
-Responsabilidad: toda la lógica de negocio.
-NO acceden a MongoDB directamente — usan el Repository.
-
-### Capa 4 — Repositories (`backend/src/repositories/`)
-
-Responsabilidad: toda la comunicación con MongoDB y Redis.
-Si se cambia MongoDB por PostgreSQL, solo se tocan los repositories.
-
-```ts
-export const usuarioRepository = {
-  crear:           (datos) => Usuario.create(datos),
-  buscarPorCorreo: (correo) => Usuario.findOne({ correo }),
-  existePorCorreo: async (correo) => !!(await Usuario.exists({ correo })),
-  actualizar:      (id, datos) =>
-    Usuario.findByIdAndUpdate(id, datos, { new: true }),
-}
-```
-
-### Capa 5 — Models
-
-Responsabilidad: definir esquemas Mongoose únicamente.
-Sin lógica de negocio dentro del modelo.
 
 ### Repositories planificados
 
 | Fichero | Modelos | Sprint |
 |---|---|---|
-| `backend/src/repositories/usuarioRepository.ts` | Usuario | Sprint 2 |
-| `backend/src/repositories/tokenRepository.ts` | Token | Sprint 2 |
-| `backend/src/repositories/recetaRepository.ts` | Receta, Ingrediente | Sprint 3 |
-| `backend/src/repositories/despensaRepository.ts` | Despensa, ItemDespensa | Sprint 6 |
-| `backend/src/repositories/grupoRepository.ts` | Grupo, Miembro | Sprint 7 |
+| `usuarioRepository.ts` | Usuario | ✅ Sprint 2 |
+| `tokenRepository.ts` | Token | ✅ Sprint 2 |
+| `recetaRepository.ts` | Receta, Ingrediente | Sprint 3 |
+| `despensaRepository.ts` | Despensa, ItemDespensa | Sprint 6 |
+| `grupoRepository.ts` | Grupo, Miembro | Sprint 7 |
 
-## Regla de oro — cambio sin efecto cascada
-
-| Si quiero cambiar… | Solo toco… |
-|---|---|
-| URL del backend | `src/services/apiClient.ts` |
-| Axios por fetch | `src/services/apiClient.ts` |
-| MongoDB por PostgreSQL | `backend/src/repositories/*.ts` |
-| shadcn por otra UI lib | `src/components/ui/` |
-| Zustand por Jotai | `src/stores/*.ts` |
-| TanStack Query por SWR | `src/features/*/hooks/*.ts` |
-| Gemini por otro modelo IA | `backend/src/services/chatService.ts` |
-| Cloudinary por S3 | `backend/src/services/imagenService.ts` |
-
-## Árbol docs/stitch/
-
-```
-docs/stitch/              # Diseños de referencia Stitch by Google
-├── home/                 # home.png + home.html (Sprint 2)
-├── detalleReceta/        # detalleReceta.png + detalleReceta.html (Sprint 2)
-├── crearReceta/          # (Sprint 3+)
-├── perfil/               # (Sprint 4+)
-├── despensa/             # (Sprint 5+)
-├── chat/                 # (Sprint 5+)
-├── grupos/               # (Sprint 6+)
-├── notificaciones/       # (Sprint 6+)
-└── ajustes/              # (Sprint 7+)
-```
-
-Ver [docs/stitch/LEEME.md](../stitch/LEEME.md) para el flujo completo de uso.
+---
 
 ## Aliases (tsconfig)
 
@@ -267,11 +141,13 @@ Ver [docs/stitch/LEEME.md](../stitch/LEEME.md) para el flujo completo de uso.
 
 Todos los imports usan `@/` como raíz de `src/`.
 
-## Features Actuales
+---
+
+## Features actuales
 
 | Feature | Estado | Componentes |
-| --- | --- | --- |
-| `landing` | ✅ | SeccionHero, BentoCaracteristicas, BentoTestimonios |
+|---|---|---|
+| `landing` | ✅ Aprobado | SeccionHero, BentoCaracteristicas, BentoTestimonios |
 | `auth` | 👁️ revisión | FormularioRegistro, FormularioLogin, BotonGoogle, DivisorOAuth, +4 |
 | `recetas` | 👁️ revisión | `home/` ×9 (FeedHome, TarjetaPost…) · `detalleReceta/` ×7 (HeroReceta, TabsReceta…) |
 | `perfil` | ⏳ Sprint 4 | Pendiente |
@@ -279,9 +155,9 @@ Todos los imports usan `@/` como raíz de `src/`.
 | `chat` | ⏳ Sprint 5 | Pendiente |
 | `grupos` | ⏳ Sprint 6 | Pendiente |
 
-## Añadir un Nuevo Feature
+## Añadir un nuevo feature
 
-1. Crear `features/<nombre>/components/` con un `index.ts`
+1. Crear `features/<nombre>/components/` con un `index.ts` barrel
 2. Crear subcarpetas adicionales según se necesiten (`hooks/`, `data/`, `types/`)
-3. Importar desde `@/features/<nombre>/components`
-4. Actualizar esta tabla
+3. Importar siempre desde el barrel raíz: `@/features/<nombre>/components`
+4. Actualizar la tabla de features actuales

@@ -328,6 +328,28 @@ Stitch se usa **SOLO** como referencia de layout, jerarquía y composición.
 | Notificaciones | `notificaciones/` |
 | Ajustes | `ajustes/` |
 
+### Prompt sugerido para Stitch
+
+```
+App de red social gastronómica llamada Cookr. Diseño mobile-first (375px de ancho),
+estilo moderno y limpio. Paleta cálida con tonos ocre y naranja suave, fondos crema.
+App instalable en móvil (PWA). Barra de navegación inferior con 5 iconos.
+La vista que necesito es: [descripción detallada de la vista].
+```
+
+### Cómo traduce Claude Code el diseño de Stitch
+
+| Stitch muestra | Claude Code implementa |
+|---|---|
+| Card con fondo blanco y borde gris | `<Card className="bg-card border-border">` |
+| Botón naranja primario | `<Button className="bg-brand text-brand-foreground">` |
+| Input con label | shadcn `<FormField>` + `<Input>` + `<Label>` |
+| Texto gris secundario | `<p className="text-muted-foreground">` |
+| Fondo de página | `<div className="bg-background">` |
+| Icono de búsqueda | `<Search className="text-muted-foreground" />` (Lucide) |
+| Animación de entrada | `<motion.div>` con Framer Motion |
+| Lista animada | `staggerChildren` en el contenedor padre (Framer Motion) |
+
 ---
 
 ## 11. Modelo de desarrollo — Sprint paralelo FE + BE

@@ -1,101 +1,11 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-03-30
-**Sprint Actual:** Sprint 2 — Home + Feed + Detalle FE / Auth BE (Mar 30 → Abr 12)
+**Fecha:** 2026-04-17
+**Sprint Actual:** Sprint 3 — activo
 **Modelo:** FE nuevas vistas mock + BE sprint anterior real + BD necesaria
 **Fase:** Fase 2 de 7 — Recetas (FE mock) + Autenticación (BE real)
 
----
-
-## Reglas de flujo de trabajo — Claude
-
-### Estados de vistas/componentes
-
-Cuando Claude crea una vista nueva, el estado en context.md y en el registro de cambios es:
-
-| Estado | Símbolo | Significado |
-|---|---|---|
-| Implementado, pendiente de revisión | `👁️ Pendiente revisión` | Claude ha creado el código. El autor aún no ha revisado ni aprobado visualmente la vista |
-| Aprobado por el autor | `✅` | El autor ha revisado la vista en el navegador y da el visto bueno |
-
-**Regla:** Claude nunca marca una vista como `✅ Completado` en context.md hasta que el autor confirme explícitamente que la ha revisado y aprobado. Si el autor dice "ok", "aprobado", "bien" o similar, Claude actualiza el estado a `✅`.
-
----
-
-## Modelo de desarrollo — Sprint paralelo FE + BE
-
-A partir del Sprint 2 cada sprint tiene dos frentes:
-
-**FRENTE FE (mock):**
-- Nuevas vistas con datos mock, sin conectar al backend
-- Mobile-first, paleta Cookr, patrón feature-based
-
-**FRENTE BE (real):**
-- Backend de las vistas del sprint anterior
-- Express + Mongoose + Zod + JWT
-- MongoDB modelos necesarios para ese sprint
-
-Regla: el FE nunca espera al BE para avanzar.
-El BE siempre va un sprint por detrás del FE.
-
----
-
-## Flujo Stitch — referencia de diseño FE
-
-OBLIGATORIO antes de implementar cualquier vista FE:
-1. Crear diseño en Stitch by Google (stitch.withgoogle.com)
-2. Guardar en `docs/stitch/<nombreVista>/`:
-   - `<nombreVista>.png` → captura visual
-   - `<nombreVista>.html` → HTML generado por Stitch
-3. Adjuntar ambos al iniciar la sesión de implementación
-
-Claude Code usa Stitch **SOLO** como referencia visual de:
-- Layout y estructura (dónde va cada elemento)
-- Jerarquía visual (tamaños, pesos, protagonismo)
-- Composición de secciones
-
-Claude Code **NUNCA** usa de Stitch:
-- Código HTML directamente
-- Colores (usa paleta Cookr de globals.css)
-- Componentes (usa shadcn/ui + librerías del proyecto)
-- Fuentes (usa Geist configurada en el proyecto)
-- Clases CSS (usa variables Cookr + Tailwind)
-
-Nomenclatura de carpetas `docs/stitch/`:
-
-| Vista | Carpeta |
-|---|---|
-| Home / Feed | `home/` |
-| Detalle de receta | `detalleReceta/` |
-| Crear receta | `crearReceta/` |
-| Perfil | `perfil/` |
-| Despensa | `despensa/` |
-| Chat IA | `chat/` |
-| Grupos | `grupos/` |
-| Notificaciones | `notificaciones/` |
-| Ajustes | `ajustes/` |
-
----
-
-## Reglas de arquitectura — capas de abstracción
-
-```
-FE: Componente → Hook → Service → apiClient → Backend
-BE: Route → Controller → Service → Repository → MongoDB
-```
-
-NUNCA:
-- Un componente llama a Axios directamente
-- Un hook conoce rutas de la API (`/api/recetas`)
-- Un controller accede a modelos Mongoose directamente
-- Lógica de negocio en routes o controllers
-
-SIEMPRE:
-- Nuevas llamadas HTTP → `src/services/<nombre>Service.ts`
-- Nuevo estado global → `src/stores/<nombre>Store.ts`
-- Nuevo acceso a BD → `backend/src/repositories/<nombre>Repository.ts`
-
-Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
+> Reglas de desarrollo, arquitectura, colores, nomenclatura y diseño → `docs/rules.md`
 
 ---
 
@@ -133,6 +43,8 @@ Ver detalle completo en [docs/folderStructure.md](../docs/folderStructure.md)
 - ✅ [AUTH-FE-BE] `formularioRecuperarContrasena.tsx` conectado a `POST /api/auth/recuperar-contrasena`
 - ✅ [AUTH-FE-BE] `formularioNuevaContrasena.tsx` conectado a `POST /api/auth/nueva-contrasena`
 - ✅ [AUTH-FE-BE] `NEXT_PUBLIC_API_URL` añadido a `.env.local`
+- ✅ [ARCH-001] BE: interfaces de dominio separadas de schemas Mongoose — nueva carpeta `backend/src/types/` con `IUsuario` e `IToken` como interfaces puras
+- ✅ [ARCH-002] BE: modelos renombrados con nomenclatura BD-explícita — `usuarioMongo.ts`, `tokenMongo.ts`
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -256,6 +168,8 @@ Diseño de ambas páginas:
 - 🔴 Email/contraseña: formulario validado localmente, envío es mock (TODO Fase 4: conectar backend)
 - ✅ Google OAuth: funcional, redirige a "/" (TODO Fase 2: cambiar a /feed)
 
+---
+
 ## Auth — TODOs marcados en código
 
 - 🔴 [AUTH-001] `botonGoogle.tsx` — cambiar `callbackUrl` de `"/"` a `"/feed"` → Fase 2
@@ -323,19 +237,10 @@ El login con Google OAuth sigue funcionando sin restricciones.
 
 - Ver: docs/phase-reports/fase-0-pendientes.md
 - [SETUP-001] CI/CD GitHub Actions → aplazado a Fase 6
-- [SETUP-002] Rama develop → pendiente
+- ✅ [SETUP-002] Rama develop → completado
 - [SETUP-003] Variables Vercel → aplazado a Fase 6
 - ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
 - [SETUP-005] Paquetes deprecated (eslint@8, next-pwa@5) → aplazado a Fase 6, ver docs/tech-debt.md
-
-## Filtros del Feed — Decisión de diseño
-
-Los filtros de categoría que aparecen en `BuscadorFiltros` (Todas · Vegano · Keto · Sin gluten · Sin lactosa)
-son **predefinidos por el autor**. No son generados por el backend ni configurables por el usuario.
-
-En Sprint 3, cuando se implemente la vista "Filtrar recetas", se añadirán más chips predefinidos
-a la lista `FILTROS_FEED` en `features/recetas/data/datosFeed.ts`.
-El autor decide qué categorías existen — Claude no debe inventar nuevas sin confirmación explícita.
 
 ## Carrusel — Pendientes
 
@@ -345,6 +250,7 @@ El autor decide qué categorías existen — Claude no debe inventar nuevas sin 
 - [CAROUSEL-003] Controles accesibles prev/next + aria-live
 
 ## Estrategia de despliegue — decidida en Fase 1
+
 Estado: ⏳ Pendiente de implementar (Fase 6 / Sprint 15)
 
 Frontend → Vercel → cookr.vercel.app
@@ -358,47 +264,12 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 1 completado y aprobado al 100%.
+Sprint 2 completado y aprobado al 100%.
 
-Sprint 2 activo — dos frentes:
-- **FE:** NavBar inferior (TFG-17) — 👁️ implementado, pendiente revisión visual
-- **FE:** Home/Feed (TFG-20) — requiere `docs/stitch/home/` antes de implementar
-- **FE:** Detalle receta (TFG-21) — requiere `docs/stitch/detalleReceta/` antes de implementar
-- **BE:** Setup Express + Auth real + MongoDB modelos Usuario y Token
-
-## Paleta de colores — Cookr
-
-Definida en: `frontend/src/app/globals.css`
-Formato: oklch con variables CSS + Tailwind
-
-Colores de marca:
-  --brand          → color principal Cookr (ocre/naranja cálido)
-  --brand-muted    → versión suave del brand
-  --brand-subtle   → versión muy sutil, para fondos de badges
-  --warm-bg        → fondo cálido para secciones hero
-  --warm-bg-accent → variante más intensa del fondo cálido
-
-Hero gradient:
-  --hero-gradient-start / --hero-gradient-mid / --hero-gradient-end
-
-Categorías semánticas:
-  --category-social → azul para elementos de comunidad/social
-  --category-ai     → violeta para elementos de IA
-
-Temas del carrusel:
-  --theme-fresh     → verde para carrusel ensaladas
-  --theme-sweet     → rosa para carrusel postres
-  --theme-pasta     → violeta para carrusel pastas
-
-Auth panel:
-  --auth-dark       → negro cálido para panel de autenticación
-
-Regla para futuros desarrollos:
-  NUNCA usar colores hardcodeados (hex, rgb, colores Tailwind genéricos)
-  SIEMPRE usar las variables CSS de globals.css a través de Tailwind
-  Ejemplo correcto:   bg-brand text-primary-foreground border-border
-  Ejemplo incorrecto: bg-orange-500 text-white border-gray-200
-
-Excepciones permitidas:
-  bg-black/30              → overlay semitransparente funcional sobre foto
-  Google SVG fills         → colores corporativos obligatorios de Google
+Sprint 3 activo — tareas prioritarias:
+- **FE:** DET-001 — Guardar receta (persistente)
+- **FE:** DET-002 — Like persistente en recetas
+- **FE:** DET-009 — Carrusel de recetas similares funcional
+- **FE:** CAROUSEL-001 — Imágenes reales en el carrusel de la landing
+- **DOCS:** DOCS-001 — Limpiar duplicados docs/ (en progreso)
+- **DOCS:** DOCS-002 — Renombrar archivos phase-reports/changes de pendientes a completados

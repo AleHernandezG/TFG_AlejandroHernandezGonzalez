@@ -97,10 +97,10 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">0</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">21</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">35</div><div class="label">Completadas</div></div>
+    <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">12</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">18</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">36</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -259,7 +259,7 @@
             <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-002</td>
@@ -269,7 +269,7 @@
             <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-009</td>
@@ -279,7 +279,7 @@
             <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-001</td>
@@ -289,7 +289,7 @@
             <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-002</td>
@@ -299,7 +299,7 @@
             <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3 opcional</span></td>
-          <td><span class="urg baja">Baja</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-003</td>
@@ -309,7 +309,7 @@
             <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg baja">Baja</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">ARCH-001</td>
@@ -335,11 +335,11 @@
           <td class="id">DOCS-001</td>
           <td class="desc">
             <strong>Limpiar docs/ — eliminar duplicados entre context.md, folderStructure.md y rules.md</strong>
-            <small>Todo lo que ya está en rules.md (reglas de capas, colores, nomenclatura, estructura de carpetas, etc.) debe quitarse de context.md y folderStructure.md, dejando context.md solo con contexto narrativo del proyecto y folderStructure.md solo con la descripción de la estructura real actual.</small>
+            <small>context.md: eliminadas 6 secciones duplicadas (reglas de arquitectura, paleta, Stitch, sprint paralelo, filtros del feed, estados de vistas) — queda solo contexto narrativo, historial de sesiones y estado de rutas. folderStructure.md: eliminadas 4 secciones duplicadas (Reglas, Patrón de capas BE, Regla de oro, Árbol stitch/) — queda solo el árbol real actualizado con types/ BE. Header de context.md actualizado a Sprint 3 / 2026-04-17.</small>
             <span class="source">📄 docs/context.md · docs/folderStructure.md · docs/rules.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DOCS-002</td>
@@ -349,7 +349,7 @@
             <span class="source">📄 docs/phase-reports/ · docs/changes/</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg media">Media</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DOCS-003</td>
@@ -359,7 +359,7 @@
             <span class="source">📄 docs/desarrollo/</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3 / continuo</span></td>
-          <td><span class="urg baja">Baja</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>
     </table>
@@ -767,6 +767,7 @@
         <tr><td class="id">AUTH-002</td><td class="desc">formularioRegistro.tsx conectado a POST /api/auth/registro — maneja 409 (correo duplicado). authService.registro() a través de apiClient.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
         <tr><td class="id">AUTH-003 / AUTH-007 / AUTH-008 / AUTH-009</td><td class="desc">lib/auth.ts: CredentialsProvider conectado a POST /api/auth/login (401/403). formularioLogin → signIn("credentials"). formularioRecuperarContrasena → POST /api/auth/recuperar-contrasena. formularioNuevaContrasena → POST /api/auth/nueva-contrasena.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
         <tr><td class="id">ARCH-001</td><td class="desc">BE separación tipos/schemas — Nueva carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces de dominio puras sin Document ni schemas. Los modelos usuarioMongo.ts y tokenMongo.ts definen IUsuarioDoc/ITokenDoc extends IXxx, Document y contienen el schema Mongoose completo (select: false, unique, TTL index, etc.). Los repositories importan IXxx de types/ (contrato de dominio) e IXxxDoc + modelo de models/ (persistencia). Beneficio: cambiar el schema no afecta al contrato; cambiar la BD solo toca models/ y repositories/. TypeScript check: 0 errores.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DOCS-001</td><td class="desc">Limpieza de duplicados en docs/ — 6 secciones eliminadas de context.md (reglas arquitectura, paleta, Stitch, sprint paralelo, filtros feed, estados vistas) y 4 de folderStructure.md (Reglas, Patrón capas BE, Regla de oro, Árbol stitch/). context.md queda como contexto narrativo puro. folderStructure.md queda con el árbol real actualizado (incluye types/ BE de ARCH-001). Header de context.md actualizado a Sprint 3 / 2026-04-17.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">ARCH-002</td><td class="desc">BE renombrado con nomenclatura BD-explícita — usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo por estar dentro de types/). Todos los imports actualizados en repositories. Archivos antiguos eliminados. Regla añadida a docs/rules.md secciones 4 y 6. HTML explicativo creado en docs/arquitectura-backend-tipos.html.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>
