@@ -1,5 +1,6 @@
-import { Token, IToken } from "../models/token.model";
 import { Types } from "mongoose";
+import { IToken } from "../types/token";
+import { ITokenDoc, Token } from "../models/tokenMongo";
 
 interface DatosCrearToken {
   userId: Types.ObjectId;
@@ -9,12 +10,14 @@ interface DatosCrearToken {
 }
 
 export const tokenRepository = {
-  crear: (datos: DatosCrearToken): Promise<IToken> =>
+  crear: (datos: DatosCrearToken): Promise<ITokenDoc> =>
     Token.create(datos),
 
-  buscarPorToken: (token: string): Promise<IToken | null> =>
+  buscarPorToken: (token: string): Promise<ITokenDoc | null> =>
     Token.findOne({ token, usado: false }),
 
-  invalidar: (id: string): Promise<IToken | null> =>
+  invalidar: (id: string): Promise<ITokenDoc | null> =>
     Token.findByIdAndUpdate(id, { usado: true }, { new: true }),
 };
+
+export type { IToken };

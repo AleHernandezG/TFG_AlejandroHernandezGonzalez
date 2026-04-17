@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arquitectura Backend — Separación de tipos y schemas</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --bg-card: #1a1d27;
+      --bg-card-alt: #1e2130;
+      --border: #2e3347;
+      --brand: #e8914a;
+      --brand-subtle: #e8914a18;
+      --text: #e2e4ed;
+      --muted: #7c839e;
+      --green: #4ade80;
+      --green-bg: #4ade8012;
+      --red: #f87171;
+      --red-bg: #f8717112;
+      --blue: #60a5fa;
+      --blue-bg: #60a5fa12;
+      --violet: #a78bfa;
+      --violet-bg: #a78bfa12;
+      --amber: #fbbf24;
+      --amber-bg: #fbbf2412;
+      --radius: 10px;
+      --font-mono: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      padding: 48px 24px 80px;
+    }
+
+    .wrapper { max-width: 900px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--brand-subtle);
+      color: var(--brand);
+      border: 1px solid var(--brand);
+      border-radius: 100px;
+      padding: 3px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      width: fit-content;
+      letter-spacing: 0.03em;
+    }
+
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+    .subtitle { color: var(--muted); font-size: 15px; max-width: 620px; }
+
+    /* ── Sections ── */
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    section { margin-bottom: 48px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+
+    /* ── Before / After ── */
+    .diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .diff-grid { grid-template-columns: 1fr; }
+    }
+
+    .diff-before {
+      background: var(--red-bg);
+      border: 1px solid var(--red);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .diff-after {
+      background: var(--green-bg);
+      border: 1px solid var(--green);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .diff-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .diff-before .diff-label { color: var(--red); }
+    .diff-after .diff-label { color: var(--green); }
+
+    /* ── Code blocks ── */
+    pre {
+      background: #0d0f18;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+
+    code { font-family: var(--font-mono); font-size: 13px; }
+
+    .cm { color: var(--muted); }
+    .ck { color: #c792ea; }
+    .ct { color: #82aaff; }
+    .cs { color: #c3e88d; }
+    .cn { color: var(--amber); }
+    .cp { color: var(--blue); }
+
+    /* ── File tree ── */
+    .tree {
+      background: #0d0f18;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .tree-folder { color: var(--blue); font-weight: 600; }
+    .tree-file-type { color: var(--green); font-weight: 600; }
+    .tree-file-model { color: var(--amber); font-weight: 600; }
+    .tree-file-repo { color: var(--violet); font-weight: 600; }
+    .tree-comment { color: var(--muted); }
+    .tree-new { color: var(--brand); font-weight: 700; }
+
+    /* ── Layer diagram ── */
+    .layers {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .layer {
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .layer-name { font-weight: 700; font-family: var(--font-mono); }
+    .layer-desc { color: var(--muted); font-size: 12px; }
+    .layer-files { font-family: var(--font-mono); font-size: 12px; opacity: 0.8; text-align: right; }
+
+    .layer-types   { background: var(--green-bg);  border: 1px solid var(--green); }
+    .layer-models  { background: var(--amber-bg);  border: 1px solid var(--amber); }
+    .layer-repos   { background: var(--violet-bg); border: 1px solid var(--violet); }
+    .layer-service { background: var(--blue-bg);   border: 1px solid var(--blue); }
+
+    .arrow {
+      text-align: center;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      padding: 2px 0;
+    }
+
+    /* ── Benefit pills ── */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .benefit {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+
+    .benefit-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .benefit-desc { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    /* ── Naming table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--bg-card-alt);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td code {
+      background: #0d0f18;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+
+    .tag-new {
+      display: inline-block;
+      background: var(--brand-subtle);
+      color: var(--brand);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    /* ── Scenario boxes ── */
+    .scenario {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--brand);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .scenario-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--brand);
+    }
+
+    .scenario p { color: var(--muted); font-size: 13px; }
+
+    .step {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 4px 0;
+    }
+
+    .step-num {
+      background: var(--brand-subtle);
+      color: var(--brand);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 800;
+      min-width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-text { color: var(--text); font-size: 13px; }
+    .step-text code { color: var(--amber); }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">&#9679; Cookr · Backend · Arquitectura</div>
+    <h1>Separación de interfaces de dominio y schemas Mongoose</h1>
+    <p class="subtitle">
+      Refactorización de la capa de modelos para desacoplar el contrato de dominio
+      de los detalles de persistencia en MongoDB — mejora de escalabilidad y mantenibilidad.
+    </p>
+  </div>
+
+  <!-- 1. El problema anterior -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--red-bg);color:var(--red)">⚠</span>
+      El problema: responsabilidades mezcladas
+    </h2>
+    <p style="color:var(--muted);margin-bottom:16px">
+      Antes de esta refactorización, cada archivo <code>*.model.ts</code> mezclaba dos
+      responsabilidades distintas en el mismo fichero:
+    </p>
+
+    <div class="diff-grid">
+      <div class="diff-before">
+        <div class="diff-label">&#10005; Antes — <code>usuario.model.ts</code></div>
+        <pre><code><span class="cm">// ① INTERFAZ DE DOMINIO</span>
+<span class="cm">// (contrato que usan repositories, services...)</span>
+<span class="ck">export interface</span> <span class="ct">IUsuario</span> <span class="ck">extends</span> <span class="ct">Document</span> {
+  nombre: <span class="ct">string</span>
+  correo: <span class="ct">string</span>
+  rol: <span class="cs">"usuario"</span> | <span class="cs">"admin"</span>
+  <span class="cm">// ...</span>
+}
+
+<span class="cm">// ② SCHEMA MONGOOSE</span>
+<span class="cm">// (detalles de persistencia MongoDB)</span>
+<span class="ck">const</span> usuarioSchema = <span class="ck">new</span> <span class="ct">Schema</span>&lt;<span class="ct">IUsuario</span>&gt;({
+  nombre: { type: String, trim: <span class="ck">true</span>, ... }
+  correo: { unique: <span class="ck">true</span>, lowercase: <span class="ck">true</span> }
+  contrasena: { select: <span class="ck">false</span> } <span class="cm">// ← detalle Mongoose</span>
+})
+
+<span class="ck">export const</span> Usuario = mongoose.model(...)
+</code></pre>
+      </div>
+
+      <div class="diff-after">
+        <div class="diff-label">&#10003; Ahora — separado en dos capas</div>
+        <pre><code><span class="cm">// types/usuario.ts</span>
+<span class="cm">// Solo el contrato de dominio</span>
+<span class="ck">export interface</span> <span class="ct">IUsuario</span> {
+  nombre: <span class="ct">string</span>
+  correo: <span class="ct">string</span>
+  rol: <span class="cs">"usuario"</span> | <span class="cs">"admin"</span>
+  <span class="cm">// ...</span>
+}
+
+<span class="cm">// models/usuarioMongo.ts</span>
+<span class="cm">// Solo el schema de persistencia</span>
+<span class="ck">export interface</span> <span class="ct">IUsuarioDoc</span>
+  <span class="ck">extends</span> <span class="ct">IUsuario</span>, <span class="ct">Document</span> {}
+
+<span class="ck">const</span> usuarioSchema = <span class="ck">new</span> <span class="ct">Schema</span>&lt;<span class="ct">IUsuarioDoc</span>&gt;({...})
+<span class="ck">export const</span> Usuario = mongoose.model(...)
+</code></pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:4px">
+      <strong>¿Por qué es un problema mezclarlos?</strong>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px">
+        Si la interfaz vive dentro del archivo del schema, cualquier cambio en cómo MongoDB
+        persiste los datos (añadir un índice, cambiar <code>select: false</code>, renombrar
+        una opción de Mongoose) obliga a repasar todos los archivos que importan esa interfaz —
+        aunque solo les importe el <em>tipo</em>, no el schema.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. Estructura de archivos -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--blue-bg);color:var(--blue)">📁</span>
+      Estructura de archivos resultante
+    </h2>
+
+    <div class="tree">
+      <span class="tree-folder">backend/src/</span><br>
+      &nbsp;&nbsp;├── <span class="tree-folder">types/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment tree-new">← NUEVA CAPA</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="tree-file-type">usuario.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">IUsuario — contrato de dominio puro</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="tree-file-type">token.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">IToken — contrato de dominio puro</span><br>
+      &nbsp;&nbsp;├── <span class="tree-folder">models/</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="tree-file-model">usuarioMongo.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">IUsuarioDoc + schema Mongoose</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="tree-file-model">tokenMongo.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tree-comment">ITokenDoc + schema Mongoose + TTL index</span><br>
+      &nbsp;&nbsp;├── <span class="tree-folder">repositories/</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="tree-file-repo">usuarioRepository.ts</span>&nbsp;<span class="tree-comment">importa IUsuario de types/ + Usuario de models/</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="tree-file-repo">tokenRepository.ts</span>&nbsp;&nbsp;&nbsp;<span class="tree-comment">importa IToken de types/ + Token de models/</span><br>
+      &nbsp;&nbsp;└── <span class="tree-folder">services/</span><span class="tree-comment"> controllers/ routes/ ...</span><br>
+    </div>
+
+    <div style="margin-top:12px;font-size:13px;color:var(--muted)">
+      La nomenclatura <strong style="color:var(--text)">Xxxxxuario.ts → nombreMongo.ts</strong>
+      hace explícito qué BD está vinculada: si mañana aparece un
+      <code>usuarioPostgres.ts</code> o <code>usuarioRedis.ts</code>, el equipo sabe
+      inmediatamente qué motor usa cada archivo.
+    </div>
+  </section>
+
+  <!-- 3. Capas y dependencias -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--violet-bg);color:var(--violet)">⟷</span>
+      Flujo de dependencias entre capas
+    </h2>
+
+    <div class="layers">
+      <div class="layer layer-service">
+        <div>
+          <div class="layer-name">services/ · controllers/</div>
+          <div class="layer-desc">Lógica de negocio — solo conocen interfaces de dominio</div>
+        </div>
+        <div class="layer-files">authService.ts<br>authController.ts</div>
+      </div>
+      <div class="arrow">↓ usa</div>
+      <div class="layer layer-repos">
+        <div>
+          <div class="layer-name">repositories/</div>
+          <div class="layer-desc">Importa IXxx de types/ e IXxxDoc + modelo de models/</div>
+        </div>
+        <div class="layer-files">usuarioRepository.ts<br>tokenRepository.ts</div>
+      </div>
+      <div class="arrow">↓ importa de</div>
+      <div class="diff-grid" style="gap:8px">
+        <div class="layer layer-types">
+          <div>
+            <div class="layer-name">types/</div>
+            <div class="layer-desc">Interfaz pura, cero acoplamiento a Mongoose</div>
+          </div>
+          <div class="layer-files">usuario.ts<br>token.ts</div>
+        </div>
+        <div class="layer layer-models">
+          <div>
+            <div class="layer-name">models/</div>
+            <div class="layer-desc">Schema + IXxxDoc. Importa de types/</div>
+          </div>
+          <div class="layer-files">usuarioMongo.ts<br>tokenMongo.ts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;font-size:13px">
+      <strong>Regla clave:</strong>
+      <span style="color:var(--muted)">
+        Los <code>services/</code> y <code>controllers/</code> <em>nunca</em> importan desde
+        <code>models/</code> directamente. Solo hablan con <code>repositories/</code>.
+        Los <code>repositories/</code> son los únicos que conocen tanto las interfaces
+        (<code>types/</code>) como los schemas Mongoose (<code>models/</code>).
+      </span>
+    </div>
+  </section>
+
+  <!-- 4. Cómo se implementó -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--green-bg);color:var(--green)">⚙</span>
+      Cómo se implementó
+    </h2>
+
+    <div class="card">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        El patrón aplicado en cada entidad es siempre el mismo:
+      </p>
+
+      <p style="font-size:13px;font-weight:700;margin-bottom:8px">① Interface de dominio — <code style="color:var(--green)">types/usuario.ts</code></p>
+      <pre><code><span class="cm">// Sin ningún import de Mongoose — solo TypeScript puro</span>
+<span class="ck">export interface</span> <span class="ct">IUsuario</span> {
+  nombre: <span class="ct">string</span>
+  correo: <span class="ct">string</span>
+  contrasena?: <span class="ct">string</span>
+  foto?: <span class="ct">string</span>
+  rol: <span class="cs">"usuario"</span> | <span class="cs">"admin"</span>
+  cuentaVerificada: <span class="ct">boolean</span>
+  proveedor: <span class="cs">"local"</span> | <span class="cs">"google"</span>
+  googleId?: <span class="ct">string</span>
+  alergias: <span class="ct">string</span>[]
+  preferencias: <span class="ct">string</span>[]
+  fechaRegistro: <span class="ct">Date</span>
+}</code></pre>
+
+      <p style="font-size:13px;font-weight:700;margin:14px 0 8px">② Schema y modelo Mongoose — <code style="color:var(--amber)">models/usuarioMongo.ts</code></p>
+      <pre><code><span class="ck">import</span> { <span class="ct">IUsuario</span> } <span class="ck">from</span> <span class="cs">"../types/usuario"</span>
+<span class="ck">import</span> mongoose, { <span class="ct">Schema</span>, <span class="ct">Document</span> } <span class="ck">from</span> <span class="cs">"mongoose"</span>
+
+<span class="cm">// IUsuarioDoc = dominio + métodos Document (._id, .save, etc.)</span>
+<span class="ck">export interface</span> <span class="ct">IUsuarioDoc</span> <span class="ck">extends</span> <span class="ct">IUsuario</span>, <span class="ct">Document</span> {}
+
+<span class="cm">// Solo aquí viven los detalles de MongoDB</span>
+<span class="ck">const</span> usuarioSchema = <span class="ck">new</span> <span class="ct">Schema</span>&lt;<span class="ct">IUsuarioDoc</span>&gt;({
+  contrasena: { type: <span class="ct">String</span>, select: <span class="ck">false</span> }, <span class="cm">// ← detalle Mongoose</span>
+  correo:     { unique: <span class="ck">true</span>, lowercase: <span class="ck">true</span> },  <span class="cm">// ← detalle Mongoose</span>
+  <span class="cm">// ...</span>
+})
+<span class="ck">export const</span> Usuario = mongoose.model&lt;<span class="ct">IUsuarioDoc</span>&gt;(<span class="cs">"Usuario"</span>, usuarioSchema)
+<span class="ck">export type</span> { <span class="ct">IUsuario</span> } <span class="cm">// re-export de conveniencia</span></code></pre>
+
+      <p style="font-size:13px;font-weight:700;margin:14px 0 8px">③ Repository — <code style="color:var(--violet)">repositories/usuarioRepository.ts</code></p>
+      <pre><code><span class="ck">import</span> { <span class="ct">IUsuario</span> }              <span class="ck">from</span> <span class="cs">"../types/usuario"</span>     <span class="cm">// contrato</span>
+<span class="ck">import</span> { <span class="ct">IUsuarioDoc</span>, Usuario } <span class="ck">from</span> <span class="cs">"../models/usuarioMongo"</span> <span class="cm">// Mongoose</span>
+
+<span class="ck">export const</span> usuarioRepository = {
+  buscarPorCorreo: (correo: <span class="ct">string</span>): <span class="ct">Promise</span>&lt;<span class="ct">IUsuarioDoc</span> | <span class="ck">null</span>&gt; =>
+    Usuario.findOne({ correo }),
+  <span class="cm">// los métodos devuelven IUsuarioDoc para que _id esté disponible</span>
+  <span class="cm">// en authService sin importar nada de Mongoose desde el service</span>
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- 5. Beneficios -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--amber-bg);color:var(--amber)">★</span>
+      Beneficios concretos
+    </h2>
+
+    <div class="benefits-grid">
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--green)">⟳</span>
+          Cambio sin efecto cascada
+        </div>
+        <div class="benefit-desc">
+          Añadir un índice, cambiar una opción de Mongoose, o renombrar un campo en el schema
+          solo toca <code>models/</code>. Los <code>types/</code> (lo que ve el resto del código)
+          permanecen intactos.
+        </div>
+      </div>
+
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--blue)">⬡</span>
+          Cambio de base de datos
+        </div>
+        <div class="benefit-desc">
+          Si en el futuro se usa PostgreSQL, Redis o cualquier otro motor, solo cambian
+          <code>models/</code> (ORM/cliente) y <code>repositories/</code> (queries).
+          Las interfaces en <code>types/</code> y toda la lógica en <code>services/</code>
+          no se tocan.
+        </div>
+      </div>
+
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--violet)">◈</span>
+          Legibilidad de imports
+        </div>
+        <div class="benefit-desc">
+          Al ver <code>import { IUsuario } from "../types/usuario"</code> en un archivo,
+          sabes de inmediato que solo necesitas el tipo. Al ver
+          <code>from "../models/usuarioMongo"</code> sabes que hay operaciones de BD involucradas.
+        </div>
+      </div>
+
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--amber)">⊙</span>
+          Nomenclatura BD-explícita
+        </div>
+        <div class="benefit-desc">
+          El sufijo <code>Mongo</code> en los modelos indica qué motor de BD usa ese archivo.
+          Si aparece <code>usuarioPostgres.ts</code> en el futuro, la distinción es inmediata
+          sin abrir el archivo.
+        </div>
+      </div>
+
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--brand)">⊞</span>
+          Testing más sencillo
+        </div>
+        <div class="benefit-desc">
+          Los tests unitarios de <code>services/</code> pueden importar
+          <code>IUsuario</code> desde <code>types/</code> para construir mocks sin
+          depender de Mongoose ni de una conexión a MongoDB.
+        </div>
+      </div>
+
+      <div class="benefit">
+        <div class="benefit-title">
+          <span style="color:var(--red)">⊛</span>
+          Sin cambios funcionales
+        </div>
+        <div class="benefit-desc">
+          El schema Mongoose es idéntico al anterior. Ningún endpoint, controller ni
+          servicio cambió su comportamiento. La refactorización es 100% estructural.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Escenarios de cambio futuro -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--brand-subtle);color:var(--brand)">→</span>
+      Escenarios de cambio futuro
+    </h2>
+
+    <div class="scenario">
+      <div class="scenario-title">Escenario A — Añadir un campo al modelo (ej: "bio")</div>
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-text">Añadir <code>bio?: string</code> a <code>types/usuario.ts</code></span>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-text">Añadir el campo al schema en <code>models/usuarioMongo.ts</code></span>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-text">TypeScript señala automáticamente dónde usarlo si es requerido</span>
+      </div>
+      <p style="margin-top:10px;color:var(--muted);font-size:13px">
+        <code>repositories/</code>, <code>services/</code> y <code>controllers/</code>
+        no necesitan cambio si el campo es opcional.
+      </p>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-title">Escenario B — Cambiar el motor de BD (MongoDB → PostgreSQL)</div>
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-text">Crear <code>models/usuarioPostgres.ts</code> con el ORM de Postgres (ej: Prisma/TypeORM)</span>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-text">Reescribir <code>repositories/usuarioRepository.ts</code> con las queries de Postgres</span>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-text"><code>types/usuario.ts</code>, <code>services/</code> y <code>controllers/</code> — <strong>sin tocar</strong></span>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-title">Escenario C — Añadir caché Redis sobre el repository</div>
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-text">Crear <code>models/usuarioRedis.ts</code> con el cliente Redis</span>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-text">Actualizar el repository para consultar Redis antes que MongoDB</span>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-text">El resto del código sigue usando la misma interfaz <code>IUsuario</code></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Tabla de nomenclatura -->
+  <section>
+    <h2>
+      <span class="icon" style="background:var(--blue-bg);color:var(--blue)">≡</span>
+      Nomenclatura adoptada
+    </h2>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Capa</th>
+            <th>Convención</th>
+            <th>Ejemplo</th>
+            <th>Por qué</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Types BE</strong></td>
+            <td><code>nombre.ts</code></td>
+            <td><code>usuario.ts</code> <span class="tag-new">NUEVO</span></td>
+            <td style="color:var(--muted);font-size:12px">Al estar en <code>types/</code> ya está claro que son interfaces. Sin sufijo redundante.</td>
+          </tr>
+          <tr>
+            <td><strong>Models BE</strong></td>
+            <td><code>nombreMongo.ts</code></td>
+            <td><code>usuarioMongo.ts</code> <span class="tag-new">NUEVO</span></td>
+            <td style="color:var(--muted);font-size:12px">El sufijo indica qué BD usa. Si hay más motores, la distinción es inmediata.</td>
+          </tr>
+          <tr>
+            <td><strong>Types FE</strong></td>
+            <td><code>nombre.types.ts</code></td>
+            <td><code>receta.types.ts</code></td>
+            <td style="color:var(--muted);font-size:12px">En FE los types conviven con datos mock, hooks, etc. El sufijo ayuda a distinguirlos.</td>
+          </tr>
+          <tr>
+            <td><strong>Repositories</strong></td>
+            <td><code>nombreRepository.ts</code></td>
+            <td><code>usuarioRepository.ts</code></td>
+            <td style="color:var(--muted);font-size:12px">Sin cambio — la convención ya era correcta.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:8px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <span>Cookr · TFG · Alejandro Hernández González</span>
+    <span>Refactorización aplicada en Sprint 2 · Verificado con <code>npx tsc --noEmit</code> → 0 errores</span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Generado: 2026-04-09 · Sprint 2 activo (Mar 30 → Abr 12) · Fase 2 de 7</div>
+    <div class="meta">Generado: 2026-04-17 · Sprint 2 activo (Mar 30 → Abr 12) · Fase 2 de 7</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">4</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">9</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">14</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">22</div><div class="label">Completadas</div></div>
+    <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">0</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">21</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">35</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -172,7 +172,7 @@
             <small>El backend necesita este schema de Mongoose para poder registrar y autenticar usuarios. Bloquea todos los endpoints BE de auth.</small>
             <span class="source">📄 docs/changes/domain-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -182,7 +182,7 @@
             <small>Necesario para guardar los tokens de verificación de email y de recuperación de contraseña con expiración automática (TTL index).</small>
             <span class="source">📄 docs/changes/domain-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -192,7 +192,7 @@
             <small>Endpoint para crear cuenta con correo/contraseña. Hashea la contraseña con bcrypt y genera un token de verificación de email.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -202,7 +202,7 @@
             <small>Endpoint para iniciar sesión con correo y contraseña. Comprueba bcrypt y devuelve un JWT de sesión.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -212,7 +212,7 @@
             <small>Valida el token del enlace que llega al correo y marca la cuenta como verificada en MongoDB.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -222,7 +222,7 @@
             <small>Genera un token de recuperación de 1h y (en Fase 6 con Resend) lo envía por correo.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -232,7 +232,7 @@
             <small>Permite resetear la contraseña con un token válido. El middleware JWT protegerá las rutas privadas de la API.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Pendiente</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
       </tbody>
@@ -243,8 +243,8 @@
   <section id="sprint3">
     <div class="section-header">
       <span class="section-icon">📋</span>
-      <h2>Sprint 3 — Próximo sprint</h2>
-      <span class="sprint-badge s3">Sprint 3</span>
+      <h2>Sprint 3 — Sprint activo</h2>
+      <span class="sprint-badge actual">Sprint 3 · activo</span>
     </div>
     <table>
       <thead>
@@ -311,6 +311,56 @@
           <td><span class="status pending">⏳ Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
+        <tr>
+          <td class="id">ARCH-001</td>
+          <td class="desc">
+            <strong>BE: Separar interfaces de dominio de schemas Mongoose</strong>
+            <small>Creada carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces puras sin acoplamiento a Mongoose. Los modelos (usuarioMongo.ts, tokenMongo.ts) definen IXxxDoc extends IXxx, Document. Los repositories importan de types/ (contrato) y models/ (Mongoose). TypeScript check: 0 errores.</small>
+            <span class="source">📄 docs/arquitectura-backend-tipos.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">ARCH-002</td>
+          <td class="desc">
+            <strong>BE: Renombrar modelos y types con nomenclatura BD-explícita</strong>
+            <small>usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo, la carpeta ya indica que son interfaces). Regla añadida a docs/rules.md sección 4 y 6. Archivos antiguos eliminados.</small>
+            <span class="source">📄 docs/rules.md · backend/src/models/ · backend/src/types/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-001</td>
+          <td class="desc">
+            <strong>Limpiar docs/ — eliminar duplicados entre context.md, folderStructure.md y rules.md</strong>
+            <small>Todo lo que ya está en rules.md (reglas de capas, colores, nomenclatura, estructura de carpetas, etc.) debe quitarse de context.md y folderStructure.md, dejando context.md solo con contexto narrativo del proyecto y folderStructure.md solo con la descripción de la estructura real actual.</small>
+            <span class="source">📄 docs/context.md · docs/folderStructure.md · docs/rules.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-002</td>
+          <td class="desc">
+            <strong>Revisar phase-reports/ y changes/ — renombrar archivos de pendientes a completados</strong>
+            <small>Revisar todos los archivos en docs/phase-reports/ y docs/changes/ y renombrar los que ya estén completados de "-pendientes.md" a "-completados.md" (o equivalente). Mantiene el historial del proyecto coherente con el estado real.</small>
+            <span class="source">📄 docs/phase-reports/ · docs/changes/</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-003</td>
+          <td class="desc">
+            <strong>Subir HTMLs de /desarrollo a OneDrive y eliminarlos del repo una vez aprobados</strong>
+            <small>Los archivos HTML de docs/desarrollo/ (registro.html, landingPage.html, estadoTareas.html, arquitectura-backend-tipos.html...) son documentación visual de vistas. Una vez aprobada la vista, subir a OneDrive y borrar del repo para no inflar el historial git.</small>
+            <span class="source">📄 docs/desarrollo/</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3 / continuo</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -334,7 +384,7 @@
             <small>Actualmente no existe ningún cliente Axios compartido. Este fichero añade la base URL, el header JWT automático y el interceptor de 401 → /login. Lo necesitan todos los services.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -344,7 +394,7 @@
             <small>Centraliza todas las llamadas de auth (registro, login, verificar, recuperar, nueva contraseña). Los componentes ya no harán fetch directamente.</small>
             <span class="source">📄 docs/changes/api-changes.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -361,20 +411,20 @@
           <td class="id">AUTH-002</td>
           <td class="desc">
             <strong>Conectar formulario de registro con el backend real</strong>
-            <small>Ahora el envío es mock (setTimeout). En Sprint 4 hay que sustituirlo por una llamada real a POST /api/auth/registro con manejo de errores (409, 422, 500).</small>
+            <small>Formulario conectado a POST /api/auth/registro con manejo de errores 409 (correo ya registrado). authService.registro() creado en Sprint 2.</small>
             <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">AUTH-003</td>
           <td class="desc">
             <strong>Añadir CredentialsProvider a NextAuth</strong>
-            <small>NextAuth ahora solo tiene Google OAuth. Hay que añadir el proveedor de email/contraseña que llame al backend real para el login.</small>
+            <small>CredentialsProvider añadido a lib/auth.ts, conectado a POST /api/auth/login. Maneja 401 (credenciales inválidas) y 403 (cuenta no verificada).</small>
             <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -401,10 +451,10 @@
           <td class="id">DEBT-007</td>
           <td class="desc">
             <strong>Redirigir a /completar-perfil tras el registro (Google y correo)</strong>
-            <small>Ahora el registro con Google va a "/" y el de correo va a /verificar-email/pendiente → /home. Hay que crear la vista /completar-perfil (alergias, dietas, preferencias) y ajustar los flujos: registro correo → verificar email → /completar-perfil → /home · registro Google → /completar-perfil → /home. Requiere comprobar desde el backend si el perfil ya está completo para no repetir la vista.</small>
+            <small>Vista /completar-perfil implementada (selección de alergias y dietas). Pendiente revisión visual del autor y de ajustar los flujos de redirección post-registro.</small>
             <span class="source">📄 docs/tech-debt.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -593,10 +643,10 @@
           <td class="id">DEBT-007</td>
           <td class="desc">
             <strong>Flujo post-registro no pasa por /completar-perfil</strong>
-            <small>Actualmente el registro con Google va a "/" y el de correo va a /home. Hay que crear la vista /completar-perfil (alergias, dietas, preferencias) e integrarla en ambos flujos. La vista debe comprobar si el perfil ya está completo para no mostrarse de nuevo a usuarios ya registrados con Google.</small>
+            <small>Vista /completar-perfil creada (alergias, dietas). Pendiente revisión visual y ajuste de redirecciones post-registro en formularioRegistro.tsx y botonGoogle.tsx.</small>
             <span class="source">📄 docs/tech-debt.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>
@@ -705,6 +755,19 @@
         <tr><td class="id">NextAuth</td><td class="desc">NextAuth configurado: opcionesAuth + route handler /api/auth/[...nextauth]</td><td><span class="status done">✅ Completado</span></td></tr>
         <tr><td class="id">Rebrand</td><td class="desc">Rebrand completo a Cookr en todo el frontend</td><td><span class="status done">✅ Completado</span></td></tr>
         <tr><td class="id">Refactor</td><td class="desc">Refactor: components/recetas → subcarpetas home/ y detalleReceta/</td><td><span class="status done">✅ Completado · 2026-04-09</span></td></tr>
+        <tr><td class="id">DOM-001</td><td class="desc">Modelo MongoDB Usuario — backend/src/models/usuario.model.ts: nombre, correo (único), contrasena (bcrypt), foto, rol, cuentaVerificada, proveedor, googleId, alergias, preferencias, fechaRegistro</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">DOM-002</td><td class="desc">Modelo MongoDB Token — backend/src/models/token.model.ts: userId (ref Usuario), token, tipo (verificacion/recuperacion), expira (TTL index), usado. TTL MongoDB borra automáticamente al expirar.</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-004</td><td class="desc">BE POST /api/auth/registro — bcrypt hash, crea Usuario, genera Token verificación 24h. Response 201 / 400 Zod / 409 correo duplicado</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-005</td><td class="desc">BE POST /api/auth/login — bcrypt compare, verifica cuentaVerificada, devuelve JWT sesión. Response 200 / 401 credenciales / 403 no verificado</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-006</td><td class="desc">BE POST /api/auth/verificar-email — valida JWT firma + expiración + existe en BD → cuentaVerificada=true → invalida token</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-007</td><td class="desc">BE POST /api/auth/recuperar-contrasena — genera token JWT 1h, persiste en Token collection. Resend pendiente Fase 6. Response always 200 (no revela si email existe)</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-008 / API-009</td><td class="desc">BE POST /api/auth/nueva-contrasena + middleware autenticacion.ts — bcrypt nueva contraseña, invalida token. Middleware JWT lee Bearer, adjunta req.usuario = {id, correo, rol}.</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-010</td><td class="desc">FE apiClient.ts — instancia Axios con baseURL = NEXT_PUBLIC_API_URL. Interceptores de request (JWT header) y response (401 → /login). frontend/src/services/apiClient.ts</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">API-011</td><td class="desc">FE authService.ts — capa HTTP para auth: registro, login, verificarEmail, recuperarContrasena, nuevaContrasena (5 métodos). frontend/src/services/authService.ts</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">AUTH-002</td><td class="desc">formularioRegistro.tsx conectado a POST /api/auth/registro — maneja 409 (correo duplicado). authService.registro() a través de apiClient.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">AUTH-003 / AUTH-007 / AUTH-008 / AUTH-009</td><td class="desc">lib/auth.ts: CredentialsProvider conectado a POST /api/auth/login (401/403). formularioLogin → signIn("credentials"). formularioRecuperarContrasena → POST /api/auth/recuperar-contrasena. formularioNuevaContrasena → POST /api/auth/nueva-contrasena.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">ARCH-001</td><td class="desc">BE separación tipos/schemas — Nueva carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces de dominio puras sin Document ni schemas. Los modelos usuarioMongo.ts y tokenMongo.ts definen IUsuarioDoc/ITokenDoc extends IXxx, Document y contienen el schema Mongoose completo (select: false, unique, TTL index, etc.). Los repositories importan IXxx de types/ (contrato de dominio) e IXxxDoc + modelo de models/ (persistencia). Beneficio: cambiar el schema no afecta al contrato; cambiar la BD solo toca models/ y repositories/. TypeScript check: 0 errores.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">ARCH-002</td><td class="desc">BE renombrado con nomenclatura BD-explícita — usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo por estar dentro de types/). Todos los imports actualizados en repositories. Archivos antiguos eliminados. Regla añadida a docs/rules.md secciones 4 y 6. HTML explicativo creado en docs/arquitectura-backend-tipos.html.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>
 

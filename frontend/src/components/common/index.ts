@@ -1,0 +1,5 @@
+export { PiePagina } from './piePagina'
+export { NavBarInferior } from './navBarInferior'
+export { BuscadorFiltros } from './buscadorFiltros'
+export { ChipAlergeno } from './chipAlergeno'
+export { SelectorChips } from './selectorChips'

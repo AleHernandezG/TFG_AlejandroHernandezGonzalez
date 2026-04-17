@@ -1,15 +1,9 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
+import { IToken } from "../types/token";
 
-export interface IToken extends Document {
-  userId: Types.ObjectId; //Para ver quien es el usuario a quien corresponde el token
-  token: string;
-  tipo: "verificacion" | "recuperacion"; //Cambia el tiempo que esta activo
-  expira: Date;
-  usado: boolean;
-  creadoEn: Date;
-}
+export interface ITokenDoc extends IToken, Document {}
 
-const tokenSchema = new Schema<IToken>({
+const tokenSchema = new Schema<ITokenDoc>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "Usuario",
@@ -42,4 +36,5 @@ const tokenSchema = new Schema<IToken>({
 // TTL index — MongoDB elimina automáticamente el documento cuando expira
 tokenSchema.index({ expira: 1 }, { expireAfterSeconds: 0 });
 
-export const Token = mongoose.model<IToken>("Token", tokenSchema);
+export const Token = mongoose.model<ITokenDoc>("Token", tokenSchema);
+export type { IToken };

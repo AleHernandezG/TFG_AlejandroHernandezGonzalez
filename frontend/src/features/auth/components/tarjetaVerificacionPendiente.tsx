@@ -9,7 +9,7 @@ import { Mail, RefreshCw, ArrowLeft, AlertCircle, FlaskConical } from 'lucide-re
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 // TODO [Fase 6]: eliminar esta importación cuando Resend esté integrado
-import { apiClient } from '@/services/apiClient'
+import { authService } from '@/services/authService'
 
 const COOLDOWN_SEGUNDOS = 60
 
@@ -51,7 +51,7 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
     setVerificandoDev(true)
     setErrorDev(null)
     try {
-      await apiClient.post('/dev/verificar-usuario', { correo: email })
+      await authService.verificarDev(email)
       router.push('/login')
     } catch {
       setErrorDev('No se pudo verificar. ¿Está el backend corriendo?')
@@ -121,7 +121,7 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
             <div className="w-full space-y-1.5">
               <Button
                 variant="outline"
-                className="w-full border-dashed border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-600 dark:text-yellow-400"
+                className="w-full border-dashed border-[var(--chart-4)]/50 text-[var(--chart-4)] hover:bg-[var(--chart-4)]/10"
                 onClick={handleVerificarDev}
                 disabled={verificandoDev || !email}
               >

@@ -1,20 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { IUsuario } from "../types/usuario";
 
-export interface IUsuario extends Document {
-  nombre: string;
-  correo: string;
-  contrasena?: string; // La ? significa que es opcional
-  foto?: string;
-  rol: "usuario" | "admin"; //Revisar si cambia funcionalidad por rol
-  cuentaVerificada: boolean; //Se pone a true cuando el usuario verifica su correo
-  proveedor: "local" | "google";
-  googleId?: string;
-  alergias: string[];
-  preferencias: string[];
-  fechaRegistro: Date;
-}
+export interface IUsuarioDoc extends IUsuario, Document {}
 
-const usuarioSchema = new Schema<IUsuario>({
+const usuarioSchema = new Schema<IUsuarioDoc>({
   nombre: {
     type: String,
     required: true,
@@ -67,4 +56,5 @@ const usuarioSchema = new Schema<IUsuario>({
   },
 });
 
-export const Usuario = mongoose.model<IUsuario>("Usuario", usuarioSchema);
+export const Usuario = mongoose.model<IUsuarioDoc>("Usuario", usuarioSchema);
+export type { IUsuario };

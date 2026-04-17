@@ -63,4 +63,9 @@ export const authService = {
     );
     return data;
   },
+
+  // TODO [Fase 6]: eliminar este método cuando Resend esté integrado
+  async verificarDev(correo: string): Promise<void> {
+    await apiClient.post("/dev/verificar-usuario", { correo });
+  },
 };
