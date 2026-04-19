@@ -117,6 +117,22 @@ backend/src/
 └── lib/                   # db.ts, jwt.ts, validadores.ts
 ```
 
+---
+
+## Árbol raíz del proyecto
+
+```text
+TFG_AlejandroHernandezGonzalez/
+├── frontend/              # Next.js 14 App Router
+├── backend/               # Express + TypeScript
+├── docs/                  # Documentación del proyecto
+└── scripts/               # Scripts de desarrollo y operaciones
+    ├── dev.sh             # Arranca FE (:3000) + BE (:4000) en paralelo  [DEV-001]
+    ├── lint.sh            # tsc --noEmit (BE) + next lint (FE) secuencial
+    ├── build.sh           # tsc (BE) + next build (FE) secuencial
+    └── keep-alive.sh      # Ping a Render antes de demos (evita cold start) [DEV-002]
+```
+
 ### Repositories planificados
 
 | Fichero | Modelos | Sprint |

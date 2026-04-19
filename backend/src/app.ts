@@ -30,7 +30,9 @@ if (process.env.NODE_ENV === "development") {
   app.use("/api/dev", devRoutes);
 }
 
-// Sirve para comprobar que todo está funcionando bien
+// GET /api/health — health check público (sin auth).
+// Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.
+// Responde 200 { estado: "ok", entorno } mientras el proceso esté vivo.
 app.get("/api/health", (_req, res) => {
   res.json({ estado: "ok", entorno: process.env.NODE_ENV });
 });

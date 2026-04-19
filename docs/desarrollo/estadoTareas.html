@@ -97,10 +97,10 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">12</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">18</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">36</div><div class="label">Completadas</div></div>
+    <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">20</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">37</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -361,6 +361,76 @@
           <td><span class="status pending">⏳ Sprint 3 / continuo</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
+        <tr>
+          <td class="id">UI-016</td>
+          <td class="desc">
+            <strong>Buscar recetas — vista FE mock (Sprint 3)</strong>
+            <small>Barra de búsqueda con debounce. Resultados en tiempo real con skeleton loaders. Estado vacío con ilustración. Datos mock en features/recetas/data/. Diseño Stitch previo obligatorio antes de implementar.</small>
+            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-017</td>
+          <td class="desc">
+            <strong>Filtrar recetas — Drawer filtros FE mock (Sprint 3)</strong>
+            <small>Drawer de filtros con multi-selección (alérgenos, dietas, dificultad). Badge con número de filtros activos en el chip de entrada. Chips sincronizados con el feed. Datos mock. Diseño Stitch previo obligatorio.</small>
+            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018</td>
+          <td class="desc">
+            <strong>Crear receta — formulario multi-step FE mock (Sprint 3)</strong>
+            <small>Formulario de 3-4 pasos: título + imagen → ingredientes → pasos (drag-and-drop reordenable) → preview antes de publicar. Datos mock. Diseño Stitch previo obligatorio. Validación con RHF + Zod.</small>
+            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-008</td>
+          <td class="desc">
+            <strong>CI/CD GitHub Actions — alpha en main, desarrollo en develop</strong>
+            <small>Revisar y configurar workflow de GitHub Actions para que main sirva como rama alpha (deploy automático a Vercel FE + Render BE via Deploy Hook) mientras develop sigue siendo la rama de trabajo diario. Incluye: branch protection en main, PR develop → main para promover cambios estables, secrets RENDER_DEPLOY_HOOK_URL + RENDER_APP_URL + Vercel en GitHub. Anticipa SETUP-001 (Fase 6) pero con alcance mínimo de alpha.</small>
+            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md · SETUP-001 · docs/infraestructura.md §7</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEV-001</td>
+          <td class="desc">
+            <strong>Script de arranque conjunto FE + BE</strong>
+            <small>scripts/dev.sh — arranca Next.js (:3000) y Express (:4000) en paralelo con prefijos coloreados [FE]/[BE]. Sin dependencias externas (bash puro). Ctrl+C mata ambos procesos. Lint y build verificados: BE tsc --noEmit ✅ · FE next lint ✅. También creados scripts/lint.sh y scripts/build.sh.</small>
+            <span class="source">📄 scripts/dev.sh · scripts/lint.sh · scripts/build.sh · docs/folderStructure.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-019</td>
+          <td class="desc">
+            <strong>Revisar y modificar la NavBar inferior</strong>
+            <small>La NavBar actual está aprobada visualmente pero puede necesitar ajustes conforme avanza el desarrollo: rutas activas reales (ahora son mock), iconos de nuevas secciones (Grupos, Notificaciones en Sprint 6+), protección de rutas privadas. Revisar en cada sprint si requiere cambios.</small>
+            <span class="source">📄 docs/context.md · features/recetas/components/home/ · components/common/</span>
+          </td>
+          <td><span class="status pending">⏳ Continuo · Sprint 3+</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-004</td>
+          <td class="desc">
+            <strong>Esquema de conexiones entre vistas — mapa de navegación</strong>
+            <small>Diagrama visual de cómo se conectan todas las rutas de la app: qué vista lleva a cuál, con qué acción (tap en tarjeta, botón, redirect post-login…). Útil para la memoria del TFG y para detectar rutas huérfanas. Formato sugerido: Excalidraw o draw.io exportado a PNG + referenciado desde docs/.</small>
+            <span class="source">📄 docs/roadmap.md · docs/context.md · rutas del proyecto</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3 / Documentación TFG</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -412,7 +482,7 @@
           <td class="desc">
             <strong>Conectar formulario de registro con el backend real</strong>
             <small>Formulario conectado a POST /api/auth/registro con manejo de errores 409 (correo ya registrado). authService.registro() creado en Sprint 2.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
           </td>
           <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
@@ -422,7 +492,7 @@
           <td class="desc">
             <strong>Añadir CredentialsProvider a NextAuth</strong>
             <small>CredentialsProvider añadido a lib/auth.ts, conectado a POST /api/auth/login. Maneja 401 (credenciales inválidas) y 403 (cuenta no verificada).</small>
-            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
           </td>
           <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
           <td><span class="urg media">Media</span></td>
@@ -432,7 +502,7 @@
           <td class="desc">
             <strong>Enriquecer la sesión NextAuth con datos del backend</strong>
             <small>Ahora la sesión solo tiene el email de Google. Hay que añadir avatar, nombre y rol del usuario para mostrarlos en la app.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
@@ -558,7 +628,7 @@
           <td class="desc">
             <strong>Configurar imágenes reales en el carrusel hero (landing)</strong>
             <small>Relacionado con CAROUSEL-001. Hay que añadir el campo imageUrl a heroSlides y usar next/image en lugar del emoji placeholder.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-pendientes.md</span>
+            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
@@ -666,6 +736,16 @@
       </thead>
       <tbody>
         <tr>
+          <td class="id">DEV-002</td>
+          <td class="desc">
+            <strong>Script keep-alive para Render — activación manual antes de demos</strong>
+            <small>Crear scripts/keep-alive.sh. Hace ping a GET /api/health cada 4 min para evitar el cold start del free tier (~30-60 s). Requisitos: (1) activación 100% manual, nunca desde CI/CD; (2) duración máxima 2 h — el script se detiene solo y avisa; (3) lee RENDER_APP_URL o valor por defecto editable en el script; (4) muestra timestamp + status HTTP en cada ping; (5) avisa si el status ≠ 200 sin romper el bucle; (6) mensaje de inicio con hora de expiración y Ctrl+C para detener. Uso: bash scripts/keep-alive.sh · o con URL: RENDER_APP_URL=https://cookr-api.onrender.com bash scripts/keep-alive.sh. El endpoint GET /api/health ya existe en el backend.</small>
+            <span class="source">📄 docs/infraestructura.md §7 · docs/phase-reports/fase-0-pendientes.md SETUP-006 · backend/src/app.ts</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6 / antes de demos</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
           <td class="id">SETUP-001</td>
           <td class="desc">
             <strong>GitHub Actions — CI/CD (lint + typecheck automático)</strong>
@@ -698,8 +778,8 @@
         <tr>
           <td class="id">SETUP-006</td>
           <td class="desc">
-            <strong>Deploy completo: Azure App Service + Vercel + CI/CD</strong>
-            <small>Secuencia completa del deploy. FE en Vercel (cookr.vercel.app), BE en Azure App Service Free F1. Todo documentado paso a paso en fase-0-pendientes.md.</small>
+            <strong>Deploy completo: Render + Vercel + CI/CD</strong>
+            <small>Secuencia completa del deploy. FE en Vercel (cookr.vercel.app), BE en Render (tier gratuito, Deploy Hook). Render free duerme tras 15 min de inactividad (cold start 30-60 s). Todo documentado paso a paso en fase-0-pendientes.md.</small>
             <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
           </td>
           <td><span class="status pending">⏳ Fase 6</span></td>
@@ -768,6 +848,7 @@
         <tr><td class="id">AUTH-003 / AUTH-007 / AUTH-008 / AUTH-009</td><td class="desc">lib/auth.ts: CredentialsProvider conectado a POST /api/auth/login (401/403). formularioLogin → signIn("credentials"). formularioRecuperarContrasena → POST /api/auth/recuperar-contrasena. formularioNuevaContrasena → POST /api/auth/nueva-contrasena.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
         <tr><td class="id">ARCH-001</td><td class="desc">BE separación tipos/schemas — Nueva carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces de dominio puras sin Document ni schemas. Los modelos usuarioMongo.ts y tokenMongo.ts definen IUsuarioDoc/ITokenDoc extends IXxx, Document y contienen el schema Mongoose completo (select: false, unique, TTL index, etc.). Los repositories importan IXxx de types/ (contrato de dominio) e IXxxDoc + modelo de models/ (persistencia). Beneficio: cambiar el schema no afecta al contrato; cambiar la BD solo toca models/ y repositories/. TypeScript check: 0 errores.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">DOCS-001</td><td class="desc">Limpieza de duplicados en docs/ — 6 secciones eliminadas de context.md (reglas arquitectura, paleta, Stitch, sprint paralelo, filtros feed, estados vistas) y 4 de folderStructure.md (Reglas, Patrón capas BE, Regla de oro, Árbol stitch/). context.md queda como contexto narrativo puro. folderStructure.md queda con el árbol real actualizado (incluye types/ BE de ARCH-001). Header de context.md actualizado a Sprint 3 / 2026-04-17.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DEV-001</td><td class="desc">scripts/dev.sh — arranca Next.js (:3000) + Express (:4000) en paralelo con prefijos coloreados [FE]/[BE]. Sin dependencias externas. Ctrl+C mata ambos. Verificado: BE tsc --noEmit ✅ · FE next lint ✅. También creados scripts/lint.sh y scripts/build.sh. BE package.json actualizado con script "lint": "tsc --noEmit".</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">ARCH-002</td><td class="desc">BE renombrado con nomenclatura BD-explícita — usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo por estar dentro de types/). Todos los imports actualizados en repositories. Archivos antiguos eliminados. Regla añadida a docs/rules.md secciones 4 y 6. HTML explicativo creado en docs/arquitectura-backend-tipos.html.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>

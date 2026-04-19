@@ -25,7 +25,7 @@ Sprint N:
 | Fase 0: Setup | Setup | Repo, estructura, ESLint, CI/CD básico — ✅ Completada |
 | Fase 1: Auth FE | Frontend | Landing, Login, Registro, OAuth — ✅ Completada |
 | Fase 2-5: FE + BE paralelo | FE + BE | Cada sprint: vistas nuevas mock + backend sprint anterior |
-| Fase 6: APIs Externas + PWA + Deploy | Integración | Gemini, Edamam, Cloudinary, Service Worker, Vercel + Azure |
+| Fase 6: APIs Externas + PWA + Deploy | Integración | Gemini, Edamam, Cloudinary, Service Worker, Vercel + Render |
 | Fase 7: QA y Documentación | QA | Tests, performance, memoria TFG, presentación |
 
 ---
@@ -66,7 +66,7 @@ Sprint N:
 | E6 | Social | Grupos, seguir usuarios, notificaciones, likes | 6 | 7 |
 | E7 | Perfil + UX | Perfil, recetas guardadas, ajustes | 4 | 5 |
 | E8 | PWA | Modo manos libres, offline, instalación | 8 | — |
-| E9 | Deploy | Vercel, Azure, CI/CD, OAuth producción | — | Fase 6 |
+| E9 | Deploy | Vercel, Render, CI/CD, OAuth producción | — | Fase 6 |
 
 ---
 
@@ -273,7 +273,7 @@ Sprint N:
 | next-pwa migración | next-pwa@5 → @ducanh2912/next-pwa (ver tech-debt.md DEBT-001) |
 | Next.js 14 → 15 | Migración + ESLint v9 (ver tech-debt.md DEBT-001) |
 | Vercel deploy | Frontend en producción |
-| Azure App Service | Backend en producción (ver fase-0-pendientes.md SETUP-006) |
+| Render | Backend en producción — Deploy Hook desde GitHub Actions (ver fase-0-pendientes.md SETUP-006) |
 | GitHub Actions CI/CD | Workflow lint + deploy (ver fase-0-pendientes.md SETUP-001) |
 | OAuth producción | NEXTAUTH_URL + Google Cloud Console (ver api-changes.md API-003) |
 
@@ -309,7 +309,7 @@ Sprint N:
 | `[UI-XXX]` | Vistas, componentes, layouts | `ui-changes.md` |
 | `[API-XXX]` | Endpoints, contratos, hooks | `api-changes.md` |
 | `[DOM-XXX]` | Modelo de dominio, schemas | `domain-changes.md` |
-| `[AUTH-XXX]` | TODOs de autenticación | `fase-1-pendientes.md` |
+| `[AUTH-XXX]` | TODOs de autenticación | `fase-1-completados.md` |
 | `[SETUP-XXX]` | Setup y deploy | `fase-0-pendientes.md` |
 | `[DEBT-XXX]` | Deuda técnica | `tech-debt.md` |
 
@@ -363,7 +363,7 @@ CLOUDINARY_URL=                      # Fase 6
 
 ```
 Frontend → Vercel (cookr.vercel.app)
-Backend  → Azure App Service Free F1 (api-cookr.azurewebsites.net)
+Backend  → Render (https://{nombre-servicio}.onrender.com)
 BD       → MongoDB Atlas M0
 Redis    → Upstash (tier gratuito)
 CI/CD    → GitHub Actions (push a main)

@@ -194,7 +194,7 @@ Redis actúa como intermediario entre Express y MongoDB para reducir consultas r
 | Componente | Plataforma | Motivo |
 |---|---|---|
 | Frontend Next.js | Vercel | Deploy automático, CDN global, optimizado para Next.js |
-| Backend Node.js | Azure App Service (Free F1) | Azure for Students, $100 crédito, válido para CV |
+| Backend Node.js | Render (tier gratuito) | Deploy automático desde GitHub, sleep tras 15 min inactividad en tier gratuito |
 | Base de datos | MongoDB Atlas M0 | Cloud, backups automáticos, tier gratuito |
 | Redis | Upstash | Serverless Redis, tier gratuito, sin servidor |
 | Imágenes/vídeos | Cloudinary | CDN global, transformaciones automáticas |
@@ -202,7 +202,7 @@ Redis actúa como intermediario entre Express y MongoDB para reducir consultas r
 
 ### URLs de producción
 - Frontend: https://cookr.vercel.app
-- Backend API: https://api-cookr.azurewebsites.net
+- Backend API: https://{nombre-servicio}.onrender.com  (se define al crear el servicio en Render)
 - CORS permitido: solo cookr.vercel.app en producción
 
 ### Flujo de deploy (Fase 6)
@@ -212,7 +212,7 @@ git push main
 GitHub Actions: lint + tsc
   ↓ (si pasa)
 Vercel despliega frontend automáticamente
-Azure App Service despliega backend (zip deploy)
+Render redespliega backend (curl al Deploy Hook)
   ↓
 App en producción en ~3 minutos
 ```
@@ -225,11 +225,11 @@ NEXTAUTH_SECRET
 NEXTAUTH_URL=https://cookr.vercel.app
 GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
-NEXT_PUBLIC_API_URL=https://api-cookr.azurewebsites.net/api
+NEXT_PUBLIC_API_URL=https://{nombre-servicio}.onrender.com/api
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 ```
 
-**Backend — Azure Portal (Configuration → App Settings)**
+**Backend — Render (Environment Variables en el panel del servicio)**
 ```
 MONGODB_URI
 UPSTASH_REDIS_URL
@@ -249,7 +249,8 @@ PORT=8080
 VERCEL_TOKEN
 VERCEL_ORG_ID
 VERCEL_PROJECT_ID
-AZURE_WEBAPP_PUBLISH_PROFILE
+RENDER_DEPLOY_HOOK_URL
+RENDER_APP_URL
 ```
 
 ---

@@ -84,25 +84,30 @@ Resumen:
 
 ---
 
-## [SETUP-006] Deploy — Azure App Service + Vercel + GitHub Actions
+## [SETUP-006] Deploy — Render + Vercel + GitHub Actions
 Estado:   ⏳ Pendiente
 Cuándo:   Fase 6 / Sprint 15
 
 Pasos en orden:
-  1. Activar Azure for Students en azure.microsoft.com/free/students
-  2. Crear App Service: api-cookr, Node 20, West Europe, Free F1, Linux
-  3. Descargar Publish Profile desde Azure Portal → Overview
-  4. Añadir secretos en GitHub:
-       AZURE_WEBAPP_PUBLISH_PROFILE (el XML descargado)
+  1. Crear cuenta en render.com y nuevo Web Service apuntando al repo GitHub
+  2. Configurar el servicio: Runtime Node, Build Command "cd backend && npm ci && npm run build",
+     Start Command "cd backend && node dist/index.js", tier gratuito
+  3. En Render → Settings → Deploy Hook: copiar la URL secreta del hook
+  4. Añadir secretos en GitHub (Settings → Secrets → Actions):
+       RENDER_DEPLOY_HOOK_URL (la URL copiada del paso 3)
+       RENDER_APP_URL         (https://{nombre-servicio}.onrender.com)
        VERCEL_TOKEN
        VERCEL_ORG_ID
        VERCEL_PROJECT_ID
   5. Crear .github/workflows/ci-cd.yml (ver roadmap.md sección 9)
-  6. Configurar App Settings en Azure Portal (ver infraestructura.md sección 7)
+  6. Configurar Environment Variables en Render → Environment (ver infraestructura.md sección 7)
   7. Configurar Environment Variables en Vercel (ver infraestructura.md sección 7)
   8. Añadir en Google Cloud Console:
        https://cookr.vercel.app/api/auth/callback/google
   9. Verificar CORS en backend (ver api-changes.md [API-002])
+
+  ⚠️ Render free tier: el servicio duerme tras 15 min de inactividad.
+     Cold start ~30-60 s. Ejecutar scripts/keep-alive.sh manualmente antes de demos.
 
 ---
 

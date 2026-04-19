@@ -223,6 +223,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `BE /api/auth/verificar-email` | Endpoint real | ✅ Sprint 2 BE |
 | `BE /api/auth/recuperar-contrasena` | Endpoint real | ✅ Sprint 2 BE |
 | `BE /api/auth/nueva-contrasena` | Endpoint real | ✅ Sprint 2 BE |
+| `BE /api/health` | Health check público (sin auth) — usado por scripts/keep-alive.sh | ✅ Sprint 3 |
 
 ## Estructura del Proyecto
 
@@ -254,10 +255,11 @@ El login con Google OAuth sigue funcionando sin restricciones.
 Estado: ⏳ Pendiente de implementar (Fase 6 / Sprint 15)
 
 Frontend → Vercel → cookr.vercel.app
-Backend  → Azure App Service Free F1 → api-cookr.azurewebsites.net
+Backend  → Render (tier gratuito) → https://{nombre-servicio}.onrender.com
 CI/CD    → GitHub Actions → .github/workflows/ci-cd.yml
-Método   → zip deploy sin Docker (máxima simplicidad)
+Método   → Deploy Hook de Render (curl a URL secreta desde GitHub Actions)
 Dominio  → cookr.vercel.app (gratuito, sin configuración extra)
+Nota     → Render free duerme el servicio tras 15 min inactividad (cold start 30-60 s)
 OAuth localhost: funciona hasta Fase 6, no tocar .env.local
 
 Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [SETUP-007]
