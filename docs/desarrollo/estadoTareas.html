@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">19</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">42</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">43</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -418,7 +418,7 @@
             <small>Revisar y configurar workflow de GitHub Actions para que main sirva como rama alpha (deploy automático a Vercel FE + Render BE via Deploy Hook) mientras develop sigue siendo la rama de trabajo diario. Incluye: branch protection en main, PR develop → main para promover cambios estables, secrets RENDER_DEPLOY_HOOK_URL + RENDER_APP_URL + Vercel en GitHub. Anticipa SETUP-001 (Fase 6) pero con alcance mínimo de alpha.</small>
             <span class="source">📄 docs/phase-reports/fase-0-pendientes.md · SETUP-001 · docs/infraestructura.md §7</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -875,6 +875,7 @@
         <tr><td class="id">DOCS-004</td><td class="desc">Mapa de navegación — esquema visual de conexiones entre vistas de la app: qué ruta lleva a cuál, con qué acción (tap tarjeta, botón, redirect post-login…). Creado y referenciado desde docs/.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">UI-019</td><td class="desc">NavBar inferior — añadida ruta Colección (/coleccion) con icono BookMarked, reemplazando Discover (sin contenido aún). Sidebar PC actualizado en espejo. 5 ítems: Inicio · Despensa · Cookr IA (central) · Colección · Perfil.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">UI-020</td><td class="desc">Vista /coleccion — página con dos subpestañas: "Guardadas" (posts donde guardado === true) y "Mis recetas" (mock). Estado vacío con CTA en "Mis recetas". Desktop: sidebar + max-w-2xl centrado. Mobile: columna única de TarjetaPost. Lint ✅.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-008</td><td class="desc">CI/CD GitHub Actions — .github/workflows/ci-cd.yml creado. CI: lint + tsc --noEmit en FE y BE en cada push a develop y PR a main. CD: deploy automático a Vercel (npx vercel --cwd frontend --prod) + Render Deploy Hook en cada push a main, condicionado a que el CI pase. Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, RENDER_DEPLOY_HOOK_URL, RENDER_APP_URL añadidos en GitHub. Branch protection activada en main (PR obligatoria + status checks). Vercel y Render ya conectados al repo.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>
 
