@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Búsqueda y Filtros — UI-016 + UI-017 — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    .badge { font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .badge.done { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .badge.sprint3 { background: #f9731622; color: #f97316; border: 1px solid #f9731644; }
+
+    p { font-size: 0.85rem; color: #d4d4d4; }
+    strong { color: #fff; }
+
+    /* Code block */
+    .code-block { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; }
+    .code-block pre { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.75rem; color: #a3a3a3; white-space: pre; }
+    .code-block .kw { color: #f97316; }
+    .code-block .fn { color: #60a5fa; }
+    .code-block .str { color: #22c55e; }
+    .code-block .cm { color: #525252; }
+
+    /* Flow diagram */
+    .flow { display: flex; flex-direction: column; gap: 0.5rem; }
+    .flow-row { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.82rem; }
+    .flow-label { background: #252525; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.75rem; color: #e5e5e5; white-space: nowrap; font-weight: 600; }
+    .flow-arrow { color: #525252; font-size: 0.9rem; padding-top: 0.3rem; }
+    .flow-desc { color: #737373; padding-top: 0.3rem; font-size: 0.78rem; }
+
+    /* File list */
+    .file-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .file-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 0.75rem; background: #111; border-radius: 8px; border: 1px solid #222; }
+    .file-path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; }
+    .file-desc { font-size: 0.78rem; color: #737373; margin-top: 0.15rem; }
+    .file-action { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+    .file-action.new { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .file-action.mod { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+
+    /* Two-col grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 1rem; }
+    .card h3 { font-size: 0.82rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .card p, .card li { font-size: 0.78rem; color: #737373; }
+    .card ul { padding-left: 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+
+    hr { border: none; border-top: 1px solid #222; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Búsqueda y Filtros — Cookr TFG</h1>
+    <div class="meta">Implementado: 2026-04-20 · Sprint 3 · UI-016 + UI-017</div>
+  </div>
+</header>
+
+<nav>
+  <a href="#que-se-implemento">Qué se implementó</a>
+  <a href="#debounce-skeleton">Debounce y skeleton</a>
+  <a href="#drawer-filtros">DrawerFiltros</a>
+  <a href="#flujo-estado">Flujo de estado</a>
+  <a href="#archivos">Archivos modificados</a>
+  <a href="#fuentes">Reutilización</a>
+</nav>
+
+<main>
+
+  <!-- QUÉ SE IMPLEMENTÓ -->
+  <section id="que-se-implemento">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Qué se implementó</h2>
+      <span class="badge done">Completado</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3>UI-016 — Buscar recetas</h3>
+          <ul>
+            <li>Barra de búsqueda ya existía — se añadió <strong>debounce de 300 ms</strong> para no filtrar en cada tecla</li>
+            <li><strong>Skeleton loaders</strong>: mientras el valor rebotado no llega, se muestran 3 tarjetas de carga animadas</li>
+            <li>Estado vacío mejorado con icono <strong>SearchX</strong> de lucide-react</li>
+            <li>Funciona igual en móvil (feedHome) y escritorio (feedHomePc)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>UI-017 — Filtrar recetas</h3>
+          <ul>
+            <li>Botón <strong>"Filtros"</strong> fijo junto a la barra de búsqueda — patrón YouTube/Instagram, nunca se corta</li>
+            <li><strong>Badge naranja</strong> sobre el botón muestra el total de filtros activos (dietas + dificultad + alérgenos)</li>
+            <li>Drawer con <strong>3 secciones</strong>: Dieta, Dificultad, Excluir alérgenos</li>
+            <li>Duplicados eliminados de config: <code>sinGluten</code> y <code>sinLactosa</code> cubiertos por alérgenos</li>
+            <li>Datos mock actualizados con campo <code>alergenos</code> en cada receta</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEBOUNCE Y SKELETON -->
+  <section id="debounce-skeleton">
+    <div class="section-header">
+      <span class="section-icon">⏱️</span>
+      <h2>Cómo funciona el debounce y los skeleton loaders</h2>
+    </div>
+    <div class="section-body">
+      <p>Se creó un hook genérico <strong>useDebounce</strong> que retrasa cualquier valor un número de milisegundos configurable. En los feeds se usa con 300 ms:</p>
+
+      <div class="code-block"><pre>
+<span class="cm">// hooks/useDebounce.ts</span>
+<span class="kw">export function</span> <span class="fn">useDebounce</span>&lt;T&gt;(value: T, delay: <span class="kw">number</span>): T {
+  <span class="kw">const</span> [debounced, setDebounced] = <span class="fn">useState</span>&lt;T&gt;(value)
+  <span class="fn">useEffect</span>(() =&gt; {
+    <span class="kw">const</span> timer = <span class="fn">setTimeout</span>(() =&gt; <span class="fn">setDebounced</span>(value), delay)
+    <span class="kw">return</span> () =&gt; <span class="fn">clearTimeout</span>(timer)
+  }, [value, delay])
+  <span class="kw">return</span> debounced
+}</pre></div>
+
+      <p>En cada feed se deriva el estado <strong>cargando</strong> de forma reactiva, sin ningún efecto extra:</p>
+
+      <div class="code-block"><pre>
+<span class="kw">const</span> busquedaDebounciada = <span class="fn">useDebounce</span>(busqueda, 300)
+<span class="kw">const</span> cargando = busqueda !== busquedaDebounciada  <span class="cm">// true durante los 300 ms</span></pre></div>
+
+      <p>Mientras <code>cargando === true</code> se renderizan tarjetas esqueleto (cajas grises pulsantes) en lugar del feed real. En cuanto el valor debounced se actualiza, desaparecen y aparecen los resultados filtrados.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Skeleton móvil (TarjetaPostSkeleton)</h3>
+          <ul>
+            <li>Círculo: avatar</li>
+            <li>Rectángulo h-4 w-32: nombre del autor</li>
+            <li>Rectángulo h-48 rounded-xl: imagen de la receta</li>
+            <li>Rectángulo h-4 w-3/4: título</li>
+            <li>Rectángulo h-3 w-1/2: metadatos</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Skeleton escritorio (TarjetaPostSkeletonPc)</h3>
+          <ul>
+            <li>Rectángulo h-48: imagen</li>
+            <li>Rectángulo h-4 w-3/4: título</li>
+            <li>Rectángulo h-3 w-1/2: metadatos</li>
+            <li>Se muestran 6 en un grid de 3 columnas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRAWER FILTROS -->
+  <section id="drawer-filtros">
+    <div class="section-header">
+      <span class="section-icon">🎛️</span>
+      <h2>Cómo funciona el DrawerFiltros</h2>
+    </div>
+    <div class="section-body">
+      <p>El componente <strong>DrawerFiltros</strong> (<code>features/recetas/components/home/drawerFiltros.tsx</code>) usa el primitivo <strong>Drawer de Vaul</strong> (panel deslizante desde abajo, con soporte de gesto táctil) que ya existía en <code>components/ui/drawer.tsx</code>.</p>
+
+      <p>Recibe tres props:</p>
+      <div class="code-block"><pre>
+<span class="kw">interface</span> Props {
+  filtros: FiltrosAvanzados     <span class="cm">// estado actual del padre</span>
+  onChange: (f: FiltrosAvanzados) =&gt; <span class="kw">void</span>  <span class="cm">// callback al aplicar</span>
+  children: React.ReactNode     <span class="cm">// el botón trigger</span>
+}</pre></div>
+
+      <p>El drawer mantiene una <strong>copia local</strong> de los filtros mientras está abierto. El padre no se entera de los cambios hasta que el usuario pulsa <strong>"Aplicar"</strong>. Si pulsa <strong>"Limpiar"</strong>, la copia local se resetea pero el padre tampoco cambia hasta aplicar. Esto evita que el feed se recalcule en cada chip pulsado dentro del drawer.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Sección Dieta</h3>
+          <ul>
+            <li>10 chips de <code>DIETAS_OPCIONES</code> (config/opcionesUsuario.ts)</li>
+            <li><code>sinGluten</code> y <code>sinLactosa</code> eliminados — duplicaban los alérgenos Cereales y Lácteos</li>
+            <li>Multi-select, chips activos en naranja brand</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Sección Dificultad</h3>
+          <ul>
+            <li>Chips: Fácil / Media / Difícil</li>
+            <li>Multi-select: se pueden marcar varias</li>
+            <li>Filtra posts cuya <code>receta.dificultad</code> no esté en el array</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Sección Excluir alérgenos</h3>
+          <ul>
+            <li>14 chips de <code>ALERGENOS_OPCIONES</code> (config/opcionesUsuario.ts)</li>
+            <li>Cada chip muestra la imagen del alérgeno (webp en /public/alergenos/)</li>
+            <li>Semántica: seleccionar un alérgeno <em>excluye</em> recetas que lo contienen</li>
+            <li>Chips activos en rojo <code>destructive</code> para reforzar la exclusión</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJO DE ESTADO -->
+  <section id="flujo-estado">
+    <div class="section-header">
+      <span class="section-icon">🔄</span>
+      <h2>Flujo de estado entre componentes</h2>
+    </div>
+    <div class="section-body">
+      <p><strong>Móvil</strong> — feedHome.tsx posee todo el estado:</p>
+      <div class="flow">
+        <div class="flow-row">
+          <span class="flow-label">feedHome.tsx</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Posee: busqueda, filtrosAvanzados {dietas, alergenos, dificultad}. Calcula busquedaDebounciada y cargando.</span>
+        </div>
+        <div class="flow-row">
+          <span class="flow-label">BuscadorFiltros</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Renderiza barra de búsqueda + botón "Filtros" en la misma fila. Sin chips inline.</span>
+        </div>
+        <div class="flow-row">
+          <span class="flow-label">DrawerFiltros</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Copia local de filtros mientras está abierto. Al "Aplicar" llama onChange y feedHome recalcula postsFiltrados.</span>
+        </div>
+      </div>
+
+      <hr />
+
+      <p style="margin-top:1rem"><strong>Escritorio</strong> — layoutHomePc.tsx posee el estado y lo distribuye:</p>
+      <div class="flow">
+        <div class="flow-row">
+          <span class="flow-label">layoutHomePc.tsx</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Posee: busqueda, filtrosAvanzados. Pasa busqueda a HeaderHomePc y filtrosAvanzados también.</span>
+        </div>
+        <div class="flow-row">
+          <span class="flow-label">HeaderHomePc</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Recibe busqueda + filtrosAvanzados. Renderiza buscador + botón "Filtros" con DrawerFiltros centrado en el header.</span>
+        </div>
+        <div class="flow-row">
+          <span class="flow-label">FeedHomePc</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-desc">Recibe busqueda + filtrosAvanzados. Solo renderiza skeletons o el bento grid filtrado.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHIVOS MODIFICADOS -->
+  <section id="archivos">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Archivos creados y modificados</h2>
+    </div>
+    <div class="section-body">
+      <div class="file-list">
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/hooks/useDebounce.ts</div>
+            <div class="file-desc">Hook genérico de debounce. Reutilizable en cualquier parte del proyecto.</div>
+          </div>
+          <span class="file-action new">NUEVO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/components/home/drawerFiltros.tsx</div>
+            <div class="file-desc">Drawer de filtros avanzados: dificultad + alérgenos. Usa Drawer (vaul) + ALERGENOS_OPCIONES.</div>
+          </div>
+          <span class="file-action new">NUEVO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/types/receta.types.ts</div>
+            <div class="file-desc">Añadido alergenos?: string[] a DatosReceta. Añadida interfaz FiltrosAvanzados { alergenos, dificultad }.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/data/datosFeed.ts</div>
+            <div class="file-desc">Añadido campo alergenos en cada uno de los 7 POSTS_MOCK con IDs de ALERGENOS_OPCIONES.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/config/opcionesUsuario.ts</div>
+            <div class="file-desc">Eliminados sinGluten y sinLactosa de DIETAS_OPCIONES — duplicaban los alérgenos Cereales y Lácteos.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/components/common/buscadorFiltros.tsx</div>
+            <div class="file-desc">Simplificado: solo barra de búsqueda + botón "Filtros" en la misma fila. Sin chips. Props: onBuscar, filtrosAvanzados, onFiltrosAvanzadosChange.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/components/home/feedHome.tsx</div>
+            <div class="file-desc">Eliminado filtrosActivos. Solo busqueda + filtrosAvanzados {dietas, alergenos, dificultad}. Debounce, skeleton, SearchX.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/components/home/feedHomePc.tsx</div>
+            <div class="file-desc">Eliminados chips inline y filtrosActivos. Solo recibe busqueda + filtrosAvanzados. Debounce, skeleton (6 cards), SearchX.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/components/home/layoutHomePc.tsx</div>
+            <div class="file-desc">Eliminado filtrosActivos. Estado filtrosAvanzados {dietas, alergenos, dificultad} pasado a HeaderHomePc y FeedHomePc.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+        <div class="file-item">
+          <div>
+            <div class="file-path">frontend/src/features/recetas/components/home/headerHomePc.tsx</div>
+            <div class="file-desc">Añadido botón "Filtros" con DrawerFiltros junto al buscador en el header de escritorio.</div>
+          </div>
+          <span class="file-action mod">MODIFICADO</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUENTES REUTILIZADAS -->
+  <section id="fuentes">
+    <div class="section-header">
+      <span class="section-icon">♻️</span>
+      <h2>Componentes y datos reutilizados</h2>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="card">
+          <h3>ALERGENOS_OPCIONES + DIETAS_OPCIONES</h3>
+          <p>Ambas importadas de <code>config/opcionesUsuario.ts</code>. Fuente única de verdad. <code>sinGluten</code> y <code>sinLactosa</code> eliminados de DIETAS_OPCIONES al ser redundantes con los alérgenos Cereales y Lácteos.</p>
+        </div>
+        <div class="card">
+          <h3>Drawer (vaul)</h3>
+          <p>Primitivo ya instalado y configurado en <code>components/ui/drawer.tsx</code>. Soporta gesto de swipe para cerrar en móvil. No se instaló ninguna dependencia nueva.</p>
+        </div>
+        <div class="card">
+          <h3>Skeleton (shadcn)</h3>
+          <p>Componente ya existente en <code>components/ui/skeleton.tsx</code>. Se usa pasando className con el tamaño deseado para simular las tarjetas.</p>
+        </div>
+        <div class="card">
+          <h3>FiltrosAvanzados type</h3>
+          <p>Interfaz exportada desde <code>receta.types.ts</code> e importada por todos los componentes que la necesitan. Un único punto de definición.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

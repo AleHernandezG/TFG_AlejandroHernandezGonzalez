@@ -45,6 +45,13 @@
 - ✅ [AUTH-FE-BE] `NEXT_PUBLIC_API_URL` añadido a `.env.local`
 - ✅ [ARCH-001] BE: interfaces de dominio separadas de schemas Mongoose — nueva carpeta `backend/src/types/` con `IUsuario` e `IToken` como interfaces puras
 - ✅ [ARCH-002] BE: modelos renombrados con nomenclatura BD-explícita — `usuarioMongo.ts`, `tokenMongo.ts`
+- ✅ [DOCS-001] Limpieza docs/ — 6 secciones eliminadas de context.md y 4 de folderStructure.md; ambos quedan como fuente única sin duplicados
+- ✅ [DEV-001] scripts/dev.sh — arranca FE (:3000) + BE (:4000) en paralelo con prefijos coloreados; también scripts/lint.sh y scripts/build.sh
+- ✅ [UI-016] Búsqueda con debounce 300 ms + skeleton loaders (3 mobile / 6 desktop) + estado vacío SearchX — hook `useDebounce.ts` genérico en hooks/
+- ✅ [UI-017] Drawer de filtros avanzados — botón "Filtros" fijo junto a la barra (patrón YouTube/Instagram). Drawer vaul con 3 secciones: Dieta (DIETAS_OPCIONES), Dificultad, Excluir alérgenos (ALERGENOS_OPCIONES). Badge con conteo activo
+- ✅ [UI-019] NavBar inferior refactorizada — patrón FAB (Material Design / WhatsApp): Cookr IA como botón flotante sobre la nav, nav con 5 ítems planos (Inicio · Despensa · Discover · Colección · Perfil). Sidebar PC actualizado con los 6 destinos
+- ✅ [UI-020] Vista /coleccion — dos subpestañas: "Guardadas" (mock) y "Mis recetas" (mock). Estado vacío con CTA en Mis recetas. Mobile: columna TarjetaPost. Desktop: sidebar + max-w-2xl
+- ✅ [DOCS-004] Mapa de navegación — esquema de conexiones entre vistas (rutas, acciones de navegación)
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -216,6 +223,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
 | `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
+| `/coleccion` | Mi colección — subpestañas Guardadas y Mis recetas (mock) | ✅ Sprint 3 |
 | `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |
 | `frontend/src/services/authService.ts` | Servicio HTTP de auth (5 métodos) | ✅ |
 | `BE /api/auth/registro` | Endpoint real | ✅ Sprint 2 BE |
@@ -267,11 +275,13 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 ## Próxima Tarea
 
 Sprint 2 completado y aprobado al 100%.
+Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001.
 
-Sprint 3 activo — tareas prioritarias:
-- **FE:** DET-001 — Guardar receta (persistente)
-- **FE:** DET-002 — Like persistente en recetas
+Sprint 3 — pendientes:
+- **FE:** DET-001 — Guardar receta (persistente, conectar al BE)
+- **FE:** DET-002 — Like persistente en recetas (optimistic update TanStack Query)
 - **FE:** DET-009 — Carrusel de recetas similares funcional
 - **FE:** CAROUSEL-001 — Imágenes reales en el carrusel de la landing
-- **DOCS:** DOCS-001 — Limpiar duplicados docs/ (en progreso)
+- **FE:** UI-018 — Formulario multi-step crear receta (RHF + Zod, 3-4 pasos)
 - **DOCS:** DOCS-002 — Renombrar archivos phase-reports/changes de pendientes a completados
+- **SETUP:** SETUP-008 — CI/CD GitHub Actions (alpha en main)

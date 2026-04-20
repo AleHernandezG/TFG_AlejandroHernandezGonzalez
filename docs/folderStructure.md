@@ -15,6 +15,15 @@ src/
 │   │   └── auth/
 │   │       └── [...nextauth]/  # Route handler NextAuth (GET + POST)
 │   │           └── route.ts
+│   ├── (main)/                 # Grupo de rutas con NavBarInferior
+│   │   ├── home/               # Ruta /home (feed)
+│   │   │   └── page.tsx
+│   │   ├── coleccion/          # Ruta /coleccion — Guardadas + Mis recetas [UI-020]
+│   │   │   └── page.tsx
+│   │   ├── recetas/
+│   │   │   └── [id]/           # Ruta /recetas/[id] — detalle de receta
+│   │   │       └── page.tsx
+│   │   └── layout.tsx          # Añade NavBarInferior a todas las rutas del grupo
 │   ├── registro/               # Ruta /registro
 │   │   └── page.tsx
 │   ├── fonts/
@@ -55,6 +64,7 @@ src/
 │   ├── recetas/
 │   │   ├── components/
 │   │   │   ├── home/           # Componentes exclusivos de /home (feed)
+│   │   │   │   ├── drawerFiltros.tsx   # Drawer vaul: Dieta + Dificultad + Alérgenos
 │   │   │   │   ├── feedHome.tsx
 │   │   │   │   ├── feedHomePc.tsx
 │   │   │   │   ├── headerHome.tsx
@@ -87,12 +97,14 @@ src/
 │   └── grupos/                 # Sprint 6+
 │
 ├── hooks/                      # Custom hooks globales (usados por 2+ features)
+│   └── useDebounce.ts          # useDebounce<T>(value, delay) — Sprint 3 [UI-016b]
 ├── stores/                     # Zustand stores globales
 ├── services/                   # apiClient.ts + *Service.ts
 │   ├── apiClient.ts
 │   └── authService.ts
 ├── types/                      # Tipos TypeScript compartidos entre features
 └── config/                     # Constantes y variables de entorno tipadas
+    └── opcionesUsuario.ts      # ALERGENOS_OPCIONES (14) + DIETAS_OPCIONES (10) — fuente única
 ```
 
 ---
@@ -165,7 +177,7 @@ Todos los imports usan `@/` como raíz de `src/`.
 |---|---|---|
 | `landing` | ✅ Aprobado | SeccionHero, BentoCaracteristicas, BentoTestimonios |
 | `auth` | 👁️ revisión | FormularioRegistro, FormularioLogin, BotonGoogle, DivisorOAuth, +4 |
-| `recetas` | 👁️ revisión | `home/` ×9 (FeedHome, TarjetaPost…) · `detalleReceta/` ×7 (HeroReceta, TabsReceta…) |
+| `recetas` | ✅ Aprobado | `home/` ×10 (FeedHome, DrawerFiltros, TarjetaPost…) · `detalleReceta/` ×7 · `/coleccion` (page) |
 | `perfil` | ⏳ Sprint 4 | Pendiente |
 | `despensa` | ⏳ Sprint 5 | Pendiente |
 | `chat` | ⏳ Sprint 5 | Pendiente |

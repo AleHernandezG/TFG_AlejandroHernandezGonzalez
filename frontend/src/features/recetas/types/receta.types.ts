@@ -12,6 +12,13 @@ export type DatosReceta = {
   imagenUrl: string
   tiempo: string
   dificultad: DificultadReceta
+  alergenos?: string[] // ids de ALERGENOS_OPCIONES en opcionesUsuario.ts
+}
+
+export interface FiltrosAvanzados {
+  dietas: string[]
+  alergenos: string[]
+  dificultad: string[]
 }
 
 export type PostFeed = {

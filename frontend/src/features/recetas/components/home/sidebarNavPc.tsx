@@ -1,24 +1,25 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { Bot, Compass, Home, ShoppingBasket, User } from 'lucide-react'
+import { BookMarked, Bot, Compass, Home, ShoppingBasket, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-// Mirrors NavBarInferior routes — same routes, different visual presentation
+// Desktop: todos los destinos de la app (FAB no aplica en PC — Cookr IA es ítem normal)
 const NAV_ITEMS = [
-  { href: '/home',     Icono: Home,           etiqueta: 'Inicio' },
-  { href: '/despensa', Icono: ShoppingBasket,  etiqueta: 'Despensa' },
-  { href: '/chat',     Icono: Bot,            etiqueta: 'Cookr IA' },
-  { href: '/discover', Icono: Compass,        etiqueta: 'Discover' },
-  { href: '/perfil',   Icono: User,           etiqueta: 'Perfil' },
+  { href: '/home',      Icono: Home,          etiqueta: 'Inicio'    },
+  { href: '/despensa',  Icono: ShoppingBasket, etiqueta: 'Despensa'  },
+  { href: '/chat',      Icono: Bot,           etiqueta: 'Cookr IA'  },
+  { href: '/discover',  Icono: Compass,       etiqueta: 'Discover'  },
+  { href: '/coleccion', Icono: BookMarked,    etiqueta: 'Colección' },
+  { href: '/perfil',    Icono: User,          etiqueta: 'Perfil'    },
 ]
 
 export function SidebarNavPc() {
   const rutaActual = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-border/40 bg-background pt-24 pb-8 px-6 lg:flex">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-border/40 bg-background pb-8 pt-24 px-6 lg:flex">
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ href, Icono, etiqueta }) => {
           const activo = rutaActual === href || rutaActual.startsWith(`${href}/`)

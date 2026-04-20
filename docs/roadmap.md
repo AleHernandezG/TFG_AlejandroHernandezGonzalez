@@ -1,6 +1,6 @@
 # Roadmap — Cookr (TFG)
 > Red Social Gastronómica con IA · Stack MERN + PWA · 2024-2025
-> **Actualizado:** 2026-03-29 — Nuevo modelo de desarrollo FE + BE en paralelo
+> **Actualizado:** 2026-04-20 — Sprint 3 en curso; colección adelantada a Sprint 3
 
 ---
 
@@ -39,11 +39,12 @@ Sprint N:
 | Home / Feed de recetas | Sprint 2 | Sprint 3 |
 | NavBar inferior | Sprint 2 | — sin backend |
 | Detalle de receta | Sprint 2 | Sprint 3 |
-| Buscar recetas | Sprint 3 | Sprint 4 |
-| Filtros de recetas | Sprint 3 | Sprint 4 |
+| Buscar recetas | Sprint 3 ✅ | Sprint 4 |
+| Filtros de recetas | Sprint 3 ✅ | Sprint 4 |
+| Colección (Guardadas + Mis recetas) | Sprint 3 ✅ adelantado | Sprint 5 |
 | Crear receta | Sprint 3 | Sprint 4 |
 | Perfil de usuario | Sprint 4 | Sprint 5 |
-| Recetas guardadas | Sprint 4 | Sprint 5 |
+| Recetas guardadas (persistente) | Sprint 4 → conectar BE | Sprint 5 |
 | Despensa virtual | Sprint 5 | Sprint 6 |
 | Chat IA (Gemini) | Sprint 5 | Fase 6 |
 | Grupos / Comunidades | Sprint 6 | Sprint 7 |

@@ -1,35 +1,39 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { Search } from 'lucide-react'
-import type { FiltroFeed } from '@/features/recetas/types/receta.types'
+import { Search, SlidersHorizontal } from 'lucide-react'
+import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
+import { DrawerFiltros } from '@/features/recetas/components/home/drawerFiltros'
 
 interface BuscadorFiltrosProps {
   placeholder?: string
-  filtros: FiltroFeed[]
-  filtrosActivos: string[]
-  onFiltroChange: (id: string) => void
   onBuscar: (query: string) => void
+  filtrosAvanzados: FiltrosAvanzados
+  onFiltrosAvanzadosChange: (filtros: FiltrosAvanzados) => void
   className?: string
 }
 
 export function BuscadorFiltros({
   placeholder = '¿Qué quieres cocinar hoy?',
-  filtros,
-  filtrosActivos,
-  onFiltroChange,
   onBuscar,
+  filtrosAvanzados,
+  onFiltrosAvanzadosChange,
   className,
 }: BuscadorFiltrosProps) {
+  const totalActivos =
+    filtrosAvanzados.dietas.length +
+    filtrosAvanzados.dificultad.length +
+    filtrosAvanzados.alergenos.length
+
   return (
     <div
       className={cn(
-        'space-y-2 bg-background/80 px-4 py-2 backdrop-blur-md',
+        'flex items-center gap-2 bg-background/80 px-4 py-3 backdrop-blur-md',
         className,
       )}
     >
-      {/* Input pill */}
-      <label className="flex cursor-text items-center gap-2 rounded-full bg-muted px-4 py-2.5">
+      {/* Barra de búsqueda */}
+      <label className="flex flex-1 cursor-text items-center gap-2 rounded-full bg-muted px-4 py-2.5">
         <Search className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={2} />
         <input
           type="search"
@@ -39,26 +43,25 @@ export function BuscadorFiltros({
         />
       </label>
 
-      {/* Chips de filtro — multi-select */}
-      <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {filtros.map((filtro) => {
-          const activo = filtrosActivos.includes(filtro.id)
-          return (
-            <button
-              key={filtro.id}
-              onClick={() => onFiltroChange(filtro.id)}
-              className={cn(
-                'shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
-                activo
-                  ? 'bg-brand text-brand-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
-              )}
-            >
-              {filtro.etiqueta}
-            </button>
-          )
-        })}
-      </div>
+      {/* Botón Filtros — siempre visible, nunca se corta */}
+      <DrawerFiltros filtros={filtrosAvanzados} onChange={onFiltrosAvanzadosChange}>
+        <button
+          className={cn(
+            'relative flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2.5 text-xs font-semibold transition-colors',
+            totalActivos > 0
+              ? 'border-brand bg-brand/10 text-brand'
+              : 'border-border bg-muted text-muted-foreground hover:bg-muted/80',
+          )}
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={2} />
+          Filtros
+          {totalActivos > 0 && (
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-brand-foreground">
+              {totalActivos}
+            </span>
+          )}
+        </button>
+      </DrawerFiltros>
     </div>
   )
 }

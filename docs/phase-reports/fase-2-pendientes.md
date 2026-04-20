@@ -149,19 +149,14 @@ Qué hay que hacer:
 
 ---
 
-## [HOME-001] Chips de filtros del feed — listado completo con separación por categoría
-Estado:   ⏳ Pendiente — Sprint 3 (bloqueado: el autor facilita el listado)
-Componentes: components/common/buscadorFiltros.tsx · features/recetas/data/datosFeed.ts · features/recetas/components/home/feedHomePc.tsx
+## [HOME-001] Chips de filtros del feed — RESUELTO con drawer ✅
+Estado:   ✅ Completado — Sprint 3 (solución alternativa aprobada)
 
-Qué hay que hacer:
-  1. El autor facilita el listado completo de filtros (alérgenos 14 de /public/alergenos + dietas + dificultad + otros)
-  2. Ampliar el tipo FiltroFeed para incluir una categoría: { id, etiqueta, categoria: 'alergeno' | 'dieta' | 'dificultad' | ... }
-  3. Sustituir FILTROS_FEED en datosFeed.ts con el listado completo
-  4. Actualizar BuscadorFiltros para renderizar separadores visuales entre categorías (ej. divisor sutil o label de sección)
-  5. Aplicar el mismo cambio en feedHomePc.tsx (chips de filtro en la vista PC)
-  6. Conectar la lógica de filtrado real en feedHome.tsx y feedHomePc.tsx (ahora solo filtra por búsqueda de texto)
+Resuelto de forma distinta a lo planificado: en lugar de chips inline con categorías,
+se implementó un DrawerFiltros (vaul bottom-sheet) con 3 secciones separadas:
+  - Dieta: 10 opciones de DIETAS_OPCIONES (config/opcionesUsuario.ts)
+  - Dificultad: Fácil / Media / Difícil
+  - Excluir alérgenos: 14 opciones de ALERGENOS_OPCIONES (config/opcionesUsuario.ts)
 
-Notas de diseño:
-  - No juntar chips de alérgenos con chips de dietas ni de dificultad — separación visual clara entre grupos
-  - El multi-select ya está implementado (UI-019); este cambio solo añade datos y UI de agrupación
-  - Los iconos de /public/alergenos/*.webp pueden usarse como imagen dentro del chip
+Ventaja: los chips inline causaban desbordamiento del viewport — el drawer elimina ese problema.
+Ver: ui-changes.md [UI-017] y docs/desarrollo/busquedaFiltros.html

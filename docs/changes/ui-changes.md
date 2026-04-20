@@ -6,6 +6,72 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-020] — Vista /coleccion — dos subpestañas (Guardadas + Mis Recetas) ✅
+
+Fecha: 2026-04-20 | Estado: ✅ Completado | Sprint: 3
+
+**Fichero creado:** `app/(main)/coleccion/page.tsx`
+
+- Dos pestañas pill: **Guardadas** (filtra `POSTS_MOCK` donde `guardado === true`) y **Mis recetas** (2 posts mock de placeholder)
+- Estado vacío en "Mis recetas" con CTA "Crear receta" → `/crear-receta` (icono `PlusCircle`)
+- Mobile: columna única de `TarjetaPost`. Desktop: `SidebarNavPc` + columna `max-w-2xl` centrada
+- Lint ✅ · 0 errores TypeScript
+
+**Pendiente:** conectar al backend cuando existan `GET /api/usuarios/:id/guardadas` y `GET /api/usuarios/:id/recetas` (UI-021 + UI-022).
+
+---
+
+## [UI-019b] — NavBar inferior: patrón FAB (Cookr IA) + ruta Colección ✅
+
+Fecha: 2026-04-20 | Estado: ✅ Completado | Sprint: 3
+
+**Ficheros modificados:** `components/common/navBarInferior.tsx` · `features/recetas/components/home/sidebarNavPc.tsx`
+
+**Patrón FAB (Material Design / WhatsApp):**
+- Cookr IA (`/chat`) pasa de botón central inline a FAB flotante (`position: fixed`, `z-50`, `left: 50%`) sobre la navbar
+- Sombra `shadow-[0_4px_20px_rgba(0,0,0,0.22)]`, `whileTap scale 0.88` (Framer Motion), `lg:hidden`
+- Cuando la ruta es `/chat`: añade `ring-2 ring-brand` como indicador activo
+- Bottom: `calc(4.5rem + env(safe-area-inset-bottom) + 0.25rem)` — respeta safe area y flota justo encima
+
+**Nav:** 5 ítems planos (Inicio · Despensa · Discover · Colección · Perfil). Eliminado `esCentral` del tipo.
+
+**Sidebar PC:** 6 ítems (añadidos Discover + Colección). El FAB no aplica en desktop — Cookr IA queda como ítem normal con icono `Bot`.
+
+---
+
+## [UI-017] — Drawer de filtros avanzados ✅
+
+Fecha: 2026-04-20 | Estado: ✅ Completado | Sprint: 3
+
+**Fichero creado:** `features/recetas/components/home/drawerFiltros.tsx`
+
+**Cambios en:** `components/common/buscadorFiltros.tsx` · `features/recetas/components/home/feedHome.tsx` · `feedHomePc.tsx` · `layoutHomePc.tsx` · `headerHomePc.tsx`
+
+- Botón "Filtros" fijo junto a la barra de búsqueda (`shrink-0`), nunca se corta — patrón YouTube/Instagram
+- Drawer vaul (bottom-sheet) con **3 secciones**: Dieta (10 ops de `DIETAS_OPCIONES`), Dificultad (Fácil/Media/Difícil), Excluir alérgenos (14 ops de `ALERGENOS_OPCIONES`)
+- Estado interno: copia local hasta "Aplicar" — padre no actualiza en cada toggle
+- Badge naranja con total de filtros activos (`dietas.length + dificultad.length + alergenos.length`)
+- `DIETAS_OPCIONES`: eliminados `sinGluten` y `sinLactosa` (duplicados semánticos de los alérgenos Cereales/Lácteos)
+- `FiltrosAvanzados { dietas: string[], alergenos: string[], dificultad: string[] }` como tipo único en `receta.types.ts`
+
+---
+
+## [UI-016b] — Búsqueda con debounce + skeleton loaders + estado vacío ✅
+
+Fecha: 2026-04-20 | Estado: ✅ Completado | Sprint: 3
+
+**Fichero creado:** `hooks/useDebounce.ts`
+
+**Ficheros modificados:** `features/recetas/components/home/feedHome.tsx` · `feedHomePc.tsx`
+
+- Hook genérico `useDebounce<T>(value, delay)` con `useEffect + setTimeout`
+- `cargando = busqueda !== busquedaDebounciada` — se activa durante los 300 ms de rebote
+- Mobile: 3 × `TarjetaPostSkeleton` mientras carga. Desktop: 6 × `TarjetaPostSkeletonPc` en grid 3 cols
+- Estado vacío: icono `SearchX` (lucide-react) + texto "No hay recetas que coincidan"
+- Filtrado combina: búsqueda debounced + dieta + dificultad + exclusión de alérgenos
+
+---
+
 ## [UI-019] — Home: click en tarjeta → DetalleReceta + multi-select filtros + quitar ajustes PC ✅
 
 Fecha: 2026-04-10 | Estado: ✅ Completado | Sprint: 2

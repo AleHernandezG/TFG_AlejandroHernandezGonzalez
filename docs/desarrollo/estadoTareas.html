@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">20</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">37</div><div class="label">Completadas</div></div>
+    <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">19</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">42</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -365,21 +365,41 @@
           <td class="id">UI-016</td>
           <td class="desc">
             <strong>Buscar recetas — vista FE mock (Sprint 3)</strong>
-            <small>Barra de búsqueda con debounce. Resultados en tiempo real con skeleton loaders. Estado vacío con ilustración. Datos mock en features/recetas/data/. Diseño Stitch previo obligatorio antes de implementar.</small>
-            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+            <small>Barra de búsqueda con debounce 300 ms, skeleton loaders mientras rebota el valor, estado vacío con icono SearchX. Funciona en móvil y escritorio.</small>
+            <span class="source">📄 docs/desarrollo/busquedaFiltros.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">UI-017</td>
           <td class="desc">
             <strong>Filtrar recetas — Drawer filtros FE mock (Sprint 3)</strong>
-            <small>Drawer de filtros con multi-selección (alérgenos, dietas, dificultad). Badge con número de filtros activos en el chip de entrada. Chips sincronizados con el feed. Datos mock. Diseño Stitch previo obligatorio.</small>
-            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+            <small>Botón "Filtros" junto a la barra de búsqueda (nunca se corta). Drawer (vaul) con 3 secciones: Dieta (DIETAS_OPCIONES), Dificultad, Excluir alérgenos (ALERGENOS_OPCIONES). Badge con total de filtros activos. Duplicados eliminados de config.</small>
+            <span class="source">📄 docs/desarrollo/busquedaFiltros.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-021</td>
+          <td class="desc">
+            <strong>Vista Guardadas — colección de recetas guardadas por el usuario</strong>
+            <small>Subpestaña dentro de /coleccion. Actualmente filtra POSTS_MOCK donde guardado === true (mock). Pendiente: conectar al endpoint GET /api/usuarios/:id/guardadas cuando exista el backend de recetas. El componente ya existe en app/(main)/coleccion/page.tsx.</small>
+            <span class="source">📄 app/(main)/coleccion/page.tsx · features/recetas/data/datosFeed.ts</span>
+          </td>
+          <td><span class="status review">👁️ FE mock listo · BE pendiente</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-022</td>
+          <td class="desc">
+            <strong>Vista Mis Recetas — recetas creadas por el usuario</strong>
+            <small>Subpestaña dentro de /coleccion. Actualmente muestra 2 posts mock como placeholder. Pendiente: crear modelo Receta en BD, endpoint GET /api/usuarios/:id/recetas y conectar aquí. Estado vacío ya implementado con CTA "Crear receta" → /crear-receta.</small>
+            <span class="source">📄 app/(main)/coleccion/page.tsx · UI-018 (formulario crear receta)</span>
+          </td>
+          <td><span class="status review">👁️ FE mock listo · BE pendiente</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">UI-018</td>
@@ -418,7 +438,7 @@
             <small>La NavBar actual está aprobada visualmente pero puede necesitar ajustes conforme avanza el desarrollo: rutas activas reales (ahora son mock), iconos de nuevas secciones (Grupos, Notificaciones en Sprint 6+), protección de rutas privadas. Revisar en cada sprint si requiere cambios.</small>
             <span class="source">📄 docs/context.md · features/recetas/components/home/ · components/common/</span>
           </td>
-          <td><span class="status pending">⏳ Continuo · Sprint 3+</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -428,7 +448,7 @@
             <small>Diagrama visual de cómo se conectan todas las rutas de la app: qué vista lleva a cuál, con qué acción (tap en tarjeta, botón, redirect post-login…). Útil para la memoria del TFG y para detectar rutas huérfanas. Formato sugerido: Excalidraw o draw.io exportado a PNG + referenciado desde docs/.</small>
             <span class="source">📄 docs/roadmap.md · docs/context.md · rutas del proyecto</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3 / Documentación TFG</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
       </tbody>
@@ -848,8 +868,13 @@
         <tr><td class="id">AUTH-003 / AUTH-007 / AUTH-008 / AUTH-009</td><td class="desc">lib/auth.ts: CredentialsProvider conectado a POST /api/auth/login (401/403). formularioLogin → signIn("credentials"). formularioRecuperarContrasena → POST /api/auth/recuperar-contrasena. formularioNuevaContrasena → POST /api/auth/nueva-contrasena.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
         <tr><td class="id">ARCH-001</td><td class="desc">BE separación tipos/schemas — Nueva carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces de dominio puras sin Document ni schemas. Los modelos usuarioMongo.ts y tokenMongo.ts definen IUsuarioDoc/ITokenDoc extends IXxx, Document y contienen el schema Mongoose completo (select: false, unique, TTL index, etc.). Los repositories importan IXxx de types/ (contrato de dominio) e IXxxDoc + modelo de models/ (persistencia). Beneficio: cambiar el schema no afecta al contrato; cambiar la BD solo toca models/ y repositories/. TypeScript check: 0 errores.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">DOCS-001</td><td class="desc">Limpieza de duplicados en docs/ — 6 secciones eliminadas de context.md (reglas arquitectura, paleta, Stitch, sprint paralelo, filtros feed, estados vistas) y 4 de folderStructure.md (Reglas, Patrón capas BE, Regla de oro, Árbol stitch/). context.md queda como contexto narrativo puro. folderStructure.md queda con el árbol real actualizado (incluye types/ BE de ARCH-001). Header de context.md actualizado a Sprint 3 / 2026-04-17.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-016</td><td class="desc">Buscar recetas FE — debounce 300 ms en barra de búsqueda, skeleton loaders (3 móvil / 6 escritorio) mientras rebota el valor, estado vacío con icono SearchX de lucide-react. Hook useDebounce.ts genérico creado en hooks/. Funciona en feedHome.tsx y feedHomePc.tsx.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-017</td><td class="desc">Filtrar recetas FE — botón "Filtros" pinado junto a la barra de búsqueda (patrón YouTube/Instagram, nunca se corta). DrawerFiltros.tsx con 3 secciones: Dieta (10 ops de DIETAS_OPCIONES), Dificultad (Fácil/Media/Difícil), Excluir alérgenos (14 ops de ALERGENOS_OPCIONES). Badge naranja con total de filtros activos. Duplicados sinLactosa y sinGluten eliminados de DIETAS_OPCIONES. FiltrosAvanzados { dietas, alergenos, dificultad } como tipo único.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">DEV-001</td><td class="desc">scripts/dev.sh — arranca Next.js (:3000) + Express (:4000) en paralelo con prefijos coloreados [FE]/[BE]. Sin dependencias externas. Ctrl+C mata ambos. Verificado: BE tsc --noEmit ✅ · FE next lint ✅. También creados scripts/lint.sh y scripts/build.sh. BE package.json actualizado con script "lint": "tsc --noEmit".</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">ARCH-002</td><td class="desc">BE renombrado con nomenclatura BD-explícita — usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo por estar dentro de types/). Todos los imports actualizados en repositories. Archivos antiguos eliminados. Regla añadida a docs/rules.md secciones 4 y 6. HTML explicativo creado en docs/arquitectura-backend-tipos.html.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DOCS-004</td><td class="desc">Mapa de navegación — esquema visual de conexiones entre vistas de la app: qué ruta lleva a cuál, con qué acción (tap tarjeta, botón, redirect post-login…). Creado y referenciado desde docs/.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-019</td><td class="desc">NavBar inferior — añadida ruta Colección (/coleccion) con icono BookMarked, reemplazando Discover (sin contenido aún). Sidebar PC actualizado en espejo. 5 ítems: Inicio · Despensa · Cookr IA (central) · Colección · Perfil.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-020</td><td class="desc">Vista /coleccion — página con dos subpestañas: "Guardadas" (posts donde guardado === true) y "Mis recetas" (mock). Estado vacío con CTA en "Mis recetas". Desktop: sidebar + max-w-2xl centrado. Mobile: columna única de TarjetaPost. Lint ✅.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>
 
