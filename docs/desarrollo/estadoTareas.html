@@ -97,7 +97,7 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
+    <div class="counter alta"><div class="num">6</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">19</div><div class="label">Urgencia baja</div></div>
     <div class="counter done"><div class="num">43</div><div class="label">Completadas</div></div>
@@ -407,6 +407,16 @@
             <strong>Crear receta — formulario multi-step FE mock (Sprint 3)</strong>
             <small>Formulario de 3-4 pasos: título + imagen → ingredientes → pasos (drag-and-drop reordenable) → preview antes de publicar. Datos mock. Diseño Stitch previo obligatorio. Validación con RHF + Zod.</small>
             <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-006</td>
+          <td class="desc">
+            <strong>Google OAuth — detectar usuario nuevo y redirigir a /completar-perfil</strong>
+            <small>En el callback de NextAuth, comprobar si el usuario que acaba de autenticarse con Google ya existe en MongoDB. Si es nuevo → redirigir a /completar-perfil (selección de alergias y dietas). Si ya estaba registrado → redirigir a /home como ahora. Requiere consultar la BD en el callback signIn o jwt de lib/auth.ts.</small>
+            <span class="source">📄 frontend/src/lib/auth.ts · DEBT-007 · app/(auth)/completar-perfil/</span>
           </td>
           <td><span class="status pending">⏳ Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>

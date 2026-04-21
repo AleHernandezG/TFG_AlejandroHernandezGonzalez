@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deploy — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    /* Flow diagram */
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 1rem; background: #111; border-radius: 8px; }
+    .flow-step { background: #1f1f1f; border: 1px solid #333; border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.8rem; color: #e5e5e5; white-space: nowrap; }
+    .flow-step.orange { border-color: #f9731644; color: #f97316; background: #f9731611; }
+    .flow-step.green { border-color: #22c55e44; color: #22c55e; background: #22c55e11; }
+    .flow-step.blue { border-color: #3b82f644; color: #60a5fa; background: #3b82f611; }
+    .flow-arrow { color: #525252; font-size: 0.85rem; }
+
+    /* Tabla de configuración */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.5rem 0.9rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.6rem 0.9rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .key { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; }
+    .val { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #a3a3a3; }
+    .note { font-size: 0.72rem; color: #525252; margin-top: 0.2rem; }
+
+    /* Pasos numerados */
+    .steps { display: flex; flex-direction: column; gap: 0.75rem; }
+    .step { display: flex; gap: 0.9rem; align-items: flex-start; }
+    .step-num { min-width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #f97316; color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 0.1rem; }
+    .step-body { flex: 1; }
+    .step-body strong { font-size: 0.85rem; color: #fff; }
+    .step-body p { font-size: 0.8rem; color: #a3a3a3; margin-top: 0.2rem; }
+
+    /* Code block */
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.9rem 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #a3a3a3; overflow-x: auto; white-space: pre; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; background: #f9731611; padding: 0.1rem 0.35rem; border-radius: 4px; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.green { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .badge.orange { background: #f9731622; color: #f97316; border: 1px solid #f9731644; }
+    .badge.blue { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .badge.red { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+
+    /* Alert */
+    .alert { background: #eab30811; border: 1px solid #eab30833; border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.8rem; color: #fbbf24; }
+    .alert strong { color: #eab308; }
+
+    /* URL highlight */
+    .url { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #60a5fa; background: #3b82f611; border: 1px solid #3b82f633; border-radius: 6px; padding: 0.4rem 0.75rem; display: inline-block; margin-top: 0.3rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; margin-bottom: 0.5rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Deploy — Cookr TFG</h1>
+  <div class="meta">Completado: 2026-04-20 · SETUP-008 · Sprint 3</div>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#flujo">Flujo CI/CD</a>
+  <a href="#vercel">Vercel (FE)</a>
+  <a href="#render">Render (BE)</a>
+  <a href="#github">GitHub Actions</a>
+  <a href="#secrets">Secrets</a>
+  <a href="#google">Google OAuth</a>
+  <a href="#workflow">Workflow diario</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span>🚀</span>
+      <h2>Qué se ha configurado</h2>
+    </div>
+    <div class="section-body">
+      <div class="grid2">
+        <div>
+          <h3>Frontend</h3>
+          <span class="badge green">✅ Live</span>
+          <div class="url">https://tfg-alejandro-hernandez-gonzalez.vercel.app</div>
+          <p class="note" style="margin-top:0.5rem">Vercel · Next.js 14 · Deploy automático desde main</p>
+        </div>
+        <div>
+          <h3>Backend</h3>
+          <span class="badge green">✅ Live</span>
+          <div class="url">https://tfg-alejandrohernandezgonzalez.onrender.com</div>
+          <p class="note" style="margin-top:0.5rem">Render · Express + MongoDB · Deploy via Deploy Hook</p>
+        </div>
+      </div>
+      <div class="alert">
+        <strong>⚠️ Render free tier:</strong> el backend duerme tras 15 min de inactividad. El primer request tras el sueño tarda ~30-60 s (cold start). Antes de demos ejecutar <code>scripts/keep-alive.sh</code> manualmente.
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJO CI/CD -->
+  <section id="flujo">
+    <div class="section-header">
+      <span>⚡</span>
+      <h2>Flujo CI/CD</h2>
+    </div>
+    <div class="section-body">
+      <h3>Push a develop</h3>
+      <div class="flow">
+        <div class="flow-step orange">git push develop</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">GitHub Actions</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">Lint FE ✅</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-step green">Typecheck BE ✅</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step blue">Sin deploy</div>
+      </div>
+
+      <h3 style="margin-top:0.5rem">PR develop → main</h3>
+      <div class="flow">
+        <div class="flow-step orange">PR abierta</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">CI obligatorio</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">Checks pasan → merge permitido</div>
+      </div>
+
+      <h3 style="margin-top:0.5rem">Merge a main</h3>
+      <div class="flow">
+        <div class="flow-step orange">merge main</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">CI ✅</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">Vercel autodeploy ✅</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-step green">Render Deploy Hook ✅</div>
+      </div>
+
+      <table style="margin-top:0.5rem">
+        <thead><tr><th>Evento</th><th>CI</th><th>Deploy FE</th><th>Deploy BE</th></tr></thead>
+        <tbody>
+          <tr><td>push develop</td><td><span class="badge green">✅ Corre</span></td><td><span class="badge red">⊘ No</span></td><td><span class="badge red">⊘ No</span></td></tr>
+          <tr><td>PR → main</td><td><span class="badge green">✅ Obligatorio</span></td><td><span class="badge red">⊘ No</span></td><td><span class="badge red">⊘ No</span></td></tr>
+          <tr><td>merge main</td><td><span class="badge green">✅ Corre</span></td><td><span class="badge green">✅ Vercel</span></td><td><span class="badge green">✅ Render</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- VERCEL -->
+  <section id="vercel">
+    <div class="section-header">
+      <span>▲</span>
+      <h2>Vercel — Frontend</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Proyecto creado</strong><p>vercel.com → New Project → Import repo GitHub. Root Directory: <code>frontend</code>. Framework: Next.js (autodetectado).</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Integración nativa GitHub</strong><p>Vercel detecta push a <code>main</code> y despliega automáticamente. No se usa Vercel CLI en GitHub Actions.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Variables de entorno añadidas en el wizard de import</strong><p>Settings → Environment Variables (Production + Preview).</p></div></div>
+      </div>
+
+      <h3 style="margin-top:0.5rem">Variables de entorno en Vercel</h3>
+      <table>
+        <thead><tr><th>Variable</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td class="key">NEXTAUTH_SECRET</td><td class="val">valor secreto local</td></tr>
+          <tr><td class="key">NEXTAUTH_URL</td><td class="val">https://tfg-alejandro-hernandez-gonzalez.vercel.app</td></tr>
+          <tr><td class="key">NEXT_PUBLIC_API_URL</td><td class="val">https://tfg-alejandrohernandezgonzalez.onrender.com/api</td></tr>
+          <tr><td class="key">GOOGLE_CLIENT_ID</td><td class="val">desde Google Cloud Console</td></tr>
+          <tr><td class="key">GOOGLE_CLIENT_SECRET</td><td class="val">desde Google Cloud Console</td></tr>
+        </tbody>
+      </table>
+
+      <div class="alert" style="margin-top:0.5rem">
+        <strong>Nota:</strong> Vercel se encarga del deploy FE solo. No necesita VERCEL_TOKEN en el workflow porque usa la integración nativa de GitHub. Los secrets VERCEL_TOKEN/ORG_ID/PROJECT_ID en GitHub se pueden dejar como referencia pero no se usan.
+      </div>
+    </div>
+  </section>
+
+  <!-- RENDER -->
+  <section id="render">
+    <div class="section-header">
+      <span>🟣</span>
+      <h2>Render — Backend</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Web Service creado</strong><p>render.com → New Web Service → conectar repo GitHub. Tier gratuito.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Comandos configurados</strong>
+          <p>Build: <code>cd backend && npm ci --include=dev && npm run build</code></p>
+          <p>Start: <code>cd backend && node dist/server.js</code></p>
+          <p class="note">⚠️ <code>--include=dev</code> es obligatorio: TypeScript necesita los <code>@types/*</code> de devDependencies para compilar aunque NODE_ENV=production.</p>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Deploy Hook copiado</strong><p>Settings → Deploy Hooks → copiar URL → añadir como <code>RENDER_DEPLOY_HOOK_URL</code> en GitHub Secrets.</p></div></div>
+      </div>
+
+      <h3 style="margin-top:0.5rem">Variables de entorno en Render</h3>
+      <table>
+        <thead><tr><th>Variable</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td class="key">MONGODB_URI</td><td class="val">URI de MongoDB Atlas</td></tr>
+          <tr><td class="key">JWT_SECRET</td><td class="val">valor secreto</td></tr>
+          <tr><td class="key">NODE_ENV</td><td class="val">production</td></tr>
+          <tr><td class="key">PORT</td><td class="val">8080</td></tr>
+          <tr><td class="key">FRONTEND_URL</td><td class="val">https://tfg-alejandro-hernandez-gonzalez.vercel.app</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- GITHUB ACTIONS -->
+  <section id="github">
+    <div class="section-header">
+      <span>⚙️</span>
+      <h2>GitHub Actions — Workflow</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:0.82rem;color:#a3a3a3">Archivo: <code>.github/workflows/ci-cd.yml</code></p>
+      <pre>name: CI / CD — Cookr
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci-frontend:               # Lint + tsc --noEmit
+    runs-on: ubuntu-latest
+    working-directory: frontend
+
+  ci-backend:                # tsc --noEmit
+    runs-on: ubuntu-latest
+    working-directory: backend
+
+  deploy:                    # Solo en push a main
+    needs: [ci-frontend, ci-backend]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      # Vercel se gestiona solo (integración nativa GitHub)
+      - name: Deploy backend → Render (Deploy Hook)
+        run: curl "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"</pre>
+
+      <h3>Branch protection en main</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">✓</div><div class="step-body"><strong>Require a pull request before merging</strong><p>No se puede hacer push directo a main. Todo debe entrar por PR.</p></div></div>
+        <div class="step"><div class="step-num">✓</div><div class="step-body"><strong>Require status checks to pass</strong><p>Checks requeridos: <code>Lint & typecheck — Frontend</code> y <code>Typecheck — Backend</code>. La PR no se puede mergear si alguno falla.</p></div></div>
+        <div class="step"><div class="step-num">✓</div><div class="step-body"><strong>Do not allow bypassing</strong><p>Ni el administrador puede saltarse las reglas.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECRETS -->
+  <section id="secrets">
+    <div class="section-header">
+      <span>🔑</span>
+      <h2>GitHub Secrets — Settings → Secrets → Actions</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Secret</th><th>Qué es</th><th>Usado en</th></tr></thead>
+        <tbody>
+          <tr><td class="key">RENDER_DEPLOY_HOOK_URL</td><td>URL secreta del Deploy Hook de Render</td><td>Workflow deploy job</td></tr>
+          <tr><td class="key">RENDER_APP_URL</td><td><code>https://tfg-alejandrohernandezgonzalez.onrender.com</code></td><td>keep-alive.sh (Fase 6)</td></tr>
+          <tr><td class="key">VERCEL_TOKEN</td><td>Token de cuenta Vercel</td><td>Referencia (no usado actualmente)</td></tr>
+          <tr><td class="key">VERCEL_ORG_ID</td><td>ID de organización Vercel</td><td>Referencia (no usado actualmente)</td></tr>
+          <tr><td class="key">VERCEL_PROJECT_ID</td><td>ID de proyecto Vercel</td><td>Referencia (no usado actualmente)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- GOOGLE OAUTH -->
+  <section id="google">
+    <div class="section-header">
+      <span>🔵</span>
+      <h2>Google OAuth — Producción</h2>
+    </div>
+    <div class="section-body">
+      <p style="font-size:0.82rem;color:#a3a3a3">console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client ID → Edit</p>
+      <h3 style="margin-top:0.75rem">Authorized redirect URIs</h3>
+      <pre>http://localhost:3000/api/auth/callback/google       ← desarrollo
+https://tfg-alejandro-hernandez-gonzalez.vercel.app/api/auth/callback/google  ← producción</pre>
+      <h3 style="margin-top:0.75rem">Authorized JavaScript origins</h3>
+      <pre>http://localhost:3000
+https://tfg-alejandro-hernandez-gonzalez.vercel.app</pre>
+    </div>
+  </section>
+
+  <!-- WORKFLOW DIARIO -->
+  <section id="workflow">
+    <div class="section-header">
+      <span>📋</span>
+      <h2>Workflow diario de desarrollo</h2>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Trabajar en develop</strong><p>Todos los cambios van a <code>develop</code>. Nunca commitear directo a <code>main</code>.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Push a develop</strong><p>GitHub Actions corre CI automáticamente. Si falla lint o typecheck, hay que arreglarlo antes de continuar.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>PR develop → main al terminar una feature o sprint</strong><p>GitHub exige que CI pase para poder mergear. Revisar los checks en la PR.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Merge → deploy automático</strong><p>Vercel despliega el FE. GitHub Actions dispara el Deploy Hook de Render para el BE. En ~3 min la app está actualizada en producción.</p></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Antes de demos</strong><p>Ejecutar <code>bash scripts/keep-alive.sh</code> para evitar el cold start de Render (DEV-002, pendiente Fase 6).</p></div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
