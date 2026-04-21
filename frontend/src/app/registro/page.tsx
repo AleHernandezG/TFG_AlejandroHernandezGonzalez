@@ -8,71 +8,81 @@ export const metadata: Metadata = {
     'Únete a la comunidad gastronómica. Crea tu cuenta gratis y empieza a descubrir recetas personalizadas.',
 }
 
-/**
- * Página de registro — /registro
- *
- * Layout split-screen (referentes: Linear, Spotify, Netflix):
- *   - Panel izquierdo (lg+): imagen gastronómica con texto editorial centrado
- *     y gradiente derecho que funde la imagen con el panel del formulario
- *   - Panel derecho: fondo oscuro cálido (stone-950→zinc-950) para diferenciarse
- *     visualmente de la barra del navegador; Card blanca flota con contraste elegante
- *   - Móvil: imagen oculta, formulario ocupa pantalla completa
- */
+const caracteristicas = [
+  'Recetas personalizadas a tu gusto',
+  'Comunidad gastronómica activa',
+  'IA que aprende tus preferencias',
+]
+
+const textShadow = '0 1px 12px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.7)'
+
 export default function PaginaRegistro() {
   return (
-    <div className="flex min-h-screen">
-      {/* ── Panel izquierdo — imagen (solo ≥ lg) ─────────────────────── */}
-      <div className="relative hidden lg:block lg:w-1/2 xl:w-3/5">
-        <Image
-          src="/images/fondo-auth.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-          aria-hidden="true"
-        />
+    <div className="relative flex min-h-screen">
+      {/* ── Imagen de fondo a pantalla completa ── */}
+      <Image
+        src="/images/fondo-auth.jpg"
+        alt=""
+        fill
+        priority
+        className="object-cover object-center"
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-black/25" />
 
-        {/* Overlay general — mejora contraste del texto sin ahogar la imagen */}
-        {/* sin equivalente en paleta Cookr: overlay semitransparente negro sobre foto */}
-        <div className="absolute inset-0 bg-black/30" />
+      {/* ── Panel izquierdo — marca + features (solo ≥ lg) ── */}
+      <div className="relative z-10 hidden flex-col items-end justify-center pl-8 pr-10 lg:flex lg:w-1/2">
+        <div className="w-full max-w-sm text-center">
 
-        {/* Gradiente lateral derecho — funde la imagen con el panel del formulario
-            (técnica usada por Linear, Spotify, Vercel en sus páginas de auth) */}
-        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[var(--auth-dark)]" />
-
-        {/* ── Texto editorial centrado ────────────────────────────────── */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
-          {/* Etiqueta decorativa superior — uniforme, sin mezcla de colores */}
-          <div className="mb-8 flex items-center gap-3">
-            <div className="h-px w-14 bg-white/40" />
-            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/55">
+          {/* Etiqueta */}
+          <div className="mb-5 flex items-center gap-2.5">
+            <div className="h-px flex-1 bg-white/35" />
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white"
+              style={{ textShadow }}
+            >
               Red social gastronómica
             </span>
-            <div className="h-px w-14 bg-white/40" />
+            <div className="h-px flex-1 bg-white/35" />
           </div>
 
-          {/* Nombre de marca — único tratamiento: gradiente brand→brand-muted
-              Patrón Linear / Stripe / Vercel: máximo impacto con un solo efecto */}
+          {/* Marca — beige cálido: from-amber-100 to-amber-200 */}
           <h1
-            className="bg-gradient-to-r from-brand to-brand-muted bg-clip-text font-black italic leading-none tracking-tight text-transparent"
-            style={{ fontSize: 'clamp(3.5rem, 6vw, 6.5rem)' }}
+            className="bg-gradient-to-br from-amber-100 to-amber-200 bg-clip-text font-black italic leading-none tracking-tight text-transparent"
+            style={{
+              fontSize: 'clamp(4rem, 5.5vw, 6.5rem)',
+              filter:
+                'drop-shadow(0 2px 14px rgba(0,0,0,0.85)) drop-shadow(0 4px 36px rgba(0,0,0,0.55))',
+            }}
           >
             Cookr
           </h1>
 
-          {/* Subtítulo — limpio, sin efectos extra */}
-          <div className="mt-7 flex items-center gap-4 text-white/60">
-            <div className="h-px w-12 bg-white/35" />
-            <p className="text-xs font-semibold uppercase tracking-[0.35em]">El arte de cocinar</p>
-            <div className="h-px w-12 bg-white/35" />
-          </div>
+          {/* Tagline */}
+          <p
+            className="mt-4 text-base font-medium leading-relaxed text-white"
+            style={{ textShadow }}
+          >
+            Descubre recetas, comparte lo que cocinas y conecta con quien ama la gastronomía.
+          </p>
+
+          {/* Features — solo texto, sin iconos */}
+          <ul className="mt-7 space-y-2.5">
+            {caracteristicas.map((texto) => (
+              <li
+                key={texto}
+                className="text-sm font-semibold text-white"
+                style={{ textShadow }}
+              >
+                {texto}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
-      {/* ── Panel derecho — formulario ────────────────────────────────── */}
-      {/* Gradiente oscuro cálido: diferencia claramente del blanco del navegador
-          y crea contraste elegante con la Card blanca del formulario */}
-      <main className="flex w-full flex-col items-center justify-center bg-[var(--auth-dark)] px-4 py-12 lg:w-1/2 xl:w-2/5">
+      {/* ── Panel derecho — formulario ── */}
+      <main className="relative z-10 flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
           <FormularioRegistro />
         </div>

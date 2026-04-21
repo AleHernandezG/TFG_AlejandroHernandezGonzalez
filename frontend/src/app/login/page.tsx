@@ -8,69 +8,83 @@ export const metadata: Metadata = {
     'Accede a tu cuenta de Cookr y vuelve a conectar con tu comunidad gastronómica.',
 }
 
-/**
- * Página de login — /login
- *
- * Layout split-screen espejado respecto a /registro:
- *   - Panel izquierdo: fondo oscuro cálido con el formulario (formulario a la izquierda)
- *   - Panel derecho (lg+): imagen gastronómica con texto editorial centrado
- *     y gradiente izquierdo que funde la imagen con el panel del formulario
- *   - Móvil: imagen oculta, formulario a pantalla completa con fondo oscuro
- */
+const caracteristicas = [
+  'Recetas personalizadas a tu gusto',
+  'Comunidad gastronómica activa',
+  'IA que aprende tus preferencias',
+]
+
+const textShadow = '0 1px 12px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.7)'
+
 export default function PaginaLogin() {
   return (
-    <div className="flex min-h-screen">
-      {/* ── Panel izquierdo — formulario ─────────────────────────────────── */}
-      <main className="flex w-full flex-col items-center justify-center bg-[var(--auth-dark)] px-4 py-12 lg:w-1/2 xl:w-2/5">
+    <div className="relative flex min-h-screen">
+      {/* ── Imagen de fondo a pantalla completa ── */}
+      <Image
+        src="/images/fondo-auth.jpg"
+        alt=""
+        fill
+        priority
+        className="object-cover object-center"
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-black/25" />
+
+      {/* ── Panel izquierdo — formulario ── */}
+      <main className="relative z-10 flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
           <FormularioLogin />
         </div>
       </main>
 
-      {/* ── Panel derecho — imagen (solo ≥ lg) ───────────────────────────── */}
-      <div className="relative hidden lg:block lg:w-1/2 xl:w-3/5">
-        <Image
-          src="/images/fondo-auth.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-          aria-hidden="true"
-        />
+      {/* ── Panel derecho — marca + features (solo ≥ lg) ── */}
+      <div className="relative z-10 hidden flex-col items-start justify-center pl-10 pr-8 lg:flex lg:w-1/2">
+        <div className="w-full max-w-sm text-center">
 
-        {/* Overlay general — mejora contraste del texto sin ahogar la imagen */}
-        {/* sin equivalente en paleta Cookr: overlay semitransparente negro sobre foto */}
-        <div className="absolute inset-0 bg-black/30" />
-
-        {/* Gradiente lateral izquierdo — funde la imagen con el panel del formulario
-            (espejo exacto del gradiente right de /registro) */}
-        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-l from-transparent to-[var(--auth-dark)]" />
-
-        {/* ── Texto editorial centrado ─────────────────────────────────── */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-12 text-center">
-          {/* Etiqueta decorativa superior */}
-          <div className="mb-8 flex items-center gap-3">
-            <div className="h-px w-14 bg-white/40" />
-            <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/55">
+          {/* Etiqueta */}
+          <div className="mb-5 flex items-center gap-2.5">
+            <div className="h-px flex-1 bg-white/35" />
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white"
+              style={{ textShadow }}
+            >
               Red social gastronómica
             </span>
-            <div className="h-px w-14 bg-white/40" />
+            <div className="h-px flex-1 bg-white/35" />
           </div>
 
-          {/* Nombre de marca */}
+          {/* Marca — beige cálido: from-amber-100 to-amber-200 */}
           <h1
-            className="bg-gradient-to-r from-brand to-brand-muted bg-clip-text font-black italic leading-none tracking-tight text-transparent"
-            style={{ fontSize: 'clamp(3.5rem, 6vw, 6.5rem)' }}
+            className="bg-gradient-to-br from-amber-100 to-amber-200 bg-clip-text font-black italic leading-none tracking-tight text-transparent"
+            style={{
+              fontSize: 'clamp(4rem, 5.5vw, 6.5rem)',
+              filter:
+                'drop-shadow(0 2px 14px rgba(0,0,0,0.85)) drop-shadow(0 4px 36px rgba(0,0,0,0.55))',
+            }}
           >
             Cookr
           </h1>
 
-          {/* Subtítulo */}
-          <div className="mt-7 flex items-center gap-4 text-white/60">
-            <div className="h-px w-12 bg-white/35" />
-            <p className="text-xs font-semibold uppercase tracking-[0.35em]">El arte de cocinar</p>
-            <div className="h-px w-12 bg-white/35" />
-          </div>
+          {/* Tagline */}
+          <p
+            className="mt-4 text-base font-medium leading-relaxed text-white"
+            style={{ textShadow }}
+          >
+            Descubre recetas, comparte lo que cocinas y conecta con quien ama la gastronomía.
+          </p>
+
+          {/* Features — solo texto, sin iconos */}
+          <ul className="mt-7 space-y-2.5">
+            {caracteristicas.map((texto) => (
+              <li
+                key={texto}
+                className="text-sm font-semibold text-white"
+                style={{ textShadow }}
+              >
+                {texto}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

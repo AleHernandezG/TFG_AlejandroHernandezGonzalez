@@ -6,6 +6,50 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-022] — Auth: fondo imagen completo + rediseño panel de marca ✅
+
+Fecha: 2026-04-21 | Estado: ✅ Completado | Sprint: 3
+
+**Ficheros modificados:**
+`app/login/page.tsx` · `app/registro/page.tsx`
+
+### Motivación
+
+El layout split-screen original (`bg-[var(--auth-dark)]` + panel imagen lateral oculto en móvil) generaba un contraste brusco y desaprovechaba la fotografía gastronómica. El rediseño convierte ambas páginas al mismo patrón visual del hero de la landing: imagen de fondo a pantalla completa con texto superpuesto.
+
+### Cambios de layout
+
+- **Antes:** `flex min-h-screen` con dos paneles — panel oscuro `bg-[var(--auth-dark)]` para el formulario + panel imagen `hidden lg:block` con `bg-black/30` + gradientes laterales de fusión
+- **Ahora:** imagen `<Image fill>` como fondo completo (igual que `SeccionHero`), overlay único `bg-black/25`, ambos paneles `relative z-10` sin fondo propio
+
+### Panel de marca (texto editorial)
+
+- Proporción: 50/50 entre panel formulario y panel de marca (antes 40/60 o 60/40)
+- Posición del contenido: `items-end` (registro, panel izquierdo) / `items-start` (login, panel derecho) → contenido se acerca al centro de pantalla (seam), patrón Clerk/Linear
+- Contenido ampliado: etiqueta + marca + tagline + 3 feature bullets (antes solo etiqueta + marca + subtítulo)
+- Feature bullets simplificados a solo texto en iteración final (iconos eliminados a petición)
+- Separador `h-px` entre tagline y bullets eliminado
+
+### Tipografía del panel de marca
+
+| Elemento | Antes | Ahora |
+|---|---|---|
+| "Cookr" | `bg-gradient-to-r from-brand to-brand-muted bg-clip-text text-transparent` + `clamp(3.5rem, 6vw, 6.5rem)` | `bg-gradient-to-br from-amber-100 to-amber-200 bg-clip-text text-transparent` + `clamp(4rem, 5.5vw, 6.5rem)` |
+| Tagline | `font-light text-white/90` | `font-medium text-white` |
+| Feature bullets | `text-white/85` | `font-semibold text-white` |
+| Etiqueta | `text-white/80` | `text-white` |
+| `textShadow` | `0 1px 10px rgba(0,0,0,0.85)` | `0 1px 12px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.7)` (doble capa) |
+
+El gradiente `amber-100 → amber-200` da un resultado crema/beige cálido, más luminoso y menos saturado que el naranja sólido `text-brand`, que se fundía con la madera del `fondo-auth.jpg`.
+
+### Posiciones mantenidas
+
+- `/login`: formulario izquierda, panel de marca derecha
+- `/registro`: panel de marca izquierda, formulario derecha
+- Móvil: solo formulario a pantalla completa (sin cambio)
+
+---
+
 ## [UI-021] — Landing: fondo cálido + hero con imágenes reales y transición T1 ✅
 
 Fecha: 2026-04-21 | Estado: ✅ Completado | Sprint: 3
