@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hero — Opciones de transición y tipografía · Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #111; border-bottom: 1px solid #222; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    header h1 { font-size: 1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.75rem; color: #555; }
+
+    nav { background: #111; border-bottom: 1px solid #1a1a1a; padding: 0.6rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+    nav a { font-size: 0.78rem; color: #737373; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 4rem; }
+
+    /* ─── Sección ─── */
+    .seccion-titulo { margin-bottom: 2rem; }
+    .seccion-titulo h2 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .seccion-titulo p { font-size: 0.82rem; color: #737373; max-width: 600px; }
+    .tag-referencia { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731633; margin-top: 0.5rem; }
+
+    /* ─── Grid de opciones ─── */
+    .grid-opciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .grid-opciones.grande { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); }
+
+    /* ─── Tarjeta de opción ─── */
+    .opcion { background: #111; border: 1px solid #222; border-radius: 14px; overflow: hidden; }
+    .opcion-label { padding: 0.85rem 1rem; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .opcion-label h3 { font-size: 0.85rem; font-weight: 700; color: #fff; }
+    .opcion-label small { font-size: 0.7rem; color: #555; }
+    .badge-ref { font-size: 0.62rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+    .badge-ref.verde { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e33; }
+    .badge-ref.azul { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge-ref.morado { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf633; }
+    .badge-ref.naranja { background: #f9731622; color: #f97316; border: 1px solid #f9731633; }
+
+    /* ─── CARRUSEL DEMO ─── */
+    .carousel-wrap { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #000; }
+    .carousel-track { position: relative; width: 100%; height: 100%; }
+
+    /* Las imágenes del carrusel */
+    .carousel-track img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .carousel-track .slide { position: absolute; inset: 0; }
+    .carousel-track .slide img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Overlay común */
+    .overlay-bottom { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 40%, transparent 70%); pointer-events: none; z-index: 2; }
+
+    /* Dot indicators */
+    .carousel-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 10; }
+    .dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.35); transition: all 0.4s ease; cursor: pointer; border: none; }
+    .dot.active { width: 18px; background: #f97316; box-shadow: 0 0 8px #f9731688; }
+
+    /* ─── T1: Crossfade ─── */
+    .t1 .slide { opacity: 0; transition: opacity 1.2s ease; }
+    .t1 .slide.active { opacity: 1; }
+
+    /* ─── T2: Slide horizontal ─── */
+    .t2 .slide { transform: translateX(100%); transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1); opacity: 1; }
+    .t2 .slide.active { transform: translateX(0%); }
+    .t2 .slide.prev { transform: translateX(-100%); }
+
+    /* ─── T3: Blur dissolve ─── */
+    .t3 .slide { opacity: 0; filter: blur(16px); transition: opacity 1s ease, filter 1s ease; }
+    .t3 .slide.active { opacity: 1; filter: blur(0px); }
+
+    /* ─── T4: Ken Burns (actual) ─── */
+    .t4 .slide { opacity: 0; transition: opacity 1.4s ease; }
+    .t4 .slide.active { opacity: 1; animation: kenBurns 5s ease-out forwards; }
+    .t4 .slide.active img { animation: kenBurns 5s ease-out forwards; }
+    @keyframes kenBurns { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+    /* ─── T5: Scale reveal (zoom out entrada) ─── */
+    .t5 .slide { opacity: 0; transition: opacity 0.9s ease, transform 0.9s ease; transform: scale(1.12); }
+    .t5 .slide.active { opacity: 1; transform: scale(1); }
+
+    /* ─── T6: Wipe vertical (de arriba a abajo) ─── */
+    .t6 .slide { clip-path: inset(0 0 100% 0); transition: clip-path 1s cubic-bezier(0.77, 0, 0.175, 1); }
+    .t6 .slide.active { clip-path: inset(0 0 0% 0); }
+
+    /* ─── DEMOS DE TIPOGRAFÍA ─── */
+    .typo-wrap { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; }
+    .typo-wrap img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    /* Overlay por defecto */
+    .ov-bottom { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 40%, transparent 70%); }
+    .ov-strong { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.2) 100%); }
+    .ov-minimal { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 40%, transparent 70%); }
+    .ov-none { display: none; }
+
+    /* Contenido de tipografía */
+    .typo-content { position: relative; z-index: 3; padding: 1.5rem; text-align: center; width: 100%; max-width: 500px; }
+
+    /* Subtítulo compartido */
+    .sub { font-size: 0.72rem; color: rgba(255,255,255,0.7); margin-top: 0.4rem; line-height: 1.5; max-width: 360px; margin-left: auto; margin-right: auto; }
+
+    /* Botones demo */
+    .btn-demo { display: inline-flex; align-items: center; gap: 6px; padding: 0.45rem 1.1rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; cursor: default; margin: 0 3px; }
+    .btn-primary { background: #f97316; color: #fff; }
+    .btn-secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(8px); }
+    .btns-wrap { margin-top: 0.8rem; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+
+    /* ─── TYP-A: Blanco puro + text-shadow ─── */
+    .typa h1 { font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 800; color: #ffffff; line-height: 1.2; text-shadow: 0 2px 12px rgba(0,0,0,0.55), 0 4px 30px rgba(0,0,0,0.35); }
+    .typa .accent { color: #f97316; font-style: italic; }
+    .typa .brand { color: #fb923c; }
+    .typa .underline-wrap { position: relative; display: inline-block; }
+    .typa .wavy { position: absolute; bottom: -3px; left: 0; width: 100%; }
+    .typa .sub { text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+
+    /* ─── TYP-B: Frosted glass container ─── */
+    .typb-card { background: rgba(10,10,10,0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem 1.75rem; }
+    .typb h1 { font-size: clamp(1rem, 2.8vw, 1.5rem); font-weight: 800; color: #ffffff; line-height: 1.2; }
+    .typb .accent { color: #f97316; font-style: italic; }
+    .typb .brand { color: #fb923c; }
+    .typb .underline-wrap { position: relative; display: inline-block; }
+    .typb .wavy { position: absolute; bottom: -3px; left: 0; width: 100%; }
+    .typb .sub { color: rgba(255,255,255,0.65); }
+
+    /* ─── TYP-C: Split bottom / Badge arriba ─── */
+    .typc-wrap { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; }
+    .typc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .typc-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.5) 45%, transparent 70%); }
+    .typc-badge { position: absolute; top: 12px; left: 14px; background: rgba(249,115,22,0.9); color: #fff; font-size: 0.62rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; z-index: 4; }
+    .typc-content { position: absolute; bottom: 14px; left: 0; right: 0; padding: 0 1.5rem; z-index: 4; text-align: left; }
+    .typc-content h1 { font-size: clamp(1rem, 3vw, 1.5rem); font-weight: 800; color: #fff; line-height: 1.2; }
+    .typc-content .brand { color: #fb923c; }
+    .typc-content p { font-size: 0.7rem; color: rgba(255,255,255,0.65); margin-top: 0.3rem; }
+    .typc-btns { display: flex; gap: 6px; margin-top: 0.6rem; }
+
+    /* ─── TYP-D: Text shadow editorial (mantener colores) ─── */
+    .typd h1 { font-size: clamp(1rem, 2.8vw, 1.5rem); font-weight: 800; color: #ffffff; line-height: 1.2; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8)) drop-shadow(0 4px 20px rgba(0,0,0,0.6)); }
+    .typd .accent { color: #f97316; font-style: italic; }
+    .typd .grad { background: linear-gradient(90deg, #f97316, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8px rgba(249,115,22,0.4)); }
+    .typd .underline-wrap { position: relative; display: inline-block; }
+    .typd .wavy { position: absolute; bottom: -3px; left: 0; width: 100%; }
+    .typd .sub { text-shadow: 0 1px 8px rgba(0,0,0,0.7); }
+
+    /* ─── TYP-E: Badge + texto simple limpio ─── */
+    .type-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(249,115,22,0.2); color: #f97316; border: 1px solid rgba(249,115,22,0.3); border-radius: 999px; font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.65rem; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.07em; }
+    .type h1 { font-size: clamp(1rem, 3vw, 1.55rem); font-weight: 800; color: #fff; line-height: 1.2; letter-spacing: -0.01em; }
+    .type .accent { color: #f97316; font-style: italic; }
+    .type .brand { border-bottom: 2px solid #f97316; }
+    .type .sub { color: rgba(255,255,255,0.6); }
+
+    /* ─── Notas ─── */
+    .nota { padding: 0.75rem 1rem; font-size: 0.76rem; color: #737373; border-top: 1px solid #1a1a1a; }
+    .nota strong { color: #a3a3a3; }
+
+    /* ─── Leyenda ─── */
+    .leyenda { background: #111; border: 1px solid #222; border-radius: 10px; padding: 1rem 1.25rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .leyenda-item { font-size: 0.74rem; color: #737373; display: flex; align-items: center; gap: 0.4rem; }
+
+    /* ─── Separador ─── */
+    hr { border: none; border-top: 1px solid #1a1a1a; margin: 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Hero — Opciones de transición y tipografía · Cookr TFG</h1>
+    <div class="meta">Sprint 3 · Diseño visual · Las demos usan imágenes de picsum.photos — en producción son tus WebP reales</div>
+  </div>
+</header>
+
+<nav>
+  <a href="#transiciones">Efectos de transición</a>
+  <a href="#tipografia">Tipografía sobre imagen</a>
+  <a href="#transicion-contenido">Transición Hero → Contenido</a>
+  <a href="#leyenda">Leyenda</a>
+</nav>
+
+<main>
+
+  <!-- ════════════════════════════════════════════════
+       SECCIÓN 1 — EFECTOS DE TRANSICIÓN
+  ════════════════════════════════════════════════ -->
+  <section id="transiciones">
+    <div class="seccion-titulo">
+      <h2>Efectos de transición del carrusel</h2>
+      <p>Cada carrusel avanza automáticamente cada 3 s para que puedas comparar el efecto en tiempo real. Las mismas 4 imágenes en todos.</p>
+      <span class="tag-referencia">🔍 Referencias: Airbnb · Netflix · Apple · Booking.com · linear.app</span>
+    </div>
+
+    <div class="grid-opciones">
+
+      <!-- T1: Crossfade simple -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>T1 · Crossfade</h3>
+            <small>Fundido de opacidad puro</small>
+          </div>
+          <span class="badge-ref verde">Airbnb · Apple</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t1" id="c1">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d1">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Cuando la imagen es la protagonista y quieres la transición menos intrusiva. Atemporalidad garantizada. Usado por Airbnb, Apple, Amazon. <br><strong>Pros:</strong> Suavísimo, imagen siempre visible. <strong>Contras:</strong> Puede parecer genérico.</div>
+      </div>
+
+      <!-- T2: Slide horizontal -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>T2 · Slide horizontal</h3>
+            <small>Deslizamiento de derecha a izquierda</small>
+          </div>
+          <span class="badge-ref azul">Booking · YouTube</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t2" id="c2">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d2">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Sensación táctil, familiar en móvil. Las imágenes se perciben como "contenido contiguo" (como un story de Instagram). <br><strong>Pros:</strong> Muy reconocible, claro. <strong>Contras:</strong> Menos elegante en desktop.</div>
+      </div>
+
+      <!-- T3: Blur dissolve -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>T3 · Blur dissolve</h3>
+            <small>Desenfoque + fundido simultáneo</small>
+          </div>
+          <span class="badge-ref morado">Linear · Notion · Framer</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t3" id="c3">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d3">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Apps de diseño moderno, SaaS premium. Da sensación "onírica" o soñada, muy usada en portfolios y startups tech. <br><strong>Pros:</strong> Muy diferenciador. <strong>Contras:</strong> Puede marear en pantallas pequeñas.</div>
+      </div>
+
+      <!-- T4: Ken Burns — zoom in + fade (ACTUAL) -->
+      <div class="opcion" style="border-color: #f9731655;">
+        <div class="opcion-label" style="border-color: #f9731622;">
+          <div>
+            <h3>T4 · Ken Burns <span style="color:#f97316;font-size:0.68rem;">← ACTUAL</span></h3>
+            <small>Zoom lento + fundido de opacidad</small>
+          </div>
+          <span class="badge-ref naranja">National Geographic · BBC</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t4" id="c4">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d4">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Fotografía editorial, documentales, sitios de viajes y gastronomía premium. Da vida a las imágenes estáticas. <br><strong>Pros:</strong> Cinematic, muy elegante. <strong>Contras:</strong> El zoom puede distraer del texto si se hace demasiado agresivo.</div>
+      </div>
+
+      <!-- T5: Scale reveal -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>T5 · Scale reveal</h3>
+            <small>Entrada con zoom out + fundido</small>
+          </div>
+          <span class="badge-ref azul">Spotify · Behance</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t5" id="c5">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d5">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Apps de música, portfolios creativos, startups con mucho "energy". La imagen entra con impacto y luego se asienta. <br><strong>Pros:</strong> Percepción de dinamismo y energía. <strong>Contras:</strong> Más agresivo visualmente que crossfade.</div>
+      </div>
+
+      <!-- T6: Wipe vertical -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>T6 · Wipe vertical</h3>
+            <small>Cortina de arriba a abajo (clip-path)</small>
+          </div>
+          <span class="badge-ref morado">Awwwards · Agencias de lujo</span>
+        </div>
+        <div class="carousel-wrap">
+          <div class="carousel-track t6" id="c6">
+            <div class="slide active"><img src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodB/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodC/800/450" alt="" loading="lazy" /></div>
+            <div class="slide"><img src="https://picsum.photos/seed/foodD/800/450" alt="" loading="lazy" /></div>
+          </div>
+          <div class="overlay-bottom"></div>
+          <div class="carousel-dots" id="d6">
+            <button class="dot active" data-i="0"></button>
+            <button class="dot" data-i="1"></button>
+            <button class="dot" data-i="2"></button>
+            <button class="dot" data-i="3"></button>
+          </div>
+        </div>
+        <div class="nota"><strong>Cuándo usarlo:</strong> Proyectos de diseño editorial avanzado, agencias creativas, luxury brands. Muy diferenciador. <br><strong>Pros:</strong> Impactante, único, no lo usa casi nadie en apps de recetas → te diferencia. <strong>Contras:</strong> Más experimental, puede percibirse como "complejo".</div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ════════════════════════════════════════════════
+       SECCIÓN 2 — TIPOGRAFÍA
+  ════════════════════════════════════════════════ -->
+  <section id="tipografia">
+    <div class="seccion-titulo">
+      <h2>Tipografía sobre imagen — Opciones</h2>
+      <p>El problema actual: texto con colores adaptivos del tema (foreground, muted-foreground, brand gradient) que pierden contraste sobre fotografías reales. Estas son las soluciones más usadas por las webs de referencia.</p>
+      <span class="tag-referencia">🔍 Referencias: Nike · Netflix · Airbnb · Apple · linear.app · Headspace</span>
+    </div>
+
+    <div class="grid-opciones grande">
+
+      <!-- TYP-A: Blanco puro + text-shadow -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>A · Blanco + text-shadow</h3>
+            <small>Todo blanco, énfasis naranja, sombra de texto</small>
+          </div>
+          <span class="badge-ref verde">Nike · Apple · Airbnb</span>
+        </div>
+        <div class="typo-wrap">
+          <img class="bg" src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" />
+          <div class="ov-bottom"></div>
+          <div class="typo-content typa">
+            <h1>
+              Disfruta <span class="accent">cocinando</span> con nuevas
+              <span class="underline-wrap">
+                recetas
+                <svg class="wavy" height="6" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden>
+                  <path d="M0,4 Q25,0 50,4 Q75,8 100,4" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              y una amplia comunidad <span class="brand">Cookr</span>
+            </h1>
+            <p class="sub">Descubre ideas según tus gustos, <strong style="color:rgba(255,255,255,0.9)">comparte tus recetas</strong> y conéctate con la comunidad.</p>
+            <div class="btns-wrap">
+              <span class="btn-demo btn-primary">Crear cuenta →</span>
+              <span class="btn-demo btn-secondary">Ya tengo cuenta</span>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Qué cambia:</strong> text-shadow suave en el h1 y el párrafo. "cocinando" y "Cookr" en naranja sólido (#f97316) — funciona bien sobre cualquier fondo oscuro. Sin gradiente CSS en el clip-text.<br>
+          <strong>Overlay:</strong> from-black/65 (actual, sin cambiar).<br>
+          <strong>Esfuerzo:</strong> ★☆☆ — solo cambiar clases de texto en el h1.
+        </div>
+      </div>
+
+      <!-- TYP-B: Frosted glass -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>B · Frosted glass</h3>
+            <small>Caja con backdrop-blur detrás del texto</small>
+          </div>
+          <span class="badge-ref morado">Apple · Linear · iOS</span>
+        </div>
+        <div class="typo-wrap">
+          <img class="bg" src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" />
+          <div class="typo-content typb" style="padding:0 1rem;">
+            <div class="typb-card">
+              <h1>
+                Disfruta <span class="accent">cocinando</span> con nuevas
+                <span class="underline-wrap">
+                  recetas
+                  <svg class="wavy" height="6" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden>
+                    <path d="M0,4 Q25,0 50,4 Q75,8 100,4" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                y una comunidad <span class="brand">Cookr</span>
+              </h1>
+              <p class="sub" style="margin-top:0.5rem;">Descubre ideas, <strong style="color:rgba(255,255,255,0.85)">comparte tus recetas</strong> y conéctate.</p>
+              <div class="btns-wrap" style="margin-top:0.6rem;">
+                <span class="btn-demo btn-primary">Crear cuenta →</span>
+                <span class="btn-demo btn-secondary">Ya tengo cuenta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Qué cambia:</strong> Se añade un contenedor con <code>backdrop-filter: blur(20px)</code> y fondo semitransparente. La imagen de fondo se ve a través del blur. Texto interno puede ser cualquier color ya que no depende del contraste con la imagen directa.<br>
+          <strong>Overlay:</strong> Se puede quitar o dejar mínimo.<br>
+          <strong>Esfuerzo:</strong> ★★☆ — añadir un contenedor wrapper con estilos glass.
+        </div>
+      </div>
+
+      <!-- TYP-C: Split bottom / Badge categoría -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>C · Texto abajo + badge categoría</h3>
+            <small>Imagen visible arriba, texto anclado abajo</small>
+          </div>
+          <span class="badge-ref azul">Airbnb · Medium · Magazine</span>
+        </div>
+        <div class="typc-wrap" style="aspect-ratio:16/9;">
+          <img class="typc-img" src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" />
+          <div class="typc-overlay"></div>
+          <span class="typc-badge">✦ Desayunos creativos</span>
+          <div class="typc-content">
+            <h1>Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span> con recetas de la comunidad <span class="brand">Cookr</span></h1>
+            <p>Descubre, comparte y conéctate con amantes de la cocina.</p>
+            <div class="typc-btns">
+              <span class="btn-demo btn-primary" style="font-size:0.65rem;padding:0.35rem 0.85rem;">Crear cuenta →</span>
+              <span class="btn-demo btn-secondary" style="font-size:0.65rem;padding:0.35rem 0.85rem;">Ya tengo cuenta</span>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Qué cambia:</strong> El texto se reposiciona a la parte inferior. Un badge de categoría aparece arriba (cambia con cada slide). La imagen se ve limpia en la mitad superior. El gradiente solo oscurece la parte inferior.<br>
+          <strong>Overlay:</strong> Solo mitad inferior, muy oscuro.<br>
+          <strong>Esfuerzo:</strong> ★★★ — cambiar el layout del contenido (de center a bottom).
+        </div>
+      </div>
+
+      <!-- TYP-D: Text-shadow editorial (mantener colores actuales) -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>D · Drop-shadow editorial</h3>
+            <small>Mantiene colores actuales + drop-shadow fuerte</small>
+          </div>
+          <span class="badge-ref naranja">Solución mínima · Lowest effort</span>
+        </div>
+        <div class="typo-wrap">
+          <img class="bg" src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" />
+          <div class="ov-strong"></div>
+          <div class="typo-content typd">
+            <h1>
+              Disfruta <span class="accent">cocinando</span> con nuevas
+              <span class="underline-wrap">
+                recetas
+                <svg class="wavy" height="6" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden>
+                  <path d="M0,4 Q25,0 50,4 Q75,8 100,4" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+              y una amplia comunidad <span class="grad">Cookr</span>
+            </h1>
+            <p class="sub">Descubre ideas según tus gustos, <strong style="color:rgba(255,255,255,0.85)">comparte tus recetas</strong> y conéctate.</p>
+            <div class="btns-wrap">
+              <span class="btn-demo btn-primary">Crear cuenta →</span>
+              <span class="btn-demo btn-secondary">Ya tengo cuenta</span>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Qué cambia:</strong> Overlay MÁS oscuro (from-black/85) + añadir <code>filter: drop-shadow()</code> al h1. "Cookr" mantiene el gradiente naranja. El texto blanco principal añade text-shadow. Mínimo cambio de código.<br>
+          <strong>Overlay:</strong> Reforzado a from-black/85.<br>
+          <strong>Esfuerzo:</strong> ★☆☆ — cambiar opacidad del overlay + añadir filter al h1.
+        </div>
+      </div>
+
+      <!-- TYP-E: Minimalista con badge -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>E · Badge + tipografía limpia</h3>
+            <small>Badge de categoría + h1 white bold simple</small>
+          </div>
+          <span class="badge-ref verde">Headspace · Calm · Spotify</span>
+        </div>
+        <div class="typo-wrap">
+          <img class="bg" src="https://picsum.photos/seed/foodA/800/450" alt="" loading="lazy" />
+          <div class="ov-bottom"></div>
+          <div class="typo-content type">
+            <div class="type-badge">✦ La comunidad gastronómica</div>
+            <h1>
+              Disfruta <span class="accent">cocinando</span> con nuevas recetas y comparte con <span class="brand">Cookr</span>
+            </h1>
+            <p class="sub" style="margin-top:0.4rem;font-size:0.7rem;">Descubre ideas, guarda recetas favoritas y conéctate con la comunidad.</p>
+            <div class="btns-wrap">
+              <span class="btn-demo btn-primary">Crear cuenta →</span>
+              <span class="btn-demo btn-secondary">Ya tengo cuenta</span>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Qué cambia:</strong> Badge de categoría sobre el título (cambia con cada slide). h1 todo blanco excepto "cocinando" (naranja italic) y "Cookr" (subrayado naranja solid, sin clip gradient). Subtítulo más corto. Sin wavy underline en "recetas" para simplificar.<br>
+          <strong>Overlay:</strong> from-black/65 (igual que ahora).<br>
+          <strong>Esfuerzo:</strong> ★★☆ — refactorizar el h1 + añadir badge dinámico.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr />
+
+  <!-- ════════════════════════════════════════════════
+       SECCIÓN 3 — TRANSICIÓN HERO → CONTENIDO
+  ════════════════════════════════════════════════ -->
+  <section id="transicion-contenido">
+    <div class="seccion-titulo">
+      <h2>Transición Hero → Contenido</h2>
+      <p>El hero es oscuro y la sección siguiente tiene fondo blanco. Ese salto brusco crea un "shock visual". Estos son los patrones que usan las apps modernas para suavizarlo.</p>
+      <span class="tag-referencia">🔍 Referencias: Airbnb · Stripe · Linear · Booking.com · NYT Cooking · Netflix</span>
+    </div>
+
+    <div class="grid-opciones grande">
+
+      <!-- TR-A: Gradient bleed (hero fade to page bg) -->
+      <div class="opcion" style="border-color: #f9731655;">
+        <div class="opcion-label" style="border-color: #f9731622;">
+          <div>
+            <h3>TR-A · Gradient bleed <span style="color:#f97316;font-size:0.68rem;">← RECOMENDADO</span></h3>
+            <small>El hero se disuelve hacia el color de fondo</small>
+          </div>
+          <span class="badge-ref naranja">Airbnb · Apple · NYT Cooking</span>
+        </div>
+        <!-- Demo: hero oscuro que se funde hacia blanco -->
+        <div style="display:flex;flex-direction:column;overflow:hidden;border-radius:0 0 8px 8px;">
+          <div style="position:relative;height:160px;background:linear-gradient(to bottom, #1a0a00 0%, #2d1500 50%, #0a0a0a 100%);overflow:hidden;">
+            <img src="https://picsum.photos/seed/foodA/800/450" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45;" loading="lazy"/>
+            <!-- Overlay hero bottom fade to bg -->
+            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);"></div>
+            <!-- El truco: fade adicional de negro a blanco en el bottom del hero -->
+            <div style="position:absolute;bottom:0;left:0;right:0;height:70px;background:linear-gradient(to bottom, transparent 0%, #ffffff 100%);"></div>
+            <div style="position:relative;z-index:3;padding:1rem;text-align:center;padding-top:1.5rem;">
+              <p style="color:#fff;font-weight:800;font-size:1rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span> con Cookr</p>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.7rem;margin-top:4px;">Descubre y comparte recetas con la comunidad</p>
+            </div>
+          </div>
+          <!-- Contenido que sigue — simula bg blanco -->
+          <div style="background:#ffffff;padding:1rem 1.5rem;border-top:none;">
+            <p style="color:#555;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Funcionalidades</p>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#333;">🍳 Recetas personalizadas</div>
+              <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#333;">👥 Comunidad Cookr</div>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Cómo funciona:</strong> Se añade un gradiente extra al bottom del hero (<code>from-transparent to-background</code>) que se disuelve exactamente al color de fondo de la página. La transición parece orgánica.<br>
+          <strong>Cambio en código:</strong> Una sola línea en <code>seccionHero.tsx</code> — añadir <code>&lt;div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-b from-transparent to-background" /&gt;</code><br>
+          <strong>Esfuerzo:</strong> ★☆☆ — 1 div extra en el hero.
+        </div>
+      </div>
+
+      <!-- TR-B: Wave SVG divider -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>TR-B · Wave SVG divider</h3>
+            <small>Forma ondulada separa hero y contenido</small>
+          </div>
+          <span class="badge-ref azul">Stripe · Linear · Notion · Mailchimp</span>
+        </div>
+        <div style="display:flex;flex-direction:column;overflow:hidden;border-radius:0 0 8px 8px;">
+          <div style="position:relative;height:140px;overflow:hidden;">
+            <img src="https://picsum.photos/seed/foodA/800/450" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45;" loading="lazy"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+            <div style="position:relative;z-index:3;padding:1rem;text-align:center;padding-top:1.5rem;">
+              <p style="color:#fff;font-weight:800;font-size:1rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span> con Cookr</p>
+            </div>
+            <!-- Wave SVG en el bottom del hero -->
+            <div style="position:absolute;bottom:-1px;left:0;right:0;z-index:4;">
+              <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style="display:block;width:100%;height:40px;" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,40 C360,0 1080,60 1440,20 L1440,60 L0,60 Z" fill="#ffffff"/>
+              </svg>
+            </div>
+          </div>
+          <div style="background:#ffffff;padding:1rem 1.5rem;">
+            <p style="color:#555;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Funcionalidades</p>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#333;">🍳 Recetas personalizadas</div>
+              <div style="flex:1;background:#f5f5f5;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#333;">👥 Comunidad Cookr</div>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Cómo funciona:</strong> Un SVG con <code>path</code> ondulado se posiciona encima de la imagen hero, con <code>fill</code> igual al color de fondo. Crea una separación decorativa suave.<br>
+          <strong>Cambio en código:</strong> Añadir componente SVG al bottom del hero. El <code>fill</code> debe usar <code>var(--background)</code> o ser blanco si el fondo es siempre claro.<br>
+          <strong>Esfuerzo:</strong> ★★☆ — SVG inline + ajustar overflow del hero.
+        </div>
+      </div>
+
+      <!-- TR-C: Warm tinted background -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>TR-C · Fondo cálido en contenido</h3>
+            <small>Cambiar bg-background por un beige/warm tint</small>
+          </div>
+          <span class="badge-ref verde">NYT Cooking · Food52 · Bon Appétit</span>
+        </div>
+        <div style="display:flex;flex-direction:column;overflow:hidden;border-radius:0 0 8px 8px;">
+          <div style="position:relative;height:140px;overflow:hidden;">
+            <img src="https://picsum.photos/seed/foodA/800/450" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45;" loading="lazy"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+            <div style="position:relative;z-index:3;padding:1rem;text-align:center;padding-top:1.5rem;">
+              <p style="color:#fff;font-weight:800;font-size:1rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span> con Cookr</p>
+            </div>
+          </div>
+          <!-- Contenido con fondo warm en lugar de blanco puro -->
+          <div style="background:#faf7f2;padding:1rem 1.5rem;">
+            <p style="color:#6b5c40;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Funcionalidades</p>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;background:#f0ebe0;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#4a3f2f;">🍳 Recetas personalizadas</div>
+              <div style="flex:1;background:#f0ebe0;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#4a3f2f;">👥 Comunidad Cookr</div>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Cómo funciona:</strong> El <code>--warm-bg</code> ya está definido en <code>globals.css</code>. Cambiar <code>bg-background</code> por <code>bg-[var(--warm-bg)]</code> en el <code>&lt;main&gt;</code> de la landing. El tono beige/cálido contrasta menos con el hero oscuro.<br>
+          <strong>Cambio en código:</strong> 1 clase en <code>page.tsx</code> — cambiar <code>bg-background</code> por <code>bg-[var(--warm-bg)]</code>.<br>
+          <strong>Esfuerzo:</strong> ★☆☆ — 1 cambio de clase.
+        </div>
+      </div>
+
+      <!-- TR-D: Card overlap (cards flotan sobre el hero) -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>TR-D · Cards flotando sobre el hero</h3>
+            <small>El primer bloque sube y solapa el hero visualmente</small>
+          </div>
+          <span class="badge-ref azul">Booking.com · TripAdvisor · Headspace</span>
+        </div>
+        <div style="display:flex;flex-direction:column;overflow:hidden;border-radius:0 0 8px 8px;position:relative;">
+          <div style="position:relative;height:160px;overflow:hidden;">
+            <img src="https://picsum.photos/seed/foodA/800/450" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45;" loading="lazy"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+            <div style="position:relative;z-index:3;padding:1rem;text-align:center;padding-top:1rem;">
+              <p style="color:#fff;font-weight:800;font-size:0.95rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span> con Cookr</p>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.68rem;margin-top:4px;">Descubre y comparte recetas</p>
+              <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
+                <span style="background:#f97316;color:#fff;font-size:0.62rem;font-weight:700;padding:0.3rem 0.85rem;border-radius:999px;">Crear cuenta →</span>
+                <span style="background:rgba(255,255,255,0.12);color:#fff;font-size:0.62rem;padding:0.3rem 0.85rem;border-radius:999px;border:1px solid rgba(255,255,255,0.2);">Ya tengo cuenta</span>
+              </div>
+            </div>
+          </div>
+          <!-- Cards que suben por encima del hero -->
+          <div style="background:#ffffff;padding:0 1rem 1rem;margin-top:-28px;position:relative;z-index:5;">
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;background:#ffffff;border-radius:10px;padding:0.75rem;font-size:0.68rem;color:#333;box-shadow:0 4px 20px rgba(0,0,0,0.1);">🍳 Recetas personalizadas</div>
+              <div style="flex:1;background:#ffffff;border-radius:10px;padding:0.75rem;font-size:0.68rem;color:#333;box-shadow:0 4px 20px rgba(0,0,0,0.1);">👥 Comunidad Cookr</div>
+            </div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Cómo funciona:</strong> La sección de contenido tiene <code>-mt-16</code> (margin-top negativo) y <code>relative z-10</code>, haciendo que las cards suban sobre el hero. La imagen queda parcialmente visible debajo.<br>
+          <strong>Cambio en código:</strong> Añadir <code>-mt-16 relative z-10</code> al <code>motion.div</code> contenedor de secciones en <code>page.tsx</code>.<br>
+          <strong>Esfuerzo:</strong> ★★☆ — ajustar margin y z-index. Puede romper animaciones de scroll.
+        </div>
+      </div>
+
+      <!-- TR-E: Dark first section -->
+      <div class="opcion">
+        <div class="opcion-label">
+          <div>
+            <h3>TR-E · Primera sección oscura</h3>
+            <small>El contenido empieza en oscuro y va aclarando</small>
+          </div>
+          <span class="badge-ref morado">Netflix · HBO Max · Disney+</span>
+        </div>
+        <div style="display:flex;flex-direction:column;overflow:hidden;border-radius:0 0 8px 8px;">
+          <div style="position:relative;height:120px;overflow:hidden;">
+            <img src="https://picsum.photos/seed/foodA/800/450" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45;" loading="lazy"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+            <div style="position:relative;z-index:3;padding:1rem;text-align:center;padding-top:1.5rem;">
+              <p style="color:#fff;font-weight:800;font-size:0.95rem;text-shadow:0 2px 8px rgba(0,0,0,0.8);">Disfruta <span style="color:#f97316;font-style:italic;">cocinando</span></p>
+            </div>
+          </div>
+          <!-- Primera sección en oscuro -->
+          <div style="background:#0f0f0f;padding:1rem 1.5rem;">
+            <p style="color:rgba(255,255,255,0.5);font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Funcionalidades</p>
+            <div style="display:flex;gap:10px;margin-bottom:0.75rem;">
+              <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#ccc;">🍳 Recetas personalizadas</div>
+              <div style="flex:1;background:#1a1a1a;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#ccc;">👥 Comunidad Cookr</div>
+            </div>
+            <!-- Gradiente que va de oscuro a claro -->
+            <div style="height:20px;background:linear-gradient(to bottom, #0f0f0f 0%, #f5f5f5 100%);border-radius:4px;opacity:0.6;font-size:0.6rem;color:#777;text-align:center;line-height:20px;">… gradiente a sección clara</div>
+          </div>
+        </div>
+        <div class="nota">
+          <strong>Cómo funciona:</strong> La landing adopta un tema oscuro para las primeras secciones (testimonios, características) usando <code>bg-[var(--auth-dark)]</code>. Solo el footer o secciones finales son claros.<br>
+          <strong>Cambio en código:</strong> Requiere adaptar colores de texto y cards de <code>BentoCaracteristicas</code> y <code>BentoTestimonios</code> para modo oscuro.<br>
+          <strong>Esfuerzo:</strong> ★★★ — rediseño visual de las secciones de contenido.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ LEYENDA ═══ -->
+  <section id="leyenda">
+    <div class="leyenda">
+      <div class="leyenda-item"><span style="color:#22c55e">●</span> Usado por apps mainstream de gran audiencia</div>
+      <div class="leyenda-item"><span style="color:#3b82f6">●</span> Usado por apps tech / SaaS modernos</div>
+      <div class="leyenda-item"><span style="color:#c084fc">●</span> Usado por proyectos de diseño editorial avanzado</div>
+      <div class="leyenda-item"><span style="color:#f97316">●</span> Opción de menor esfuerzo / actual</div>
+      <div class="leyenda-item">★☆☆ Mínimo cambio de código &nbsp;·&nbsp; ★★★ Cambio de layout mayor</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ─── Motor de carrusel genérico ───────────────────────────
+  function initCarousel(trackId, dotsId, type) {
+    const track  = document.getElementById(trackId)
+    const dotsEl = document.getElementById(dotsId)
+    const slides = Array.from(track.querySelectorAll('.slide'))
+    const dots   = dotsEl ? Array.from(dotsEl.querySelectorAll('.dot')) : []
+    let current  = 0
+    let timer    = null
+
+    function go(next) {
+      const prev = current
+
+      if (type === 't2') {
+        // Slide horizontal
+        slides[prev].classList.remove('active')
+        slides[prev].classList.add('prev')
+        setTimeout(() => slides[prev].classList.remove('prev'), 750)
+      } else {
+        slides[prev].classList.remove('active')
+      }
+
+      current = (next + slides.length) % slides.length
+      slides[current].classList.add('active')
+
+      // Re-trigger Ken Burns animation
+      if (type === 't4') {
+        const img = slides[current].querySelector('img')
+        if (img) { img.style.animation = 'none'; img.offsetHeight; img.style.animation = ''; }
+      }
+
+      dots.forEach((d, i) => d.classList.toggle('active', i === current))
+    }
+
+    function start() {
+      timer = setInterval(() => go(current + 1), 3000)
+    }
+
+    dots.forEach(d => {
+      d.addEventListener('click', () => { clearInterval(timer); go(+d.dataset.i); start() })
+    })
+
+    start()
+  }
+
+  initCarousel('c1', 'd1', 't1')
+  initCarousel('c2', 'd2', 't2')
+  initCarousel('c3', 'd3', 't3')
+  initCarousel('c4', 'd4', 't4')
+  initCarousel('c5', 'd5', 't5')
+  initCarousel('c6', 'd6', 't6')
+</script>
+</body>
+</html>

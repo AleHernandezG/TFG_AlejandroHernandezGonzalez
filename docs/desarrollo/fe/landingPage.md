@@ -1,7 +1,7 @@
 # Landing Page — Documentación Técnica
 
-> **Última actualización:** 2026-03-20
-> **Sprint:** Sprint 1 · Fase 1 — Autenticación (Frontend)
+> **Última actualización:** 2026-04-21
+> **Sprint:** Sprint 3 (última actualización) · Iniciado en Sprint 1
 > **Tarea Linear:** TFG-14
 
 ---
@@ -17,20 +17,20 @@ La página está implementada como Server Component raíz (`app/page.tsx`) que o
 ## Árbol de componentes
 
 ```
-app/page.tsx                          ← Página raíz (Server Component shell)
+app/page.tsx                          ← Página raíz ('use client', bg-[var(--warm-bg)])
 │
-├── HeroSection                       ← Carrusel fullscreen + copy + CTAs
-│   └── [heroSlides data]
+├── SeccionHero                       ← Carrusel fullscreen + copy + CTAs
+│   └── [slidesHero data]
 │
 ├── motion.div (container stagger)    ← Wrapper de animación de entrada
-│   ├── TestimonialsBento             ← Sección de testimonios de usuarios
-│   │   └── TestimonialCard × 6      ← Tarjeta individual de testimonio
-│   │       └── [landingTestimonials data]
+│   ├── BentoTestimonios             ← Sección de testimonios de usuarios
+│   │   └── TarjetaTestimonio × 6   ← Tarjeta individual de testimonio
+│   │       └── [testimoniosLanding data]
 │   │
-│   └── FeaturesBento                 ← Sección de funcionalidades bento
-│       └── [landingFeatures data]
+│   └── BentoCaracteristicas         ← Sección de funcionalidades bento
+│       └── [caracteristicasLanding data]
 │
-└── LandingFooter                     ← Footer global con tech stack, links y quote
+└── PiePagina                         ← Footer global con tech stack, links y quote
 ```
 
 ---
@@ -40,20 +40,20 @@ app/page.tsx                          ← Página raíz (Server Component shell)
 Todos los datos son **mock estáticos** definidos en:
 
 ```
-frontend/src/features/landing/data/landing-data.ts
+frontend/src/features/landing/data/datosLanding.ts
 ```
 
 No hay llamadas a API ni estado de servidor en la landing. La conexión a datos reales ocurrirá en Fase 4 (Backend) cuando el perfil de usuario y las recetas estén disponibles.
 
-### Tipos exportados desde `landing-data.ts`
+### Tipos exportados desde `datosLanding.ts`
 
 | Tipo | Uso |
 |---|---|
-| `HeroSlide` | Slides del carrusel del hero (gradient, emoji, label) |
-| `LandingFeature` | Cards de funcionalidades (título, descripción, icono) |
-| `LandingFeatureIcon` | Union type `"chef" \| "social" \| "ai"` |
-| `Testimonial` | Tarjetas de testimonios (nombre, rol, avatarId, comentario, rating) |
-| `LandingStat` | *(definido, actualmente no usado — sección eliminada)* |
+| `SlideHero` | Slides del carrusel (`imageUrl`, `gradiente` fallback, `etiqueta`) |
+| `CaracteristicaLanding` | Cards de funcionalidades (título, descripción, icono) |
+| `IconoCaracteristicaLanding` | Union type `"chef" \| "social" \| "ia"` |
+| `Testimonio` | Tarjetas de testimonios (nombre, rol, avatarId, comentario, valoracion) |
+| `EstadisticaLanding` | *(definido, actualmente no usado — sección eliminada)* |
 
 ---
 
@@ -71,50 +71,54 @@ El `motion.div` usa `whileInView` + `staggerChildren: 0.1` para animar las secci
 
 ---
 
-### `HeroSection` — `features/landing/components/hero-section.tsx`
+### `SeccionHero` — `features/landing/components/seccionHero.tsx`
 
 **Tipo:** Client Component (`'use client'`)
 
-**Responsabilidad:** Carrusel de fondo a pantalla completa con texto de cabecera y CTAs superpuestos.
+**Responsabilidad:** Carrusel de fondo a pantalla completa con fotografía real, texto de cabecera y CTAs superpuestos.
 
 **Estado:**
-- `activeSlide: number` — índice del slide activo, controlado por `useState`.
+- `slideActivo: number` — índice del slide activo, controlado por `useState`.
 
 **Efectos:**
-- `useEffect` + `setInterval` (5 s) para auto-avanzar el carrusel. Se limpia en el return.
-- `useCallback` en `nextSlide` para evitar recreación en cada render.
+- `useEffect` + `setInterval` (5 s) para auto-avanzar. `useCallback` en `siguienteSlide`.
 
 **Estructura visual (capas):**
 ```
 <section> min-h-screen, overflow-hidden
-  ├── Capa 0 (z-0): AnimatePresence > motion.div por slide
-  │   ├── Gradiente de color (tailwind bg-gradient-to-br)
-  │   └── Emoji decorativo difuminado (blur-2xl, opacity-10, aria-hidden)
-  ├── Overlay 1: bg-background/25 (oscurece globalmente)
-  ├── Overlay 2: bg-gradient-to-b (oscurece bordes superior e inferior)
-  ├── Overlay 3: bg-gradient-to-r (oscurece bordes laterales)
-  ├── Capa z-10: Contenido (headline + subheading + CTAs)
-  └── Capa z-20: Indicadores de slide (puntos / pill)
+  ├── Capa 0 (z-0): AnimatePresence mode="popLayout" > motion.div por slide
+  │   ├── bg-gradient-to-br [gradiente CSS] — fallback si imagen no carga
+  │   └── <Image fill sizes="100vw" priority={slideActivo === 0} /> — fotografía WebP real
+  ├── Overlay 1: bg-black/50 — tinte plano, oscurece imagen uniformemente
+  ├── Overlay 2: bg-gradient-to-t from-black/60 via-black/25 to-black/10 — refuerzo zona texto
+  ├── <span sr-only aria-live="polite"> — accesibilidad lectores de pantalla
+  ├── Capa z-10: motion.div con stagger → h1 + p + botones
+  └── Capa z-20: Indicadores de slide (puntos / pill con aria-label + aria-current)
 ```
 
-**Animaciones:**
-- Entrada del slide de fondo: `opacity: 0 → 1` + `scale: 1.06 → 1` en 1.4 s (`easeInOut`).
-- `AnimatePresence mode="popLayout"` gestiona la salida del slide anterior.
-- Contenido: `staggerChildren: 0.12`, cada hijo entra con `opacity + y: 20 → 0`.
+**Transición de slides (T1 Crossfade):**
+- `initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}`
+- `transition={{ duration: 1.2, ease: 'easeInOut' }}`
+- Sin zoom/scale — fundido de opacidad puro (patrón Airbnb/Apple)
+
+**Tipografía (mezcla A+D):**
+- `h1`: `text-white` + `filter: drop-shadow(...)` inline — editorial, legible sobre cualquier foto
+- `"cocinando"`: `font-black italic text-brand` — énfasis naranja sólido
+- `"recetas"`: subrayado wavy SVG `var(--brand)` — decorativo
+- `"Cookr"`: `text-brand` — naranja sólido (gradient clip-text invisible sobre overlay oscuro)
+- Subtítulo: `text-white/75` + `textShadow` inline
 
 **CTAs:**
-- Botón primario → `/registro` (rounded-full, shadow de brand).
-- Botón secundario → `/login` (outline, backdrop-blur).
+- Botón primario → `/registro` (rounded-full, shadow brand).
+- Botón secundario → `/login` (outline `border-white/25 bg-white/10 text-white backdrop-blur-sm`).
 
 **Indicadores de slide:**
-- Pill alargado (`w-7`) para el activo, círculo (`w-2`) para los demás.
-- Click en indicador salta directamente al slide.
-
-**Pendiente:** Sustituir gradientes + emoji por imágenes reales con `next/image`. Ver [fase-1-sprint-1-carrousel-pendientes.md](../phase-reports/fase-1-sprint-1-carrousel-pendientes.md).
+- Pill alargado (`w-7 bg-brand`) para el activo, círculo (`w-2 bg-white/30`) para los demás.
+- `aria-label="Ver slide: {etiqueta}"` + `aria-current` en activo.
 
 ---
 
-### `TestimonialsBento` — `features/landing/components/testimonials-bento.tsx`
+### `BentoTestimonios` — `features/landing/components/bentoTestimonios.tsx`
 
 **Tipo:** Client Component
 
@@ -124,18 +128,18 @@ El `motion.div` usa `whileInView` + `staggerChildren: 0.1` para animar las secci
 
 **Animación:** `staggerChildren: 0.1` con `whileInView` (threshold 15 %). Cada `TestimonialCard` recibe las `variants` del item padre para participar en el stagger.
 
-**Datos:** Consume `landingTestimonials` (6 items mock) de `landing-data.ts`.
+**Datos:** Consume `testimoniosLanding` (6 items mock) de `datosLanding.ts`.
 
 ---
 
-### `TestimonialCard` — `features/landing/components/testimonial-card.tsx`
+### `TarjetaTestimonio` — `features/landing/components/tarjetaTestimonio.tsx`
 
 **Tipo:** Client Component
 
 **Props:**
 ```ts
-interface TestimonialCardProps {
-  testimonial: Testimonial;
+interface TarjetaTestimonioProps {
+  testimonio: Testimonio;
   variants?: object;  // recibe las variants del stagger padre
 }
 ```
@@ -160,29 +164,29 @@ interface TestimonialCardProps {
 
 ---
 
-### `FeaturesBento` — `features/landing/components/features-bento.tsx`
+### `BentoCaracteristicas` — `features/landing/components/bentoCaracteristicas.tsx`
 
 **Tipo:** Client Component
 
 **Responsabilidad:** Grid bento de las 3 funcionalidades principales de la app.
 
-**Grid:** `1 col → 3 cols md`, 2 rows. La primera feature (`index === 0`) ocupa `col-span-2 row-span-2` como tarjeta hero.
+**Grid:** `1 col → 3 cols md`, 2 rows. La primera característica (`index === 0`) ocupa `col-span-2 row-span-2` como tarjeta hero.
 
 **Mapa de iconos:**
 ```ts
-const iconMap: Record<LandingFeatureIcon, typeof ChefHat> = {
+const mapaIconos: Record<IconoCaracteristicaLanding, typeof ChefHat> = {
   chef: ChefHat,
   social: Users,
-  ai: Sparkles,
+  ia: Sparkles,
 }
 ```
 
-**Mapa de gradientes por categoría:**
+**Mapa de gradientes por categoría (usa CSS vars — 0 colores hardcodeados):**
 ```ts
-const iconGradient: Record<LandingFeatureIcon, string> = {
-  chef:   "from-amber-400/20 to-orange-300/10 text-amber-600",
-  social: "from-sky-400/20 to-blue-300/10 text-sky-600",
-  ai:     "from-violet-400/20 to-purple-300/10 text-violet-600",
+const gradienteIcono: Record<IconoCaracteristicaLanding, string> = {
+  chef:   "from-brand/20 to-brand-muted/10 text-brand",
+  social: "bg-[oklch(0.92_0.04_240)] text-[var(--category-social)]",
+  ia:     "bg-[oklch(0.92_0.04_290)] text-[var(--category-ai)]",
 }
 ```
 
@@ -203,7 +207,7 @@ const iconGradient: Record<LandingFeatureIcon, string> = {
 
 ---
 
-### `LandingFooter` — `components/common/landing-footer.tsx`
+### `PiePagina` — `components/common/piePagina.tsx`
 
 **Tipo:** Client Component
 
@@ -233,17 +237,16 @@ const iconGradient: Record<LandingFeatureIcon, string> = {
 
 ```ts
 // features/landing/components/index.ts
-export { LandingHeader } from "./landing-header"
-export { HeroSection } from "./hero-section"
-export { FeaturesBento } from "./features-bento"
-export { TestimonialsBento } from "./testimonials-bento"
-export { TestimonialCard } from "./testimonial-card"
+export { SeccionHero } from "./seccionHero"
+export { BentoCaracteristicas } from "./bentoCaracteristicas"
+export { BentoTestimonios } from "./bentoTestimonios"
+export { TarjetaTestimonio } from "./tarjetaTestimonio"
 ```
 
 Import desde fuera del feature:
 ```ts
-import { HeroSection, FeaturesBento, TestimonialsBento } from "@/features/landing/components"
-import { LandingFooter } from "@/components/common/landing-footer"
+import { SeccionHero, BentoCaracteristicas, BentoTestimonios } from "@/features/landing/components"
+import { PiePagina } from "@/components/common/piePagina"
 ```
 
 ---
@@ -252,12 +255,16 @@ import { LandingFooter } from "@/components/common/landing-footer"
 
 | Decisión | Motivo |
 |---|---|
-| Hero fullscreen sin navbar | Impacto visual máximo en primera visita. La navbar aparecerá dentro de la app autenticada. |
-| Datos mock en `landing-data.ts` | Aísla el contenido del componente. Fácil de actualizar sin tocar JSX. |
-| `TestimonialCard` como componente separado | Reutilizable en futuras páginas. Recibe `variants` del padre para participar en el stagger sin acoplarse a él. |
-| `LandingFooter` en `components/common/` | El footer se usará también en páginas como `/privacidad` o `/terminos`, por lo que no es exclusivo de la landing. |
+| Hero fullscreen sin navbar | Impacto visual máximo en primera visita. La navbar aparece dentro de la app autenticada. |
+| Datos mock en `datosLanding.ts` | Aísla el contenido del componente. Fácil de actualizar sin tocar JSX. |
+| `TarjetaTestimonio` como componente separado | Reutilizable en futuras páginas. Recibe `variants` del padre para el stagger. |
+| `PiePagina` en `components/common/` | El footer se usa también en `/privacidad` y `/terminos`. |
 | `AnimatePresence mode="popLayout"` en carrusel | Evita z-index flickering durante la transición entre slides. |
-| Overlays en capas independientes | Permiten ajustar la opacidad de fondo, bordes y lateral por separado sin sobrecargar un solo gradiente. |
+| Dos capas de overlay en hero | Las imágenes son fotografía de producto sobre fondo blanco/claro. Una sola capa es insuficiente. |
+| T1 Crossfade en lugar de Ken Burns | 6 opciones evaluadas en `heroOpciones.html`. Crossfade más elegante sobre fotografía densa. |
+| `text-white` + `text-brand` sólido | `text-foreground` es oscuro en light mode — inlegible sobre overlay. Gradient clip-text invisible sobre oscuro. |
+| `bg-[var(--warm-bg)]` en `page.tsx` | Elimina el contraste brusco entre el hero oscuro y el fondo blanco puro. Usa variable ya definida. |
+| Sin botones prev/next | Carrusel automático — diseño más limpio. Los puntos indicadores ofrecen navegación manual suficiente. |
 
 ---
 
@@ -265,17 +272,32 @@ import { LandingFooter } from "@/components/common/landing-footer"
 
 | Librería | Uso en landing |
 |---|---|
-| `framer-motion` | Animaciones de entrada, stagger, transición del carrusel |
+| `framer-motion` | Animaciones de entrada, stagger, crossfade del carrusel (`AnimatePresence`) |
+| `next/image` | `<Image fill>` para fotografías reales del hero con optimización automática |
 | `lucide-react` | Iconos (ArrowRight, ChefHat, Users, Sparkles, Heart, Quote) |
 | `next/link` | Navegación a `/registro` y `/login` |
 | `shadcn/ui` | Button, Card, CardContent, CardHeader, CardTitle, Avatar, AvatarFallback, Separator |
 
 ---
 
+## Assets
+
+```
+public/images/hero/
+├── desayuno.webp   ← slide 1 — fotografía de desayuno (~1920px, Unsplash)
+├── ensalada.webp   ← slide 2 — fotografía de ensalada (~1920px, Unsplash)
+├── postre.webp     ← slide 3 — fotografía de postre (~1920px, Unsplash)
+└── pasta.webp      ← slide 4 — fotografía de pasta (~1920px, Unsplash)
+```
+
+Las imágenes son locales (`/public`) — no requieren `remotePatterns` en `next.config.js`.
+
+---
+
 ## Pendientes relacionados
 
-- [CAROUSEL-001] Imágenes reales en hero carousel → [fase-1-sprint-1-carrousel-pendientes.md](../phase-reports/fase-1-sprint-1-carrousel-pendientes.md)
-- [CAROUSEL-002] Transición Ken Burns → mismo doc
-- [CAROUSEL-003] Controles accesibles prev/next + aria-live → mismo doc
-- Conectar `AvatarFallback` a foto real de usuario cuando exista backend (Fase 4)
-- Conectar `landingTestimonials` a datos reales de la base de datos (Fase 4)
+- [DET-009] Carrusel de recetas similares — aplazado a Sprint 4 (requiere modelo Receta en MongoDB)
+- Conectar `TarjetaTestimonio` → `AvatarFallback` a foto real cuando exista backend (Fase 4)
+- Conectar `testimoniosLanding` a datos reales de la base de datos (Fase 4)
+- [UI-021] ✅ Completado — ver `docs/changes/ui-changes.md`
+- [CAROUSEL-001/002/003] ✅ Completados — ver `docs/phase-reports/fase-1-sprint-1-carrousel-completados.md`

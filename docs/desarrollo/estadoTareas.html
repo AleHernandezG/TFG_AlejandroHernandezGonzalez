@@ -285,30 +285,30 @@
           <td class="id">CAROUSEL-001</td>
           <td class="desc">
             <strong>Imágenes reales en el carrusel de la landing</strong>
-            <small>El hero carousel de la landing usa fondos de gradiente + emojis como placeholder. Hay que añadir fotografías reales de comida vía Unsplash o assets propios.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+            <small>4 fotografías WebP reales en public/images/hero/ (desayuno, ensalada, postre, pasta). next/image fill + dos capas de overlay. imageUrl añadido a SlideHero, emoji eliminado.</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-completados.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-002</td>
           <td class="desc">
-            <strong>Transición Ken Burns en el carrusel (opcional)</strong>
-            <small>Mejora visual: zoom lento mientras hace fade entre slides. Opcional, solo si queda tiempo.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+            <strong>Transición mejorada entre slides</strong>
+            <small>6 opciones evaluadas en heroOpciones.html. Elegida T1 Crossfade (patrón Airbnb/Apple): fundido de opacidad puro, sin scale/zoom. duration 1.2s easeInOut. AnimatePresence mode="popLayout".</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-completados.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3 opcional</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-003</td>
           <td class="desc">
-            <strong>Controles accesibles prev/next en carrusel</strong>
-            <small>El carrusel solo tiene puntos indicadores. Hay que añadir botones prev/next y aria-live para lectores de pantalla.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md</span>
+            <strong>Controles accesibles del carrusel</strong>
+            <small>aria-live="polite" aria-atomic="true" en span.sr-only. Puntos indicadores con aria-label + aria-current. Sin prev/next (decisión de diseño: carrusel automático 5s, UX más limpia).</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-completados.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -657,10 +657,10 @@
           <td class="id">LANDING-001</td>
           <td class="desc">
             <strong>Configurar imágenes reales en el carrusel hero (landing)</strong>
-            <small>Relacionado con CAROUSEL-001. Hay que añadir el campo imageUrl a heroSlides y usar next/image en lugar del emoji placeholder.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
+            <small>Completado junto a CAROUSEL-001. imageUrl añadido a SlideHero, emoji eliminado, next/image fill con dos capas de overlay. Ver fase-1-sprint-1-carrousel-completados.md</small>
+            <span class="source">📄 docs/phase-reports/fase-1-sprint-1-carrousel-completados.md</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
       </tbody>

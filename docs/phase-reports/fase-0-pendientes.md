@@ -33,7 +33,7 @@ Commit esperado:
 ---
 
 ## [SETUP-002] Rama develop
-Estado:   ⏳ Pendiente
+Estado:   ✅ Completado — Sprint 2
 Cuándo:   Antes de empezar el Sprint 2 (recomendado)
 
 Qué hay que hacer:

@@ -57,7 +57,7 @@ Implementar la Landing Page inicial de la app cumpliendo criterios de aceptacion
 - `frontend/src/features/landing/components/testimonial-card.tsx`
 - `frontend/src/features/landing/components/testimonials-bento.tsx`
 - `frontend/src/components/common/landing-footer.tsx`
-- `docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md`
+- `docs/phase-reports/fase-1-sprint-1-carrousel-completados.md`
 - `docs/desarrollo/landingPage.md`
 
 ### Modificados

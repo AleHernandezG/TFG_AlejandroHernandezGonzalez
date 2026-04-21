@@ -146,8 +146,25 @@ Si el color que necesitas no existe como variable, **crear una nueva variable en
 ### Excepciones permitidas (documentadas)
 
 ```
-bg-black/30     → overlay semitransparente funcional sobre foto (registro/login)
-Google SVG fills → colores corporativos obligatorios de Google en botonGoogle.tsx
+bg-black/30–/60        → overlays semitransparentes funcionales sobre fotografía
+                          (hero carousel, registro, login). Necesarios para legibilidad
+                          del texto. No son colores de marca, son capas de oscurecimiento.
+
+text-white             → texto sobre overlay oscuro forzado (hero, auth).
+                          NO sustituible por text-foreground: en light mode foreground
+                          es oscuro y el texto quedaría ilegible sobre el overlay negro.
+
+border-white/N         → bordes de componentes UI dentro de un contexto
+bg-white/N             → de overlay oscuro sobre fotografía (ej. botón outline del hero).
+hover:bg-white/N       → Mismo razonamiento que text-white.
+
+rgba(0,0,0,N) en       → CSS filter (drop-shadow) y text-shadow no aceptan CSS
+filter / textShadow     → custom properties con modificador de opacidad en Tailwind v3.
+inline style            → Excepción técnica — no hay alternativa con variables.
+
+rgba(var(--brand),N)   → ✅ CORRECTO — usa la variable del sistema.
+
+Google SVG fills        → colores corporativos obligatorios de Google en botonGoogle.tsx
 ```
 
 ---

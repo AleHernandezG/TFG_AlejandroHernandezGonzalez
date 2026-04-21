@@ -6,6 +6,54 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-021] — Landing: fondo cálido + hero con imágenes reales y transición T1 ✅
+
+Fecha: 2026-04-21 | Estado: ✅ Completado | Sprint: 3
+
+**Ficheros modificados:**
+`app/page.tsx` · `features/landing/components/seccionHero.tsx` · `features/landing/data/datosLanding.ts`
+
+**Ficheros creados:** `public/images/hero/desayuno.webp` · `ensalada.webp` · `postre.webp` · `pasta.webp`
+
+### CAROUSEL-001 — Imágenes reales
+
+- Tipo `SlideHero`: eliminado campo `emoji`, añadido `imageUrl: string`
+- Hero usa `<Image fill sizes="100vw" priority={slideActivo === 0} />` de `next/image`
+- Imágenes locales en `public/images/hero/` (~1920 px wide, formato WebP)
+- Overlays en dos capas necesarios por fotografía de producto sobre fondo claro:
+  - `bg-black/50` — tinte plano uniforme
+  - `bg-gradient-to-t from-black/60 via-black/25 to-black/10` — refuerzo zona texto
+
+### CAROUSEL-002 — Transición T1 Crossfade
+
+- 6 opciones evaluadas y documentadas en `docs/desarrollo/fe/heroOpciones.html`
+- Elegida **T1 Crossfade** (Airbnb/Apple): fundido de opacidad puro sin zoom
+- `motion.div key={slideActivo}`: `opacity 0→1` entrada, `opacity 1→0` salida, 1.2 s easeInOut
+- Ken Burns descartado: zoom interfería con legibilidad sobre fotografía densa
+
+### CAROUSEL-003 — Accesibilidad
+
+- `<span className="sr-only" aria-live="polite" aria-atomic="true">` — anuncia slide activo
+- Puntos indicadores con `aria-label` y `aria-current` en el activo
+- Botones prev/next descartados — diseño automático más limpio (decisión de autor)
+
+### Tipografía hero (A+D mix)
+
+- Evaluadas 5 opciones tipográficas en `heroOpciones.html`
+- Elegida mezcla A+D: texto blanco puro + `drop-shadow` editorial + `text-shadow` en subtítulo
+- `h1`: `filter: drop-shadow(0 2px 12px rgba(0,0,0,0.9)) drop-shadow(0 4px 32px rgba(0,0,0,0.65))`
+- `"Cookr"` cambiado de `bg-clip-text text-transparent` a `text-brand` (gradiente clip invisible sobre overlay oscuro)
+- Botón outline: `border-white/25 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm`
+
+### Fondo warm-bg en landing
+
+- `page.tsx`: `bg-background` → `bg-[var(--warm-bg)]` (crema muy suave en light, cálido en dark)
+- Suaviza el contraste visual entre el hero oscuro y el contenido inferior sin bleed ni wave
+
+**Excepciones rules.md documentadas:** `text-white`, `bg-black/N`, `border-white/N`, `bg-white/N`, `rgba(0,0,0,N)` en inline styles — ver sección "Excepciones permitidas" de `docs/rules.md`.
+
+---
+
 ## [UI-020] — Vista /coleccion — dos subpestañas (Guardadas + Mis Recetas) ✅
 
 Fecha: 2026-04-20 | Estado: ✅ Completado | Sprint: 3

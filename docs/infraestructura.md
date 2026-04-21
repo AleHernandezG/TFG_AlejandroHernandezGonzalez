@@ -28,7 +28,7 @@ Arquitectura Mobile-First construida sobre Next.js + React.
 |---|---|
 | Tailwind CSS | Estilos responsive y utilidades CSS |
 | shadcn/ui | Componentes base (modales, drawers, botones) integrados con Tailwind |
-| Framer Motion | Animaciones y transiciones fluidas |
+| Framer Motion | Animaciones y transiciones fluidas. El efecto Ken Burns del hero carousel (`seccionHero.tsx`) usa `motion.div` con `animate={{ scale: 1.06 }}` durante 5 s — sin dependencias adicionales |
 | Lucide React | Iconos SVG ligeros y limpios |
 | Vaul | Menús que suben desde abajo en móvil (drawer) |
 | Embla Carousel | Scroll horizontal de recetas con soporte a swipe |

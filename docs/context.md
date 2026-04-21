@@ -201,7 +201,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 - Ver: docs/phase-reports/fase-1-sprint-1-registro.md (registro — historial completo)
 - Ver: docs/registro.html (documentación técnica de la vista /registro)
 - Ver: docs/phase-reports/fase-1-sprint-1-landing.md (landing — historial completo)
-- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md (carrusel con imágenes reales)
+- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-completados.md (carrusel con imágenes reales — ✅ completado)
 - Ver: docs/desarrollo/landingPage.md (documentación técnica de todos los componentes)
 
 ## Rutas del proyecto (build actual)
@@ -251,12 +251,12 @@ El login con Google OAuth sigue funcionando sin restricciones.
 - ✅ [SETUP-004] Google Cloud Console OAuth → completado, credenciales en .env.local
 - [SETUP-005] Paquetes deprecated (eslint@8, next-pwa@5) → aplazado a Fase 6, ver docs/tech-debt.md
 
-## Carrusel — Pendientes
+## Carrusel — ✅ Completado (Sprint 3)
 
-- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-pendientes.md
-- [CAROUSEL-001] Imágenes reales (sustituir gradientes + emoji)
-- [CAROUSEL-002] Transición Ken Burns (opcional, sprint 3)
-- [CAROUSEL-003] Controles accesibles prev/next + aria-live
+- Ver: docs/phase-reports/fase-1-sprint-1-carrousel-completados.md
+- ✅ [CAROUSEL-001] Imágenes WebP reales en el hero (desayuno, ensalada, postre, pasta)
+- ✅ [CAROUSEL-002] Transición T1 Crossfade (fundido opacidad, patrón Airbnb/Apple)
+- ✅ [CAROUSEL-003] Controles accesibles — aria-live + aria-label en puntos indicadores
 
 ## Estrategia de despliegue — decidida en Fase 1
 
