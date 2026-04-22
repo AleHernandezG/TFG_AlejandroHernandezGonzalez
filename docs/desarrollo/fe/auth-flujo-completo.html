@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth — Flujo completo · Cookr</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 40px 100px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 22pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 56px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #292524;
+      border-left: 4px solid #b45309;
+      padding-left: 10px;
+      margin-top: 40px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #44403c;
+      margin-top: 28px;
+      margin-bottom: 8px;
+    }
+
+    p { margin: 0 0 10px; }
+
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 9.5pt;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: 3px;
+      padding: 1px 5px;
+    }
+
+    pre {
+      font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 9pt;
+      background: #1c1917;
+      color: #e7e5e4;
+      border-radius: 6px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      line-height: 1.5;
+      margin: 12px 0 20px;
+    }
+
+    pre .c  { color: #78716c; }   /* comment */
+    pre .k  { color: #fb923c; }   /* keyword */
+    pre .s  { color: #86efac; }   /* string */
+    pre .t  { color: #67e8f9; }   /* type */
+    pre .f  { color: #fde68a; }   /* function/field */
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+      margin: 12px 0 24px;
+    }
+
+    th {
+      background: #292524;
+      color: #fafaf9;
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      border: 1px solid #e7e5e4;
+      padding: 7px 12px;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #fafaf9; }
+
+    .flow {
+      background: #fafaf9;
+      border: 1px solid #e7e5e4;
+      border-radius: 8px;
+      padding: 20px 28px;
+      margin: 16px 0 24px;
+      font-family: 'Cascadia Code', Consolas, monospace;
+      font-size: 9.5pt;
+      line-height: 2;
+    }
+
+    .flow .step  { color: #292524; font-weight: 600; }
+    .flow .arrow { color: #b45309; }
+    .flow .note  { color: #78716c; font-style: italic; font-family: inherit; font-weight: normal; }
+    .flow .ok    { color: #16a34a; font-weight: 700; }
+    .flow .warn  { color: #b45309; font-weight: 700; }
+
+    .badge {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+      letter-spacing: .03em;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .badge-done  { background: #dcfce7; color: #15803d; }
+    .badge-new   { background: #fef3c7; color: #92400e; }
+    .badge-fixed { background: #dbeafe; color: #1d4ed8; }
+    .badge-todo  { background: #f3f4f6; color: #6b7280; }
+
+    .callout {
+      border-left: 4px solid #b45309;
+      background: #fffbeb;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 16px 0;
+      font-size: 10.5pt;
+    }
+
+    .callout.info  { border-color: #3b82f6; background: #eff6ff; }
+    .callout.warn  { border-color: #f59e0b; background: #fffbeb; }
+    .callout.ok    { border-color: #22c55e; background: #f0fdf4; }
+    .callout.error { border-color: #ef4444; background: #fef2f2; }
+
+    .toc {
+      background: #fafaf9;
+      border: 1px solid #e7e5e4;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin: 24px 0;
+      font-size: 10pt;
+    }
+
+    .toc ul { margin: 6px 0 0; padding-left: 20px; }
+    .toc li { margin: 4px 0; }
+    .toc a  { color: #b45309; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    .meta {
+      color: #78716c;
+      font-size: 9.5pt;
+      margin-bottom: 4px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e7e5e4;
+      margin: 40px 0;
+    }
+
+    .file-ref {
+      font-family: 'Cascadia Code', Consolas, monospace;
+      font-size: 9pt;
+      color: #b45309;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 3px;
+      padding: 1px 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="meta">TFG · Red Social Gastronómica · Cookr &nbsp;|&nbsp; 2026-04-22 &nbsp;|&nbsp; AUTH-006 / DEBT-007</p>
+  <h1>Autenticación — Flujo completo y cambios implementados</h1>
+
+  <p>Este documento describe el flujo de autenticación completo de Cookr tras implementar
+  <strong>AUTH-006</strong> (Google OAuth → detección de usuario nuevo → completar perfil)
+  y los cambios asociados en modelo, repositorio, servicio, controlador, rutas y frontend.</p>
+
+  <div class="toc">
+    <strong>Índice</strong>
+    <ul>
+      <li><a href="#resumen">1. Qué se cambió (resumen ejecutivo)</a></li>
+      <li><a href="#flujo-local">2. Flujo: usuario local (email + contraseña)</a></li>
+      <li><a href="#flujo-google">3. Flujo: usuario Google OAuth</a></li>
+      <li><a href="#modelo">4. Modelo MongoDB — todos los campos</a></li>
+      <li><a href="#backend">5. Backend — archivos modificados</a></li>
+      <li><a href="#frontend">6. Frontend — archivos modificados</a></li>
+      <li><a href="#sesion">7. Sesión NextAuth — cómo fluye perfilCompleto</a></li>
+      <li><a href="#pendiente">8. Lo que sigue pendiente (Fase 6)</a></li>
+    </ul>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="resumen">1. Qué se cambió — resumen ejecutivo</h1>
+
+  <table>
+    <tr>
+      <th>Archivo</th>
+      <th>Cambio</th>
+      <th>Tag</th>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/types/usuario.ts</span></td>
+      <td>Añadido campo <code>perfilCompleto: boolean</code> a la interfaz <code>IUsuario</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/models/usuarioMongo.ts</span></td>
+      <td>Campo <code>perfilCompleto</code> en el schema Mongoose con <code>default: false</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/repositories/usuarioRepository.ts</span></td>
+      <td><code>DatosCrearUsuario</code> ahora incluye <code>foto?</code> y <code>cuentaVerificada?</code>. Nuevos métodos: <code>buscarPorGoogleId</code>, <code>vincularGoogle</code>, <code>completarPerfil</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/lib/validadores.ts</span></td>
+      <td>Añadidos <code>esquemaGoogleOAuth</code> y <code>esquemaCompletarPerfil</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/services/authService.ts</span></td>
+      <td>Método <code>iniciarSesionGoogle</code> completo (busca por googleId → email → crea). <code>iniciarSesion</code> devuelve <code>perfilCompleto</code>. Nuevo <code>completarPerfil</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/controllers/authController.ts</span></td>
+      <td>Añadido método <code>completarPerfil</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">backend/src/routes/auth.routes.ts</span></td>
+      <td><code>POST /google</code> con validación. <code>POST /completar-perfil</code> protegida con <code>requerirAuth</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/lib/auth.ts</span></td>
+      <td>Callback <code>jwt</code> llama al backend en primer login Google. Propaga <code>perfilCompleto</code>. Soporte de <code>update()</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/services/authService.ts</span></td>
+      <td><code>RespuestaLogin</code> incluye <code>perfilCompleto</code>. Nuevo método <code>completarPerfil(datos, token)</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/features/auth/components/formularioCompletarPerfil.tsx</span></td>
+      <td>Conectado al backend. Llama a <code>update({ perfilCompleto: true })</code> y navega a <code>/home</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/app/completar-perfil/page.tsx</span></td>
+      <td>Server Component: sin sesión → <code>/login</code>; perfil completo → <code>/home</code>; si no → muestra formulario</td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/features/auth/components/formularioLogin.tsx</span></td>
+      <td>Tras login exitoso redirige a <code>/completar-perfil</code> en lugar de <code>/home</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/features/auth/components/botonGoogle.tsx</span></td>
+      <td><code>callbackUrl</code> por defecto cambiado a <code>/completar-perfil</code>. Eliminada función muerta <code>verificarCuentaGoogle</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/app/verificar-email/contenidoVerificacion.tsx</span></td>
+      <td>Quitado el mock <code>setTimeout</code>. Ahora llama a <code>authService.verificarEmail()</code> → <code>POST /api/auth/verificar-email</code></td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+  </table>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="flujo-local">2. Flujo: usuario local (email + contraseña)</h1>
+
+  <div class="callout ok">
+    Los usuarios locales deben verificar su correo electrónico antes de poder iniciar sesión.
+    Solo después de verificar se les permite entrar y completar su perfil.
+  </div>
+
+  <div class="flow">
+    <div><span class="step">1. REGISTRO</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>/registro</code> — formulario nombre + correo + contraseña</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>POST /api/auth/registro</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— hashea contraseña con bcrypt (10 rounds)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— crea usuario: <code>proveedor:"local"</code>, <code>cuentaVerificada:false</code>, <code>perfilCompleto:false</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— crea token de verificación (hex 32 bytes, TTL 24h) en colección <code>tokens</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <span class="warn">TODO Fase 6:</span> envía email con Resend (URL: <code>/verificar-email?token=xxx</code>)</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> redirige a <code>/verificar-email/pendiente?email=...</code></div>
+    <br/>
+    <div><span class="step">2. VERIFICACIÓN</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> usuario hace clic en el enlace del email</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>/verificar-email?token=xxx</code> — llama <code>POST /api/auth/verificar-email</code> <span class="ok">← CORREGIDO (era mock)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— valida token: existe, tipo "verificacion", no expirado</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— actualiza usuario: <code>cuentaVerificada:true</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— invalida token (<code>usado:true</code>); MongoDB TTL lo eliminará al expirar</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> muestra "¡Correo verificado!" con botón "Iniciar sesión" → <code>/login</code></div>
+    <br/>
+    <div><span class="step">3. LOGIN</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>/login</code> — formulario correo + contraseña</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> NextAuth <code>signIn("credentials")</code> → <code>authorize()</code> → <code>POST /api/auth/login</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— comprueba correo, contraseña (bcrypt compare), <code>cuentaVerificada</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— devuelve: <code>{ token, usuario, perfilCompleto }</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— callback <code>jwt</code> almacena <code>backendToken</code>, <code>rol</code>, <code>perfilCompleto</code> en el JWT de NextAuth</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>formularioLogin</code> hace <code>router.push("/completar-perfil")</code></div>
+    <br/>
+    <div><span class="step">4. COMPLETAR PERFIL</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>completar-perfil/page.tsx</code> (Server Component)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— sin sesión → redirect <code>/login</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>perfilCompleto === true</code> → redirect <code>/home</code> <span class="note">(usuario volviendo)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>perfilCompleto === false</code> → muestra <code>&lt;FormularioCompletarPerfil&gt;</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> usuario selecciona alergias y preferencias → "Listo"</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>POST /api/auth/completar-perfil</code> (Authorization: Bearer backendToken)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>requerirAuth</code> verifica JWT → extrae <code>req.usuario.id</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— actualiza usuario: <code>alergias</code>, <code>preferencias</code>, <code>perfilCompleto:true</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> cliente llama <code>update({ perfilCompleto: true })</code> — refresca el JWT de NextAuth</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>router.push("/home")</code></div>
+    <br/>
+    <div><span class="step">5. LOGINS POSTERIORES</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> mismos pasos 3-4, pero <code>perfilCompleto === true</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>completar-perfil/page.tsx</code> redirige directamente a <code>/home</code></div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="flujo-google">3. Flujo: usuario Google OAuth</h1>
+
+  <div class="callout ok">
+    Los usuarios de Google tienen <code>cuentaVerificada: true</code> automáticamente (Google ya lo garantiza).
+    No pasan por el flujo de verificación de correo. Pero sí deben completar su perfil la primera vez.
+  </div>
+
+  <div class="flow">
+    <div><span class="step">1. INICIO DE SESIÓN</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> usuario pulsa "Continuar con Google" en <code>/login</code> o <code>/registro</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>signIn('google', { callbackUrl: '/completar-perfil' })</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> NextAuth redirige a Google OAuth</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> Google autentica → devuelve a NextAuth con perfil: <code>{ googleId, email, name, image }</code></div>
+    <br/>
+    <div><span class="step">2. CALLBACK JWT (servidor — NextAuth)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> NextAuth dispara callback <code>jwt</code> con <code>account.provider === "google"</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> Llama <code>POST /api/auth/google</code> (fetch server-side)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;con <code>{ googleId, correo, nombre, foto }</code></div>
+    <br/>
+    <div>&nbsp;&nbsp;&nbsp;<span class="note">El backend ejecuta esta lógica:</span></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;① busca por <code>googleId</code> → usuario ya vinculado</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;② si no → busca por <code>correo</code> → cuenta local preexistente con mismo email</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ si encuentra: <code>vincularGoogle()</code> — añade googleId y foto si no tenía</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;③ si no → <code>crear()</code>: <code>proveedor:"google"</code>, <code>cuentaVerificada:true</code>, <code>perfilCompleto:false</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— firma JWT del backend</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— devuelve <code>{ token, usuario, perfilCompleto }</code></div>
+    <br/>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> callback <code>jwt</code> almacena <code>backendToken</code>, <code>rol</code>, <code>perfilCompleto</code></div>
+    <br/>
+    <div><span class="step">3. REDIRECT A /completar-perfil</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> NextAuth redirige al <code>callbackUrl</code> → <code>/completar-perfil</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> page.tsx (Server Component): comprueba <code>session.user.perfilCompleto</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <span class="ok">nuevo usuario</span>: <code>false</code> → muestra formulario</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <span class="ok">usuario volviendo</span>: <code>true</code> → redirect a <code>/home</code></div>
+    <br/>
+    <div><span class="step">4. COMPLETAR PERFIL (mismo flujo que local)</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>POST /api/auth/completar-perfil</code> con Bearer backendToken</div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>update({ perfilCompleto: true })</code> + <code>router.push("/home")</code></div>
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="modelo">4. Modelo MongoDB — todos los campos</h1>
+
+  <h2>Colección: <code>usuarios</code></h2>
+
+  <table>
+    <tr>
+      <th>Campo</th>
+      <th>Tipo</th>
+      <th>Default</th>
+      <th>Cuándo se rellena</th>
+      <th>Por quién</th>
+    </tr>
+    <tr>
+      <td><code>nombre</code></td>
+      <td>String</td>
+      <td>—</td>
+      <td>Registro (local o Google)</td>
+      <td><code>crear()</code></td>
+    </tr>
+    <tr>
+      <td><code>correo</code></td>
+      <td>String</td>
+      <td>—</td>
+      <td>Registro (local o Google)</td>
+      <td><code>crear()</code></td>
+    </tr>
+    <tr>
+      <td><code>contrasena</code></td>
+      <td>String (select:false)</td>
+      <td>—</td>
+      <td>Solo registro local (bcrypt hash)</td>
+      <td><code>crear()</code>, <code>actualizarContrasena()</code></td>
+    </tr>
+    <tr>
+      <td><code>foto</code></td>
+      <td>String?</td>
+      <td>—</td>
+      <td>Google: en el momento de crear/vincular. Local: pendiente Fase 4 (ajustes de perfil)</td>
+      <td><code>crear()</code>, <code>vincularGoogle()</code></td>
+    </tr>
+    <tr>
+      <td><code>rol</code></td>
+      <td>"usuario" | "admin"</td>
+      <td>"usuario"</td>
+      <td>Siempre por defecto</td>
+      <td>Schema Mongoose</td>
+    </tr>
+    <tr>
+      <td><code>cuentaVerificada</code></td>
+      <td>Boolean</td>
+      <td>false</td>
+      <td>Local: tras verificar email. Google: true en el momento de crear</td>
+      <td><code>actualizarVerificacion()</code>, <code>crear({ cuentaVerificada: true })</code></td>
+    </tr>
+    <tr style="background: #fef9c3;">
+      <td><code><strong>perfilCompleto</strong></code> ★ nuevo</td>
+      <td>Boolean</td>
+      <td>false</td>
+      <td>Cuando el usuario guarda alergias y preferencias en /completar-perfil</td>
+      <td><code>completarPerfil()</code></td>
+    </tr>
+    <tr>
+      <td><code>proveedor</code></td>
+      <td>"local" | "google"</td>
+      <td>—</td>
+      <td>Registro</td>
+      <td><code>crear()</code></td>
+    </tr>
+    <tr>
+      <td><code>googleId</code></td>
+      <td>String?</td>
+      <td>—</td>
+      <td>Solo usuarios Google (o local que vincula Google)</td>
+      <td><code>crear()</code>, <code>vincularGoogle()</code></td>
+    </tr>
+    <tr style="background: #fef9c3;">
+      <td><code><strong>alergias</strong></code> ★ antes sin uso</td>
+      <td>String[]</td>
+      <td>[]</td>
+      <td>Cuando el usuario completa el perfil</td>
+      <td><code>completarPerfil()</code></td>
+    </tr>
+    <tr style="background: #fef9c3;">
+      <td><code><strong>preferencias</strong></code> ★ antes sin uso</td>
+      <td>String[]</td>
+      <td>[]</td>
+      <td>Cuando el usuario completa el perfil</td>
+      <td><code>completarPerfil()</code></td>
+    </tr>
+    <tr>
+      <td><code>fechaRegistro</code></td>
+      <td>Date</td>
+      <td>Date.now</td>
+      <td>Siempre en el momento de crear</td>
+      <td>Schema Mongoose</td>
+    </tr>
+  </table>
+
+  <h2>Colección: <code>tokens</code></h2>
+
+  <table>
+    <tr>
+      <th>Campo</th>
+      <th>Tipo</th>
+      <th>Default</th>
+      <th>Cuándo se rellena</th>
+    </tr>
+    <tr>
+      <td><code>userId</code></td>
+      <td>ObjectId → Usuario</td>
+      <td>—</td>
+      <td>Al crear token de verificación o recuperación</td>
+    </tr>
+    <tr>
+      <td><code>token</code></td>
+      <td>String (único)</td>
+      <td>—</td>
+      <td>Cadena hex aleatoria de 32 bytes</td>
+    </tr>
+    <tr>
+      <td><code>tipo</code></td>
+      <td>"verificacion" | "recuperacion"</td>
+      <td>—</td>
+      <td>Según el contexto de uso</td>
+    </tr>
+    <tr>
+      <td><code>expira</code></td>
+      <td>Date</td>
+      <td>—</td>
+      <td>Verificación: +24h. Recuperación: +1h</td>
+    </tr>
+    <tr>
+      <td><code>usado</code></td>
+      <td>Boolean</td>
+      <td>false</td>
+      <td>Se pone a <code>true</code> al validar el token (<code>invalidar()</code>)</td>
+    </tr>
+    <tr>
+      <td><code>creadoEn</code></td>
+      <td>Date</td>
+      <td>Date.now</td>
+      <td>Automático en el momento de crear</td>
+    </tr>
+  </table>
+
+  <div class="callout info">
+    <strong>TTL automático:</strong> La colección <code>tokens</code> tiene un índice TTL sobre el campo
+    <code>expira</code> (<code>expireAfterSeconds: 0</code>). MongoDB elimina el documento automáticamente
+    cuando la fecha <code>expira</code> pasa, sin necesidad de limpieza manual.
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="backend">5. Backend — archivos modificados</h1>
+
+  <h2>5.1 — <span class="file-ref">repositories/usuarioRepository.ts</span></h2>
+
+  <h3>Problema anterior</h3>
+  <p>La interfaz <code>DatosCrearUsuario</code> no incluía <code>foto</code> ni <code>cuentaVerificada</code>,
+  por lo que TypeScript rechazaba pasarlos al crear un usuario de Google. Los campos <code>alergias</code>
+  y <code>preferencias</code> existían en el schema pero no había ningún método para escribirlos.</p>
+
+  <h3>Solución</h3>
+  <pre><span class="c">// ANTES</span>
+<span class="k">interface</span> <span class="t">DatosCrearUsuario</span> {
+  nombre: <span class="t">string</span>
+  correo: <span class="t">string</span>
+  contrasena?: <span class="t">string</span>
+  proveedor: <span class="s">"local"</span> | <span class="s">"google"</span>
+  googleId?: <span class="t">string</span>
+}
+
+<span class="c">// DESPUÉS</span>
+<span class="k">interface</span> <span class="t">DatosCrearUsuario</span> {
+  nombre: <span class="t">string</span>
+  correo: <span class="t">string</span>
+  contrasena?: <span class="t">string</span>
+  foto?: <span class="t">string</span>              <span class="c">// ← nuevo (foto de Google)</span>
+  cuentaVerificada?: <span class="t">boolean</span>  <span class="c">// ← nuevo (Google = true en creación)</span>
+  proveedor: <span class="s">"local"</span> | <span class="s">"google"</span>
+  googleId?: <span class="t">string</span>
+}</pre>
+
+  <p>Métodos nuevos:</p>
+  <ul>
+    <li><code>buscarPorGoogleId(googleId)</code> — para identificar usuarios Google en logins posteriores</li>
+    <li><code>vincularGoogle(id, { googleId, foto? })</code> — cuando un usuario local se autentica con el mismo correo en Google</li>
+    <li><code>completarPerfil(id, { alergias, preferencias })</code> — escribe alergias, preferencias y pone <code>perfilCompleto: true</code></li>
+  </ul>
+
+  <h2>5.2 — <span class="file-ref">services/authService.ts</span></h2>
+
+  <h3>iniciarSesionGoogle (antes: googleOAuth incompleto)</h3>
+  <p>El método anterior solo buscaba por correo y no firmaba ningún JWT ni devolvía token.
+  El nombre tampoco coincidía con lo que llamaba el controlador (<code>iniciarSesionGoogle</code> vs <code>googleOAuth</code>).</p>
+
+  <p>Lógica de búsqueda ahora:</p>
+  <div class="flow">
+    <div><span class="arrow">①</span> <code>buscarPorGoogleId(googleId)</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> encontrado: usuario ya vinculado, continúa</div>
+    <div><span class="arrow">②</span> si no → <code>buscarPorCorreo(correo)</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> encontrado: cuenta local con mismo email → <code>vincularGoogle()</code> y actualiza</div>
+    <div><span class="arrow">③</span> si no → <code>crear()</code> con <code>proveedor:"google"</code>, <code>cuentaVerificada:true</code></div>
+    <div><span class="arrow">④</span> firma JWT del backend y devuelve <code>{ token, usuario, perfilCompleto }</code></div>
+  </div>
+
+  <h3>iniciarSesion (login local)</h3>
+  <p>Ahora devuelve <code>perfilCompleto: usuario.perfilCompleto</code> junto al token y datos del usuario.</p>
+
+  <h3>completarPerfil (nuevo)</h3>
+  <p>Recibe <code>userId</code> (del JWT validado por <code>requerirAuth</code>) y llama a <code>usuarioRepository.completarPerfil()</code>.</p>
+
+  <h2>5.3 — <span class="file-ref">routes/auth.routes.ts</span></h2>
+
+  <table>
+    <tr><th>Ruta</th><th>Middleware</th><th>Controlador</th></tr>
+    <tr><td><code>POST /registro</code></td><td>validarBody(esquemaRegistro)</td><td>authController.registro</td></tr>
+    <tr><td><code>POST /login</code></td><td>validarBody(esquemaLogin)</td><td>authController.login</td></tr>
+    <tr><td><code>POST /verificar-email</code></td><td>validarBody(esquemaVerificarEmail)</td><td>authController.verificarEmail</td></tr>
+    <tr><td><code>POST /recuperar-contrasena</code></td><td>validarBody(esquemaRecuperar)</td><td>authController.recuperarContrasena</td></tr>
+    <tr><td><code>POST /nueva-contrasena</code></td><td>validarBody(esquemaNuevaContrasena)</td><td>authController.nuevaContrasena</td></tr>
+    <tr style="background:#fef9c3;"><td><code>POST /google</code> ★</td><td>validarBody(esquemaGoogleOAuth)</td><td>authController.googleOAuth</td></tr>
+    <tr style="background:#fef9c3;"><td><code>POST /completar-perfil</code> ★</td><td>requerirAuth + validarBody(esquemaCompletarPerfil)</td><td>authController.completarPerfil</td></tr>
+  </table>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="frontend">6. Frontend — archivos modificados</h1>
+
+  <h2>6.1 — <span class="file-ref">lib/auth.ts</span> (NextAuth options)</h2>
+
+  <h3>Callback <code>jwt</code> — cómo fluye perfilCompleto</h3>
+
+  <pre><span class="k">async</span> <span class="f">jwt</span>({ token, user, account, trigger, session }) {
+
+  <span class="c">// ① Credentials — primer login</span>
+  <span class="k">if</span> (user && account?.provider === <span class="s">"credentials"</span>) {
+    token.backendToken = user.backendToken
+    token.perfilCompleto = user.perfilCompleto  <span class="c">// viene del backend /auth/login</span>
+  }
+
+  <span class="c">// ② Google OAuth — primer login (account presente solo en 1ª vez)</span>
+  <span class="k">if</span> (user && account?.provider === <span class="s">"google"</span>) {
+    <span class="k">const</span> result = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">`${API_URL}/auth/google`</span>, { ... })
+    token.backendToken = result.token
+    token.perfilCompleto = result.perfilCompleto  <span class="c">// false si es nuevo, true si vuelve</span>
+  }
+
+  <span class="c">// ③ update() desde cliente — actualiza perfilCompleto sin re-login</span>
+  <span class="k">if</span> (trigger === <span class="s">"update"</span> && session?.perfilCompleto !== <span class="k">undefined</span>) {
+    token.perfilCompleto = session.perfilCompleto
+  }
+
+  <span class="k">return</span> token
+}</pre>
+
+  <div class="callout info">
+    <strong>¿Por qué fetch() en el callback jwt?</strong><br/>
+    El callback <code>jwt</code> corre en Node.js (servidor). No en el navegador. Por eso se puede
+    llamar al backend con <code>fetch()</code> directamente. El resultado queda guardado en el JWT
+    encriptado de NextAuth y no vuelve a ejecutarse hasta que el token expira o se llama a <code>update()</code>.
+  </div>
+
+  <h2>6.2 — <span class="file-ref">app/completar-perfil/page.tsx</span></h2>
+
+  <p>Convertido de Client Component vacío a Server Component con triple lógica:</p>
+
+  <pre><span class="k">export default async function</span> <span class="f">PaginaCompletarPerfil</span>() {
+  <span class="k">const</span> session = <span class="k">await</span> <span class="f">getServerSession</span>(opcionesAuth)
+
+  <span class="k">if</span> (!session) <span class="f">redirect</span>(<span class="s">"/login"</span>)           <span class="c">// no autenticado</span>
+  <span class="k">if</span> (session.user.perfilCompleto) <span class="f">redirect</span>(<span class="s">"/home"</span>)  <span class="c">// ya completado</span>
+
+  <span class="k">return</span> &lt;<span class="t">FormularioCompletarPerfil</span> /&gt;             <span class="c">// primer acceso</span>
+}</pre>
+
+  <h2>6.3 — <span class="file-ref">features/auth/components/formularioCompletarPerfil.tsx</span></h2>
+
+  <p>El formulario ahora:</p>
+  <ol>
+    <li>Lee <code>session.user.backendToken</code> con <code>useSession()</code></li>
+    <li>Llama <code>authService.completarPerfil({ alergias, preferencias }, token)</code></li>
+    <li>Llama <code>update({ perfilCompleto: true })</code> para refrescar el JWT de NextAuth sin re-login</li>
+    <li>Navega a <code>/home</code></li>
+    <li>Muestra estado de carga y mensaje de error si falla</li>
+  </ol>
+
+  <h2>6.4 — <span class="file-ref">app/verificar-email/contenidoVerificacion.tsx</span></h2>
+
+  <div class="callout warn">
+    <strong>Mock reemplazado (decisión deliberada):</strong> El <code>setTimeout</code> era un placeholder
+    de diseño — mostraba "éxito" en 1.5s sin importar el token, pero <em>no verificaba nada en MongoDB</em>.
+    Para verificar de verdad en desarrollo ya existía <code>POST /dev/verificar-usuario</code>.<br/><br/>
+    El mock se ha reemplazado por la llamada real porque:
+    <ol style="margin:6px 0 0; padding-left:20px;">
+      <li>El backend <em>sí crea el token</em> en MongoDB al registrarse (aunque no envíe el email).</li>
+      <li>En dev se puede coger ese token de MongoDB Compass y visitar la URL → verifica de verdad.</li>
+      <li>El shortcut <code>POST /dev/verificar-usuario</code> sigue disponible para saltar el email completamente.</li>
+    </ol>
+    El envío real del email con Resend sigue siendo <strong>Fase 6</strong>. Lo que cambia es que la página
+    ya hace la llamada correcta al backend cuando el token llega por URL.
+  </div>
+
+  <pre><span class="c">// ANTES (mock)</span>
+<span class="k">const</span> id = <span class="f">setTimeout</span>(() => <span class="f">setEstado</span>(<span class="s">'exito'</span>), 1500)
+
+<span class="c">// DESPUÉS (real)</span>
+<span class="f">authService</span>
+  .<span class="f">verificarEmail</span>({ token })
+  .<span class="f">then</span>(() => <span class="f">setEstado</span>(<span class="s">'exito'</span>))
+  .<span class="f">catch</span>((err) => {
+    <span class="k">const</span> msg = err?.response?.data?.error
+    <span class="k">if</span> (msg) <span class="f">setMensajeError</span>(msg)
+    <span class="f">setEstado</span>(<span class="s">'error'</span>)
+  })</pre>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="sesion">7. Sesión NextAuth — cómo fluye <code>perfilCompleto</code></h1>
+
+  <div class="flow">
+    <div><span class="step">JWT de NextAuth (cookie HttpOnly)</span></div>
+    <div>&nbsp;</div>
+    <div><span class="f">sub</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← ID del usuario en MongoDB</div>
+    <div><span class="f">backendToken</span> ← JWT firmado por el backend Express (para llamadas a la API)</div>
+    <div><span class="f">rol</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← "usuario" | "admin"</div>
+    <div><span class="f">perfilCompleto</span> ← boolean — sincronizado con la BD</div>
+    <div>&nbsp;</div>
+    <div><span class="step">session.user (en componentes)</span></div>
+    <div>&nbsp;</div>
+    <div><span class="f">id</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← token.sub</div>
+    <div><span class="f">backendToken</span> &nbsp;← para adjuntar en Authorization: Bearer ...</div>
+    <div><span class="f">rol</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← para permisos de UI</div>
+    <div><span class="f">perfilCompleto</span> ← para el guard en /completar-perfil/page.tsx</div>
+  </div>
+
+  <h3>Flujo de update()</h3>
+  <p>NextAuth v4 no re-ejecuta el callback <code>jwt</code> en cada petición (el token se guarda en cookie
+  y se reutiliza hasta expirar). Para actualizar <code>perfilCompleto</code> sin que el usuario tenga
+  que cerrar y volver a abrir sesión, se usa:</p>
+
+  <pre><span class="c">// En el cliente (FormularioCompletarPerfil)</span>
+<span class="k">const</span> { data: session, <span class="f">update</span> } = <span class="f">useSession</span>()
+
+<span class="k">await</span> <span class="f">authService</span>.<span class="f">completarPerfil</span>({ alergias, preferencias }, session.user.backendToken)
+<span class="k">await</span> <span class="f">update</span>({ perfilCompleto: <span class="k">true</span> })  <span class="c">// ← dispara trigger:"update" en el callback jwt</span>
+router.<span class="f">push</span>(<span class="s">"/home"</span>)</pre>
+
+  <p>En el callback <code>jwt</code>, cuando <code>trigger === "update"</code>, el valor de <code>session.perfilCompleto</code>
+  se copia al token. En el siguiente <code>getServerSession()</code> ya aparece como <code>true</code>.</p>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="pendiente">8. Lo que sigue pendiente (Fase 6)</h1>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descripción</th>
+      <th>Archivo</th>
+    </tr>
+    <tr>
+      <td>AUTH-005 / Fase 6</td>
+      <td>Envío real de email de verificación con Resend (actualmente el token se crea en BD pero no se envía). El enlace debe ser <code>/verificar-email?token=xxx</code></td>
+      <td><span class="file-ref">backend/src/services/authService.ts → registrarse()</span></td>
+    </tr>
+    <tr>
+      <td>AUTH-008 / Fase 6</td>
+      <td>Envío real de email de recuperación de contraseña con Resend</td>
+      <td><span class="file-ref">backend/src/services/authService.ts → solicitarRecuperacion()</span></td>
+    </tr>
+    <tr>
+      <td>AUTH-004 / Fase 4</td>
+      <td>Enriquecer sesión con avatar y nombre desde el backend (actualmente solo vienen id, rol, backendToken, perfilCompleto)</td>
+      <td><span class="file-ref">frontend/src/lib/auth.ts → callback session</span></td>
+    </tr>
+    <tr>
+      <td>AUTH-005 / Fase 6</td>
+      <td>Proteger rutas autenticadas con <code>getServerSession</code> + redirect en layout de grupo <code>(autenticado)</code></td>
+      <td><span class="file-ref">frontend/src/app/(autenticado)/layout.tsx</span></td>
+    </tr>
+    <tr>
+      <td>foto (local)</td>
+      <td>El campo <code>foto</code> existe en el modelo pero los usuarios locales no tienen forma de subirla todavía. Pendiente de la pantalla de ajustes de perfil (Fase 4)</td>
+      <td>TBD — ajustes de perfil</td>
+    </tr>
+  </table>
+
+  <hr/>
+  <p class="meta">Generado: 2026-04-22 &nbsp;·&nbsp; AUTH-006 implementado &nbsp;·&nbsp; Cookr TFG</p>
+
+</body>
+</html>

@@ -55,4 +55,22 @@ export const authController = {
       manejarError(res, error);
     }
   },
+
+  async googleOAuth(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = await authService.iniciarSesionGoogle(req.body);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async completarPerfil(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = await authService.completarPerfil(req.usuario!.id, req.body);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
 };

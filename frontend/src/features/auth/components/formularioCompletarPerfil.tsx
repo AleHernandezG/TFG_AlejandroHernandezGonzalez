@@ -2,25 +2,39 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { SelectorChips } from "@/components/common/selectorChips";
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from "@/config/opcionesUsuario";
+import { authService } from "@/services/authService";
 
-/**
- * Formulario de onboarding post-registro.
- * El usuario selecciona sus alergias/intolerancias y preferencias de dieta.
- *
- * TODO [Fase 5]: antes del router.push, llamar a
- *   usuariosService.actualizarPerfil({ alergenos, dietas })
- */
 export function FormularioCompletarPerfil() {
   const router = useRouter();
+  const { data: session, update } = useSession();
   const [alergenos, setAlergenos] = useState<string[]>([]);
   const [dietas, setDietas] = useState<string[]>([]);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleListo = () => {
-    // TODO [Fase 5]: await usuariosService.actualizarPerfil({ alergenos, dietas })
-    router.push("/home");
+  const handleListo = async () => {
+    const token = session?.user?.backendToken;
+    if (!token) {
+      setError("Sesión no válida. Vuelve a iniciar sesión.");
+      return;
+    }
+
+    setCargando(true);
+    setError(null);
+
+    try {
+      await authService.completarPerfil({ alergias: alergenos, preferencias: dietas }, token);
+      // Actualizar el JWT de NextAuth para que perfilCompleto sea true
+      await update({ perfilCompleto: true });
+      router.push("/home");
+    } catch {
+      setError("No se pudo guardar tu perfil. Inténtalo de nuevo.");
+      setCargando(false);
+    }
   };
 
   return (
@@ -74,14 +88,18 @@ export function FormularioCompletarPerfil() {
 
         {/* Footer */}
         <div className="mt-auto flex flex-col gap-3">
+          {error && (
+            <p className="text-sm text-destructive text-center">{error}</p>
+          )}
           <p className="text-xs text-muted-foreground text-center">
             Puedes cambiar esto en cualquier momento desde Ajustes
           </p>
           <Button
             onClick={handleListo}
+            disabled={cargando}
             className="w-full rounded-full py-3 font-semibold text-base bg-brand text-brand-foreground hover:bg-brand/90 h-auto"
           >
-            Listo
+            {cargando ? "Guardando…" : "Listo"}
           </Button>
         </div>
 

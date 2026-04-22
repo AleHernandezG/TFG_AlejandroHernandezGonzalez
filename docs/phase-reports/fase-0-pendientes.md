@@ -7,28 +7,15 @@
 # ─────────────────────────────────────────────────────────────────────
 
 ## [SETUP-001] GitHub Actions — CI/CD básico
-Estado:   ⏳ Pendiente (aplazado, se trabaja en local)
-Cuándo:   Antes del primer deploy a Vercel (Fase 6 / Sprint 15)
+Estado:   ✅ Completado — Sprint 3 (cubierto por SETUP-008)
+Cuándo:   Sprint 3 — implementado junto al workflow completo CI + CD
 
-Qué hay que hacer:
-  1. Crear carpeta .github/workflows/ en la raíz del repo
-  2. Crear fichero ci.yml con este workflow:
-     - Trigger: push a main y develop, PR a main
-     - Job lint: npm ci → eslint → tsc --noEmit
-     - working-directory: frontend
-     - Node version: 20
-     - cache: npm con cache-dependency-path: frontend/package-lock.json
+Qué se hizo:
+  .github/workflows/ci-cd.yml — CI para FE (next lint + tsc --noEmit) y BE (tsc --noEmit)
+  en cada push a main/develop y PR a main. CD: deploy a Vercel + Render Deploy Hook
+  condicionado al CI. Branch protection en main activada. Secretos GitHub añadidos.
 
-  3. Añadir secretos en GitHub repo → Settings → Secrets:
-     - NEXTAUTH_SECRET
-     - NEXT_PUBLIC_API_URL (cuando el backend esté en Render/Railway)
-
-  4. Cuando el backend exista, añadir segundo job:
-     - working-directory: backend
-     - npm ci → npm run lint → npm test
-
-Commit esperado:
-  chore: añadir GitHub Actions CI — lint y type check
+  Ver: .github/workflows/ci-cd.yml
 
 ---
 

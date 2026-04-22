@@ -5,8 +5,15 @@ interface DatosCrearUsuario {
   nombre: string;
   correo: string;
   contrasena?: string;
+  foto?: string;
+  cuentaVerificada?: boolean;
   proveedor: "local" | "google";
   googleId?: string;
+}
+
+interface DatosCompletarPerfil {
+  alergias: string[];
+  preferencias: string[];
 }
 
 export const usuarioRepository = {
@@ -15,6 +22,9 @@ export const usuarioRepository = {
 
   buscarPorCorreo: (correo: string): Promise<IUsuarioDoc | null> =>
     Usuario.findOne({ correo }),
+
+  buscarPorGoogleId: (googleId: string): Promise<IUsuarioDoc | null> =>
+    Usuario.findOne({ googleId }),
 
   buscarPorCorreoConContrasena: (correo: string): Promise<IUsuarioDoc | null> =>
     Usuario.findOne({ correo }).select("+contrasena"),
@@ -30,6 +40,26 @@ export const usuarioRepository = {
 
   actualizarContrasena: (id: string, contrasenaHash: string): Promise<IUsuarioDoc | null> =>
     Usuario.findByIdAndUpdate(id, { contrasena: contrasenaHash }, { new: true }),
+
+  vincularGoogle: (
+    id: string,
+    datos: { googleId: string; foto?: string },
+  ): Promise<IUsuarioDoc | null> =>
+    Usuario.findByIdAndUpdate(
+      id,
+      {
+        googleId: datos.googleId,
+        ...(datos.foto ? { foto: datos.foto } : {}),
+      },
+      { new: true },
+    ),
+
+  completarPerfil: (id: string, datos: DatosCompletarPerfil): Promise<IUsuarioDoc | null> =>
+    Usuario.findByIdAndUpdate(
+      id,
+      { alergias: datos.alergias, preferencias: datos.preferencias, perfilCompleto: true },
+      { new: true },
+    ),
 };
 
 export type { IUsuario };

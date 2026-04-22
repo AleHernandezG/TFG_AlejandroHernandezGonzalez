@@ -21,7 +21,7 @@ export default function PaginaLogin() {
     <div className="relative flex min-h-screen">
       {/* ── Imagen de fondo a pantalla completa ── */}
       <Image
-        src="/images/fondo-auth.jpg"
+        src="/images/fondo-auth.webp"
         alt=""
         fill
         priority

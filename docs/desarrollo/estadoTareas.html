@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Generado: 2026-04-17 · Sprint 2 activo (Mar 30 → Abr 12) · Fase 2 de 7</div>
+    <div class="meta">Actualizado: 2026-04-22 · Sprint 3 activo · Fase 3 de 7</div>
   </div>
 </header>
 
@@ -97,10 +97,10 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">6</div><div class="label">Urgencia alta</div></div>
+    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">19</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">43</div><div class="label">Completadas</div></div>
+    <div class="counter baja"><div class="num">17</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">46</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -345,10 +345,10 @@
           <td class="id">DOCS-002</td>
           <td class="desc">
             <strong>Revisar phase-reports/ y changes/ — renombrar archivos de pendientes a completados</strong>
-            <small>Revisar todos los archivos en docs/phase-reports/ y docs/changes/ y renombrar los que ya estén completados de "-pendientes.md" a "-completados.md" (o equivalente). Mantiene el historial del proyecto coherente con el estado real.</small>
+            <small>fase-1-sprint-1-carrousel-pendientes.md → carrousel-completados.md (git mv). AUTH-001/002/003 y LANDING-001 actualizados a ✅ en fase-1-completados.md. fase-0 y fase-2 conservan "-pendientes" porque aún tienen tareas Fase 6 y DET-series pendientes.</small>
             <span class="source">📄 docs/phase-reports/ · docs/changes/</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -769,20 +769,20 @@
           <td class="id">DEV-002</td>
           <td class="desc">
             <strong>Script keep-alive para Render — activación manual antes de demos</strong>
-            <small>Crear scripts/keep-alive.sh. Hace ping a GET /api/health cada 4 min para evitar el cold start del free tier (~30-60 s). Requisitos: (1) activación 100% manual, nunca desde CI/CD; (2) duración máxima 2 h — el script se detiene solo y avisa; (3) lee RENDER_APP_URL o valor por defecto editable en el script; (4) muestra timestamp + status HTTP en cada ping; (5) avisa si el status ≠ 200 sin romper el bucle; (6) mensaje de inicio con hora de expiración y Ctrl+C para detener. Uso: bash scripts/keep-alive.sh · o con URL: RENDER_APP_URL=https://cookr-api.onrender.com bash scripts/keep-alive.sh. El endpoint GET /api/health ya existe en el backend.</small>
-            <span class="source">📄 docs/infraestructura.md §7 · docs/phase-reports/fase-0-pendientes.md SETUP-006 · backend/src/app.ts</span>
+            <small>scripts/keep-alive.sh creado y completo: ping cada 4 min, duración máxima 2 h con auto-stop, timestamp + status HTTP en cada ping, banner de inicio, Ctrl+C limpio. La URL DEFAULT_URL tiene el placeholder {nombre-servicio} — editar cuando se cree el servicio en Render. Activación 100% manual.</small>
+            <span class="source">📄 scripts/keep-alive.sh · backend/src/app.ts</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6 / antes de demos</span></td>
+          <td><span class="status done">✅ Script listo · URL Render pendiente de Fase 6</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
           <td class="id">SETUP-001</td>
           <td class="desc">
             <strong>GitHub Actions — CI/CD (lint + typecheck automático)</strong>
-            <small>Configurar el workflow que ejecuta lint y tsc en cada push a main. No es urgente mientras se trabaja en local.</small>
-            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+            <small>.github/workflows/ci-cd.yml implementado en Sprint 3 (SETUP-008): CI para FE (next lint + tsc --noEmit) y BE (tsc --noEmit) en push a main/develop y PR a main. CD: deploy a Vercel + Render Deploy Hook en push a main. Branch protection en main activada.</small>
+            <span class="source">📄 .github/workflows/ci-cd.yml · SETUP-008</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3 (cubierto por SETUP-008)</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -829,10 +829,10 @@
           <td class="id">API-002</td>
           <td class="desc">
             <strong>Configurar CORS en el backend para producción</strong>
-            <small>En producción el backend solo acepta peticiones desde cookr.vercel.app. En desarrollo acepta localhost:3000. Hay que configurarlo en backend/src/app.js al hacer el deploy.</small>
-            <span class="source">📄 docs/changes/api-changes.md</span>
+            <small>Código ya implementado: backend/src/app.ts usa cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:3000" }). En Fase 6 solo hay que añadir FRONTEND_URL=https://cookr.vercel.app en las variables de entorno de Render.</small>
+            <span class="source">📄 backend/src/app.ts</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="status review">👁️ Código listo · env var FRONTEND_URL pendiente de Fase 6</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
       </tbody>

@@ -9,6 +9,7 @@ export interface RespuestaLogin {
     foto?: string;
     rol: string;
   };
+  perfilCompleto: boolean;
 }
 
 export const authService = {
@@ -60,6 +61,18 @@ export const authService = {
     const { data } = await apiClient.post<{ mensaje: string }>(
       "/auth/verificar-email",
       datos,
+    );
+    return data;
+  },
+
+  async completarPerfil(
+    datos: { alergias: string[]; preferencias: string[] },
+    token: string,
+  ): Promise<{ mensaje: string }> {
+    const { data } = await apiClient.post<{ mensaje: string }>(
+      "/auth/completar-perfil",
+      datos,
+      { headers: { Authorization: `Bearer ${token}` } },
     );
     return data;
   },

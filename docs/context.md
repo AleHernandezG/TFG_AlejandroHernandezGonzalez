@@ -28,7 +28,7 @@
 - ✅ [UI-002] Paleta de colores Cookr completa: oklch + CSS vars + Tailwind tokens, 0 colores hardcodeados
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
 - ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
-- ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (mock, Fase 6 para Resend real)
+- ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (conectado al backend; envío real de email pendiente Fase 6 con Resend — en dev usar POST /dev/verificar-usuario)
 - ✅ [UI-006] Login (/login) — TFG-16: layout split-screen espejado (form izquierda, imagen derecha), FormularioLogin con RHF + Zod, enlace "¿Olvidaste tu contraseña?", reutiliza BotonGoogle y DivisorOAuth
 - ✅ [UI-007] Flujo recuperación de contraseña (3 vistas mock):
   - /recuperar-contrasena: layout igual que /login, solo campo email
@@ -216,8 +216,8 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/recuperar-contrasena` | Solicitar recuperación (email) | ✅ |
 | `/recuperar-contrasena/pendiente` | Confirmar envío de correo | ✅ |
 | `/nueva-contrasena` | Establecer nueva contraseña | ✅ |
-| `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ mock |
-| `/verificar-email` | Verificación de token por enlace | ✅ mock |
+| `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ UI real (envío email: Fase 6) |
+| `/verificar-email` | Verificación de token por enlace — llama POST /api/auth/verificar-email | ✅ conectado |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
 | `/home` | Home / Feed de recetas — mobile + PC responsive | ✅ Aprobado autor |
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |

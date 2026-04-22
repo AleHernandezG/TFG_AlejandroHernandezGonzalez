@@ -34,6 +34,10 @@ const usuarioSchema = new Schema<IUsuarioDoc>({
     type: Boolean,
     default: false,
   },
+  perfilCompleto: {
+    type: Boolean,
+    default: false,
+  },
   proveedor: {
     type: String,
     enum: ["local", "google"],

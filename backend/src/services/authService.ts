@@ -97,6 +97,7 @@ export const authService = {
         foto: usuario.foto,
         rol: usuario.rol,
       },
+      perfilCompleto: usuario.perfilCompleto,
     };
   },
 
@@ -184,5 +185,62 @@ export const authService = {
       mensaje:
         "Contraseña actualizada correctamente. Ya puedes iniciar sesión.",
     };
+  },
+
+  async iniciarSesionGoogle(datos: {
+    googleId: string;
+    correo: string;
+    nombre: string;
+    foto?: string;
+  }) {
+    // Buscar primero por googleId (usuario ya vinculado), luego por correo (cuenta local preexistente)
+    let usuario =
+      await usuarioRepository.buscarPorGoogleId(datos.googleId) ??
+      await usuarioRepository.buscarPorCorreo(datos.correo);
+
+    if (!usuario) {
+      usuario = await usuarioRepository.crear({
+        nombre: datos.nombre,
+        correo: datos.correo,
+        foto: datos.foto,
+        proveedor: "google",
+        googleId: datos.googleId,
+        cuentaVerificada: true,
+      });
+    } else if (!usuario.googleId) {
+      // Cuenta local que usa el mismo correo → vincular googleId y foto si no tenía
+      usuario = (await usuarioRepository.vincularGoogle(
+        (usuario._id as Types.ObjectId).toString(),
+        { googleId: datos.googleId, ...(datos.foto && !usuario.foto ? { foto: datos.foto } : {}) },
+      ))!;
+    }
+
+    const token = firmarToken({
+      id: (usuario._id as Types.ObjectId).toString(),
+      correo: usuario.correo,
+      rol: usuario.rol,
+    });
+
+    return {
+      token,
+      usuario: {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        foto: usuario.foto,
+        rol: usuario.rol,
+      },
+      perfilCompleto: usuario.perfilCompleto,
+    };
+  },
+
+  async completarPerfil(userId: string, datos: { alergias: string[]; preferencias: string[] }) {
+    const usuario = await usuarioRepository.completarPerfil(userId, datos);
+    if (!usuario) {
+      const error = new Error("Usuario no encontrado") as Error & { status: number };
+      error.status = 404;
+      throw error;
+    }
+    return { mensaje: "Perfil completado correctamente." };
   },
 };

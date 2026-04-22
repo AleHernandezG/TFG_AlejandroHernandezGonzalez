@@ -39,57 +39,48 @@ Qué se hizo:
 
 ---
 
-## [AUTH-001] Cambiar callbackUrl en BotonGoogle de "/" a "/feed"
+## [AUTH-001] Cambiar callbackUrl en BotonGoogle de "/" a "/home"
 
-Estado: ⏳ Pendiente — aplazado a Fase 2
-Cuándo: Fase 2 — cuando exista la ruta /feed
+Estado: ✅ Completado — Sprint 2
+Cuándo: Sprint 2 — al implementar /home como ruta principal post-login
 
-Qué hay que hacer:
-En `src/features/auth/components/botonGoogle.tsx`:
+Qué se hizo:
 
-- Cambiar el valor por defecto del prop urlRetorno de "/" a "/feed"
-- También cambiar la llamada en formularioRegistro.tsx y formularioLogin.tsx si pasan urlRetorno
-  explícitamente (si usan el valor por defecto, basta con cambiar el componente)
-
-Nota: la ruta /feed no existe hasta Fase 2. Si se cambia antes creará un 404 al autenticarse.
+- `urlRetorno` en `botonGoogle.tsx` ya apuntaba a `/home` al revisar. Comentario JSDoc actualizado para reflejar el valor real.
+- La ruta /home existe desde Sprint 2 FE.
 
 ---
 
 ## [AUTH-002] Conectar formularioRegistro con backend
 
-Estado: ⏳ Pendiente — aplazado a Fase 4
-Cuándo: Fase 4 — cuando el backend esté implementado
+Estado: ✅ Completado — Sprint 2 FE
+Cuándo: Sprint 2 FE — backend implementado en Sprint 2 BE
 
-Qué hay que hacer:
-En `src/features/auth/components/formularioRegistro.tsx` (función alEnviar):
+Qué se hizo:
 
-- Sustituir el mock (setTimeout + setEstadoEnvio("exito")) por:
-  await axios.post("/api/usuarios/registro", datos)
-- Manejar errores de red (409 correo ya existe, 422 validación backend, 500 error servidor)
-- Mostrar mensaje de error específico en el banner rojo según el código de respuesta
+- `formularioRegistro.tsx` conectado a `authService.registro()` → `POST /api/auth/registro`
+- Manejo de error 409 (correo ya registrado) con mensaje en banner rojo
+- `authService.ts` creado en `frontend/src/services/authService.ts` (API-011)
 
 ---
 
 ## [AUTH-003] Añadir CredentialsProvider a NextAuth
 
-Estado: ⏳ Pendiente — aplazado a Fase 4
-Cuándo: Fase 4 — cuando el backend esté implementado
+Estado: ✅ Completado — Sprint 2 FE
+Cuándo: Sprint 2 FE — backend de login implementado en Sprint 2 BE
 
-Qué hay que hacer:
-En `src/lib/auth.ts`:
+Qué se hizo:
 
-- Importar CredentialsProvider de "next-auth/providers/credentials"
-- Añadir al array providers junto a GoogleProvider
-- authorize() debe llamar al backend: POST /api/auth/login con email y password
-- Devolver null si las credenciales son inválidas (NextAuth mostrará error de login)
-- Devolver el objeto usuario si las credenciales son válidas
+- `CredentialsProvider` añadido a `src/lib/auth.ts` junto a `GoogleProvider`
+- `authorize()` llama a `POST /api/auth/login`; maneja 401 (credenciales inválidas) y 403 (cuenta no verificada)
+- `formularioLogin.tsx` usa `signIn("credentials")` de NextAuth
 
 ---
 
 ## [AUTH-005] Proteger rutas autenticadas con getServerSession + redirect
 
-Estado: ⏳ Pendiente — aplazado a Fase 2
-Cuándo: Fase 2 — cuando exista la ruta /feed y otras rutas protegidas
+Estado: ⏳ Aplazado — Fase 6 (antes del deploy)
+Cuándo: Fase 6 — aplazado intencionalmente durante desarrollo para no requerir auth al revisar vistas
 
 Qué hay que hacer:
 
@@ -162,15 +153,15 @@ feat(auth): añadir imagen de fondo gastronómica a páginas registro y login
 
 ## [LANDING-001] Configuración Real del Carrusel de Imágenes
 
-Estado: ⏳ Pendiente (funciona con fondo y emojis temporalmente)
-Cuándo: Sprint 2 o cuando se integren assets reales (Fase 2 / Frontend UI)
+Estado: ✅ Completado — Sprint 3
+Cuándo: Sprint 3 — implementado junto a CAROUSEL-001/002/003
 
-Qué hay que hacer:
+Qué se hizo:
 
-1. Sustituir los placeholders de colores/emojis (`gradient`, `emoji`) en `heroSlides` de `src/features/landing/data/landing-data.ts` por URLs de imágenes reales o conectarlo a una API / CDN.
-2. Implementar un componente `Image` de `next/image` en `src/features/landing/components/hero-section.tsx` dentro del bucle del carrusel, con propiedades `fill`, `objectFit="cover"`, `priority` (para la primera imagen) para optimización SEO y LCP.
-3. Asegurarse de que las transiciones de opacidad (fade) de Framer Motion o CSS sigan funcionando correctamente con las imágenes.
-4. Revisar la accesibilidad (alt text) de las imágenes.
+- 4 fotografías WebP reales en `public/images/hero/` (desayuno, ensalada, postre, pasta)
+- `imageUrl: string` añadido a la interfaz `SlideHero` en `datosLanding.ts`; campo `emoji` eliminado
+- `next/image fill` con `sizes="100vw"` y `priority` en el primer slide
+- Transición T1 Crossfade (fundido opacidad, patrón Airbnb/Apple) — `AnimatePresence mode="popLayout"`, duration 1.2 s
+- `aria-live="polite"` + `aria-label` en puntos indicadores (CAROUSEL-003)
 
-Commit esperado:
-feat(landing): implementar imágenes reales en carrusel de hero section
+Ver: `docs/phase-reports/fase-1-sprint-1-carrousel-completados.md`

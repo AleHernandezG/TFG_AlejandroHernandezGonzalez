@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle, Loader2, ChefHat } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { authService } from '@/services/authService'
 
 type EstadoVerificacion = 'verificando' | 'exito' | 'error'
 
@@ -14,24 +15,26 @@ type Props = {
   token: string | null
 }
 
-/**
- * Client Component de verificación de email.
- * Recibe el token como prop desde el Server Component (page.tsx),
- * evitando useSearchParams() y el error de Suspense boundary.
- * Ver: docs/desarrollo/iniciar.html §11.5
- *
- * TODO [AUTH-006] Fase 4: llamar a POST /api/auth/verificar-email con el token.
- */
 export function ContenidoVerificacion({ token }: Props) {
   const [estado, setEstado] = useState<EstadoVerificacion>('verificando')
+  const [mensajeError, setMensajeError] = useState<string>(
+    'El enlace de verificación no es válido o ha expirado. Los enlaces son válidos durante 24 horas.'
+  )
 
   useEffect(() => {
     if (!token) {
       setEstado('error')
       return
     }
-    const id = setTimeout(() => setEstado('exito'), 1500)
-    return () => clearTimeout(id)
+
+    authService
+      .verificarEmail({ token })
+      .then(() => setEstado('exito'))
+      .catch((err) => {
+        const msg = err?.response?.data?.error
+        if (msg) setMensajeError(msg)
+        setEstado('error')
+      })
   }, [token])
 
   return (
@@ -79,8 +82,7 @@ export function ContenidoVerificacion({ token }: Props) {
                 <div className="space-y-1.5">
                   <h1 className="text-2xl font-bold tracking-tight">¡Correo verificado!</h1>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Tu cuenta está activa. Ya puedes iniciar sesión y descubrir recetas con la
-                    comunidad Cookr.
+                    Tu cuenta está activa. Ya puedes iniciar sesión y completar tu perfil.
                   </p>
                 </div>
                 <Button asChild className="w-full bg-brand text-brand-foreground hover:bg-brand/90">
@@ -101,8 +103,7 @@ export function ContenidoVerificacion({ token }: Props) {
                 <div className="space-y-1.5">
                   <h1 className="text-2xl font-bold tracking-tight">Enlace no válido</h1>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    El enlace de verificación no es válido o ha expirado. Los enlaces son válidos
-                    durante 24 horas.
+                    {mensajeError}
                   </p>
                 </div>
                 <div className="flex w-full flex-col gap-2">

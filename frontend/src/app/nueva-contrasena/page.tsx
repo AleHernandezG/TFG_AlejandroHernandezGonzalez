@@ -31,7 +31,7 @@ export default function PaginaNuevaContrasena({ searchParams }: Props) {
       {/* ── Panel izquierdo — imagen (solo ≥ lg) ─────────────────────── */}
       <div className="relative hidden lg:block lg:w-1/2 xl:w-3/5">
         <Image
-          src="/images/fondo-auth.jpg"
+          src="/images/fondo-auth.webp"
           alt=""
           fill
           priority

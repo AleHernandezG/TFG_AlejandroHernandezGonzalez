@@ -6,6 +6,26 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-023] — Asset: fondo-auth.jpg → fondo-auth.webp ✅
+
+Fecha: 2026-04-22 | Estado: ✅ Completado | Sprint: 3
+
+**Ficheros modificados:**
+`app/registro/page.tsx` · `app/login/page.tsx` · `app/recuperar-contrasena/page.tsx` · `app/nueva-contrasena/page.tsx`
+
+**Asset renombrado:**
+`public/images/fondo-auth.jpg` → `public/images/fondo-auth.webp`
+
+### Razón del cambio
+
+La imagen de fondo de las páginas de autenticación se convirtió a WebP para mantener coherencia con el resto de assets del proyecto (las imágenes del hero ya son `.webp`). WebP ofrece mejor compresión que JPEG sin pérdida visible de calidad.
+
+### Alcance
+
+Sustitución de la referencia `src="/images/fondo-auth.jpg"` por `src="/images/fondo-auth.webp"` en las 4 páginas que usan el asset. Sin cambios en layout ni estilos.
+
+---
+
 ## [UI-022] — Auth: fondo imagen completo + rediseño panel de marca ✅
 
 Fecha: 2026-04-21 | Estado: ✅ Completado | Sprint: 3

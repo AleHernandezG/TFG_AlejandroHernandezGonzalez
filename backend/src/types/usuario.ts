@@ -5,6 +5,7 @@ export interface IUsuario {
   foto?: string;
   rol: "usuario" | "admin";
   cuentaVerificada: boolean;
+  perfilCompleto: boolean;
   proveedor: "local" | "google";
   googleId?: string;
   alergias: string[];

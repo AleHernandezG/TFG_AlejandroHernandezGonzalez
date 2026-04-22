@@ -82,7 +82,7 @@ export function FormularioLogin() {
     });
 
     if (resultado?.ok) {
-      router.push("/home");
+      router.push("/completar-perfil");
       return;
     }
 
