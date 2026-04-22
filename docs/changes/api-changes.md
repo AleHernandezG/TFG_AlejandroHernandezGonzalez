@@ -73,7 +73,7 @@ Fecha:   2026-03-29 | Estado: ⏳ Pendiente | Afecta: BE | Sprint: 2
 
   POST /api/auth/recuperar-contrasena
   Body: { correo }
-  Lógica: buscar usuario → generar token JWT 1h → guardar en Token → Resend en Fase 6
+  Lógica: buscar usuario → generar token hex 1h → guardar en Token → enviar email vía Gmail SMTP (EMAIL-001)
   Response 200: { mensaje: "Si el correo existe recibirás un enlace" }
 
 ---
@@ -196,3 +196,36 @@ Pasos en Fase 6 (un único día):
 
 Motivo: Google OAuth exige que NEXTAUTH_URL coincida exactamente
         con la URI registrada — cualquier diferencia rompe el login
+
+---
+
+## [EMAIL-001] Integración Nodemailer + Gmail SMTP — eliminación rutas dev
+Fecha:   2026-04-22 | Estado: ✅ Completado | Afecta: BE | Sprint: 3 (Fase 6 adelantada)
+
+Cambio:
+  Sustituidos los 2 TODO [Fase 6] de authService.ts por llamadas reales a Gmail SMTP vía Nodemailer.
+  Eliminadas todas las rutas y código temporal de desarrollo.
+
+Archivos creados:
+  backend/src/lib/email.ts          → transporter Nodemailer + enviarEmailVerificacion() + enviarEmailRecuperacion() + plantillas HTML
+
+Archivos modificados:
+  backend/src/services/authService.ts  → reemplaza TODO en registrarse() y solicitarRecuperacion()
+  backend/src/app.ts                   → eliminados import devRoutes y bloque condicional NODE_ENV=development
+  backend/.env.example                 → sustituye RESEND_API_KEY por GMAIL_USER + GMAIL_APP_PASSWORD
+
+Archivos eliminados:
+  backend/src/routes/dev.routes.ts     → ruta temporal POST /api/dev/verificar-usuario
+
+Variables de entorno nuevas:
+  GMAIL_USER          → cuenta Gmail desde la que se envían los emails
+  GMAIL_APP_PASSWORD  → contraseña de aplicación de 16 caracteres (no la contraseña normal de Gmail)
+
+Política de errores:
+  Si Gmail SMTP falla → se loguea el error pero no se hace throw.
+  El usuario ya existe en DB y puede solicitar reenvío desde /verificar-email/pendiente.
+  (Endpoint POST /api/auth/verificar-email/reenviar pendiente de implementar.)
+
+Motivo: EMAIL-001 — activar el flujo completo de email sin depender de Resend/dominio propio.
+        Gmail SMTP funciona en dev y prod sin configuración extra. Límite ~500 emails/día,
+        suficiente para el TFG. Si el volumen crece, migrar a Resend con dominio verificado.

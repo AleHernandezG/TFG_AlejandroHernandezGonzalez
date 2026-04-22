@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMAIL-001 — Gmail SMTP Integration · Cookr Backend</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: #2e2e2e;
+      --text: #e8e8e8;
+      --muted: #888;
+      --brand: #c47c1a;
+      --brand-soft: #f5e6c8;
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --blue: #60a5fa;
+      --code-bg: #141414;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.7; padding: 40px 20px 80px; }
+    .container { max-width: 860px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 40px; }
+    .badge { display: inline-block; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; }
+    h1 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .meta { font-size: 13px; color: var(--muted); }
+    h2 { font-size: 18px; font-weight: 700; color: var(--brand-soft); margin: 40px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 24px 0 8px; }
+    p { color: #ccc; margin-bottom: 12px; }
+    ul, ol { padding-left: 20px; color: #ccc; margin-bottom: 12px; }
+    li { margin-bottom: 6px; }
+    code { background: var(--code-bg); border: 1px solid var(--border); color: var(--brand-soft); padding: 1px 6px; border-radius: 4px; font-size: 13px; font-family: 'Cascadia Code', 'Fira Code', monospace; }
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; overflow-x: auto; margin-bottom: 16px; }
+    pre code { background: none; border: none; padding: 0; font-size: 13px; color: #d4d4d4; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+    th { background: var(--surface2); color: var(--brand-soft); font-weight: 600; text-align: left; padding: 10px 14px; border: 1px solid var(--border); }
+    td { padding: 9px 14px; border: 1px solid var(--border); color: #ccc; vertical-align: top; }
+    tr:nth-child(even) td { background: var(--surface); }
+    .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .04em; }
+    .tag-new { background: #166534; color: #86efac; }
+    .tag-mod { background: #1e3a5f; color: #93c5fd; }
+    .tag-del { background: #7f1d1d; color: #fca5a5; }
+    .tag-inst { background: #3b2800; color: #fcd34d; }
+    .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 20px; }
+    .flow-step { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-size: 13px; color: #ccc; }
+    .flow-arrow { color: var(--muted); font-size: 16px; }
+    .warning { background: #2d1f00; border: 1px solid #7c5300; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; color: #fcd34d; font-size: 14px; }
+    .info { background: #0c1e35; border: 1px solid #1e3a5f; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; color: #93c5fd; font-size: 14px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">EMAIL-001</div>
+    <h1>Gmail SMTP — Integración Nodemailer</h1>
+    <div class="meta">Fecha: 2026-04-22 &nbsp;·&nbsp; Sprint 3 BE &nbsp;·&nbsp; Fase 6 (email)</div>
+  </header>
+
+  <!-- ── 1. Resumen ── -->
+  <h2>1. Resumen de cambios</h2>
+  <p>
+    Se integró Nodemailer con Gmail SMTP para enviar emails de verificación de cuenta y recuperación de contraseña.
+    Se eliminaron todas las rutas y código temporal de desarrollo que existían mientras el email no estaba operativo.
+  </p>
+  <table>
+    <thead><tr><th>Acción</th><th>Archivo</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag tag-inst">instalar</span></td><td><code>nodemailer</code>, <code>@types/nodemailer</code></td><td>Dependencia y tipos en <code>/backend</code></td></tr>
+      <tr><td><span class="tag tag-new">crear</span></td><td><code>backend/src/lib/email.ts</code></td><td>Transporter + funciones <code>enviarEmailVerificacion</code> y <code>enviarEmailRecuperacion</code> + plantillas HTML</td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/services/authService.ts</code></td><td>Sustituye los 2 <code>TODO [Fase 6]</code> por llamadas a <code>lib/email.ts</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/app.ts</code></td><td>Elimina import <code>devRoutes</code> y el bloque condicional <code>NODE_ENV=development</code></td></tr>
+      <tr><td><span class="tag tag-del">eliminar</span></td><td><code>backend/src/routes/dev.routes.ts</code></td><td>Ruta temporal <code>POST /api/dev/verificar-usuario</code> ya no necesaria</td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/.env.example</code></td><td>Añade <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 2. Flujo verificación ── -->
+  <h2>2. Flujo — Verificación de cuenta</h2>
+  <div class="flow">
+    <div class="flow-step">Usuario se registra</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>POST /api/auth/registro</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Se crea usuario en MongoDB</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Se crea token <code>tipo:verificacion</code> (24h TTL)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>enviarEmailVerificacion()</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Email llega con enlace <code>/verificar-email?token=xxx</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Usuario hace clic</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>POST /api/auth/verificar-email</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>cuentaVerificada=true</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Puede iniciar sesión</div>
+  </div>
+  <p>
+    Si Gmail SMTP falla, el error se loguea pero <strong>no se hace throw</strong>: el usuario ya está creado en DB y el token existe en MongoDB.
+    Puede solicitar un reenvío desde <code>/verificar-email/pendiente</code> (endpoint de reenvío pendiente de implementar).
+  </p>
+
+  <!-- ── 3. Flujo recuperación ── -->
+  <h2>3. Flujo — Recuperación de contraseña</h2>
+  <div class="flow">
+    <div class="flow-step">Usuario solicita recuperación</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>POST /api/auth/recuperar-contrasena</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Se crea token <code>tipo:recuperacion</code> (1h TTL)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>enviarEmailRecuperacion()</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Email con enlace <code>/nueva-contrasena?token=xxx</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Usuario establece nueva contraseña</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><code>POST /api/auth/nueva-contrasena</code></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Token invalidado en DB</div>
+  </div>
+  <p>
+    La respuesta de <code>/recuperar-contrasena</code> es siempre genérica ("Si existe una cuenta con ese correo…") para no revelar si el correo está registrado.
+  </p>
+
+  <!-- ── 4. Variables de entorno ── -->
+  <h2>4. Variables de entorno</h2>
+  <table>
+    <thead><tr><th>Variable</th><th>Dev</th><th>Prod (Render)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>GMAIL_USER</code></td>
+        <td>Tu cuenta Gmail personal</td>
+        <td>La misma o una cuenta dedicada <code>noreply@…</code></td>
+      </tr>
+      <tr>
+        <td><code>GMAIL_APP_PASSWORD</code></td>
+        <td>Contraseña de aplicación de 16 caracteres</td>
+        <td>La misma o una nueva contraseña de aplicación</td>
+      </tr>
+      <tr>
+        <td><code>FRONTEND_URL</code></td>
+        <td><code>http://localhost:3000</code></td>
+        <td>URL de Vercel del TFG (ya configurada)</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="warning">
+    ⚠️ <strong>Nunca uses tu contraseña normal de Gmail.</strong> Debes crear una <em>Contraseña de aplicación</em> específica desde la configuración de seguridad de Google.
+  </div>
+
+  <!-- ── 5. Configuración Gmail SMTP ── -->
+  <h2>5. Configuración Gmail SMTP — paso a paso</h2>
+  <ol>
+    <li>Abre tu cuenta de Gmail y ve a <strong>Gestionar tu cuenta de Google</strong>.</li>
+    <li>Navega a <strong>Seguridad</strong> y activa <strong>Verificación en 2 pasos</strong> si no está activa.</li>
+    <li>Con la verificación en 2 pasos activa, aparece la opción <strong>Contraseñas de aplicación</strong> en la misma sección.</li>
+    <li>Crea una nueva contraseña de aplicación para la categoría <em>"Correo"</em>.</li>
+    <li>Copia los 16 caracteres generados (con o sin espacios, ambos funcionan).</li>
+    <li>En <code>backend/.env</code>, añade:
+      <pre><code>GMAIL_USER=tucuenta@gmail.com
+GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx</code></pre>
+    </li>
+    <li>Reinicia el backend.</li>
+  </ol>
+
+  <!-- ── 6. Límites y producción ── -->
+  <h2>6. Límites Gmail y consideraciones para producción</h2>
+  <table>
+    <thead><tr><th>Aspecto</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td>Límite diario</td><td>~500 emails/día por cuenta Gmail. Suficiente para un TFG.</td></tr>
+      <tr><td>Entregabilidad</td><td>Gmail tiene buena reputación de dominio. Los emails llegan a bandeja de entrada en la mayoría de clientes.</td></tr>
+      <tr><td>Sin dominio propio</td><td>Funciona con cuenta <code>@gmail.com</code>. No requiere DNS, SPF, DKIM propios.</td></tr>
+      <tr><td>Para producción real</td><td>Si el volumen crece, migrar a Resend / SendGrid con dominio verificado para mejor entregabilidad y sin límites.</td></tr>
+      <tr><td>Cuenta dedicada</td><td>Recomendable usar una cuenta Gmail separada solo para Cookr en producción (<code>noreply.cookr@gmail.com</code>).</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 7. Limitaciones conocidas ── -->
+  <h2>7. Limitaciones conocidas</h2>
+  <div class="info">
+    ℹ️ <strong>Endpoint de reenvío pendiente:</strong> Las páginas <code>/verificar-email/pendiente</code> y <code>/recuperar-contrasena/pendiente</code>
+    muestran un botón de reenvío, pero el endpoint <code>POST /api/auth/verificar-email/reenviar</code> no existe todavía.
+    Implementación futura: buscar usuario por correo → invalidar token viejo → crear token nuevo → enviar email.
+  </div>
+  <ul>
+    <li>El envío de email es <strong>best-effort</strong>: si Gmail falla, el usuario ya está creado en DB pero no recibirá el email. Debe usar la UI de reenvío (pendiente).</li>
+    <li>Las plantillas usan inline CSS — compatibles con Gmail, Outlook, Apple Mail. No soportan CSS externo ni variables CSS.</li>
+    <li>El color <code>#c47c1a</code> del botón CTA es una aproximación al <code>--brand</code> de la app en oklch (los clientes de email no soportan oklch).</li>
+  </ul>
+
+  <!-- ── 8. Arquitectura ── -->
+  <h2>8. Capas — dónde vive la lógica</h2>
+  <pre><code>authController.ts          ← recibe la request HTTP
+  └── authService.ts         ← lógica de negocio: crea usuario/token, llama a lib/email
+        └── lib/email.ts     ← infraestructura: transporter Nodemailer + plantillas HTML</code></pre>
+  <p>
+    El controller nunca llama directamente a Gmail SMTP. Sigue el patrón de capas del proyecto:
+    <code>controller → service → lib</code>.
+  </p>
+
+</div>
+</body>
+</html>

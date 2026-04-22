@@ -126,7 +126,7 @@ backend/src/
 ├── types/                 # Interfaces de dominio puras (sin acoplamiento a Mongoose)
 │   ├── usuario.ts         # IUsuario
 │   └── token.ts           # IToken
-└── lib/                   # db.ts, jwt.ts, validadores.ts
+└── lib/                   # db.ts, jwt.ts, validadores.ts, email.ts
 ```
 
 ---

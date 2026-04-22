@@ -5,8 +5,6 @@ import morgan from "morgan";
 import authRoutes from "./routes/auth.routes";
 import { manejadorErrores } from "./middlewares/errores";
 
-// ⚠️ TEMPORAL [dev] — eliminar en Fase 6 cuando Resend esté integrado
-import devRoutes from "./routes/dev.routes";
 
 const app = express();
 
@@ -23,12 +21,6 @@ app.use(
 
 app.use(express.json()); // Pa parsear el cuerpo de las peticiones como JSON
 app.use("/api/auth", authRoutes); //Añade el prefijo /api/auth a todas las rutas definidas en authRoutes
-
-// ⚠️ TEMPORAL [dev] — solo disponible en desarrollo, nunca en producción
-// TODO [Fase 6]: eliminar estas dos líneas y el archivo dev.routes.ts
-if (process.env.NODE_ENV === "development") {
-  app.use("/api/dev", devRoutes);
-}
 
 // GET /api/health — health check público (sin auth).
 // Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.

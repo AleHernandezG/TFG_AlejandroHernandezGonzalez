@@ -270,7 +270,7 @@ Sprint N:
 | Gemini API real | Conectar Chat IA + contexto despensa |
 | Edamam API | Cálculo nutricional al crear/editar recetas |
 | Cloudinary | Upload real imágenes recetas y avatares |
-| Resend | Emails verificación y recuperación contraseña |
+| ~~Resend~~ → Gmail SMTP | Nodemailer + Gmail SMTP activo (EMAIL-001) — migrar a Resend/SendGrid si el volumen crece |
 | next-pwa migración | next-pwa@5 → @ducanh2912/next-pwa (ver tech-debt.md DEBT-001) |
 | Next.js 14 → 15 | Migración + ESLint v9 (ver tech-debt.md DEBT-001) |
 | Vercel deploy | Frontend en producción |
@@ -351,10 +351,11 @@ JWT_SECRET=
 UPSTASH_REDIS_URL=                   # Sprint 3+
 UPSTASH_REDIS_TOKEN=                 # Sprint 3+
 FRONTEND_URL=http://localhost:3000
+GMAIL_USER=                          # EMAIL-001 — cuenta Gmail para SMTP
+GMAIL_APP_PASSWORD=                  # EMAIL-001 — contraseña de aplicación de 16 caracteres
 GEMINI_API_KEY=                      # Fase 6
 EDAMAM_APP_ID=                       # Fase 6
 EDAMAM_APP_KEY=                      # Fase 6
-RESEND_API_KEY=                      # Fase 6
 CLOUDINARY_URL=                      # Fase 6
 ```
 

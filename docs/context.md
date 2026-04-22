@@ -28,7 +28,8 @@
 - ✅ [UI-002] Paleta de colores Cookr completa: oklch + CSS vars + Tailwind tokens, 0 colores hardcodeados
 - ✅ [UI-003] Páginas legales: /privacidad (10 secciones, RGPD) y /terminos (11 secciones) creadas
 - ✅ [UI-004] Tipografía creativa en SeccionHero: badge pre-titular + italic brand + wavy underline SVG + gradient text
-- ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (conectado al backend; envío real de email pendiente Fase 6 con Resend — en dev usar POST /dev/verificar-usuario)
+- ✅ [UI-005] Flujo de verificación de email: /verificar-email/pendiente + /verificar-email (conectado al backend; envío real con Gmail SMTP activo — EMAIL-001)
+- ✅ [EMAIL-001] Integración Nodemailer + Gmail SMTP: `backend/src/lib/email.ts` creado, TODOs de authService.ts sustituidos, dev.routes.ts eliminado, .env.example actualizado
 - ✅ [UI-006] Login (/login) — TFG-16: layout split-screen espejado (form izquierda, imagen derecha), FormularioLogin con RHF + Zod, enlace "¿Olvidaste tu contraseña?", reutiliza BotonGoogle y DivisorOAuth
 - ✅ [UI-007] Flujo recuperación de contraseña (3 vistas mock):
   - /recuperar-contrasena: layout igual que /login, solo campo email
@@ -183,8 +184,8 @@ Diseño de ambas páginas:
 - ✅ [AUTH-002] `formularioRegistro.tsx` — `POST /api/auth/registro` conectado
 - ✅ [AUTH-003] `lib/auth.ts` — `CredentialsProvider` añadido
 - 🔴 [AUTH-004] `lib/auth.ts` — enriquecer callback `session` con avatar, rol e ID del backend → Fase 4
-- 🔴 [AUTH-005] Backend — endpoint `POST /api/auth/enviar-verificacion`: generar token firmado (JWT 24h), persistirlo en MongoDB, enviarlo vía Resend → Fase 4 + Fase 6
-- 🔴 [AUTH-006] Backend — endpoint `POST /api/auth/verificar-email`: validar token, marcar usuario como verificado en MongoDB, invalidar token → Fase 4
+- ✅ [AUTH-005] Backend — email de verificación enviado vía Gmail SMTP (Nodemailer) al registrarse — EMAIL-001
+- ✅ [AUTH-006] Backend — endpoint `POST /api/auth/verificar-email`: valida token, marca cuentaVerificada=true, invalida token
 - ✅ [AUTH-007] `formularioLogin.tsx` — `signIn("credentials", ...)` conectado
 - ✅ [AUTH-008] `formularioRecuperarContrasena.tsx` — `POST /api/auth/recuperar-contrasena` conectado
 - ✅ [AUTH-009] `formularioNuevaContrasena.tsx` — `POST /api/auth/nueva-contrasena` conectado
@@ -192,8 +193,9 @@ Diseño de ambas páginas:
 ## Limitación conocida — login con credenciales
 
 El endpoint POST /api/auth/login verifica `cuentaVerificada` antes de devolver el token.
-Hasta que Resend esté activo (Fase 6), los usuarios se crean en DB pero no pueden hacer
-login con email/contraseña sin verificar manualmente la cuenta en MongoDB Atlas.
+Con Gmail SMTP activo (EMAIL-001), el email de verificación se envía automáticamente al registrarse.
+Si el envío falla (error SMTP), el usuario existe en DB pero no recibirá el email; en ese caso
+puede solicitar reenvío desde /verificar-email/pendiente (endpoint reenviar pendiente de implementar).
 El login con Google OAuth sigue funcionando sin restricciones.
 
 ## Reportes asociados
@@ -216,7 +218,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/recuperar-contrasena` | Solicitar recuperación (email) | ✅ |
 | `/recuperar-contrasena/pendiente` | Confirmar envío de correo | ✅ |
 | `/nueva-contrasena` | Establecer nueva contraseña | ✅ |
-| `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ UI real (envío email: Fase 6) |
+| `/verificar-email/pendiente` | Pantalla post-registro "revisa tu correo" | ✅ Email real con Gmail SMTP (EMAIL-001) |
 | `/verificar-email` | Verificación de token por enlace — llama POST /api/auth/verificar-email | ✅ conectado |
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
 | `/home` | Home / Feed de recetas — mobile + PC responsive | ✅ Aprobado autor |

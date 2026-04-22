@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { usuarioRepository } from "../repositories/usuarioRepository";
 import { tokenRepository } from "../repositories/tokenRepository";
 import { firmarToken } from "../lib/jwt";
+import { enviarEmailVerificacion, enviarEmailRecuperacion } from "../lib/email";
 import { Types } from "mongoose";
 
 const SALT_ROUNDS = 10;
@@ -42,7 +43,11 @@ export const authService = {
       expira: new Date(Date.now() + EXPIRACION_VERIFICACION_MS),
     });
 
-    // TODO [Fase 6]: enviar email con Resend usando tokenValor
+    try {
+      await enviarEmailVerificacion(datos.correo, datos.nombre, tokenValor);
+    } catch (err) {
+      console.error("[email] Error al enviar verificación:", err);
+    }
     return {
       mensaje:
         "Registro completado. Revisa tu correo para verificar la cuenta.",
@@ -149,7 +154,11 @@ export const authService = {
       expira: new Date(Date.now() + EXPIRACION_RECUPERACION_MS),
     });
 
-    // TODO [Fase 6]: enviar email con Resend usando tokenValor
+    try {
+      await enviarEmailRecuperacion(datos.correo, usuario.nombre, tokenValor);
+    } catch (err) {
+      console.error("[email] Error al enviar recuperación:", err);
+    }
     return respuesta;
   },
 

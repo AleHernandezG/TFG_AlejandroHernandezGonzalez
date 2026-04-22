@@ -183,7 +183,7 @@ Redis actúa como intermediario entre Express y MongoDB para reducir consultas r
 | Google Gemini API | Asistente culinario con contexto de la despensa virtual del usuario |
 | Edamam API | Cálculo nutricional automático al crear o editar una receta |
 | Cloudinary | Almacenamiento y CDN de imágenes y vídeos de recetas |
-| Resend | Emails de verificación de cuenta y notificaciones transaccionales |
+| Nodemailer + Gmail SMTP | Emails de verificación de cuenta y recuperación de contraseña (EMAIL-001) |
 | Google OAuth | Login con cuenta de Google gestionado a través de NextAuth.js |
 | Upstash | Redis cloud con tier gratuito, conexión idéntica a Redis local |
 
@@ -236,10 +236,11 @@ UPSTASH_REDIS_URL
 UPSTASH_REDIS_TOKEN
 JWT_SECRET
 FRONTEND_URL=https://cookr.vercel.app
+GMAIL_USER
+GMAIL_APP_PASSWORD
 GEMINI_API_KEY
 EDAMAM_APP_ID
 EDAMAM_APP_KEY
-RESEND_API_KEY
 NODE_ENV=production
 PORT=8080
 ```
