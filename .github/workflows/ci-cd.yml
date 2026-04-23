@@ -67,4 +67,4 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
           echo "Render deploy hook HTTP status: $STATUS"
-          [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ] || exit 1
+          [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ] || [ "$STATUS" = "202" ] || exit 1
