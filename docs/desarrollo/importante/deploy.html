@@ -75,7 +75,7 @@
 
 <header>
   <h1>Deploy — Cookr TFG</h1>
-  <div class="meta">Completado: 2026-04-20 · SETUP-008 · Sprint 3</div>
+  <div class="meta">Actualizado: 2026-04-23 · SETUP-008 · Sprint 3 · Verificado en producción</div>
 </header>
 
 <nav>
@@ -226,6 +226,8 @@
           <tr><td class="key">NODE_ENV</td><td class="val">production</td></tr>
           <tr><td class="key">PORT</td><td class="val">8080</td></tr>
           <tr><td class="key">FRONTEND_URL</td><td class="val">https://tfg-alejandro-hernandez-gonzalez.vercel.app</td></tr>
+          <tr><td class="key">GMAIL_USER</td><td class="val">tfg.alejandro.hg@gmail.com</td></tr>
+          <tr><td class="key">GMAIL_APP_PASSWORD</td><td class="val">contraseña de aplicación Google (16 chars)</td></tr>
         </tbody>
       </table>
     </div>
@@ -262,7 +264,11 @@ jobs:
     steps:
       # Vercel se gestiona solo (integración nativa GitHub)
       - name: Deploy backend → Render (Deploy Hook)
-        run: curl "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"</pre>
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+          echo "Render deploy hook HTTP status: $STATUS"
+          # Render responde 202 Accepted (deploy asíncrono)
+          [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ] || [ "$STATUS" = "202" ] || exit 1</pre>
 
       <h3>Branch protection en main</h3>
       <div class="steps">
@@ -322,7 +328,7 @@ https://tfg-alejandro-hernandez-gonzalez.vercel.app</pre>
         <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Push a develop</strong><p>GitHub Actions corre CI automáticamente. Si falla lint o typecheck, hay que arreglarlo antes de continuar.</p></div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body"><strong>PR develop → main al terminar una feature o sprint</strong><p>GitHub exige que CI pase para poder mergear. Revisar los checks en la PR.</p></div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Merge → deploy automático</strong><p>Vercel despliega el FE. GitHub Actions dispara el Deploy Hook de Render para el BE. En ~3 min la app está actualizada en producción.</p></div></div>
-        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Antes de demos</strong><p>Ejecutar <code>bash scripts/keep-alive.sh</code> para evitar el cold start de Render (DEV-002, pendiente Fase 6).</p></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Antes de demos</strong><p>Ejecutar <code>bash scripts/keep-alive.sh</code> para evitar el cold start de Render. URL configurada: <code>https://tfg-alejandrohernandezgonzalez.onrender.com</code>.</p></div></div>
       </div>
     </div>
   </section>

@@ -98,9 +98,9 @@
   <div class="counters">
     <div class="counter review"><div class="num">2</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">49</div><div class="label">Completadas</div></div>
+    <div class="counter media"><div class="num">8</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">55</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -358,7 +358,7 @@
             <small>Replicar el layout de /login y /registro (fondo fondo-auth.webp + overlay, título Cookr amber italic, tagline + features list) en: /recuperar-contrasena, /nueva-contrasena (split-screen), /verificar-email/pendiente, /recuperar-contrasena/pendiente y /verificar-email (tarjeta centrada sobre imagen).</small>
             <span class="source">📄 app/recuperar-contrasena/page.tsx · app/nueva-contrasena/page.tsx · app/verificar-email/pendiente/page.tsx · app/recuperar-contrasena/pendiente/page.tsx · app/verificar-email/contenidoVerificacion.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -564,7 +564,7 @@
             <small>Vista /completar-perfil implementada (selección de alergias y dietas). Pendiente revisión visual del autor y de ajustar los flujos de redirección post-registro.</small>
             <span class="source">📄 docs/tech-debt.md</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -782,7 +782,7 @@
             <small>scripts/keep-alive.sh creado y completo: ping cada 4 min, duración máxima 2 h con auto-stop, timestamp + status HTTP en cada ping, banner de inicio, Ctrl+C limpio. La URL DEFAULT_URL tiene el placeholder {nombre-servicio} — editar cuando se cree el servicio en Render. Activación 100% manual.</small>
             <span class="source">📄 scripts/keep-alive.sh · backend/src/app.ts</span>
           </td>
-          <td><span class="status done">✅ Script listo · URL Render pendiente de Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3 — URL: tfg-alejandrohernandezgonzalez.onrender.com</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -799,10 +799,10 @@
           <td class="id">SETUP-003</td>
           <td class="desc">
             <strong>Variables de entorno en Vercel</strong>
-            <small>Añadir NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GEMINI_API_KEY etc. en el panel de Vercel. Solo hay que hacerlo el día del deploy.</small>
-            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+            <small>NEXTAUTH_SECRET, NEXTAUTH_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXT_PUBLIC_API_URL configuradas en Vercel (All Environments).</small>
+            <span class="source">📄 docs/desarrollo/importante/deploy.html §vercel</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -819,30 +819,30 @@
           <td class="id">SETUP-006</td>
           <td class="desc">
             <strong>Deploy completo: Render + Vercel + CI/CD</strong>
-            <small>Secuencia completa del deploy. FE en Vercel (cookr.vercel.app), BE en Render (tier gratuito, Deploy Hook). Render free duerme tras 15 min de inactividad (cold start 30-60 s). Todo documentado paso a paso en fase-0-pendientes.md.</small>
-            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+            <small>FE live en https://tfg-alejandro-hernandez-gonzalez.vercel.app · BE live en https://tfg-alejandrohernandezgonzalez.onrender.com · CI/CD funcionando · Google OAuth operativo en producción. Documentado en docs/desarrollo/importante/deploy.html.</small>
+            <span class="source">📄 docs/desarrollo/importante/deploy.html</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
           <td class="id">SETUP-007 / API-003</td>
           <td class="desc">
             <strong>OAuth Google para producción + NEXTAUTH_URL</strong>
-            <small>Añadir cookr.vercel.app como URI autorizada en Google Cloud Console y actualizar NEXTAUTH_URL en Vercel. Hacerlo el mismo día del deploy. No tocar antes.</small>
-            <span class="source">📄 docs/phase-reports/fase-0-pendientes.md</span>
+            <small>Google Cloud Console: URI autorizada https://tfg-alejandro-hernandez-gonzalez.vercel.app/api/auth/callback/google y origen https://tfg-alejandro-hernandez-gonzalez.vercel.app añadidos. NEXTAUTH_URL configurada en Vercel.</small>
+            <span class="source">📄 docs/desarrollo/importante/deploy.html §google</span>
           </td>
-          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
           <td class="id">API-002</td>
           <td class="desc">
             <strong>Configurar CORS en el backend para producción</strong>
-            <small>Código ya implementado: backend/src/app.ts usa cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:3000" }). En Fase 6 solo hay que añadir FRONTEND_URL=https://cookr.vercel.app en las variables de entorno de Render.</small>
+            <small>FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app configurada en Render. backend/src/app.ts usa cors({ origin: process.env.FRONTEND_URL }) en producción.</small>
             <span class="source">📄 backend/src/app.ts</span>
           </td>
-          <td><span class="status review">👁️ Código listo · env var FRONTEND_URL pendiente de Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
       </tbody>
@@ -895,6 +895,13 @@
         <tr><td class="id">DOCS-004</td><td class="desc">Mapa de navegación — esquema visual de conexiones entre vistas de la app: qué ruta lleva a cuál, con qué acción (tap tarjeta, botón, redirect post-login…). Creado y referenciado desde docs/.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">UI-019</td><td class="desc">NavBar inferior — añadida ruta Colección (/coleccion) con icono BookMarked, reemplazando Discover (sin contenido aún). Sidebar PC actualizado en espejo. 5 ítems: Inicio · Despensa · Cookr IA (central) · Colección · Perfil.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">UI-020</td><td class="desc">Vista /coleccion — página con dos subpestañas: "Guardadas" (posts donde guardado === true) y "Mis recetas" (mock). Estado vacío con CTA en "Mis recetas". Desktop: sidebar + max-w-2xl centrado. Mobile: columna única de TarjetaPost. Lint ✅.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-023</td><td class="desc">Homogeneizar estética auth — fondo fondo-auth.webp + overlay + título Cookr amber italic replicado en /recuperar-contrasena, /nueva-contrasena (split-screen) y /verificar-email/pendiente, /recuperar-contrasena/pendiente, /verificar-email (tarjeta centrada sobre imagen).</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DEBT-007</td><td class="desc">Flujo post-registro a /completar-perfil — formularioLogin usa getSession() tras signIn() para redirigir a /home o /completar-perfil según perfilCompleto. middleware.ts fuerza /completar-perfil si perfilCompleto=false en cualquier ruta protegida.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-003</td><td class="desc">Variables de entorno Vercel — NEXTAUTH_SECRET, NEXTAUTH_URL, NEXT_PUBLIC_API_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET configuradas en All Environments.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-006</td><td class="desc">Deploy completo — FE live en Vercel (https://tfg-alejandro-hernandez-gonzalez.vercel.app) · BE live en Render (https://tfg-alejandrohernandezgonzalez.onrender.com) · MongoDB Atlas conectado · Gmail SMTP operativo · CI/CD verificado.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-007 / API-003</td><td class="desc">OAuth Google producción — URI de redireccionamiento y origen Vercel añadidos en Google Cloud Console. NEXTAUTH_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app en Vercel. Google OAuth funcional en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">API-002</td><td class="desc">CORS producción — FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app configurada en Render. El backend acepta requests solo desde la URL de Vercel en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DEV-002</td><td class="desc">Script keep-alive — scripts/keep-alive.sh operativo. URL real: https://tfg-alejandrohernandezgonzalez.onrender.com. Ping cada 4 min, máx 2h, auto-stop, Ctrl+C limpio.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">SETUP-008</td><td class="desc">CI/CD GitHub Actions — .github/workflows/ci-cd.yml creado. CI: lint + tsc --noEmit en FE y BE en cada push a develop y PR a main. CD: deploy automático a Vercel (npx vercel --cwd frontend --prod) + Render Deploy Hook en cada push a main, condicionado a que el CI pase. Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, RENDER_DEPLOY_HOOK_URL, RENDER_APP_URL añadidos en GitHub. Branch protection activada en main (PR obligatoria + status checks). Vercel y Render ya conectados al repo.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>
     </table>
