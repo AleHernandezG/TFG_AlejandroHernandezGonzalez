@@ -224,7 +224,7 @@ Variables de entorno nuevas:
 Política de errores:
   Si Gmail SMTP falla → se loguea el error pero no se hace throw.
   El usuario ya existe en DB y puede solicitar reenvío desde /verificar-email/pendiente.
-  (Endpoint POST /api/auth/verificar-email/reenviar pendiente de implementar.)
+  Endpoint POST /api/auth/verificar-email/reenviar implementado — reutiliza enviarEmailVerificacion().
 
 Motivo: EMAIL-001 — activar el flujo completo de email sin depender de Resend/dominio propio.
         Gmail SMTP funciona en dev y prod sin configuración extra. Límite ~500 emails/día,

@@ -243,6 +243,36 @@ export const authService = {
     };
   },
 
+  async reenviarVerificacion(datos: { correo: string }) {
+    const respuesta = {
+      mensaje: "Si existe una cuenta sin verificar con ese correo, recibirás un nuevo enlace.",
+    };
+
+    const usuario = await usuarioRepository.buscarPorCorreo(datos.correo);
+    if (!usuario || usuario.cuentaVerificada) return respuesta;
+
+    await tokenRepository.invalidarPorUsuarioYTipo(
+      (usuario._id as Types.ObjectId).toString(),
+      "verificacion",
+    );
+
+    const tokenValor = crypto.randomBytes(32).toString("hex");
+    await tokenRepository.crear({
+      userId: usuario._id as Types.ObjectId,
+      token: tokenValor,
+      tipo: "verificacion",
+      expira: new Date(Date.now() + EXPIRACION_VERIFICACION_MS),
+    });
+
+    try {
+      await enviarEmailVerificacion(datos.correo, usuario.nombre, tokenValor);
+    } catch (err) {
+      console.error("[email] Error al reenviar verificación:", err);
+    }
+
+    return respuesta;
+  },
+
   async completarPerfil(userId: string, datos: { alergias: string[]; preferencias: string[] }) {
     const usuario = await usuarioRepository.completarPerfil(userId, datos);
     if (!usuario) {

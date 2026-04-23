@@ -43,3 +43,7 @@ export const esquemaCompletarPerfil = z.object({
   alergias: z.array(z.string()).default([]),
   preferencias: z.array(z.string()).default([]),
 });
+
+export const esquemaReenviarVerificacion = z.object({
+  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+});

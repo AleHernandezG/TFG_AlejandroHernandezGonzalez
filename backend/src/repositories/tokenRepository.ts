@@ -18,6 +18,9 @@ export const tokenRepository = {
 
   invalidar: (id: string): Promise<ITokenDoc | null> =>
     Token.findByIdAndUpdate(id, { usado: true }, { new: true }),
+
+  invalidarPorUsuarioYTipo: (userId: string, tipo: "verificacion" | "recuperacion"): Promise<unknown> =>
+    Token.updateMany({ userId, tipo, usado: false }, { usado: true }),
 };
 
 export type { IToken };

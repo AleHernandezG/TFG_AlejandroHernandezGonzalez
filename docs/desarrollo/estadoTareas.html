@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-04-22 · Sprint 3 activo · Fase 3 de 7</div>
+    <div class="meta">Actualizado: 2026-04-23 · Sprint 3 activo · Fase 3 de 7</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
+    <div class="counter review"><div class="num">2</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">17</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">46</div><div class="label">Completadas</div></div>
+    <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">49</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -159,10 +159,10 @@
           <td class="id">AUTH-005</td>
           <td class="desc">
             <strong>Proteger las rutas autenticadas (/home, /recetas/[id])</strong>
-            <small>Aplazado intencionalmente durante desarrollo para no requerir autenticación al revisar vistas. Se implementará antes del deploy (Fase 6).</small>
-            <span class="source">📄 docs/context.md</span>
+            <small>middleware.ts creado en frontend/src/. Protege /home, /coleccion, /recetas/*, /completar-perfil. Sin sesión → /login. Con sesión y perfilCompleto=false → /completar-perfil. Con sesión y perfilCompleto=true intentando acceder a /completar-perfil → /home.</small>
+            <span class="source">📄 frontend/src/middleware.ts</span>
           </td>
-          <td><span class="status pending">⏳ Aplazado a Fase 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -352,6 +352,16 @@
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
+          <td class="id">UI-023</td>
+          <td class="desc">
+            <strong>Homogeneizar estética auth — fondo y tipografía en todas las vistas</strong>
+            <small>Replicar el layout de /login y /registro (fondo fondo-auth.webp + overlay, título Cookr amber italic, tagline + features list) en: /recuperar-contrasena, /nueva-contrasena (split-screen), /verificar-email/pendiente, /recuperar-contrasena/pendiente y /verificar-email (tarjeta centrada sobre imagen).</small>
+            <span class="source">📄 app/recuperar-contrasena/page.tsx · app/nueva-contrasena/page.tsx · app/verificar-email/pendiente/page.tsx · app/recuperar-contrasena/pendiente/page.tsx · app/verificar-email/contenidoVerificacion.tsx</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
           <td class="id">DOCS-003</td>
           <td class="desc">
             <strong>Subir HTMLs de /desarrollo a OneDrive y eliminarlos del repo una vez aprobados</strong>
@@ -415,10 +425,10 @@
           <td class="id">AUTH-006</td>
           <td class="desc">
             <strong>Google OAuth — detectar usuario nuevo y redirigir a /completar-perfil</strong>
-            <small>En el callback de NextAuth, comprobar si el usuario que acaba de autenticarse con Google ya existe en MongoDB. Si es nuevo → redirigir a /completar-perfil (selección de alergias y dietas). Si ya estaba registrado → redirigir a /home como ahora. Requiere consultar la BD en el callback signIn o jwt de lib/auth.ts.</small>
-            <span class="source">📄 frontend/src/lib/auth.ts · DEBT-007 · app/(auth)/completar-perfil/</span>
+            <small>botonGoogle.tsx usa callbackUrl="/completar-perfil". El backend ya devuelve perfilCompleto en POST /api/auth/google, que el callback jwt guarda en el token. El middleware redirige a /home si perfilCompleto=true, o deja pasar a /completar-perfil si es false. Funciona igual para usuario nuevo que para usuario existente.</small>
+            <span class="source">📄 frontend/src/middleware.ts · frontend/src/lib/auth.ts · frontend/src/features/auth/components/botonGoogle.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -743,10 +753,10 @@
           <td class="id">DEBT-007</td>
           <td class="desc">
             <strong>Flujo post-registro no pasa por /completar-perfil</strong>
-            <small>Vista /completar-perfil creada (alergias, dietas). Pendiente revisión visual y ajuste de redirecciones post-registro en formularioRegistro.tsx y botonGoogle.tsx.</small>
-            <span class="source">📄 docs/tech-debt.md</span>
+            <small>Resuelto. formularioLogin.tsx usa getSession() tras signIn para redirigir a /home o /completar-perfil según perfilCompleto. middleware.ts fuerza /completar-perfil en cualquier ruta protegida si perfilCompleto=false. Google OAuth ya usaba callbackUrl="/completar-perfil".</small>
+            <span class="source">📄 frontend/src/middleware.ts · frontend/src/features/auth/components/formularioLogin.tsx</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>

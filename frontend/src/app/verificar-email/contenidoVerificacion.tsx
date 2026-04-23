@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CheckCircle2, XCircle, Loader2, ChefHat } from 'lucide-react'
@@ -38,16 +39,28 @@ export function ContenidoVerificacion({ token }: Props) {
   }, [token])
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--auth-dark)] px-4 py-12">
-      {/* Logo */}
-      <Link
-        href="/"
-        className="mb-8 flex items-center gap-2 text-brand transition-opacity hover:opacity-70"
-        aria-label="Volver a Cookr"
-      >
-        <ChefHat className="h-6 w-6" aria-hidden />
-        <span className="text-lg font-bold italic tracking-tight">Cookr</span>
-      </Link>
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      {/* ── Imagen de fondo ── */}
+      <Image
+        src="/images/fondo-auth.webp"
+        alt=""
+        fill
+        priority
+        className="object-cover object-center"
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-black/45" />
+
+      {/* ── Contenido ── */}
+      <div className="relative z-10 flex w-full flex-col items-center">
+        <Link
+          href="/"
+          className="mb-8 flex items-center gap-2 text-white transition-opacity hover:opacity-70"
+          aria-label="Volver a Cookr"
+        >
+          <ChefHat className="h-6 w-6" aria-hidden />
+          <span className="text-lg font-black italic tracking-tight">Cookr</span>
+        </Link>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -119,6 +132,7 @@ export function ContenidoVerificacion({ token }: Props) {
           </CardContent>
         </Card>
       </motion.div>
-    </main>
+      </div>
+    </div>
   )
 }

@@ -184,12 +184,13 @@
 </head>
 <body>
 
-  <p class="meta">TFG · Red Social Gastronómica · Cookr &nbsp;|&nbsp; 2026-04-22 &nbsp;|&nbsp; AUTH-006 / DEBT-007</p>
+  <p class="meta">TFG · Red Social Gastronómica · Cookr &nbsp;|&nbsp; 2026-04-23 &nbsp;|&nbsp; AUTH-005 / AUTH-006 / DEBT-007</p>
   <h1>Autenticación — Flujo completo y cambios implementados</h1>
 
   <p>Este documento describe el flujo de autenticación completo de Cookr tras implementar
-  <strong>AUTH-006</strong> (Google OAuth → detección de usuario nuevo → completar perfil)
-  y los cambios asociados en modelo, repositorio, servicio, controlador, rutas y frontend.</p>
+  <strong>AUTH-006</strong> (Google OAuth → detección de usuario nuevo → completar perfil),
+  <strong>AUTH-005</strong> (protección de rutas con middleware Next.js)
+  y <strong>DEBT-007</strong> (redirección post-login según <code>perfilCompleto</code>).</p>
 
   <div class="toc">
     <strong>Índice</strong>
@@ -201,7 +202,8 @@
       <li><a href="#backend">5. Backend — archivos modificados</a></li>
       <li><a href="#frontend">6. Frontend — archivos modificados</a></li>
       <li><a href="#sesion">7. Sesión NextAuth — cómo fluye perfilCompleto</a></li>
-      <li><a href="#pendiente">8. Lo que sigue pendiente (Fase 6)</a></li>
+      <li><a href="#middleware">8. Middleware — protección de rutas</a></li>
+      <li><a href="#pendiente">9. Lo que sigue pendiente (Fase 6)</a></li>
     </ul>
   </div>
 
@@ -271,7 +273,7 @@
     </tr>
     <tr>
       <td><span class="file-ref">frontend/src/features/auth/components/formularioLogin.tsx</span></td>
-      <td>Tras login exitoso redirige a <code>/completar-perfil</code> en lugar de <code>/home</code></td>
+      <td>Tras login exitoso llama a <code>getSession()</code> y redirige a <code>/home</code> si <code>perfilCompleto === true</code> o a <code>/completar-perfil</code> si <code>false</code></td>
       <td><span class="badge badge-fixed">CORREGIDO</span></td>
     </tr>
     <tr>
@@ -283,6 +285,21 @@
       <td><span class="file-ref">frontend/src/app/verificar-email/contenidoVerificacion.tsx</span></td>
       <td>Quitado el mock <code>setTimeout</code>. Ahora llama a <code>authService.verificarEmail()</code> → <code>POST /api/auth/verificar-email</code></td>
       <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/components/providers.tsx</span></td>
+      <td>Nuevo wrapper <code>&lt;Providers&gt;</code> que envuelve la app con <code>&lt;SessionProvider&gt;</code> de NextAuth. Necesario para que <code>useSession()</code> funcione en cualquier componente</td>
+      <td><span class="badge badge-new">NUEVO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/app/layout.tsx</span></td>
+      <td>Añadido <code>&lt;Providers&gt;</code> envolviendo <code>{children}</code>. Sin esto <code>useSession()</code> lanza error en componentes cliente</td>
+      <td><span class="badge badge-fixed">CORREGIDO</span></td>
+    </tr>
+    <tr>
+      <td><span class="file-ref">frontend/src/middleware.ts</span></td>
+      <td>Nuevo middleware Next.js con <code>withAuth</code>. Protege <code>/home</code>, <code>/coleccion</code>, <code>/recetas/*</code>, <code>/completar-perfil</code>. Lógica: sin token → <code>/login</code>; <code>perfilCompleto=false</code> → <code>/completar-perfil</code>; <code>perfilCompleto=true</code> en <code>/completar-perfil</code> → <code>/home</code></td>
+      <td><span class="badge badge-new">NUEVO</span></td>
     </tr>
   </table>
 
@@ -318,7 +335,8 @@
     <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— comprueba correo, contraseña (bcrypt compare), <code>cuentaVerificada</code></div>
     <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— devuelve: <code>{ token, usuario, perfilCompleto }</code></div>
     <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— callback <code>jwt</code> almacena <code>backendToken</code>, <code>rol</code>, <code>perfilCompleto</code> en el JWT de NextAuth</div>
-    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>formularioLogin</code> hace <code>router.push("/completar-perfil")</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>formularioLogin</code> llama <code>getSession()</code> y hace <code>router.push(perfilCompleto ? "/home" : "/completar-perfil")</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="note">(el middleware refuerza esta lógica: cualquier ruta protegida sin perfil → /completar-perfil)</span></div>
     <br/>
     <div><span class="step">4. COMPLETAR PERFIL</span></div>
     <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>completar-perfil/page.tsx</code> (Server Component)</div>
@@ -334,7 +352,9 @@
     <br/>
     <div><span class="step">5. LOGINS POSTERIORES</span></div>
     <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> mismos pasos 3-4, pero <code>perfilCompleto === true</code></div>
-    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>completar-perfil/page.tsx</code> redirige directamente a <code>/home</code></div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— <code>formularioLogin</code> redirige directamente a <code>/home</code> (via <code>getSession()</code>)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— Si el usuario accede directamente a cualquier ruta protegida, el middleware lo deja pasar</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— Si intenta entrar a <code>/completar-perfil</code>, el middleware lo redirige a <code>/home</code></div>
   </div>
 
   <!-- ─────────────────────────────────────────── -->
@@ -728,7 +748,66 @@ router.<span class="f">push</span>(<span class="s">"/home"</span>)</pre>
   se copia al token. En el siguiente <code>getServerSession()</code> ya aparece como <code>true</code>.</p>
 
   <!-- ─────────────────────────────────────────── -->
-  <h1 id="pendiente">8. Lo que sigue pendiente (Fase 6)</h1>
+  <h1 id="middleware">8. Middleware — protección de rutas</h1>
+
+  <p>
+    <span class="file-ref">frontend/src/middleware.ts</span> — usa <code>withAuth</code> de NextAuth para
+    interceptar peticiones a las rutas protegidas antes de que lleguen al Server Component.
+  </p>
+
+  <h2>Rutas protegidas (<code>matcher</code>)</h2>
+  <table>
+    <tr><th>Patrón</th><th>Ruta de ejemplo</th></tr>
+    <tr><td><code>/home/:path*</code></td><td>/home</td></tr>
+    <tr><td><code>/coleccion/:path*</code></td><td>/coleccion</td></tr>
+    <tr><td><code>/recetas/:path*</code></td><td>/recetas/abc123</td></tr>
+    <tr><td><code>/completar-perfil/:path*</code></td><td>/completar-perfil</td></tr>
+  </table>
+
+  <h2>Lógica de decisión</h2>
+  <div class="flow">
+    <div><span class="step">Petición a ruta protegida</span></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> <code>authorized({ token })</code>: ¿existe token NextAuth?</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— NO → NextAuth redirige a <code>/login</code> (configurado en <code>pages.signIn</code>)</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— SÍ → entra en la función <code>middleware(req)</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> ¿<code>token.perfilCompleto === false</code> y ruta ≠ <code>/completar-perfil</code>?</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— SÍ → redirect a <code>/completar-perfil</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> ¿<code>token.perfilCompleto === true</code> y ruta = <code>/completar-perfil</code>?</div>
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— SÍ → redirect a <code>/home</code></div>
+    <div>&nbsp;&nbsp;&nbsp;<span class="arrow">→</span> Ningún caso → <code>NextResponse.next()</code> (deja pasar)</div>
+  </div>
+
+  <h2>Código</h2>
+  <pre><span class="k">export default</span> <span class="f">withAuth</span>(
+  <span class="k">function</span> <span class="f">middleware</span>(req) {
+    <span class="k">const</span> { pathname } = req.nextUrl
+    <span class="k">const</span> perfilCompleto = req.nextauth.token?.perfilCompleto
+
+    <span class="k">if</span> (perfilCompleto === <span class="k">false</span> && pathname !== <span class="s">"/completar-perfil"</span>)
+      <span class="k">return</span> NextResponse.<span class="f">redirect</span>(<span class="k">new</span> URL(<span class="s">"/completar-perfil"</span>, req.url))
+
+    <span class="k">if</span> (perfilCompleto === <span class="k">true</span> && pathname === <span class="s">"/completar-perfil"</span>)
+      <span class="k">return</span> NextResponse.<span class="f">redirect</span>(<span class="k">new</span> URL(<span class="s">"/home"</span>, req.url))
+
+    <span class="k">return</span> NextResponse.<span class="f">next</span>()
+  },
+  { callbacks: { authorized: ({ token }) => !!token } }
+)
+
+<span class="k">export const</span> config = {
+  matcher: [<span class="s">"/home/:path*"</span>, <span class="s">"/coleccion/:path*"</span>, <span class="s">"/recetas/:path*"</span>, <span class="s">"/completar-perfil/:path*"</span>]
+}</pre>
+
+  <div class="callout info">
+    <strong>¿Por qué middleware y no solo el Server Component?</strong><br/>
+    <code>completar-perfil/page.tsx</code> también hace el check con <code>getServerSession</code>,
+    pero el middleware actúa <em>antes</em> de renderizar cualquier página — incluso antes de que
+    Next.js ejecute el Server Component. Esto evita flashes de contenido y es la capa correcta
+    para la lógica de acceso en Next.js App Router.
+  </div>
+
+  <!-- ─────────────────────────────────────────── -->
+  <h1 id="pendiente">9. Lo que sigue pendiente (Fase 6)</h1>
 
   <table>
     <tr>
@@ -737,34 +816,24 @@ router.<span class="f">push</span>(<span class="s">"/home"</span>)</pre>
       <th>Archivo</th>
     </tr>
     <tr>
-      <td>AUTH-005 / Fase 6</td>
-      <td>Envío real de email de verificación con Resend (actualmente el token se crea en BD pero no se envía). El enlace debe ser <code>/verificar-email?token=xxx</code></td>
-      <td><span class="file-ref">backend/src/services/authService.ts → registrarse()</span></td>
+      <td>EMAIL-001 / ✅ hecho</td>
+      <td>Envío real de email de verificación con Gmail SMTP (Nodemailer). El token se crea en BD y el email se envía. Si falla, el usuario puede reenviar desde <code>/verificar-email/pendiente</code></td>
+      <td><span class="file-ref">backend/src/lib/email.ts</span></td>
     </tr>
     <tr>
-      <td>AUTH-008 / Fase 6</td>
-      <td>Envío real de email de recuperación de contraseña con Resend</td>
-      <td><span class="file-ref">backend/src/services/authService.ts → solicitarRecuperacion()</span></td>
+      <td>EMAIL-002 / ✅ hecho</td>
+      <td>Envío real de email de recuperación de contraseña con Gmail SMTP</td>
+      <td><span class="file-ref">backend/src/lib/email.ts → enviarEmailRecuperacion()</span></td>
     </tr>
     <tr>
-      <td>AUTH-004 / Fase 4</td>
-      <td>Enriquecer sesión con avatar y nombre desde el backend (actualmente solo vienen id, rol, backendToken, perfilCompleto)</td>
-      <td><span class="file-ref">frontend/src/lib/auth.ts → callback session</span></td>
-    </tr>
-    <tr>
-      <td>AUTH-005 / Fase 6</td>
-      <td>Proteger rutas autenticadas con <code>getServerSession</code> + redirect en layout de grupo <code>(autenticado)</code></td>
-      <td><span class="file-ref">frontend/src/app/(autenticado)/layout.tsx</span></td>
-    </tr>
-    <tr>
-      <td>foto (local)</td>
-      <td>El campo <code>foto</code> existe en el modelo pero los usuarios locales no tienen forma de subirla todavía. Pendiente de la pantalla de ajustes de perfil (Fase 4)</td>
+      <td>foto (local) / Fase 4</td>
+      <td>El campo <code>foto</code> existe en el modelo pero los usuarios locales no tienen forma de subirla todavía. Pendiente de la pantalla de ajustes de perfil</td>
       <td>TBD — ajustes de perfil</td>
     </tr>
   </table>
 
   <hr/>
-  <p class="meta">Generado: 2026-04-22 &nbsp;·&nbsp; AUTH-006 implementado &nbsp;·&nbsp; Cookr TFG</p>
+  <p class="meta">Actualizado: 2026-04-23 &nbsp;·&nbsp; AUTH-005 / AUTH-006 / DEBT-007 implementados &nbsp;·&nbsp; Cookr TFG</p>
 
 </body>
 </html>

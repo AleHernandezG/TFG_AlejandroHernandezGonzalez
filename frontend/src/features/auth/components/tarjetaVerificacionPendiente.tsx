@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Mail, RefreshCw, ArrowLeft, AlertCircle, FlaskConical } from 'lucide-react'
+import { Mail, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-// TODO [Fase 6]: eliminar esta importación cuando Resend esté integrado
 import { authService } from '@/services/authService'
 
 const COOLDOWN_SEGUNDOS = 60
@@ -17,25 +15,12 @@ interface Props {
   email: string
 }
 
-/**
- * TarjetaVerificacionPendiente
- *
- * Muestra la instrucción post-registro: el usuario debe revisar su correo.
- * El botón "Reenviar" tiene un cooldown de 60 s para evitar spam.
- *
- * Estado actual: mock — el reenvío real vía Resend se conecta en Fase 6.
- * TODO [AUTH-005] Fase 6: llamar a POST /api/auth/enviar-verificacion.
- */
 export function TarjetaVerificacionPendiente({ email }: Props) {
-  const router = useRouter()
   const [segundosRestantes, setSegundosRestantes] = useState(0)
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
-  // TODO [Fase 6]: eliminar este estado cuando Resend esté integrado
-  const [verificandoDev, setVerificandoDev] = useState(false)
-  const [errorDev, setErrorDev] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  // Arranca el cooldown cuando se reenvía
   const iniciarCooldown = useCallback(() => {
     setSegundosRestantes(COOLDOWN_SEGUNDOS)
   }, [])
@@ -46,26 +31,18 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
     return () => clearTimeout(id)
   }, [segundosRestantes])
 
-  // TODO [Fase 6]: eliminar esta función cuando Resend esté integrado
-  const handleVerificarDev = async () => {
-    setVerificandoDev(true)
-    setErrorDev(null)
-    try {
-      await authService.verificarDev(email)
-      router.push('/login')
-    } catch {
-      setErrorDev('No se pudo verificar. ¿Está el backend corriendo?')
-      setVerificandoDev(false)
-    }
-  }
-
   const handleReenviar = async () => {
     setReenviando(true)
-    // TODO [AUTH-005] Fase 6: await axios.post('/api/auth/enviar-verificacion', { email })
-    await new Promise((r) => setTimeout(r, 900)) // simula latencia
-    setReenviando(false)
-    setReenviado(true)
-    iniciarCooldown()
+    setError(null)
+    try {
+      await authService.reenviarVerificacion(email)
+      setReenviado(true)
+      iniciarCooldown()
+    } catch {
+      setError('No se pudo reenviar el correo. Inténtalo de nuevo.')
+    } finally {
+      setReenviando(false)
+    }
   }
 
   return (
@@ -116,31 +93,8 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
             </motion.p>
           )}
 
-          {/* TODO [Fase 6]: eliminar este bloque cuando Resend esté integrado */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="w-full space-y-1.5">
-              <Button
-                variant="outline"
-                className="w-full border-dashed border-[var(--chart-4)]/50 text-[var(--chart-4)] hover:bg-[var(--chart-4)]/10"
-                onClick={handleVerificarDev}
-                disabled={verificandoDev || !email}
-              >
-                {verificandoDev ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-                    Verificando…
-                  </>
-                ) : (
-                  <>
-                    <FlaskConical className="mr-2 h-4 w-4" aria-hidden />
-                    [DEV] Verificar cuenta ahora
-                  </>
-                )}
-              </Button>
-              {errorDev && (
-                <p className="text-center text-xs text-destructive">{errorDev}</p>
-              )}
-            </div>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           {/* Botón reenviar */}

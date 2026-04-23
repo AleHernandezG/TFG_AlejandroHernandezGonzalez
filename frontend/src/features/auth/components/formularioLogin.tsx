@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { BotonGoogle } from "./botonGoogle";
 import { DivisorOAuth } from "./divisorOAuth";
 import {
@@ -82,7 +82,8 @@ export function FormularioLogin() {
     });
 
     if (resultado?.ok) {
-      router.push("/completar-perfil");
+      const session = await getSession();
+      router.push(session?.user?.perfilCompleto ? "/home" : "/completar-perfil");
       return;
     }
 

@@ -75,6 +75,14 @@
       <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/app.ts</code></td><td>Elimina import <code>devRoutes</code> y el bloque condicional <code>NODE_ENV=development</code></td></tr>
       <tr><td><span class="tag tag-del">eliminar</span></td><td><code>backend/src/routes/dev.routes.ts</code></td><td>Ruta temporal <code>POST /api/dev/verificar-usuario</code> ya no necesaria</td></tr>
       <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/.env.example</code></td><td>Añade <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/repositories/tokenRepository.ts</code></td><td>Añade <code>invalidarPorUsuarioYTipo()</code> — marca como usados todos los tokens de un tipo antes de crear uno nuevo</td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/lib/validadores.ts</code></td><td>Añade <code>esquemaReenviarVerificacion</code> — valida <code>{ correo }</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/services/authService.ts</code></td><td>Añade <code>reenviarVerificacion()</code> — invalida token viejo, crea uno nuevo, llama a <code>enviarEmailVerificacion()</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/controllers/authController.ts</code></td><td>Añade handler <code>reenviarVerificacion</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>backend/src/routes/auth.routes.ts</code></td><td>Registra <code>POST /verificar-email/reenviar</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>frontend/src/services/authService.ts</code></td><td>Elimina <code>verificarDev()</code> (llamaba a ruta dev borrada), añade <code>reenviarVerificacion(correo)</code></td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>frontend/src/features/auth/components/tarjetaVerificacionPendiente.tsx</code></td><td>Elimina bloque <code>[DEV] Verificar cuenta ahora</code> y estados temporales; conecta botón al endpoint real</td></tr>
+      <tr><td><span class="tag tag-mod">modificar</span></td><td><code>frontend/src/features/auth/components/tarjetaRecuperacionPendiente.tsx</code></td><td>Conecta botón reenviar a <code>authService.recuperarContrasena()</code> (reutiliza el endpoint existente)</td></tr>
     </tbody>
   </table>
 
@@ -103,7 +111,8 @@
   </div>
   <p>
     Si Gmail SMTP falla, el error se loguea pero <strong>no se hace throw</strong>: el usuario ya está creado en DB y el token existe en MongoDB.
-    Puede solicitar un reenvío desde <code>/verificar-email/pendiente</code> (endpoint de reenvío pendiente de implementar).
+    Puede solicitar un reenvío desde <code>/verificar-email/pendiente</code> usando el botón "Reenviar correo",
+    que llama a <code>POST /api/auth/verificar-email/reenviar</code> — reutiliza <code>enviarEmailVerificacion()</code> tras invalidar el token anterior.
   </p>
 
   <!-- ── 3. Flujo recuperación ── -->
@@ -183,15 +192,10 @@ GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx</code></pre>
     </tbody>
   </table>
 
-  <!-- ── 7. Limitaciones conocidas ── -->
-  <h2>7. Limitaciones conocidas</h2>
-  <div class="info">
-    ℹ️ <strong>Endpoint de reenvío pendiente:</strong> Las páginas <code>/verificar-email/pendiente</code> y <code>/recuperar-contrasena/pendiente</code>
-    muestran un botón de reenvío, pero el endpoint <code>POST /api/auth/verificar-email/reenviar</code> no existe todavía.
-    Implementación futura: buscar usuario por correo → invalidar token viejo → crear token nuevo → enviar email.
-  </div>
+  <!-- ── 7. Notas técnicas ── -->
+  <h2>7. Notas técnicas</h2>
   <ul>
-    <li>El envío de email es <strong>best-effort</strong>: si Gmail falla, el usuario ya está creado en DB pero no recibirá el email. Debe usar la UI de reenvío (pendiente).</li>
+    <li>El envío de email es <strong>best-effort</strong>: si Gmail falla, el usuario ya está creado en DB y puede usar el botón "Reenviar correo" de <code>/verificar-email/pendiente</code>, que llama a <code>POST /api/auth/verificar-email/reenviar</code>.</li>
     <li>Las plantillas usan inline CSS — compatibles con Gmail, Outlook, Apple Mail. No soportan CSS externo ni variables CSS.</li>
     <li>El color <code>#c47c1a</code> del botón CTA es una aproximación al <code>--brand</code> de la app en oklch (los clientes de email no soportan oklch).</li>
   </ul>

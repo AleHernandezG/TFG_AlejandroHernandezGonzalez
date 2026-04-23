@@ -7,6 +7,7 @@ import { Mail, RefreshCw, ArrowLeft, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { authService } from "@/services/authService";
 
 const COOLDOWN_SEGUNDOS = 60;
 
@@ -14,20 +15,11 @@ interface Props {
   email: string;
 }
 
-/**
- * TarjetaRecuperacionPendiente
- *
- * Pantalla post-solicitud de recuperación: el usuario debe revisar su correo
- * para encontrar el enlace a /nueva-contrasena?token=xxx.
- * El botón "Reenviar" tiene un cooldown de 60 s para evitar spam.
- *
- * Estado actual: mock — el reenvío real vía Resend se conecta en Fase 6.
- * TODO [AUTH-008] Fase 6: llamar a POST /api/auth/recuperar-contrasena para reenviar.
- */
 export function TarjetaRecuperacionPendiente({ email }: Props) {
   const [segundosRestantes, setSegundosRestantes] = useState(0);
   const [reenviando, setReenviando] = useState(false);
   const [reenviado, setReenviado] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const iniciarCooldown = useCallback(() => {
     setSegundosRestantes(COOLDOWN_SEGUNDOS);
@@ -41,11 +33,16 @@ export function TarjetaRecuperacionPendiente({ email }: Props) {
 
   const handleReenviar = async () => {
     setReenviando(true);
-    // TODO [AUTH-008] Fase 6: await axios.post('/api/auth/recuperar-contrasena', { correo: email })
-    await new Promise((r) => setTimeout(r, 900));
-    setReenviando(false);
-    setReenviado(true);
-    iniciarCooldown();
+    setError(null);
+    try {
+      await authService.recuperarContrasena({ correo: email });
+      setReenviado(true);
+      iniciarCooldown();
+    } catch {
+      setError("No se pudo reenviar el correo. Inténtalo de nuevo.");
+    } finally {
+      setReenviando(false);
+    }
   };
 
   return (
@@ -94,6 +91,10 @@ export function TarjetaRecuperacionPendiente({ email }: Props) {
             >
               Correo reenviado correctamente.
             </motion.p>
+          )}
+
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
           )}
 
           {/* Botón reenviar */}
