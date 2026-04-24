@@ -84,13 +84,27 @@ src/
 │   │   │   │   ├── pasosReceta.tsx
 │   │   │   │   ├── tabsReceta.tsx
 │   │   │   │   └── index.ts
-│   │   │   └── index.ts        # Barrel raíz — re-exporta home/ y detalleReceta/
+│   │   │   ├── crearReceta/    # Componentes exclusivos de /crear-receta y /crear-receta/revisar
+│   │   │   │   ├── formularioCrearReceta.tsx   # Client component principal (RHF + FormProvider)
+│   │   │   │   ├── seccionIngredientes.tsx     # Filas nombre/cantidad/unidad + autocompletado
+│   │   │   │   ├── seccionPasos.tsx            # Badge numerado + textarea + drag handle visual
+│   │   │   │   ├── seccionAlergenos.tsx        # Chips read-only + disclaimer
+│   │   │   │   ├── popUpTutorial.tsx           # Dialog ¿Primera receta? (Camera/ListOrdered/Eye)
+│   │   │   │   ├── tutorialCrearReceta.tsx     # Stepper animado 3 pasos (Framer Motion)
+│   │   │   │   ├── popUpError.tsx              # Dialog lista de campos erróneos
+│   │   │   │   ├── previsualizacionReceta.tsx  # Clone detalleReceta + banner preview + publicar mock
+│   │   │   │   └── index.ts
+│   │   │   └── index.ts        # Barrel raíz — re-exporta home/, detalleReceta/ y crearReceta/
 │   │   ├── data/
-│   │   │   ├── datosFeed.ts    # Incluye constante FILTROS_FEED
+│   │   │   ├── datosFeed.ts        # Incluye constante FILTROS_FEED
 │   │   │   ├── datosDetalle.ts
-│   │   │   └── datosTendencias.ts
+│   │   │   ├── datosTendencias.ts
+│   │   │   └── datosIngredientes.ts  # 30 ingredientes mock con alérgenos asociados
+│   │   ├── utils/
+│   │   │   └── detectarAlergenos.ts  # Función pura: ingredientes[] → ids de alérgenos[]
 │   │   └── types/
-│   │       └── receta.types.ts
+│   │       ├── receta.types.ts
+│   │       └── crearReceta.schema.ts  # Zod schema + DatosCrearReceta + ETIQUETAS_DIFICULTAD
 │   ├── perfil/                 # Sprint 4+
 │   ├── despensa/               # Sprint 5+
 │   ├── chat/                   # Sprint 5+
@@ -99,6 +113,7 @@ src/
 ├── hooks/                      # Custom hooks globales (usados por 2+ features)
 │   └── useDebounce.ts          # useDebounce<T>(value, delay) — Sprint 3 [UI-016b]
 ├── stores/                     # Zustand stores globales
+│   └── useCrearRecetaStore.ts  # Estado formulario crear receta (datos + fotoPreview)
 ├── services/                   # apiClient.ts + *Service.ts
 │   ├── apiClient.ts
 │   └── authService.ts

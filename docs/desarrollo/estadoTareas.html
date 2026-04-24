@@ -414,11 +414,71 @@
         <tr>
           <td class="id">UI-018</td>
           <td class="desc">
-            <strong>Crear receta — formulario multi-step FE mock (Sprint 3)</strong>
-            <small>Formulario de 3-4 pasos: título + imagen → ingredientes → pasos (drag-and-drop reordenable) → preview antes de publicar. Datos mock. Diseño Stitch previo obligatorio. Validación con RHF + Zod.</small>
-            <span class="source">📄 docs/roadmap.md · Sprint 3 FE · E2</span>
+            <strong>Crear receta — flujo completo FE mock (Sprint 3)</strong>
+            <small>Flujo completo: /crear-receta (formulario RHF+Zod) → validación → /crear-receta/revisar (preview) → publicar mock → /home. PopUp tutorial (primer usuario), PopUp error (validación), stepper tutorial, detección automática de alérgenos. Store Zustand compartido entre formulario y preview. 15 ficheros nuevos, TypeScript 0 errores.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/ · stores/useCrearRecetaStore.ts · docs/crearReceta.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status review">🔄 En progreso · pendiente revisión visual</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-A</td>
+          <td class="desc">
+            <strong>datosIngredientes.ts + detectarAlergenos.ts + crearReceta.schema.ts</strong>
+            <small>30 ingredientes mock con mapa alérgenos, función pura detectarAlergenos(), schema Zod v4 compatible (z.number().refine() en vez de invalid_type_error).</small>
+            <span class="source">📄 features/recetas/data/datosIngredientes.ts · features/recetas/utils/detectarAlergenos.ts · features/recetas/types/crearReceta.schema.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-B</td>
+          <td class="desc">
+            <strong>useCrearRecetaStore.ts (Zustand)</strong>
+            <small>Store global que comparte el estado del formulario entre /crear-receta y /crear-receta/revisar. Guarda datos validados + URL de preview de foto. Se limpia tras publicar.</small>
+            <span class="source">📄 stores/useCrearRecetaStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-C</td>
+          <td class="desc">
+            <strong>Secciones del formulario: SeccionIngredientes, SeccionPasos, SeccionAlergenos</strong>
+            <small>SeccionIngredientes: filas nombre/cantidad/unidad con autocompletado live desde datosIngredientes.ts. SeccionPasos: badge numerado + textarea + drag handle visual. SeccionAlergenos: chips read-only + disclaimer obligatorio.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · seccionPasos.tsx · seccionAlergenos.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-D</td>
+          <td class="desc">
+            <strong>PopUps: PopUpTutorial, TutorialCrearReceta, PopUpError</strong>
+            <small>PopUpTutorial: Dialog shadcn con 3 pasos (Camera/ListOrdered/Eye) → acepta o salta. TutorialCrearReceta: stepper animado 3 pasos con Framer Motion. PopUpError: Dialog con lista dinámica de campos erróneos + scroll al primer error.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/popUpTutorial.tsx · tutorialCrearReceta.tsx · popUpError.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-E</td>
+          <td class="desc">
+            <strong>FormularioCrearReceta.tsx — componente principal</strong>
+            <small>Client component que ensambla todas las secciones. RHF + zodResolver + FormProvider. Gestiona foto (File + URL.createObjectURL), dificultad como botones de selección, SelectorChips para dietas, detección live de alérgenos, Dialog confirmación "Borrar y salir". Botones fixed bottom con z-40.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-F</td>
+          <td class="desc">
+            <strong>PrevisualizacionReceta.tsx + rutas Next.js</strong>
+            <small>Preview clona estructura de detalleReceta. Banner "Vista previa" bg-brand/10. Lee datos desde useCrearRecetaStore. Botón "Publicar" → mock setTimeout 1s → limpiar store → router.push('/home'). Rutas: /crear-receta/page.tsx + /crear-receta/revisar/page.tsx.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · app/(main)/crear-receta/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>

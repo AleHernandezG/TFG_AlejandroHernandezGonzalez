@@ -2,3 +2,5 @@
 export * from './home'
 // Vista /recetas/[id] — Detalle de receta
 export * from './detalleReceta'
+// Vista /crear-receta — Formulario y previsualización
+export * from './crearReceta'

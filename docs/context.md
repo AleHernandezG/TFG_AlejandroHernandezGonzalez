@@ -226,6 +226,10 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
 | `/coleccion` | Mi colección — subpestañas Guardadas y Mis recetas (mock) | ✅ Sprint 3 |
+| `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | 👁️ Pendiente revisión |
+| `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + banner + publicar mock | 👁️ Pendiente revisión |
+| `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | 👁️ Pendiente revisión |
+| `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | 👁️ Pendiente revisión |
 | `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |
 | `frontend/src/services/authService.ts` | Servicio HTTP de auth (5 métodos) | ✅ |
 | `BE /api/auth/registro` | Endpoint real | ✅ Sprint 2 BE |

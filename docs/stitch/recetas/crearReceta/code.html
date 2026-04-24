@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nueva Receta - Cookr</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#7abbec",
+                        "surface-container": "#efeeea",
+                        "on-surface-variant": "#514538",
+                        "outline": "#837566",
+                        "on-primary": "#ffffff",
+                        "secondary": "#5f5e5e",
+                        "tertiary-fixed-dim": "#8dcdff",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-bright": "#faf9f5",
+                        "primary-fixed-dim": "#fcba65",
+                        "on-secondary-container": "#656464",
+                        "tertiary-fixed": "#cae6ff",
+                        "secondary-fixed": "#e4e2e1",
+                        "inverse-surface": "#2f312e",
+                        "on-surface": "#1b1c1a",
+                        "on-tertiary-fixed": "#001e30",
+                        "inverse-on-surface": "#f2f1ed",
+                        "primary-fixed": "#ffddb7",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e3e2df",
+                        "surface-tint": "#855400",
+                        "surface-variant": "#e3e2df",
+                        "inverse-primary": "#fcba65",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e9e8e4",
+                        "primary-container": "#e8a855",
+                        "primary": "#855400",
+                        "surface-container-low": "#f4f4f0",
+                        "tertiary": "#136490",
+                        "on-primary-fixed": "#2a1700",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#faf9f5",
+                        "on-primary-container": "#643e00",
+                        "secondary-container": "#e4e2e1",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-tertiary-container": "#004b6f",
+                        "on-tertiary-fixed-variant": "#004b70",
+                        "surface-dim": "#dbdad6",
+                        "outline-variant": "#d5c4b2",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#653e00",
+                        "background": "#faf9f5",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32 max-w-[390px] mx-auto relative overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 bg-[#faf9f5]/80 dark:bg-stone-950/80 backdrop-blur-md flex justify-between items-center w-full px-6 py-4 no-border bg-[#f4f4f0] dark:bg-stone-900 flat no-shadows font-['Plus_Jakarta_Sans'] font-semibold tracking-[0.02em]">
+<button class="text-on-background hover:opacity-80 transition-opacity active:scale-95 duration-200 p-2 -ml-2 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-[#1b1c1a] dark:text-[#faf9f5]">Nueva receta</h1>
+<button class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 font-semibold text-sm">
+            Guardar
+        </button>
+</header>
+<main class="px-5 py-6 space-y-8 pb-32">
+<!-- Live Preview Card -->
+<section class="bg-surface-container-lowest rounded-xl p-4 shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="h-40 rounded-xl border-2 border-dashed border-outline-variant/50 bg-surface-container-low flex flex-col items-center justify-center text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-4xl mb-2" data-icon="add_a_photo" data-weight="fill" style="font-variation-settings: 'FILL' 1;">add_a_photo</span>
+<span class="font-medium">Añadir foto principal</span>
+</div>
+<div class="mt-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container overflow-hidden">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="close up portrait of a young woman with natural makeup looking directly at camera with soft warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCX970OyA-5sWwR35cpoeCeexgI9FqbMKC2OO3bitVljQPT3c_dR9-inFP04KuRtEs0QT4tgR84LxDCvziTBAlYdZC69JF3ZAnqqoeRRFItxq-jecO_vSdpFfAS5_uxFc9npfpOJId0irWwo8torVgjFib2K-8usfEQJjHyNpDejkDRG_8_yiJvRZwA1Bpp0l6g73-Fxu2ZrfEhNsNkVgpmJezntoOpgpiNFXkG2NaMmpr4aBngSHLiUoQCMJrHv-FUS98KvgJRos"/>
+</div>
+<div>
+<div class="font-semibold text-on-surface leading-tight">Tu Nombre</div>
+<div class="text-sm text-secondary">@usuario</div>
+</div>
+</div>
+</section>
+<!-- Información Básica -->
+<section class="bg-surface-container-low rounded-xl p-5 space-y-5">
+<h2 class="font-bold text-lg text-on-surface tracking-wide">Información básica</h2>
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2 tracking-wide uppercase">Título *</label>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim" placeholder="Ej. Tacos al Pastor" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2 tracking-wide uppercase">Descripción</label>
+<textarea class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim resize-none" placeholder="Cuenta un poco sobre esta receta..." rows="3"></textarea>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2 tracking-wide uppercase">Tiempo</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg pl-4 pr-10 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim" placeholder="Min." type="number"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-sm" data-icon="schedule">schedule</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2 tracking-wide uppercase">Porciones</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-lg pl-4 pr-10 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim" placeholder="Ej. 4" type="number"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-sm" data-icon="restaurant">restaurant</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-3 tracking-wide uppercase">Dificultad</label>
+<div class="flex gap-2">
+<button class="flex-1 py-2 px-3 rounded-full bg-primary-fixed text-on-primary-container font-semibold text-sm transition-colors">Fácil</button>
+<button class="flex-1 py-2 px-3 rounded-full bg-surface-container-high text-on-surface-variant font-medium text-sm hover:bg-surface-container-highest transition-colors">Media</button>
+<button class="flex-1 py-2 px-3 rounded-full bg-surface-container-high text-on-surface-variant font-medium text-sm hover:bg-surface-container-highest transition-colors">Difícil</button>
+</div>
+</div>
+</section>
+<!-- Ingredientes -->
+<section class="bg-surface-container-low rounded-xl p-5 space-y-5">
+<h2 class="font-bold text-lg text-on-surface tracking-wide">Ingredientes</h2>
+<div class="space-y-4">
+<!-- Ingredient Item -->
+<div class="flex items-center gap-3">
+<button class="w-12 h-12 rounded-full border border-dashed border-outline-variant bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors flex-shrink-0">
+<span class="material-symbols-outlined text-lg" data-icon="add_photo_alternate">add_photo_alternate</span>
+</button>
+<input class="flex-1 min-w-0 bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim" placeholder="Nombre (ej. Cebolla)" type="text"/>
+<input class="w-24 bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim text-center" placeholder="Cant." type="text"/>
+<button class="text-on-surface-variant hover:text-error transition-colors p-2 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Add Button -->
+<button class="w-full py-3 rounded-lg border-2 border-dashed border-outline-variant text-on-surface-variant font-semibold flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Añadir ingrediente
+        </button>
+</div>
+</section>
+<!-- Pasos -->
+<section class="bg-surface-container-low rounded-xl p-5 space-y-5">
+<h2 class="font-bold text-lg text-on-surface tracking-wide">Pasos</h2>
+<div class="space-y-6">
+<!-- Step Item -->
+<div class="flex gap-3">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
+                1
+            </div>
+<div class="flex-1 space-y-3">
+<textarea class="w-full bg-surface-container-lowest border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary text-on-surface placeholder:text-secondary-fixed-dim resize-none" placeholder="Describe este paso..." rows="3"></textarea>
+<button class="w-20 h-20 rounded-lg border border-dashed border-outline-variant bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="add_photo_alternate">add_photo_alternate</span>
+</button>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-2 h-fit rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Add Button -->
+<button class="w-full py-3 rounded-lg border-2 border-dashed border-outline-variant text-on-surface-variant font-semibold flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Añadir paso
+        </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<div class="fixed bottom-0 w-full max-w-[390px] bg-surface-container shadow-[0_-4px_24px_rgba(0,0,0,0.08)] z-50 px-6 py-3 pb-8 flex justify-between items-center rounded-t-2xl">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="home">home</span>
+<span class="text-[10px] font-semibold tracking-wide">Inicio</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="search">search</span>
+<span class="text-[10px] font-semibold tracking-wide">Buscar</span>
+</button>
+<button class="flex flex-col items-center justify-center w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg -mt-8 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px]" data-icon="restaurant_menu">restaurant_menu</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="bookmark">bookmark</span>
+<span class="text-[10px] font-semibold tracking-wide">Guardados</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]" data-icon="person">person</span>
+<span class="text-[10px] font-semibold tracking-wide">Perfil</span>
+</button>
+</div>
+</body></html>
