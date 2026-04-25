@@ -177,7 +177,7 @@ export function FormularioCrearReceta() {
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmitValido, onSubmitInvalido)}
-          className="flex flex-col gap-5 pb-32"
+          className="flex flex-col gap-5 pb-8"
           noValidate
         >
           {/* ── Foto ── */}
@@ -266,7 +266,7 @@ export function FormularioCrearReceta() {
             </div>
 
             {/* Tiempo + dificultad */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               {/* Tiempo */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
@@ -373,8 +373,8 @@ export function FormularioCrearReceta() {
           {/* ── Alérgenos ── */}
           <SeccionAlergenos alergenosDetectados={alergenosDetectados} />
 
-          {/* ── Botones fixed ── */}
-          <div className="fixed bottom-16 left-0 right-0 z-40 flex gap-3 px-5 pb-2 pt-3 bg-background/90 backdrop-blur-sm border-t border-border max-w-[390px] mx-auto">
+          {/* ── Botones ── */}
+          <div className="flex gap-3 mt-2">
             <Button
               type="button"
               variant="outline"

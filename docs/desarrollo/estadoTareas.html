@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">8</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">55</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">56</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -418,7 +418,7 @@
             <small>Flujo completo: /crear-receta (formulario RHF+Zod) → validación → /crear-receta/revisar (preview) → publicar mock → /home. PopUp tutorial (primer usuario), PopUp error (validación), stepper tutorial, detección automática de alérgenos. Store Zustand compartido entre formulario y preview. 15 ficheros nuevos, TypeScript 0 errores.</small>
             <span class="source">📄 features/recetas/components/crearReceta/ · stores/useCrearRecetaStore.ts · docs/crearReceta.html</span>
           </td>
-          <td><span class="status review">🔄 En progreso · pendiente revisión visual</span></td>
+          <td><span class="status review">👁️ UX fixes aplicados · pendiente revisión final</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -465,7 +465,7 @@
           <td class="id">UI-018-E</td>
           <td class="desc">
             <strong>FormularioCrearReceta.tsx — componente principal</strong>
-            <small>Client component que ensambla todas las secciones. RHF + zodResolver + FormProvider. Gestiona foto (File + URL.createObjectURL), dificultad como botones de selección, SelectorChips para dietas, detección live de alérgenos, Dialog confirmación "Borrar y salir". Botones fixed bottom con z-40.</small>
+            <small>Client component que ensambla todas las secciones. RHF + zodResolver + FormProvider. Gestiona foto (File + URL.createObjectURL), dificultad como botones de selección, SelectorChips para dietas, detección live de alérgenos, Dialog confirmación "Borrar y salir". Botones al final del formulario (no fixed — visible al scrollear). Grid tiempo/porciones: grid-cols-1 sm:grid-cols-2 (stacked en mobile, side-by-side en tablet+).</small>
             <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx</span>
           </td>
           <td><span class="status done">✅ Completado · Sprint 3</span></td>
@@ -475,8 +475,23 @@
           <td class="id">UI-018-F</td>
           <td class="desc">
             <strong>PrevisualizacionReceta.tsx + rutas Next.js</strong>
-            <small>Preview clona estructura de detalleReceta. Banner "Vista previa" bg-brand/10. Lee datos desde useCrearRecetaStore. Botón "Publicar" → mock setTimeout 1s → limpiar store → router.push('/home'). Rutas: /crear-receta/page.tsx + /crear-receta/revisar/page.tsx.</small>
+            <small>Preview rediseñada como post real (idéntica a /recetas/[id]): hero h-[400px], chip "Vista previa" flotante sobre la imagen (bg-black/50 backdrop-blur), botón volver glassmorphism, tarjeta -mt-8 rounded-t-[2rem]. Cabecera con autor placeholder Avatar "TÚ" + acciones sociales (Heart/MessageCircle/Share2 a 0). Meta pills "Listo en X min" + porciones. Contadores "Ingredientes (N)" y "Pasos (N)". Divisores h-px entre secciones. Modo manos libres. Botones al final sin fixed. Lee datos desde useCrearRecetaStore. Publicar mock → limpiar → /home. Rutas: /crear-receta/page.tsx + /crear-receta/revisar/page.tsx.</small>
             <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · app/(main)/crear-receta/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-G</td>
+          <td class="desc">
+            <strong>UX fixes crear receta — autocompletado, layout mobile, preview</strong>
+            <small>
+              (1) SeccionIngredientes — bug crítico: ref de RHF sobreescrita por ref local → setValue no actualizaba el DOM. Fix: desestructurar {ref: rhfRef, onChange: rhfOnChange, onBlur: rhfOnBlur} de register() y fusionar refs manualmente. onMouseDown → onPointerDown + e.preventDefault() para bloquear blur antes del tap en mobile. onBlur con setTimeout 150ms para cerrar lista al pulsar fuera.
+              (2) Formulario — grid-cols-2 en tiempo/porciones era demasiado estrecho en mobile (62-77px para el input de tiempo). Fix: grid-cols-1 sm:grid-cols-2.
+              (3) Formulario — botones fixed solapaban la NavBar inferior. Fix: removed fixed, botones en flujo normal al final del form (solo visibles al scrollear hasta abajo).
+              (4) Preview — banner "Vista previa" era sticky (tapaba contenido al scrollear). Fix: eliminado sticky.
+            </small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · formularioCrearReceta.tsx · previsualizacionReceta.tsx</span>
           </td>
           <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>

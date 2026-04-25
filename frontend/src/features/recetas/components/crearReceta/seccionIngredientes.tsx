@@ -47,16 +47,18 @@ export function SeccionIngredientes() {
       </div>
 
       <div className="space-y-3">
-        {fields.map((field, i) => (
+        {fields.map((field, i) => {
+          const { ref: rhfRef, onChange: rhfOnChange, onBlur: rhfOnBlur, name } = register(`ingredientes.${i}.nombre`)
+          return (
           <div key={field.id} className="relative">
             <div className="grid grid-cols-[1fr_80px_90px_28px] gap-2 items-start">
               {/* Nombre con autocompletado */}
               <div className="relative">
                 <input
-                  {...register(`ingredientes.${i}.nombre`, {
-                    onChange: (e) => handleNombreChange(i, e.target.value),
-                  })}
-                  ref={(el) => { inputRefs.current[i] = el }}
+                  name={name}
+                  ref={(el) => { rhfRef(el); inputRefs.current[i] = el }}
+                  onChange={(e) => { rhfOnChange(e); handleNombreChange(i, e.target.value) }}
+                  onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setSugerencias(null), 150) }}
                   placeholder="Ej. Harina"
                   autoComplete="off"
                   className={[
@@ -71,7 +73,7 @@ export function SeccionIngredientes() {
                     {sugerencias.lista.map((s) => (
                       <li
                         key={s}
-                        onMouseDown={() => seleccionarSugerencia(i, s)}
+                        onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s) }}
                         className="px-3 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
                       >
                         {s}
@@ -135,7 +137,8 @@ export function SeccionIngredientes() {
               </p>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
 
       {errors.ingredientes && !Array.isArray(errors.ingredientes) && (
