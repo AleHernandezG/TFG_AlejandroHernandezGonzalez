@@ -22,19 +22,11 @@ export const esquemaCrearReceta = z.object({
     .string()
     .min(10, 'La descripción debe tener al menos 10 caracteres')
     .max(300, 'La descripción no puede superar los 300 caracteres'),
-  ingredientes: z
-    .array(esquemaIngrediente)
-    .min(1, 'Añade al menos un ingrediente'),
-  pasos: z
-    .array(esquemaPaso)
-    .min(1, 'Añade al menos un paso'),
-  porciones: z
-    .number()
-    .refine((v) => !isNaN(v) && v >= 1, 'Debe haber al menos 1 porción'),
+  ingredientes: z.array(esquemaIngrediente).min(1, 'Añade al menos un ingrediente'),
+  pasos: z.array(esquemaPaso).min(1, 'Añade al menos un paso'),
+  porciones: z.number().refine((v) => !isNaN(v) && v >= 1, 'Debe haber al menos 1 porción'),
   dificultad: z.enum(['facil', 'media', 'dificil']),
-  tiempo: z
-    .number()
-    .refine((v) => !isNaN(v) && v >= 1, 'El tiempo debe ser al menos 1'),
+  tiempo: z.number().refine((v) => !isNaN(v) && v >= 1, 'El tiempo debe ser al menos 1'),
   unidadTiempo: z.enum(['min', 'h']),
   dietas: z.array(z.string()),
   foto: z.instanceof(File).optional(),
@@ -55,9 +47,7 @@ export const UNIDADES_INGREDIENTE = [
   'kg',
   'ml',
   'l',
-  'tsp',
-  'tbsp',
-  'cup',
+  'cucharada',
   'unidad',
   'al gusto',
 ] as const
