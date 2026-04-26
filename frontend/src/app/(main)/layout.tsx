@@ -7,7 +7,7 @@ export default function LayoutPrincipal({
 }) {
   return (
     <>
-      <main className="pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+      <main className="pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
         {children}
       </main>
       <NavBarInferior />

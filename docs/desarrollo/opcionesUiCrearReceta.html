@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opciones UI Crear Receta — Cookr</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.82rem; color: #737373; margin-top: 0.25rem; }
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; margin-left: 0.5rem; vertical-align: middle; }
+
+    /* Tabs */
+    .tabs { background: #141414; border-bottom: 1px solid #222; padding: 0 2rem; display: flex; gap: 0; overflow-x: auto; }
+    .tab { font-size: 0.8rem; font-weight: 600; padding: 0.85rem 1.25rem; color: #737373; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
+    .tab:hover { color: #d4d4d4; }
+    .tab.active { color: #f97316; border-bottom-color: #f97316; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .panel { display: none; gap: 2rem; flex-direction: column; }
+    .panel.active { display: flex; }
+
+    /* Two-column layout: preview + specs */
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+    @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+
+    /* Spec panel */
+    .specs { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.25rem; }
+    .specs h3 { font-size: 0.8rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .spec-row { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.8rem; padding: 0.4rem 0; border-bottom: 1px solid #1f1f1f; }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-label { color: #525252; min-width: 90px; font-size: 0.72rem; padding-top: 0.1rem; }
+    .spec-val { color: #d4d4d4; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; background: #1f1f1f; padding: 0.1rem 0.3rem; border-radius: 3px; color: #f97316; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+    .pros, .cons { background: #111; border-radius: 8px; padding: 0.75rem; }
+    .pros h4 { font-size: 0.68rem; color: #4ade80; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .cons h4 { font-size: 0.68rem; color: #f87171; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    li { font-size: 0.76rem; color: #a3a3a3; margin-left: 1rem; margin-bottom: 0.25rem; }
+
+    .recomendacion { background: #f9731610; border: 1px solid #f9731633; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.78rem; color: #fed7aa; margin-top: 0.75rem; }
+    .recomendacion strong { color: #f97316; }
+
+    /* ===== OPTION PREVIEWS ===== */
+    /* Shared form elements */
+    .form-label { font-size: 0.72rem; font-weight: 600; color: #a3a3a3; margin-bottom: 0.35rem; display: block; }
+    .form-input { width: 100%; padding: 0.55rem 0.75rem; border-radius: 8px; font-size: 0.82rem; color: #e5e5e5; outline: none; }
+    .form-input::placeholder { color: #404040; }
+    .section-title { font-size: 0.78rem; font-weight: 700; color: #fff; }
+    .section-subtitle { font-size: 0.68rem; color: #525252; margin-top: 0.1rem; }
+    .photo-area { border-radius: 10px; height: 88px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.72rem; cursor: pointer; }
+    .photo-icon { font-size: 1.4rem; }
+    .tag-chip { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; margin-right: 0.35rem; margin-bottom: 0.35rem; cursor: pointer; }
+    .ing-row { display: grid; grid-template-columns: 1fr 0.6fr 0.6fr auto; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
+    .ing-input { padding: 0.4rem 0.6rem; border-radius: 6px; font-size: 0.74rem; color: #e5e5e5; }
+    .ing-del { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; }
+    .btn-add { font-size: 0.72rem; font-weight: 600; padding: 0.45rem 0.85rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .btn-primary { font-size: 0.82rem; font-weight: 700; padding: 0.7rem 1.25rem; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 0.75rem; }
+    .diff-btn { font-size: 0.72rem; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; }
+
+    /* ===== OPTION A: Warm Cards ===== */
+    .opt-a { background: #0f0e0c; border-radius: 16px; padding: 1rem; }
+    .opt-a .card { background: #1c1814; border: 1px solid #2d2820; border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; }
+    .opt-a .card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid #2a2318; margin-bottom: 0.75rem; }
+    .opt-a .form-input { background: #15120f; border: 1px solid #2d2820; }
+    .opt-a .photo-area { background: #15120f; border: 1.5px dashed #3d3028; color: #5a4a3a; }
+    .opt-a .tag-chip { background: #f9731615; color: #f97316; border: 1px solid #f9731630; }
+    .opt-a .tag-chip.active { background: #f97316; color: #fff; border-color: #f97316; }
+    .opt-a .ing-input { background: #15120f; border: 1px solid #2d2820; }
+    .opt-a .ing-del { background: #2d1f1f; color: #f87171; }
+    .opt-a .btn-add { background: #2d2820; color: #f97316; border: 1px solid #3d3028; }
+    .opt-a .btn-primary { background: #f97316; color: #fff; border: none; }
+    .opt-a .diff-btn { background: #2d2820; color: #a3a3a3; border: 1px solid #3d3028; }
+    .opt-a .diff-btn.active { background: #f9731620; color: #f97316; border-color: #f9731650; }
+    .opt-a .section-badge { width: 28px; height: 28px; border-radius: 8px; background: #f9731620; color: #f97316; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+    /* ===== OPTION B: Brand Section Headers ===== */
+    .opt-b { background: #0f0f0f; border-radius: 16px; padding: 1rem; }
+    .opt-b .card { background: #1a1a1a; border: 1px solid #252525; border-radius: 12px; overflow: hidden; margin-bottom: 0.75rem; }
+    .opt-b .card-header { background: linear-gradient(135deg, #f9731608 0%, transparent 100%); border-bottom: 1px solid #f9731622; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.65rem; }
+    .opt-b .card-body { padding: 1rem; }
+    .opt-b .accent-bar { width: 3px; height: 28px; border-radius: 2px; background: #f97316; flex-shrink: 0; }
+    .opt-b .form-input { background: #111; border: 1px solid #2a2a2a; }
+    .opt-b .photo-area { background: #111; border: 1.5px dashed #2a2a2a; color: #404040; }
+    .opt-b .tag-chip { background: #222; color: #a3a3a3; border: 1px solid #333; }
+    .opt-b .tag-chip.active { background: #f9731620; color: #f97316; border-color: #f9731650; }
+    .opt-b .ing-input { background: #111; border: 1px solid #2a2a2a; }
+    .opt-b .ing-del { background: #2a1a1a; color: #f87171; }
+    .opt-b .btn-add { background: transparent; color: #f97316; border: 1px dashed #f9731650; }
+    .opt-b .btn-primary { background: #f97316; color: #fff; border: none; }
+    .opt-b .diff-btn { background: #1f1f1f; color: #737373; border: 1px solid #2a2a2a; }
+    .opt-b .diff-btn.active { background: #f9731618; color: #f97316; border-color: #f9731640; }
+
+    /* ===== OPTION C: Glass Warm ===== */
+    .opt-c { background: linear-gradient(135deg, #1a1208 0%, #0f0f0f 50%, #120f1a 100%); border-radius: 16px; padding: 1rem; }
+    .opt-c .card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; backdrop-filter: blur(12px); }
+    .opt-c .card-header { padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.65rem; }
+    .opt-c .form-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); }
+    .opt-c .photo-area { background: rgba(255,255,255,0.025); border: 1.5px dashed rgba(255,255,255,0.12); color: #4a4a4a; }
+    .opt-c .tag-chip { background: rgba(249,115,22,0.1); color: #f97316; border: 1px solid rgba(249,115,22,0.25); }
+    .opt-c .tag-chip.active { background: rgba(249,115,22,0.85); color: #fff; border-color: transparent; }
+    .opt-c .ing-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    .opt-c .ing-del { background: rgba(248,113,113,0.15); color: #f87171; }
+    .opt-c .btn-add { background: rgba(255,255,255,0.05); color: #a3a3a3; border: 1px solid rgba(255,255,255,0.1); }
+    .opt-c .btn-primary { background: #f97316; color: #fff; border: none; }
+    .opt-c .diff-btn { background: rgba(255,255,255,0.04); color: #737373; border: 1px solid rgba(255,255,255,0.08); }
+    .opt-c .diff-btn.active { background: rgba(249,115,22,0.15); color: #f97316; border-color: rgba(249,115,22,0.35); }
+    .opt-c .glow { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%); top: -30px; right: -30px; pointer-events: none; }
+
+    /* ===== OPTION D: Linear-style ===== */
+    .opt-d { background: #0b0b0b; border-radius: 16px; padding: 1rem; }
+    .opt-d .card { background: #141414; border: 1px solid #1e1e1e; border-radius: 10px; padding: 0; margin-bottom: 0.75rem; overflow: hidden; }
+    .opt-d .card-header { padding: 0.7rem 1rem; display: flex; align-items: center; gap: 0.5rem; background: #141414; }
+    .opt-d .card-body { padding: 0.85rem 1rem; background: #0f0f0f; border-top: 1px solid #1e1e1e; }
+    .opt-d .section-dot { width: 6px; height: 6px; border-radius: 50%; background: #f97316; flex-shrink: 0; }
+    .opt-d .step-num { font-family: monospace; font-size: 0.68rem; color: #f97316; background: #f9731618; border: 1px solid #f9731630; border-radius: 4px; padding: 0.1rem 0.4rem; }
+    .opt-d .form-input { background: #0b0b0b; border: 1px solid #1e1e1e; }
+    .opt-d .photo-area { background: #0b0b0b; border: 1.5px dashed #1e1e1e; color: #383838; }
+    .opt-d .tag-chip { background: #1a1a1a; color: #737373; border: 1px solid #252525; }
+    .opt-d .tag-chip.active { background: #1a1a1a; color: #f97316; border-color: #f9731640; }
+    .opt-d .ing-input { background: #0b0b0b; border: 1px solid #1e1e1e; }
+    .opt-d .ing-del { background: #1a0f0f; color: #f87171; border: 1px solid #2a1515; }
+    .opt-d .btn-add { background: transparent; color: #525252; border: 1px solid #1e1e1e; }
+    .opt-d .btn-primary { background: #f97316; color: #fff; border: none; }
+    .opt-d .diff-btn { background: #141414; color: #525252; border: 1px solid #1e1e1e; }
+    .opt-d .diff-btn.active { background: #1a1410; color: #f97316; border-color: #f9731630; }
+
+    /* ===== OPTION E: Layered Elevation ===== */
+    .opt-e { background: #0a0a0a; border-radius: 16px; padding: 1rem; }
+    .opt-e .form-wrapper { background: #141310; border: 1px solid #221f1a; border-radius: 14px; padding: 1rem; }
+    .opt-e .card { background: #1e1b16; border: 1px solid #2d2820; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 1px 0 rgba(255,200,100,0.04) inset; }
+    .opt-e .card-header { display: flex; align-items: center; gap: 0.65rem; padding-bottom: 0.75rem; border-bottom: 1px solid #2a2318; margin-bottom: 0.75rem; }
+    .opt-e .form-input { background: #0e0d0b; border: 1px solid #2d2820; }
+    .opt-e .photo-area { background: #0e0d0b; border: 1.5px dashed #2d2820; color: #4a3d2e; }
+    .opt-e .tag-chip { background: #25201a; color: #7a6a5a; border: 1px solid #352e26; }
+    .opt-e .tag-chip.active { background: #3d2b10; color: #f97316; border-color: #f9731640; }
+    .opt-e .ing-input { background: #0e0d0b; border: 1px solid #2d2820; }
+    .opt-e .ing-del { background: #2a1a1a; color: #f87171; }
+    .opt-e .btn-add { background: #25201a; color: #f97316; border: 1px solid #352e26; }
+    .opt-e .btn-primary { background: #f97316; color: #fff; border: none; }
+    .opt-e .diff-btn { background: #25201a; color: #6b5c4c; border: 1px solid #352e26; }
+    .opt-e .diff-btn.active { background: #3d2b10; color: #f97316; border-color: #f9731640; }
+    .opt-e .warm-glow { background: linear-gradient(180deg, rgba(249,115,22,0.03) 0%, transparent 60%); position: absolute; inset: 0; border-radius: 14px; pointer-events: none; }
+
+    /* Comparison table */
+    .comparison { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; margin-top: 1rem; }
+    .comparison table { width: 100%; border-collapse: collapse; }
+    .comparison th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    .comparison td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.8rem; vertical-align: middle; }
+    .comparison tr:last-child td { border-bottom: none; }
+    .comparison tr:hover td { background: #1f1f1f; }
+    .score { display: inline-flex; gap: 2px; }
+    .dot-on { width: 7px; height: 7px; border-radius: 50%; background: #f97316; display: inline-block; }
+    .dot-off { width: 7px; height: 7px; border-radius: 50%; background: #2a2a2a; display: inline-block; }
+    .winner { background: #f9731610; color: #f97316; border: 1px solid #f9731630; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 999px; text-transform: uppercase; }
+
+    /* Flex row for diff buttons */
+    .diff-group { display: flex; gap: 0.4rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Opciones de diseño — Formulario Crear Receta <span class="badge">UI-025</span></h1>
+  <p>5 propuestas para mejorar el contraste visual entre tarjetas del formulario y el fondo · Todas usan variables CSS de globals.css · 0 colores hardcodeados</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('a')">A · Warm Cards</div>
+  <div class="tab" onclick="show('b')">B · Brand Sections</div>
+  <div class="tab" onclick="show('c')">C · Glass Warm</div>
+  <div class="tab" onclick="show('d')">D · Linear-style</div>
+  <div class="tab" onclick="show('e')">E · Layered Elevation</div>
+  <div class="tab" onclick="show('compare')">Comparativa</div>
+</div>
+
+<main>
+
+  <!-- OPTION A -->
+  <div id="panel-a" class="panel active">
+    <div class="layout">
+      <div>
+        <div class="opt-a">
+          <!-- Photo -->
+          <div class="card">
+            <div class="photo-area">
+              <div class="photo-icon">📷</div>
+              <span>Añadir foto de tu receta</span>
+            </div>
+          </div>
+          <!-- Info básica -->
+          <div class="card">
+            <div class="card-header">
+              <div class="section-badge">1</div>
+              <div>
+                <div class="section-title">Información básica</div>
+                <div class="section-subtitle">Nombre, descripción y datos</div>
+              </div>
+            </div>
+            <label class="form-label">Título de la receta</label>
+            <input class="form-input" placeholder="Ej: Pasta carbonara casera" style="background:#15120f;border:1px solid #2d2820;border-radius:8px;margin-bottom:0.75rem;" />
+            <label class="form-label">Dificultad</label>
+            <div class="diff-group">
+              <div class="diff-btn active">Fácil</div>
+              <div class="diff-btn">Media</div>
+              <div class="diff-btn">Difícil</div>
+            </div>
+          </div>
+          <!-- Ingredientes -->
+          <div class="card">
+            <div class="card-header">
+              <div class="section-badge">2</div>
+              <div>
+                <div class="section-title">Ingredientes</div>
+                <div class="section-subtitle">Mínimo 1 ingrediente</div>
+              </div>
+            </div>
+            <div class="ing-row">
+              <input class="ing-input" placeholder="Pasta" style="background:#15120f;border:1px solid #2d2820;border-radius:6px;" />
+              <input class="ing-input" placeholder="200" style="background:#15120f;border:1px solid #2d2820;border-radius:6px;" />
+              <input class="ing-input" placeholder="g" style="background:#15120f;border:1px solid #2d2820;border-radius:6px;" />
+              <div class="ing-del">×</div>
+            </div>
+            <div class="btn-add">+ Añadir ingrediente</div>
+          </div>
+          <!-- Dietas -->
+          <div class="card">
+            <div class="card-header">
+              <div class="section-badge">3</div>
+              <div><div class="section-title">Tipo de receta</div></div>
+            </div>
+            <span class="tag-chip active">Vegetariana</span>
+            <span class="tag-chip">Vegana</span>
+            <span class="tag-chip">Sin gluten</span>
+            <span class="tag-chip">Keto</span>
+          </div>
+          <div class="btn-primary">Revisar receta →</div>
+        </div>
+      </div>
+      <div class="specs">
+        <h3>Opción A — Warm Cards</h3>
+        <div class="spec-row"><span class="spec-label">Concepto</span><span class="spec-val">Tarjetas con fondo marrón oscuro cálido sobre un fondo casi-negro ligeramente más cálido</span></div>
+        <div class="spec-row"><span class="spec-label">Variable CSS</span><span class="spec-val"><code>--warm-bg</code> para las cards · <code>--warm-bg-accent</code> para el fondo general</span></div>
+        <div class="spec-row"><span class="spec-label">Tailwind</span><span class="spec-val"><code>bg-[var(--warm-bg)]</code> en cada sección · <code>border-[var(--warm-bg-accent)]</code></span></div>
+        <div class="spec-row"><span class="spec-label">Inspiración</span><span class="spec-val">Notion dark · Bear Notes · apps de cooking premium (Tasty, Yummly)</span></div>
+        <div class="spec-row"><span class="spec-label">Esfuerzo</span><span class="spec-val">Bajo — solo cambiar bg y border de cada sección</span></div>
+        <div class="pros-cons">
+          <div class="pros"><h4>✓ Pros</h4>
+            <ul>
+              <li>Muy on-brand para cooking</li>
+              <li>Cálido e invitante</li>
+              <li>Usa variables ya existentes</li>
+              <li>Fácil de implementar</li>
+            </ul>
+          </div>
+          <div class="cons"><h4>✗ Contras</h4>
+            <ul>
+              <li>Puede parecer demasiado "marrón"</li>
+              <li>Verificar contraste WCAG</li>
+            </ul>
+          </div>
+        </div>
+        <div class="recomendacion">⭐ <strong>Recomendación principal.</strong> Máximo impacto, mínimo esfuerzo, muy coherente con la paleta Cookr. Mismo patrón que las tarjetas de auth.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div id="panel-b" class="panel">
+    <div class="layout">
+      <div>
+        <div class="opt-b">
+          <div class="card">
+            <div class="card-header">
+              <div class="accent-bar"></div>
+              <div>
+                <div class="section-title">📷 Foto de la receta</div>
+                <div class="section-subtitle">Opcional — se asignará una automáticamente</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="photo-area">
+                <div class="photo-icon">📷</div>
+                <span>Añadir foto de tu receta</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="accent-bar"></div>
+              <div>
+                <div class="section-title">Información básica</div>
+                <div class="section-subtitle">Nombre, descripción y datos</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <label class="form-label">Título de la receta</label>
+              <input class="form-input" placeholder="Ej: Pasta carbonara casera" style="background:#111;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:0.75rem;" />
+              <label class="form-label">Dificultad</label>
+              <div class="diff-group">
+                <div class="diff-btn active">Fácil</div>
+                <div class="diff-btn">Media</div>
+                <div class="diff-btn">Difícil</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="accent-bar"></div>
+              <div><div class="section-title">Ingredientes</div></div>
+            </div>
+            <div class="card-body">
+              <div class="ing-row">
+                <input class="ing-input" placeholder="Pasta" style="background:#111;border:1px solid #2a2a2a;border-radius:6px;" />
+                <input class="ing-input" placeholder="200" style="background:#111;border:1px solid #2a2a2a;border-radius:6px;" />
+                <input class="ing-input" placeholder="g" style="background:#111;border:1px solid #2a2a2a;border-radius:6px;" />
+                <div class="ing-del">×</div>
+              </div>
+              <div class="btn-add">+ Añadir ingrediente</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="accent-bar"></div>
+              <div><div class="section-title">Tipo de receta</div></div>
+            </div>
+            <div class="card-body">
+              <span class="tag-chip active">Vegetariana</span>
+              <span class="tag-chip">Vegana</span>
+              <span class="tag-chip">Sin gluten</span>
+              <span class="tag-chip">Keto</span>
+            </div>
+          </div>
+          <div class="btn-primary">Revisar receta →</div>
+        </div>
+      </div>
+      <div class="specs">
+        <h3>Opción B — Brand Section Headers</h3>
+        <div class="spec-row"><span class="spec-label">Concepto</span><span class="spec-val">Cards oscuras estándar pero con header de sección resaltado con gradiente y barra vertical brand</span></div>
+        <div class="spec-row"><span class="spec-label">Variable CSS</span><span class="spec-val"><code>--brand</code> para accent bar · <code>bg-brand/5</code> en header</span></div>
+        <div class="spec-row"><span class="spec-label">Tailwind</span><span class="spec-val"><code>border-l-[3px] border-brand</code> + <code>bg-brand/5</code> en card-header</span></div>
+        <div class="spec-row"><span class="spec-label">Inspiración</span><span class="spec-val">Linear · Raycast · Vercel Dashboard · GitHub</span></div>
+        <div class="spec-row"><span class="spec-label">Esfuerzo</span><span class="spec-val">Bajo-medio — estructura de card con header separado</span></div>
+        <div class="pros-cons">
+          <div class="pros"><h4>✓ Pros</h4>
+            <ul>
+              <li>Muy moderno y profesional</li>
+              <li>Clara jerarquía visual</li>
+              <li>Patrón conocido por usuarios</li>
+            </ul>
+          </div>
+          <div class="cons"><h4>✗ Contras</h4>
+            <ul>
+              <li>Requiere refactorizar estructura de cards</li>
+              <li>Menos "cooking", más "dashboard"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="recomendacion">✓ <strong>Segunda opción sólida.</strong> Ideal si quieres un feel más profesional/moderno. Aporta mucha jerarquía pero cambia bastante la estructura actual.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div id="panel-c" class="panel">
+    <div class="layout">
+      <div>
+        <div class="opt-c">
+          <div class="card" style="position:relative;overflow:hidden;">
+            <div class="glow"></div>
+            <div class="photo-area">
+              <div class="photo-icon">📷</div>
+              <span>Añadir foto de tu receta</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span style="font-size:0.9rem;">📝</span>
+              <div>
+                <div class="section-title">Información básica</div>
+                <div class="section-subtitle">Nombre, descripción y datos</div>
+              </div>
+            </div>
+            <label class="form-label">Título de la receta</label>
+            <input class="form-input" placeholder="Ej: Pasta carbonara casera" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:8px;margin-bottom:0.75rem;" />
+            <label class="form-label">Dificultad</label>
+            <div class="diff-group">
+              <div class="diff-btn active">Fácil</div>
+              <div class="diff-btn">Media</div>
+              <div class="diff-btn">Difícil</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span style="font-size:0.9rem;">🧂</span>
+              <div><div class="section-title">Ingredientes</div></div>
+            </div>
+            <div class="ing-row">
+              <input class="ing-input" placeholder="Pasta" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;" />
+              <input class="ing-input" placeholder="200" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;" />
+              <input class="ing-input" placeholder="g" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;" />
+              <div class="ing-del">×</div>
+            </div>
+            <div class="btn-add">+ Añadir ingrediente</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span style="font-size:0.9rem;">🏷️</span>
+              <div><div class="section-title">Tipo de receta</div></div>
+            </div>
+            <span class="tag-chip active">Vegetariana</span>
+            <span class="tag-chip">Vegana</span>
+            <span class="tag-chip">Sin gluten</span>
+            <span class="tag-chip">Keto</span>
+          </div>
+          <div class="btn-primary">Revisar receta →</div>
+        </div>
+      </div>
+      <div class="specs">
+        <h3>Opción C — Glass Warm</h3>
+        <div class="spec-row"><span class="spec-label">Concepto</span><span class="spec-val">Cards glassmorphism sobre fondo con gradiente cálido sutil (naranja-violeta oscuro)</span></div>
+        <div class="spec-row"><span class="spec-label">CSS</span><span class="spec-val"><code>bg-white/[0.035]</code> + <code>backdrop-blur-sm</code> + <code>border-white/[0.07]</code></span></div>
+        <div class="spec-row"><span class="spec-label">Fondo</span><span class="spec-val">Gradiente en el wrapper del form con <code>--warm-bg</code> y <code>--category-ai</code></span></div>
+        <div class="spec-row"><span class="spec-label">Inspiración</span><span class="spec-val">Apple iOS · Spotify · apps fitness premium (Whoop, Oura)</span></div>
+        <div class="spec-row"><span class="spec-label">Esfuerzo</span><span class="spec-val">Medio — requiere atención al contraste en cada estado</span></div>
+        <div class="pros-cons">
+          <div class="pros"><h4>✓ Pros</h4>
+            <ul>
+              <li>Look premium e inmersivo</li>
+              <li>Muy diferente al resto de la app (destaca)</li>
+              <li>Tendencia de diseño 2024-25</li>
+            </ul>
+          </div>
+          <div class="cons"><h4>✗ Contras</h4>
+            <ul>
+              <li>Contraste difícil de mantener</li>
+              <li>backdrop-blur tiene coste de GPU</li>
+              <li>Puede ser excesivo para un form</li>
+            </ul>
+          </div>
+        </div>
+        <div class="recomendacion">⚠️ <strong>Impresionante visualmente pero arriesgado.</strong> El glassmorphism en forms con muchos inputs puede perjudicar la legibilidad. Solo recomendado si se hace con mucho cuidado en el contraste.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION D -->
+  <div id="panel-d" class="panel">
+    <div class="layout">
+      <div>
+        <div class="opt-d">
+          <div class="card">
+            <div class="card-header">
+              <div class="section-dot"></div>
+              <div class="section-title">Foto</div>
+            </div>
+            <div class="card-body">
+              <div class="photo-area">
+                <div class="photo-icon" style="font-size:1.1rem;">📷</div>
+                <span>Añadir foto de tu receta</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="section-dot"></div>
+              <div class="section-title">Información básica</div>
+            </div>
+            <div class="card-body">
+              <label class="form-label">Título de la receta</label>
+              <input class="form-input" placeholder="Ej: Pasta carbonara casera" style="background:#0b0b0b;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:0.75rem;" />
+              <label class="form-label">Dificultad</label>
+              <div class="diff-group">
+                <div class="diff-btn active">Fácil</div>
+                <div class="diff-btn">Media</div>
+                <div class="diff-btn">Difícil</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="section-dot"></div>
+              <div class="section-title">Ingredientes</div>
+              <span class="step-num" style="margin-left:auto">3</span>
+            </div>
+            <div class="card-body">
+              <div class="ing-row">
+                <input class="ing-input" placeholder="Pasta" style="background:#0b0b0b;border:1px solid #1e1e1e;border-radius:6px;" />
+                <input class="ing-input" placeholder="200" style="background:#0b0b0b;border:1px solid #1e1e1e;border-radius:6px;" />
+                <input class="ing-input" placeholder="g" style="background:#0b0b0b;border:1px solid #1e1e1e;border-radius:6px;" />
+                <div class="ing-del">×</div>
+              </div>
+              <div class="btn-add">+ Añadir ingrediente</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="section-dot"></div>
+              <div class="section-title">Tipo de receta</div>
+            </div>
+            <div class="card-body">
+              <span class="tag-chip active">Vegetariana</span>
+              <span class="tag-chip">Vegana</span>
+              <span class="tag-chip">Sin gluten</span>
+              <span class="tag-chip">Keto</span>
+            </div>
+          </div>
+          <div class="btn-primary">Revisar receta →</div>
+        </div>
+      </div>
+      <div class="specs">
+        <h3>Opción D — Linear-style</h3>
+        <div class="spec-row"><span class="spec-label">Concepto</span><span class="spec-val">Fondo muy oscuro, cards en gris ligeramente más claro con body separado visualmente del header</span></div>
+        <div class="spec-row"><span class="spec-label">Variable CSS</span><span class="spec-val"><code>bg-card</code> para header · <code>bg-background</code> para body · <code>border-border</code></span></div>
+        <div class="spec-row"><span class="spec-label">Tailwind</span><span class="spec-val">Mismo que estado actual pero con <code>bg-background</code> en los body de las secciones para crear contraste de dos niveles</span></div>
+        <div class="spec-row"><span class="spec-label">Inspiración</span><span class="spec-val">Linear · Figma dark · Superhuman</span></div>
+        <div class="spec-row"><span class="spec-label">Esfuerzo</span><span class="spec-val">Muy bajo — es la variación más cercana al estado actual</span></div>
+        <div class="pros-cons">
+          <div class="pros"><h4>✓ Pros</h4>
+            <ul>
+              <li>Muy fácil de implementar</li>
+              <li>Coherente con el resto de la app</li>
+              <li>Nunca cansa visualmente</li>
+            </ul>
+          </div>
+          <div class="cons"><h4>✗ Contras</h4>
+            <ul>
+              <li>Cambio sutil, poco "wow"</li>
+              <li>Sin calidez para una app de cooking</li>
+            </ul>
+          </div>
+        </div>
+        <div class="recomendacion">✓ <strong>Opción segura.</strong> Mínimo riesgo, mínimo esfuerzo. Si el objetivo es solo "que se note un poco más la separación" sin romper nada, esta es la opción.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION E -->
+  <div id="panel-e" class="panel">
+    <div class="layout">
+      <div>
+        <div class="opt-e">
+          <div class="form-wrapper" style="position:relative;overflow:hidden;">
+            <div class="warm-glow"></div>
+            <div class="card">
+              <div class="photo-area">
+                <div class="photo-icon">📷</div>
+                <span>Añadir foto de tu receta</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span style="font-size:0.85rem;color:#f97316;">📝</span>
+                <div>
+                  <div class="section-title">Información básica</div>
+                  <div class="section-subtitle">Nombre, descripción y datos</div>
+                </div>
+              </div>
+              <label class="form-label">Título de la receta</label>
+              <input class="form-input" placeholder="Ej: Pasta carbonara casera" style="background:#0e0d0b;border:1px solid #2d2820;border-radius:8px;margin-bottom:0.75rem;" />
+              <label class="form-label">Dificultad</label>
+              <div class="diff-group">
+                <div class="diff-btn active">Fácil</div>
+                <div class="diff-btn">Media</div>
+                <div class="diff-btn">Difícil</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span style="font-size:0.85rem;color:#f97316;">🧂</span>
+                <div><div class="section-title">Ingredientes</div></div>
+              </div>
+              <div class="ing-row">
+                <input class="ing-input" placeholder="Pasta" style="background:#0e0d0b;border:1px solid #2d2820;border-radius:6px;" />
+                <input class="ing-input" placeholder="200" style="background:#0e0d0b;border:1px solid #2d2820;border-radius:6px;" />
+                <input class="ing-input" placeholder="g" style="background:#0e0d0b;border:1px solid #2d2820;border-radius:6px;" />
+                <div class="ing-del">×</div>
+              </div>
+              <div class="btn-add">+ Añadir ingrediente</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span style="font-size:0.85rem;color:#f97316;">🏷️</span>
+                <div><div class="section-title">Tipo de receta</div></div>
+              </div>
+              <span class="tag-chip active">Vegetariana</span>
+              <span class="tag-chip">Vegana</span>
+              <span class="tag-chip">Sin gluten</span>
+            </div>
+          </div>
+          <div class="btn-primary" style="margin-top:0.75rem;">Revisar receta →</div>
+        </div>
+      </div>
+      <div class="specs">
+        <h3>Opción E — Layered Elevation</h3>
+        <div class="spec-row"><span class="spec-label">Concepto</span><span class="spec-val">3 capas: fondo oscuro puro → wrapper del form cálido → cards aún más cálidas con box-shadow</span></div>
+        <div class="spec-row"><span class="spec-label">Variable CSS</span><span class="spec-val"><code>--warm-bg</code> wrapper · <code>--warm-bg-accent</code> cards · shadow amber</span></div>
+        <div class="spec-row"><span class="spec-label">Shadow</span><span class="spec-val"><code>shadow-[0px_4px_16px_oklch(0.22_0.04_50_/_0.3)]</code> en las cards</span></div>
+        <div class="spec-row"><span class="spec-label">Inspiración</span><span class="spec-val">Stripe · Mercury Bank · apps fintech premium · shadcn blocks</span></div>
+        <div class="spec-row"><span class="spec-label">Esfuerzo</span><span class="spec-val">Medio — requiere wrapper adicional en el form</span></div>
+        <div class="pros-cons">
+          <div class="pros"><h4>✓ Pros</h4>
+            <ul>
+              <li>Profundidad visual clara</li>
+              <li>Máximo contraste entre capas</li>
+              <li>Muy premium y cuidado</li>
+              <li>Combinación con Opción A</li>
+            </ul>
+          </div>
+          <div class="cons"><h4>✗ Contras</h4>
+            <ul>
+              <li>Requiere wrapper nuevo en el form</li>
+              <li>Más complejidad en el DOM</li>
+            </ul>
+          </div>
+        </div>
+        <div class="recomendacion">⭐ <strong>Segunda recomendación.</strong> La combinación de A + E (warm cards dentro de wrapper cálido) es la opción más premium. El effort adicional es mínimo y el resultado es el más diferenciado.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVA -->
+  <div id="panel-compare" class="panel">
+    <div class="comparison">
+      <table>
+        <thead>
+          <tr>
+            <th>Opción</th>
+            <th>Calidez visual</th>
+            <th>Jerarquía</th>
+            <th>Esfuerzo impl.</th>
+            <th>Coherencia app</th>
+            <th>Recomendación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A · Warm Cards</strong></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="winner">⭐ 1ª opción</span></td>
+          </tr>
+          <tr>
+            <td><strong>B · Brand Sections</strong></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span></span></td>
+            <td>2ª opción</td>
+          </tr>
+          <tr>
+            <td><strong>C · Glass Warm</strong></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td>Arriesgado</td>
+          </tr>
+          <tr>
+            <td><strong>D · Linear-style</strong></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td>Opción segura</td>
+          </tr>
+          <tr>
+            <td><strong>E · Layered Elevation</strong></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-off"></span><span class="dot-off"></span><span class="dot-off"></span></span></td>
+            <td><span class="score"><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span><span class="dot-on"></span></span></td>
+            <td><span class="winner">⭐ A+E combo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:1.25rem;margin-top:0;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <div>
+        <h3 style="font-size:0.8rem;font-weight:700;color:#d4d4d4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;">Referencia en la app</h3>
+        <p style="font-size:0.8rem;color:#a3a3a3;margin-bottom:0.5rem;">El patrón A (warm) es consistente con cómo la app trata otras vistas de "contenido del usuario":</p>
+        <ul style="font-size:0.78rem;color:#a3a3a3;padding-left:1.2rem;">
+          <li style="margin-bottom:0.3rem;"><strong style="color:#d4d4d4">Auth pages</strong> — <code style="font-size:0.68rem;background:#111;padding:0.1rem 0.3rem;border-radius:3px;color:#f97316;">--auth-dark</code> (negro cálido) en el panel de formulario</li>
+          <li style="margin-bottom:0.3rem;"><strong style="color:#d4d4d4">Cards del feed</strong> — <code style="font-size:0.68rem;background:#111;padding:0.1rem 0.3rem;border-radius:3px;color:#f97316;">bg-card</code> sobre <code style="font-size:0.68rem;background:#111;padding:0.1rem 0.3rem;border-radius:3px;color:#f97316;">bg-background</code></li>
+          <li style="margin-bottom:0.3rem;"><strong style="color:#d4d4d4">Detalle receta</strong> — tarjeta <code style="font-size:0.68rem;background:#111;padding:0.1rem 0.3rem;border-radius:3px;color:#f97316;">-mt-8 rounded-t-[2rem]</code> sobre hero</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:0.8rem;font-weight:700;color:#d4d4d4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;">Implementación Opción A</h3>
+        <pre style="background:#111;border:1px solid #222;border-radius:8px;padding:0.75rem;font-size:0.68rem;color:#d4d4d4;overflow-x:auto;">{/* En formularioCrearReceta.tsx */}
+&lt;section className="
+  bg-[var(--warm-bg)]
+  border border-[var(--warm-bg-accent)]
+  rounded-xl p-4
+"&gt;
+  {/* contenido de sección */}
+&lt;/section&gt;
+
+{/* globals.css — si no existen aún */}
+:root {
+  --warm-bg: oklch(0.14 0.01 60);
+  --warm-bg-accent: oklch(0.18 0.015 55);
+}</pre>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

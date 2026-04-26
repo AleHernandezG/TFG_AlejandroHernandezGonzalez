@@ -96,9 +96,9 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">2</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">4</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">8</div><div class="label">Urgencia media</div></div>
+    <div class="counter review"><div class="num">6</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">16</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
     <div class="counter done"><div class="num">56</div><div class="label">Completadas</div></div>
   </div>
@@ -546,6 +546,46 @@
           <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
+        <tr>
+          <td class="id">UI-025</td>
+          <td class="desc">
+            <strong>Mejorar contraste visual del formulario crear receta</strong>
+            <small>Las tarjetas de sección del formulario apenas se distinguen del fondo general. Elegir una de las 5 opciones de diseño propuestas en docs/desarrollo/opcionesUiCrearReceta.html: warm cards, brand sections, glass warm, linear-style o layered elevation. Implementar usando variables CSS de globals.css (--warm-bg, --brand-subtle, etc.) — 0 colores hardcodeados.</small>
+            <span class="source">📄 docs/desarrollo/opcionesUiCrearReceta.html · features/recetas/components/crearReceta/formularioCrearReceta.tsx · docs/rules.md §3</span>
+          </td>
+          <td><span class="status review">👁️ Implementado · pendiente revisión autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-026</td>
+          <td class="desc">
+            <strong>Crear receta: título hero con tipografía de marca</strong>
+            <small>Cambiar h1 "Nueva receta" por "¿Cuál es tu nueva creación?" con tipografía centrada, word "creación" en font-black italic text-brand, SVG underline curvo y drop-shadow naranja. Mismo patrón visual que el hero del landing page.</small>
+            <span class="source">📄 app/(main)/crear-receta/page.tsx · docs/changes/ui-changes.md [UI-026]</span>
+          </td>
+          <td><span class="status review">👁️ Implementado · pendiente revisión autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-027</td>
+          <td class="desc">
+            <strong>Crear receta: alérgenos chips tamaño md</strong>
+            <small>Aumentar tamaño de chips de alérgenos detectados de size="sm" (icono 16px, text-[10px]) a size="md" (icono 20px, text-xs) para mejorar legibilidad de un dato de seguridad alimentaria importante.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionAlergenos.tsx · docs/changes/ui-changes.md [UI-027]</span>
+          </td>
+          <td><span class="status review">👁️ Implementado · pendiente revisión autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-028</td>
+          <td class="desc">
+            <strong>Crear receta: fondo fotográfico con atribución Unsplash</strong>
+            <small>Añadir imagen de fondo crearRecetaImagen.webp (1920×2880) con overlay bg-black/45 y object-top para encuadre móvil. Créditos de autor Delfina Iacub en esquina inferior derecha (text-white/40). Misma arquitectura que login/page.tsx.</small>
+            <span class="source">📄 app/(main)/crear-receta/page.tsx · public/images/recetas/crearRecetaImagen.webp · docs/rules.md §16</span>
+          </td>
+          <td><span class="status review">👁️ Implementado · pendiente revisión autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -662,6 +702,36 @@
           <td><span class="status pending">⏳ Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
+        <tr>
+          <td class="id">DEBT-009<br><small style="color:#525252">→ UI-026</small></td>
+          <td class="desc">
+            <strong>Extraer useCrearReceta hook — formularioCrearReceta + previsualizacionReceta</strong>
+            <small>formularioCrearReceta.tsx tiene onSubmitValido() inline y previsualizacionReceta.tsx tiene handlePublicar() inline. Viola la regla Componente → Hook → Service → apiClient (docs/rules.md §1). Crear features/recetas/hooks/useCrearReceta.ts que gestione el estado de envío, el loading y las llamadas al service. Los componentes quedan solo con UI.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · previsualizacionReceta.tsx · docs/rules.md §1</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">SVC-001</td>
+          <td class="desc">
+            <strong>Crear recetasService.ts — capa HTTP para recetas</strong>
+            <small>No existe ningún service para recetas. Sin él, cuando se conecte el backend (TODO-CR-01, CR-02) los componentes harían llamadas directas violando la arquitectura. Crear src/services/recetasService.ts con los métodos: crear(datos), obtenerPorId(id), obtenerFeed(filtros), toggleLike(id), toggleGuardada(id). Necesario antes de Fase 5.</small>
+            <span class="source">📄 src/services/ · docs/rules.md §1 · TODO-CR-01 · TODO-CR-02</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-003</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Receta</strong>
+            <small>No existe ningún schema Mongoose para recetas. Bloquea todos los endpoints de recetas (crear, obtener feed, detalle, like, guardar). Schema: titulo, descripcion, autor (ref Usuario), foto (url Cloudinary), ingredientes[], pasos[], dietas[], alergenos[], dificultad, tiempo, porciones, likes (ref[]), guardadoPor (ref[]), creadoEn. Separar IReceta en types/receta.ts e IRecetaDoc en models/recetaMongo.ts.</small>
+            <span class="source">📄 backend/src/models/ · backend/src/types/ · docs/rules.md §6 · docs/folderStructure.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -748,6 +818,46 @@
           <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
+        <tr>
+          <td class="id">API-013</td>
+          <td class="desc">
+            <strong>BE: POST /api/recetas — crear receta</strong>
+            <small>Endpoint para persistir recetas creadas desde el formulario. Requiere DOM-003 (modelo Receta) y SVC-001 (recetasService.ts). Flujo: Controller → recetaService.crear(datos, autorId) → recetaRepository.crear(doc). Si hay foto: llamada a imagenService.subirFoto(file) → Cloudinary. Respuesta 201 con el id de la receta creada. Desbloquea TODO-CR-01 y TODO-CR-02.</small>
+            <span class="source">📄 backend/src/routes/ · backend/src/controllers/ · TODO-CR-01 · TODO-CR-02 · DOM-003</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-014</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas + GET /api/recetas/:id — feed y detalle reales</strong>
+            <small>GET /api/recetas: feed paginado con filtros (dieta, dificultad, alergenos, q búsqueda). GET /api/recetas/:id: receta completa con autor populado. Sustituyen los datos mock de datosFeed.ts y datosDetalle.ts. Requiere DOM-003. Desbloquea DET-008, DET-001 (guardadas reales), DET-002 (likes reales), DET-009 (similares reales).</small>
+            <span class="source">📄 backend/src/routes/ · features/recetas/data/datosFeed.ts · datosDetalle.ts · DET-008</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">FOTO-001</td>
+          <td class="desc">
+            <strong>Foto automática vía Pexels API si el usuario no sube imagen</strong>
+            <small>Si el campo foto queda vacío, llamar a Pexels API (GET /v1/search?query={titulo}&per_page=1) desde imagenService.ts y guardar la URL devuelta en MongoDB. Requiere: PEXELS_API_KEY en Render + campo fotoFuente ('usuario'|'pexels') + fotoCredito ({fotografo, urlFoto, urlPerfil}) en el modelo Receta (DOM-003). Depende de API-013. Ver docs/desarrollo/crearReceta.html §foto-auto.</small>
+            <span class="source">📄 backend/src/services/imagenService.ts · TODO-CR-03 · DOM-003 · docs/desarrollo/crearReceta.html</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">FOTO-002</td>
+          <td class="desc">
+            <strong>Mostrar créditos Pexels en la vista de detalle de receta</strong>
+            <small>Licencia Pexels obliga a mostrar atribución cuando fotoFuente === 'pexels'. En heroReceta.tsx, si fotoFuente === 'pexels' mostrar bajo la imagen: "📷 Foto de {fotografo} en Pexels" con enlace a urlFoto y urlPerfil. Texto text-xs text-muted-foreground con los dos enlaces activos. Ver docs/desarrollo/crearReceta.html §pexels-creditos para el markup exacto. Depende de FOTO-001.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · docs/desarrollo/crearReceta.html · FOTO-001</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -823,6 +933,16 @@
           </td>
           <td><span class="status pending">⏳ Sprint 5 / Fase 6</span></td>
           <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-009<br><small style="color:#525252">→ UI-026</small></td>
+          <td class="desc">
+            <strong>formularioCrearReceta + previsualizacionReceta — lógica de envío inline</strong>
+            <small>onSubmitValido() en formularioCrearReceta.tsx y handlePublicar() en previsualizacionReceta.tsx están directamente en el componente visual. Viola la regla Componente → Hook → Service → apiClient. Si cambia la llamada al backend hay que buscar el componente UI. Resolver con useCrearReceta.ts en features/recetas/hooks/.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · previsualizacionReceta.tsx · docs/rules.md §1</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">DEBT-007</td>

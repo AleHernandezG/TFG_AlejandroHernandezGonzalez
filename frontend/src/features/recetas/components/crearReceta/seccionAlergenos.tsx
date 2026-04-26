@@ -9,7 +9,7 @@ type Props = {
 
 export function SeccionAlergenos({ alergenosDetectados }: Props) {
   return (
-    <section className="bg-card rounded-2xl p-5 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+    <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
       <h2 className="text-base font-extrabold text-foreground mb-1">Alérgenos detectados</h2>
       <p className="text-xs text-muted-foreground mb-4">
         Los alérgenos se detectan automáticamente según los ingredientes
@@ -18,7 +18,7 @@ export function SeccionAlergenos({ alergenosDetectados }: Props) {
       {alergenosDetectados.length > 0 ? (
         <div className="flex flex-wrap gap-2 mb-4">
           {alergenosDetectados.map((id) => (
-            <ChipAlergeno key={id} alergenoId={id} size="sm" />
+            <ChipAlergeno key={id} alergenoId={id} size="md" />
           ))}
         </div>
       ) : (

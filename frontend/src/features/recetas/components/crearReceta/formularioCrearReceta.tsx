@@ -177,11 +177,11 @@ export function FormularioCrearReceta() {
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmitValido, onSubmitInvalido)}
-          className="flex flex-col gap-5 pb-8"
+          className="flex flex-col gap-4 bg-[var(--warm-bg)] rounded-3xl p-3 pb-8"
           noValidate
         >
           {/* ── Foto ── */}
-          <section className="bg-card rounded-2xl overflow-hidden shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+          <section className="bg-[var(--warm-bg-accent)] rounded-2xl overflow-hidden shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
             <input
               ref={inputFotoRef}
               type="file"
@@ -213,7 +213,7 @@ export function FormularioCrearReceta() {
           </section>
 
           {/* ── Información básica ── */}
-          <section className="bg-card rounded-2xl p-5 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+          <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
             <h2 className="text-base font-extrabold text-foreground mb-4">Información básica</h2>
 
             {/* Título */}
@@ -340,7 +340,7 @@ export function FormularioCrearReceta() {
                         'flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors',
                         activo
                           ? 'bg-brand text-brand-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                          : 'bg-[var(--warm-bg)] text-muted-foreground hover:bg-[var(--warm-bg)]/80',
                       ].join(' ')}
                     >
                       {ETIQUETAS_DIFICULTAD[d]}
@@ -355,7 +355,7 @@ export function FormularioCrearReceta() {
           </section>
 
           {/* ── Tipo de receta ── */}
-          <section className="bg-card rounded-2xl p-5 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+          <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
             <h2 className="text-base font-extrabold text-foreground mb-3">Tipo de receta</h2>
             <SelectorChips
               opciones={DIETAS_OPCIONES}

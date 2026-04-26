@@ -79,6 +79,7 @@
   <a href="#validacion">Validación</a>
   <a href="#store">Store Zustand</a>
   <a href="#capas">Capas abstracción</a>
+  <a href="#foto-auto">Foto automática</a>
   <a href="#todos">TODOs Fase 5</a>
 </nav>
 
@@ -395,6 +396,110 @@ detectarAlergenos.ts  ← función pura, 0 dependencias externas</pre>
     </div>
   </section>
 
+  <!-- FOTO AUTOMÁTICA PEXELS -->
+  <section id="foto-auto">
+    <div class="section-header">
+      <span class="section-icon">🖼️</span>
+      <h2>Foto automática — Pexels API</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Si el usuario no sube foto al crear la receta, el backend llama a
+        <strong>Pexels API</strong> para obtener una imagen representativa basada en el título.
+        La URL se guarda en MongoDB junto a los créditos obligatorios.
+        Decisión tomada frente a otras opciones (Unsplash, Cloudinary AI) — ver
+        <code>docs/desarrollo/estadoTareas.html · FOTO-001</code>.
+      </p>
+
+      <h3 id="foto-auto-flujo">Flujo BE (Fase 5)</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <span class="step-num">1</span>
+          <div class="step-txt">
+            <code>POST /api/recetas</code> recibe los datos del formulario
+            <small>Si <code>foto</code> está vacío → continúa al paso 2. Si el usuario subió foto → imagenService.subirFoto(file) → Cloudinary, fotoFuente = 'usuario'</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">2</span>
+          <div class="step-txt">
+            <code>imagenService.buscarFotoPexels(titulo)</code>
+            <small>GET <code>https://api.pexels.com/v1/search?query={titulo}&per_page=1&orientation=landscape</code> con header <code>Authorization: PEXELS_API_KEY</code></small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">3</span>
+          <div class="step-txt">
+            Pexels devuelve el objeto foto — se extraen los campos necesarios
+            <small><code>foto = photos[0].src.large2x</code> · <code>fotoCredito.fotografo = photos[0].photographer</code> · <code>fotoCredito.urlFoto = photos[0].url</code> · <code>fotoCredito.urlPerfil = photos[0].photographer_url</code></small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">4</span>
+          <div class="step-txt">
+            Se guarda en MongoDB: <code>fotoFuente = 'pexels'</code> + <code>fotoCredito = {...}</code>
+            <small>Solo 1 llamada a Pexels en el momento de crear la receta. En cada render posterior se usa la URL ya guardada — sin llamadas externas adicionales.</small>
+          </div>
+        </div>
+      </div>
+
+      <h3>Schema MongoDB — campos añadidos al modelo Receta</h3>
+      <pre>fotoFuente: 'usuario' | 'pexels' | 'cloudinary'   // default: 'usuario'
+fotoCredito?: {
+  fotografo: string      // nombre del fotógrafo en Pexels
+  urlFoto:   string      // enlace a la foto en pexels.com (obligatorio en atribución)
+  urlPerfil: string      // enlace al perfil del fotógrafo (obligatorio en atribución)
+}</pre>
+
+      <h3 id="pexels-creditos">Créditos obligatorios — licencia Pexels</h3>
+      <p>
+        La <a href="https://www.pexels.com/license/" style="color:#60a5fa">licencia Pexels</a> exige mostrar
+        atribución cuando se usa su contenido. Se muestra discretamente bajo la foto en la vista de detalle.
+      </p>
+      <pre>&lt;!-- heroReceta.tsx — solo si fotoFuente === 'pexels' --&gt;
+{receta.fotoFuente === 'pexels' &amp;&amp; receta.fotoCredito &amp;&amp; (
+  &lt;p className="text-xs text-muted-foreground mt-1 px-4"&gt;
+    📷 Foto de{' '}
+    &lt;a href={receta.fotoCredito.urlPerfil}
+       target="_blank" rel="noopener noreferrer"
+       className="underline underline-offset-2"&gt;
+      {receta.fotoCredito.fotografo}
+    &lt;/a&gt;
+    {' '}en{' '}
+    &lt;a href={receta.fotoCredito.urlFoto}
+       target="_blank" rel="noopener noreferrer"
+       className="underline underline-offset-2"&gt;
+      Pexels
+    &lt;/a&gt;
+  &lt;/p&gt;
+)}</pre>
+      <p>
+        El texto es <code>text-xs text-muted-foreground</code> — discreto pero legible y con los
+        dos enlaces requeridos por Pexels activos. No se muestra si <code>fotoFuente === 'usuario'</code>
+        o <code>'cloudinary'</code>.
+      </p>
+
+      <h3>Variable de entorno requerida</h3>
+      <table>
+        <thead><tr><th>Variable</th><th>Dónde</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="path">PEXELS_API_KEY</td>
+            <td>Render (BE) + <code>backend/.env</code></td>
+            <td>Clave gratuita de <a href="https://www.pexels.com/api/" style="color:#60a5fa">pexels.com/api</a> · 200 req/hora · sin coste</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Evolución planificada (no implementar ahora)</h3>
+      <p>
+        En Fase 6, cuando la app tenga fotos reales subidas por usuarios, se puede activar
+        <strong>Cloudinary AI Semantic Search</strong> para buscar fotos del propio ecosistema Cookr
+        antes de recurrir a Pexels. <code>fotoFuente: 'cloudinary'</code> ya está previsto en el schema.
+      </p>
+    </div>
+  </section>
+
   <!-- TODOS FASE 5 -->
   <section id="todos">
     <div class="section-header">
@@ -418,7 +523,7 @@ detectarAlergenos.ts  ← función pura, 0 dependencias externas</pre>
           <tr>
             <td class="id">TODO-CR-03</td>
             <td class="path">crearReceta.schema.ts · campo foto</td>
-            <td>Cambiar <code>z.instanceof(File).optional()</code> a requerido</td>
+            <td>Mantener <code>z.instanceof(File).optional()</code> — la foto es opcional porque si no se sube se asigna una de Pexels automáticamente (FOTO-001)</td>
           </tr>
           <tr>
             <td class="id">TODO-CR-04</td>

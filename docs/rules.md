@@ -444,3 +444,55 @@ Los chips de filtro de `BuscadorFiltros` (Todas · Vegano · Keto · Sin gluten 
 ```
 
 Todos los imports usan `@/` como raíz de `src/`. Nunca rutas relativas largas (`../../../`).
+
+---
+
+## 16. Atribución de imágenes externas
+
+Cuando una imagen de terceros se use como fondo o contenido visual, aplicar las siguientes reglas según la fuente.
+
+### Pexels — obligatorio por licencia
+
+La licencia Pexels exige atribución. Mostrar siempre los créditos cuando `fotoFuente === 'pexels'`, en el componente de detalle de receta:
+
+```tsx
+{receta.fotoFuente === 'pexels' && (
+  <p className="text-xs text-muted-foreground mt-1">
+    Foto por{' '}
+    <a href={receta.fotoCredito.urlPerfil} target="_blank" rel="noopener noreferrer"
+       className="underline hover:text-foreground">
+      {receta.fotoCredito.fotografo}
+    </a>{' '}en{' '}
+    <a href={receta.fotoCredito.urlFoto} target="_blank" rel="noopener noreferrer"
+       className="underline hover:text-foreground">
+      Pexels
+    </a>
+  </p>
+)}
+```
+
+### Unsplash — voluntaria, buena práctica para el TFG
+
+La licencia Unsplash no exige atribución legalmente, pero se añade como buena práctica académica. Para fondos de página, usar texto discreto en la esquina inferior derecha del contenedor con la imagen:
+
+```tsx
+<p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/40 leading-tight">
+  Foto de{' '}
+  <a
+    href="{URL_PERFIL}?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    target="_blank" rel="noopener noreferrer"
+    className="underline hover:text-white/70 transition-colors"
+  >
+    {Nombre Fotógrafo}
+  </a>{' '}en{' '}
+  <a
+    href="{URL_FOTO}?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
+    target="_blank" rel="noopener noreferrer"
+    className="underline hover:text-white/70 transition-colors"
+  >
+    Unsplash
+  </a>
+</p>
+```
+
+Siempre incluir los parámetros UTM que Unsplash proporciona al descargar la foto (botón "Compartir enlace" en la web). Guardar la URL completa con UTM en el componente.

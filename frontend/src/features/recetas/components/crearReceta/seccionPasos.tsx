@@ -14,7 +14,7 @@ export function SeccionPasos() {
   const { fields, append, remove } = useFieldArray({ control, name: 'pasos' })
 
   return (
-    <section className="bg-card rounded-2xl p-5 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+    <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
       <h2 className="text-base font-extrabold text-foreground mb-4">Pasos</h2>
 
       <div className="space-y-4">

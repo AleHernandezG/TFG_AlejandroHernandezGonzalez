@@ -227,5 +227,121 @@ Política de errores:
   Endpoint POST /api/auth/verificar-email/reenviar implementado — reutiliza enviarEmailVerificacion().
 
 Motivo: EMAIL-001 — activar el flujo completo de email sin depender de Resend/dominio propio.
-        Gmail SMTP funciona en dev y prod sin configuración extra. Límite ~500 emails/día,
-        suficiente para el TFG. Si el volumen crece, migrar a Resend con dominio verificado.
+
+---
+
+## [API-013] BE Recetas — POST /api/recetas
+
+Fecha: 2026-04-26 | Estado: ⏳ Pendiente | Afecta: BE | Sprint: 5
+
+  POST /api/recetas
+  Auth: Bearer JWT requerido (middleware auth)
+  Body (multipart/form-data o JSON):
+    { titulo, descripcion, ingredientes, pasos, dietas, dificultad, tiempo, porciones, foto? }
+  Lógica:
+    1. Validar body con Zod schema
+    2. Si foto vacía → llamar Pexels API con titulo como query → guardar URL + créditos
+    3. Calcular alergenos automáticamente desde ingredientes
+    4. Guardar en MongoDB (colección recetas) vía recetaRepository
+  Response 201: { receta: IReceta }
+  Response 400: errores Zod
+  Response 401: sin autenticar
+
+Archivos BE a crear:
+  backend/src/types/receta.ts                  → interfaz IReceta pura (ARCH-001)
+  backend/src/models/recetaMongo.ts             → IRecetaDoc + Mongoose schema
+  backend/src/repositories/recetaRepository.ts → toda la comunicación con MongoDB
+  backend/src/controllers/receta.controller.ts
+  backend/src/routes/receta.routes.ts
+  backend/src/services/pexelsService.ts         → wrapper Pexels API (ver FOTO-001)
+
+Variables de entorno nuevas:
+  PEXELS_API_KEY → clave API de api.pexels.com
+
+Relacionado: DOM-003, FOTO-001
+
+---
+
+## [API-014] BE Recetas — GET /api/recetas + GET /api/recetas/:id
+
+Fecha: 2026-04-26 | Estado: ⏳ Pendiente | Afecta: BE | Sprint: 5
+
+  GET /api/recetas
+  Auth: opcional
+  Query params: dieta?, dificultad?, tiempo?, page?, limit?
+  Lógica: recetaRepository.listar con filtros + paginación
+  Response 200: { recetas: IReceta[], total, page, totalPages }
+
+  GET /api/recetas/:id
+  Auth: opcional
+  Lógica: recetaRepository.porId(id) — 404 si no existe
+  Response 200: { receta: IReceta }
+  Response 404: receta no encontrada
+
+Archivos BE:
+  backend/src/controllers/receta.controller.ts → MODIFICAR (añadir listar + porId)
+  backend/src/repositories/recetaRepository.ts → MODIFICAR (añadir métodos)
+
+Relacionado: DOM-003, API-013
+
+---
+
+## [FOTO-001] Integración Pexels API — foto automática en recetas
+
+Fecha: 2026-04-26 | Estado: ⏳ Pendiente | Afecta: BE | Sprint: 5
+
+Descripción:
+  Cuando el usuario no sube foto al crear una receta, el backend busca
+  automáticamente una foto en Pexels usando el título de la receta como query.
+  La URL y los créditos se guardan en MongoDB (campos fotoFuente + fotoCredito).
+
+Flujo en backend (POST /api/recetas):
+
+  1. Recibir receta sin foto
+  2. `GET <https://api.pexels.com/v1/search?query={titulo}&per_page=1>` — Header: `Authorization: PEXELS_API_KEY`
+  3. Extraer: `photos[0].src.large2x` + `photographer` + `url` + `photographer_url`
+  4. Guardar en MongoDB: `foto`, `fotoFuente: 'pexels'`, `fotoCredito: { fotografo, urlFoto, urlPerfil }`
+
+Archivos a crear:
+  backend/src/services/pexelsService.ts → buscarFotoPorTitulo(titulo: string)
+
+Variables de entorno:
+  PEXELS_API_KEY (límite: 200 req/hora, suficiente para TFG)
+
+Nota evolutiva: en versiones futuras se podría usar Cloudinary AI semantic search
+  para reutilizar fotos ya subidas por usuarios, evitando llamadas externas repetidas.
+
+Relacionado: DOM-003 (campos fotoFuente, fotoCredito), FOTO-002, API-013
+
+---
+
+## [FOTO-002] FE Receta — mostrar créditos Pexels en detalle receta
+
+Fecha: 2026-04-26 | Estado: ⏳ Pendiente | Afecta: FE | Sprint: 5
+
+Descripción:
+  La licencia de Pexels exige atribución obligatoria. Cuando fotoFuente === 'pexels',
+  el componente de detalle de receta debe mostrar debajo de la imagen los créditos
+  con dos enlaces: perfil del fotógrafo y URL de la foto original en Pexels.
+
+Markup JSX a implementar (solo si `receta.fotoFuente === 'pexels'`):
+
+```tsx
+<p className="text-xs text-muted-foreground mt-1">
+  Foto por{' '}
+  <a href={receta.fotoCredito.urlPerfil} target="_blank" rel="noopener noreferrer"
+     className="underline hover:text-foreground">
+    {receta.fotoCredito.fotografo}
+  </a>
+  {' '}en{' '}
+  <a href={receta.fotoCredito.urlFoto} target="_blank" rel="noopener noreferrer"
+     className="underline hover:text-foreground">
+    Pexels
+  </a>
+</p>
+```
+
+Archivos FE a modificar:
+  frontend/src/features/recetas/components/detalleReceta/... → PENDIENTE CREAR (Sprint 4)
+
+Relacionado: FOTO-001, DOM-003

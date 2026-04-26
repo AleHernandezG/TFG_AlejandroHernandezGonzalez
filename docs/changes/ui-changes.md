@@ -6,6 +6,197 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ---
 
+## [UI-025] — Crear receta: diseño visual A+E (Warm Cards + Layered Elevation)
+
+Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+
+**Ficheros modificados:**
+
+- `features/recetas/components/crearReceta/formularioCrearReceta.tsx`
+- `features/recetas/components/crearReceta/seccionIngredientes.tsx`
+- `features/recetas/components/crearReceta/seccionPasos.tsx`
+- `features/recetas/components/crearReceta/seccionAlergenos.tsx`
+
+### Motivación
+
+Las tarjetas de sección del formulario no tenían contraste visual suficiente frente al fondo general (`bg-background`). Al usar `bg-card` con la misma tonalidad oscura y neutral, las secciones se fundían con el entorno. Para una app de cooking, la calidez visual es importante para crear una experiencia invitante.
+
+Se evaluaron 5 opciones en `docs/desarrollo/opcionesUiCrearReceta.html`. Se eligió la **combinación A+E** por ser la de mayor impacto con mínimo esfuerzo y total coherencia con la paleta Cookr.
+
+### Cambios aplicados
+
+**Capa E — Wrapper del formulario:**
+
+```tsx
+// Antes
+<form className="flex flex-col gap-5 pb-8">
+
+// Después
+<form className="flex flex-col gap-4 bg-[var(--warm-bg)] rounded-3xl p-3 pb-8">
+```
+
+El formulario completo queda envuelto en un contenedor cálido (`--warm-bg = oklch(0.18 0.015 50)` en dark), creando la primera capa de elevación sobre el fondo de la página.
+
+**Capa A — Tarjetas de sección:**
+
+```tsx
+// Antes (todas las secciones)
+<section className="bg-card rounded-2xl p-5 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+
+// Después
+<section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+```
+
+`--warm-bg-accent = oklch(0.22 0.025 55)` en dark — más cálido y ligeramente más claro que el wrapper, creando la segunda capa de elevación. La sombra pasa a ser más profunda y cálida.
+
+**Botones de dificultad (inactivos):**
+
+```tsx
+// Antes
+'bg-muted text-muted-foreground hover:bg-muted/80'
+
+// Después
+'bg-[var(--warm-bg)] text-muted-foreground hover:bg-[var(--warm-bg)]/80'
+```
+
+Los botones inactivos usan el color del wrapper, quedando visualmente "recesados" dentro de la card.
+
+### Resultado — 3 capas de profundidad
+
+| Capa               | Color           | Variable                                     |
+| ------------------ | --------------- | -------------------------------------------- |
+| Fondo de página    | oscuro neutro   | `bg-background`                              |
+| Wrapper del form   | oscuro cálido   | `--warm-bg`                                  |
+| Tarjetas de sección| cálido elevado  | `--warm-bg-accent`                           |
+| Inputs dentro      | oscuro neutro   | `bg-background` — crea contraste hacia abajo |
+
+### Variables CSS utilizadas
+
+Definidas en `frontend/src/app/globals.css` (dark mode):
+```css
+--warm-bg:        oklch(0.18 0.015 50);   /* wrapper del form */
+--warm-bg-accent: oklch(0.22 0.025 55);   /* tarjetas de sección */
+```
+
+---
+
+## [UI-026] — Crear receta: título hero con tipografía de marca
+
+Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+
+**Ficheros modificados:**
+
+- `app/(main)/crear-receta/page.tsx`
+
+### UI-026 — Motivación
+
+El h1 "Nueva receta" era genérico, alineado a la izquierda y sin personalidad visual. El objetivo era darle presencia y calidez usando los mismos patrones tipográficos del hero del landing page.
+
+### UI-026 — Cambios aplicados
+
+```tsx
+// Antes
+<h1 className="text-2xl font-extrabold text-foreground mb-6">Nueva receta</h1>
+
+// Después
+<h1 className="text-center text-[1.75rem] font-bold leading-snug tracking-tight text-foreground mb-6">
+  ¿Cuál es tu nueva{' '}
+  <span
+    className="font-black italic text-brand relative inline-block"
+    style={{ filter: 'drop-shadow(0 1px 6px oklch(0.6 0.22 50 / 0.35))' }}
+  >
+    creación
+    <svg aria-hidden className="absolute -bottom-1 left-0 w-full overflow-visible"
+         height="6" viewBox="0 0 100 6" preserveAspectRatio="none">
+      <path d="M0,4 Q25,1 50,4 Q75,7 100,4" fill="none"
+            stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  </span>?
+</h1>
+```
+
+Patrones aplicados del landing hero:
+
+- `text-center` — centrado relativo al ancho del formulario
+- `font-black italic text-brand` en "creación" — mismo tratamiento que "cocinando" en el hero
+- SVG underline curvo bajo "creación" — mismo componente que "recetas" en el hero
+- `drop-shadow` naranja suave — da profundidad sin fondo fotográfico
+
+---
+
+## [UI-028] — Crear receta: fondo fotográfico con atribución Unsplash
+
+Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+
+**Ficheros modificados:**
+
+- `app/(main)/crear-receta/page.tsx`
+
+**Asset añadido:** `public/images/recetas/crearRecetaImagen.webp` — 1920×2880 portrait (Delfina Iacub / Unsplash)
+
+### UI-028 — Motivación
+
+Dar profundidad y contexto visual a la página de creación de recetas, siguiendo el mismo patrón fotográfico de las páginas de auth. La imagen portrait encuadra perfectamente en móvil con `object-top`.
+
+### UI-028 — Cambios aplicados
+
+Estructura de la page reemplazada de `<main>` simple a contenedor fotográfico igual a `login/page.tsx`:
+
+```tsx
+<div className="relative min-h-screen">
+  <Image src="/images/recetas/crearRecetaImagen.webp"
+    fill priority sizes="100vw"
+    className="object-cover object-top" aria-hidden="true" />
+  <div className="absolute inset-0 bg-black/45" />
+
+  {/* Crédito Unsplash — ver rules.md §16 */}
+  <p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/40">
+    Foto de <a href="...">Delfina Iacub</a> en <a href="...">Unsplash</a>
+  </p>
+
+  <main className="relative z-10 max-w-[390px] mx-auto px-5 pt-6 pb-8">
+    <h1 ... className="... text-white" style={{ textShadow: '...' }}>
+    <FormularioCrearReceta />
+  </main>
+</div>
+```
+
+Ajustes al h1 por el nuevo contexto fotográfico oscuro:
+
+- `text-foreground` → `text-white` (regla auth: no sustituible por foreground sobre overlay)
+- `textShadow` en inline style (`rgba` — excepción técnica documentada en rules.md §3)
+- `filter drop-shadow` reforzado en el span brand (`rgba(0,0,0,0.7)`)
+
+Nota PC futura: cuando se implemente el bento grid en escritorio, el `max-w-[390px]` se eliminará y la imagen de fondo ya estará en su posición correcta como `fill object-cover`.
+
+---
+
+## [UI-027] — Crear receta: alérgenos chips tamaño md
+
+Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+
+**Ficheros modificados:**
+
+- `features/recetas/components/crearReceta/seccionAlergenos.tsx`
+
+### UI-027 — Motivación
+
+Los chips de alérgenos usaban `size="sm"` (icono 16px, `text-[10px]`), lo que dificultaba la lectura de un dato importante de seguridad alimentaria.
+
+### UI-027 — Cambios aplicados
+
+```tsx
+// Antes
+<ChipAlergeno key={id} alergenoId={id} size="sm" />
+
+// Después
+<ChipAlergeno key={id} alergenoId={id} size="md" />
+```
+
+`size="md"` usa icono 20px, `text-xs`, más padding (`px-3 py-1`) — más legible manteniendo el mismo componente.
+
+---
+
 ## [UI-023] — Asset: fondo-auth.jpg → fondo-auth.webp ✅
 
 Fecha: 2026-04-22 | Estado: ✅ Completado | Sprint: 3
