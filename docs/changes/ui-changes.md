@@ -8,7 +8,7 @@ Registro de cambios visuales y de componentes. Formato: [UI-XXX] por orden crono
 
 ## [UI-025] — Crear receta: diseño visual A+E (Warm Cards + Layered Elevation)
 
-Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+Fecha: 2026-04-26 | Estado: ✅ Completado | Sprint: 3
 
 **Ficheros modificados:**
 
@@ -82,7 +82,7 @@ Definidas en `frontend/src/app/globals.css` (dark mode):
 
 ## [UI-026] — Crear receta: título hero con tipografía de marca
 
-Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+Fecha: 2026-04-26 | Estado: ✅ Completado | Sprint: 3
 
 **Ficheros modificados:**
 
@@ -126,7 +126,7 @@ Patrones aplicados del landing hero:
 
 ## [UI-028] — Crear receta: fondo fotográfico con atribución Unsplash
 
-Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+Fecha: 2026-04-26 | Estado: ✅ Completado | Sprint: 3
 
 **Ficheros modificados:**
 
@@ -173,7 +173,7 @@ Nota PC futura: cuando se implemente el bento grid en escritorio, el `max-w-[390
 
 ## [UI-027] — Crear receta: alérgenos chips tamaño md
 
-Fecha: 2026-04-26 | Estado: 👁️ Pendiente revisión autor | Sprint: 3
+Fecha: 2026-04-26 | Estado: ✅ Completado | Sprint: 3
 
 **Ficheros modificados:**
 
