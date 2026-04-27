@@ -228,6 +228,10 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/coleccion` | Mi colección — subpestañas Guardadas y Mis recetas (mock) | ✅ Sprint 3 |
 | `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | 👁️ Pendiente revisión |
 | `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + banner + publicar mock | 👁️ Pendiente revisión |
+| `/despensa` | Despensa virtual — inventario de ingredientes del usuario | ⏳ Sprint 3 — pendiente Stitch |
+| `/chat` | Chat IA (asistente culinario Cookr IA) — sin navbar inferior | ⏳ Sprint 3 — pendiente Stitch |
+| `/perfil` | Ajustes de usuario (avatar, contraseña, preferencias, permisos) | ⏳ Sprint 3 — pendiente Stitch |
+| `/discover` | Discover — feed global trending + eventos temáticos | ⏳ Sprint 3 — pendiente Stitch |
 | `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | 👁️ Pendiente revisión |
 | `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | 👁️ Pendiente revisión |
 | `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |

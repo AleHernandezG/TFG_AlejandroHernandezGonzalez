@@ -134,6 +134,7 @@ Sprint N:
 | Buscar recetas | Barra búsqueda con debounce. Resultados en tiempo real. Estado vacío | 5 pts | E2 |
 | Filtrar recetas | Drawer filtros. Multi-selección. Badge número activos | 3 pts | E2 |
 | Crear receta | Formulario multi-step. Drag-and-drop pasos. Preview antes de publicar | 8 pts | E2 |
+| Scaffolding vistas Sprint 3+ | Carpetas + barrel exports + pages placeholder para despensa, chat, perfil, discover. `docs/tareas-vistas-pendientes.md` creado | 1 pt | E2/E4/E5/E7 |
 
 #### BE — Feed + Detalle real Sprint 2 FE conectado
 

@@ -20,6 +20,12 @@ src/
 │   │   │   └── page.tsx
 │   │   ├── coleccion/          # Ruta /coleccion — Guardadas + Mis recetas [UI-020]
 │   │   │   └── page.tsx
+│   │   ├── despensa/           # Ruta /despensa — placeholder ⏳ Sprint 3+
+│   │   │   └── page.tsx
+│   │   ├── chat/               # Ruta /chat — placeholder ⏳ Sprint 3+ (sin navbar)
+│   │   │   └── page.tsx
+│   │   ├── perfil/             # Ruta /perfil — placeholder ⏳ Sprint 3+ (ajustes)
+│   │   │   └── page.tsx
 │   │   ├── recetas/
 │   │   │   └── [id]/           # Ruta /recetas/[id] — detalle de receta
 │   │   │       └── page.tsx
@@ -105,9 +111,25 @@ src/
 │   │   └── types/
 │   │       ├── receta.types.ts
 │   │       └── crearReceta.schema.ts  # Zod schema + DatosCrearReceta + ETIQUETAS_DIFICULTAD
-│   ├── perfil/                 # Sprint 4+
-│   ├── despensa/               # Sprint 5+
-│   ├── chat/                   # Sprint 5+
+│   ├── perfil/                 # Sprint 4+ (estructura pendiente de crear)
+│   ├── despensa/               # ⏳ Sprint 3+ — estructura creada
+│   │   ├── components/
+│   │   │   └── index.ts        # Barrel export vacío
+│   │   ├── data/               # datosIngredientes.ts — pendiente
+│   │   ├── hooks/              # useDespensa.ts — pendiente Fase 5
+│   │   └── types/              # tipos de despensa — pendiente
+│   ├── coleccion/              # ⏳ Sprint 3+ — estructura creada
+│   │   ├── components/
+│   │   │   └── index.ts        # Barrel export vacío
+│   │   ├── data/
+│   │   ├── hooks/              # useColeccion.ts — pendiente Fase 5
+│   │   └── types/
+│   ├── chat/                   # ⏳ Sprint 3+ — estructura creada
+│   │   ├── components/
+│   │   │   └── index.ts        # Barrel export vacío
+│   │   ├── data/               # datosChat.ts — pendiente
+│   │   ├── hooks/              # useChatIA.ts — pendiente Fase 6
+│   │   └── types/
 │   └── grupos/                 # Sprint 6+
 │
 ├── hooks/                      # Custom hooks globales (usados por 2+ features)
@@ -193,9 +215,10 @@ Todos los imports usan `@/` como raíz de `src/`.
 | `landing` | ✅ Aprobado | SeccionHero, BentoCaracteristicas, BentoTestimonios |
 | `auth` | 👁️ revisión | FormularioRegistro, FormularioLogin, BotonGoogle, DivisorOAuth, +4 |
 | `recetas` | ✅ Aprobado | `home/` ×10 (FeedHome, DrawerFiltros, TarjetaPost…) · `detalleReceta/` ×7 · `/coleccion` (page) |
-| `perfil` | ⏳ Sprint 4 | Pendiente |
-| `despensa` | ⏳ Sprint 5 | Pendiente |
-| `chat` | ⏳ Sprint 5 | Pendiente |
+| `perfil` | ⏳ Sprint 4 | Pendiente (structure por crear) |
+| `despensa` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
+| `coleccion` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
+| `chat` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
 | `grupos` | ⏳ Sprint 6 | Pendiente |
 
 ## Añadir un nuevo feature
