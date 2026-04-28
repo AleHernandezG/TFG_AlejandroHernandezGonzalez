@@ -225,7 +225,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
 | `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
-| `/coleccion` | Mi colección — subpestañas Guardadas y Mis recetas (mock) | ✅ Sprint 3 |
+| `/coleccion` | Mi colección — Guardadas y Mis recetas, grid 2 cols portrait, stitch aprobado | ✅ Aprobado autor |
 | `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | 👁️ Pendiente revisión |
 | `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + banner + publicar mock | 👁️ Pendiente revisión |
 | `/despensa` | Despensa virtual — inventario de ingredientes del usuario | ⏳ Sprint 3 — pendiente Stitch |
@@ -285,13 +285,13 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 ## Próxima Tarea
 
 Sprint 2 completado y aprobado al 100%.
-Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001.
+Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001.
 
-Sprint 3 — pendientes:
+Sprint 3 — pendientes (revisión del autor):
+
 - **FE:** DET-001 — Guardar receta (persistente, conectar al BE)
 - **FE:** DET-002 — Like persistente en recetas (optimistic update TanStack Query)
 - **FE:** DET-009 — Carrusel de recetas similares funcional
-- **FE:** CAROUSEL-001 — Imágenes reales en el carrusel de la landing
 - **FE:** UI-018 — Formulario multi-step crear receta (RHF + Zod, 3-4 pasos)
 - **DOCS:** DOCS-002 — Renombrar archivos phase-reports/changes de pendientes a completados
 - **SETUP:** SETUP-008 — CI/CD GitHub Actions (alpha en main)

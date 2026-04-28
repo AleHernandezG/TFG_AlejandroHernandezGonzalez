@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Despensa - Cookr</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-secondary-fixed-variant": "#474747",
+                  "tertiary-fixed": "#cae6ff",
+                  "inverse-surface": "#2f312e",
+                  "on-secondary": "#ffffff",
+                  "inverse-on-surface": "#f2f1ed",
+                  "on-error-container": "#93000a",
+                  "primary-fixed-dim": "#fcba65",
+                  "on-primary-fixed-variant": "#653e00",
+                  "primary": "#855400",
+                  "on-primary": "#ffffff",
+                  "on-surface": "#1b1c1a",
+                  "on-background": "#1b1c1a",
+                  "tertiary": "#136490",
+                  "outline-variant": "#d5c4b2",
+                  "surface": "#faf9f5",
+                  "surface-container-low": "#f4f4f0",
+                  "error": "#ba1a1a",
+                  "on-primary-container": "#643e00",
+                  "surface-tint": "#855400",
+                  "outline": "#837566",
+                  "on-tertiary-container": "#004b6f",
+                  "on-tertiary-fixed": "#001e30",
+                  "on-primary-fixed": "#2a1700",
+                  "inverse-primary": "#fcba65",
+                  "background": "#faf9f5",
+                  "surface-dim": "#dbdad6",
+                  "surface-container-highest": "#e3e2df",
+                  "surface-bright": "#faf9f5",
+                  "error-container": "#ffdad6",
+                  "primary-fixed": "#ffddb7",
+                  "secondary-container": "#e4e2e1",
+                  "tertiary-fixed-dim": "#8dcdff",
+                  "secondary-fixed": "#e4e2e1",
+                  "surface-container": "#efeeea",
+                  "on-surface-variant": "#514538",
+                  "surface-variant": "#e3e2df",
+                  "secondary": "#5f5e5e",
+                  "tertiary-container": "#7abbec",
+                  "secondary-fixed-dim": "#c8c6c6",
+                  "on-tertiary": "#ffffff",
+                  "on-error": "#ffffff",
+                  "on-secondary-container": "#656464",
+                  "surface-container-lowest": "#ffffff",
+                  "on-tertiary-fixed-variant": "#004b70",
+                  "primary-container": "#e8a855",
+                  "surface-container-high": "#e9e8e4",
+                  "on-secondary-fixed": "#1b1c1c"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {},
+          "fontFamily": {
+                  "headline": [
+                          "Plus Jakarta Sans"
+                  ],
+                  "display": [
+                          "Plus Jakarta Sans"
+                  ],
+                  "body": [
+                          "Plus Jakarta Sans"
+                  ],
+                  "label": [
+                          "Plus Jakarta Sans"
+                  ]
+          },
+          "fontSize": {}
+  },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glassmorphism {
+      background: rgba(250, 249, 245, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col relative pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#faf9f5]/80 backdrop-blur-xl shadow-none">
+<div class="flex items-center px-6 py-4 w-full">
+<div class="flex-grow text-center">
+<h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold tracking-[0.03em] text-[#1b1c1a]">
+          ¡Bienvenido a tu <span class="text-[#855400]">Despensa</span>!
+        </h1>
+<p class="text-secondary text-sm mt-1">12 ingredientes guardados</p>
+</div>
+<div class="w-6 flex-shrink-0"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="flex-1 pt-24 px-4 sm:px-6 md:hidden">
+<!-- Add Bar (Sticky) -->
+<div class="sticky top-24 z-40 mb-6 mt-4">
+<div class="glassmorphism rounded-full p-2 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)] border border-surface-variant/50">
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface placeholder-secondary ml-4 outline-none" placeholder="¿Quieres añadir algún alimento?" type="text"/>
+<button class="bg-primary text-on-primary rounded-full w-10 h-10 flex items-center justify-center hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-white" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Ingredient List -->
+<div class="space-y-4">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed to-primary-container flex-shrink-0 mr-4 overflow-hidden">
+<img alt="Tomates" class="w-full h-full object-cover" data-alt="close up of ripe red tomatoes on a wooden surface with warm natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5U0s-HYS97U-PwLOLJNqR_QyV1tfcQbn2BXFEq6Wj-GOIy5qRFxJTT84H6iD-fwSKWgxck1TTLCEa1n5sdOp0Wh0PC42ITDF0bxj2hBYflQTsfkNTSR5flhGNcEvg7Oxsir21BW_L9qqIjHeoQS0UED1P4yBawoPpq1MuobWzJEOFdr6cU4q-CJ-RYaIymw00Q7bccQKFzDDrvtHY9__ms_SblS-7llZUEzKLNTw7ZnVZ1gRjngHGxCV3YWiLGdpKRAg-iawlOcc"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-on-surface text-lg">Tomates</h3>
+<p class="text-secondary text-sm">4 unidades</p>
+</div>
+<div class="flex gap-2 text-secondary">
+<button class="hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span></button>
+<button class="hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span></button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-surface-variant to-secondary-container flex-shrink-0 mr-4 overflow-hidden">
+<img alt="Cebolla" class="w-full h-full object-cover" data-alt="close up of raw yellow onions with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPC6_w3znH75a6DfwXv94lGWpPuwcp7J5pqKQZlRDwYSHmSvQHmqYcIq8AdBR7OgaVhY5mpSZzRAx6sa0J1i6XzYAOcCQoAsL7jTPFYUPbap9q3CfeoAn0qt_BjmG3zTPt9-2IKdm4qve9HkJAyzoA9hY_OLGHebi3zqUSWsAsV0nhuLEjfhDjuUYxToCsRI59M4o5ZWQ1IDIaHwQcaFsJD5hkLpT-DhU2n-7XtcZKoYG9kF_3-49tbCt14WTilfu7tlFsh1pprCg"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-on-surface text-lg">Cebolla</h3>
+<p class="text-secondary text-sm">2 unidades</p>
+</div>
+<div class="flex gap-2 text-secondary">
+<button class="hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span></button>
+<button class="hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span></button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-tertiary-fixed to-tertiary-container flex-shrink-0 mr-4 overflow-hidden">
+<img alt="Ajo" class="w-full h-full object-cover" data-alt="close up of garlic cloves on a light background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFeT6y3foiukBFSZd0HYlcCjZy3ohRCuzlh1e589oQppqePUgR8gD_gkWpi6heHNUfCvWiZiwtkEFo_vMwCcr2jHcuAvm3Tm5N6YLkm_wQuBF_BaybvQNmSXbXZw5TTIUPGQPYVelFYxkmtkzCYvurbS_9fyRJz4noQk-giXqSO0zNaqktXujXLmYHDguHL_uU9xKv17NkOjofcJGx51AJm37FqwBI5-9F0bfABD45YW2zTxs6ObsG7VoH-fidFDmd7RmZGfvsLno"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-on-surface text-lg">Ajo</h3>
+<p class="text-secondary text-sm">1 cabeza</p>
+</div>
+<div class="flex gap-2 text-secondary">
+<button class="hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span></button>
+<button class="hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span></button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed-dim to-primary flex-shrink-0 mr-4 overflow-hidden">
+<img alt="Zanahoria" class="w-full h-full object-cover" data-alt="close up of raw fresh carrots on a neutral surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOU4WsCfGn0LD6jUyDrFVcbkAYivW3_Rjp0Tp44hICZ-exVPYBgG9-XlnUOM-QWr_ptpRKJ-UJ3nw9ovDHKCzqCv41_sJcxu97atJxCF3NlhDbOX7_tM8lW3FFZQonVha_-Q8OUDAuIzj63RC1VUQlB-csM82EdDhYXeqkE2S9iUQhLYkMdwp4bOs_KMJ-woZHc-i8P3HQtJxl7chQt2yLyPWAR0JfNkKF524-m7wAynQRI_RASMbYLJbzqlmtgdXvFCQxv8_buv8"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-on-surface text-lg">Zanahorias</h3>
+<p class="text-secondary text-sm">500 g</p>
+</div>
+<div class="flex gap-2 text-secondary">
+<button class="hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span></button>
+<button class="hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span></button>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<div class="w-12 h-12 rounded-full bg-gradient-to-br from-secondary-container to-secondary-fixed-dim flex-shrink-0 mr-4 overflow-hidden">
+<img alt="Arroz" class="w-full h-full object-cover" data-alt="close up of white rice grains in a wooden bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRkrlttugUJCyLpH9mYL8GaAVygovE4Puk-IsO-Gw9W2qaG6Z2SidqYRiZRTcxeq-PROojad_zTTgqSqX2NZ09AFckPJKJpXEsQ_28izdQFCPEzIRRny-hRUKVk5by8PhDhab7AfOxWWD4vF5KGL9CDolupEeDzvCHt-RntixYovsYQoaXsfCrUvRIR6tUDdEnX8EnF9VAzmpAiJ4yMo7KkphCUo4KrxTa7DtNVHj7XuJrB59zEt9WUSENcajG0U03C5-X26ftTws"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-bold text-on-surface text-lg">Arroz blanco</h3>
+<p class="text-secondary text-sm">1 kg</p>
+</div>
+<div class="flex gap-2 text-secondary">
+<button class="hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span></button>
+<button class="hover:text-error transition-colors p-1"><span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span></button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md rounded-[24px] z-50 bg-white/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(27,28,26,0.06)] md:hidden">
+<div class="flex justify-around items-center p-2">
+<!-- Explorar (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] px-4 py-2 hover:bg-[#f4f4f0]/50 rounded-2xl tap-highlight-transparent active:scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="restaurant">restaurant</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-widest uppercase">Explorar</span>
+</a>
+<!-- Buscar (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] px-4 py-2 hover:bg-[#f4f4f0]/50 rounded-2xl tap-highlight-transparent active:scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="search">search</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-widest uppercase">Buscar</span>
+</a>
+<!-- Despensa (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#f4f4f0] text-[#855400] rounded-2xl px-4 py-2 scale-105 transition-all tap-highlight-transparent active:scale-95 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="inventory_2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-widest uppercase">Despensa</span>
+</a>
+<!-- Perfil (Inactive) -->
+<a class="flex flex-col items-center justify-center text-[#5f5e5e] px-4 py-2 hover:bg-[#f4f4f0]/50 rounded-2xl tap-highlight-transparent active:scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-widest uppercase">Perfil</span>
+</a>
+</div>
+</nav>
+<!-- Web layout placeholder for hidden md:flex -->
+<div class="hidden md:flex flex-1 items-center justify-center text-secondary h-screen text-center p-8">
+<p class="text-xl">Esta vista está optimizada para dispositivos móviles. Por favor, redimensiona la ventana.</p>
+</div>
+</body></html>

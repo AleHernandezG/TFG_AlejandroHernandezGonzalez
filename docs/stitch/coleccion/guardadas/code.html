@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved Recipes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-tertiary-fixed-variant": "#004b70",
+                        "on-background": "#1b1c1a",
+                        "surface-tint": "#855400",
+                        "tertiary-container": "#7abbec",
+                        "tertiary": "#136490",
+                        "outline-variant": "#d5c4b2",
+                        "on-tertiary-fixed": "#001e30",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#004b6f",
+                        "surface": "#faf9f5",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#cae6ff",
+                        "surface-container-highest": "#e3e2df",
+                        "on-primary-fixed": "#2a1700",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#e8a855",
+                        "on-surface": "#1b1c1a",
+                        "on-primary-container": "#643e00",
+                        "primary-fixed": "#ffddb7",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-surface-variant": "#514538",
+                        "inverse-surface": "#2f312e",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "background": "#faf9f5",
+                        "tertiary-fixed-dim": "#8dcdff",
+                        "secondary-container": "#e4e2e1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e9e8e4",
+                        "secondary": "#5f5e5e",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#fcba65",
+                        "on-primary-fixed-variant": "#653e00",
+                        "surface-bright": "#faf9f5",
+                        "on-secondary-container": "#656464",
+                        "surface-container-low": "#f4f4f0",
+                        "surface-container": "#efeeea",
+                        "primary": "#855400",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#fcba65",
+                        "surface-variant": "#e3e2df",
+                        "surface-dim": "#dbdad6",
+                        "outline": "#837566"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem", // Overriding for design system
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top App Bar (From Shared Components + User Request) -->
+<header class="sticky top-0 z-40 bg-[#faf9f5] dark:bg-[#1b1c1a] flex flex-col w-full px-6 pt-6 pb-4">
+<div class="flex items-center justify-between w-full mb-2">
+</div>
+<div class="text-center w-full px-4 mb-4">
+<h1 class="font-['Plus_Jakarta_Sans'] text-3xl font-light tracking-[0.05em] text-[#1b1c1a] dark:text-[#faf9f5] leading-tight">¡Mis recetas <span class="font-bold italic text-primary-container text-4xl block mt-1">Guardadas!</span></h1>
+<p class="text-secondary text-sm mt-2 font-medium tracking-wide">12 recetas guardadas</p>
+</div>
+<!-- Segmented Control -->
+<div class="bg-surface-container-high rounded-full p-1 flex mt-2 w-full max-w-[280px] mx-auto shadow-sm">
+<button class="flex-1 py-2.5 rounded-full bg-primary text-on-primary text-sm font-bold tracking-wide transition-all shadow-md">
+                Guardadas
+            </button>
+<button class="flex-1 py-2.5 rounded-full text-secondary text-sm font-semibold tracking-wide hover:text-on-surface transition-colors">
+                Mis recetas
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-4 pb-32 pt-4">
+<!-- Pinterest-style Grid (Columns) -->
+<div class="gap-4 grid grid-cols-2">
+<!-- Card 1 -->
+<div class="relative rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(27,28,26,0.06)] group aspect-[3/4]">
+<img alt="Healthy Bowl" class="w-full h-full object-cover" data-alt="vibrant healthy salad bowl with fresh greens, roasted chickpeas, avocado, and creamy dressing on a rustic wooden table top-down view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDWQBQSlzOUYJh12NFypcY30-WCxNPcucFoxICya808MKlZd_s1C_SENIOttWvFDJrBzd99KMPQt7Kd7UsHW8OY47Z0Bw4vATT7z0k4DNGE9IO0e8ltPPZLRReoE98F9x9Yrn8DhIkspok3GGrrJSruVE56yEPkVnWOew8Nktg4WrjbRe0kBTnrkKTgZOP6r7RTmWNpx9aKHvxunf_4dX8tfOdQltHcSjsaJLqd0N1ahOx05-7W5405cGopuk_1yhM1kZ-u6xjKxI"/>
+<!-- Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<!-- Content -->
+<div class="absolute bottom-0 left-0 right-0 p-4 flex flex-col justify-end text-on-primary">
+<h3 class="font-bold text-lg leading-tight mb-2 tracking-wide drop-shadow-md">Buddha Bowl <br/>de Verano</h3>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Author" class="w-6 h-6 rounded-full border border-white/30 object-cover" data-alt="portrait of a smiling young woman with bright natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3pGvEaZ0HSBHafYf-32AfRJR-kQEJxy09T3Z8R6iL7Kq59czP-HUg8OkHtEs1RH-ZtIajtLPL-KDxQmGvVJ9n8lEGOAVOhW-X6OCLvPIlVPCL01cgW83sE9W69xTjsVrI_IYbsIYGoWfo0MMnSilekciSem3wXTEK-toZoqa1BrTqs4SMBN25wIvW9NmNeUBjICeT0ONcCPIZIPFrbB0YeJrYkJp9-ltwkzkYc1fr_O0TAJXeo5kWAZjYz7bBX4HJCxoOSECdgzE"/>
+<span class="text-xs font-medium text-white/90">Clara M.</span>
+</div>
+</div>
+<!-- Save Button Overlay -->
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform">
+<span class="material-symbols-outlined fill text-[18px]"><img alt="Bookmark" class="w-5 h-5 object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uh8ovuYmjhVtxbEFpx4iJh5_bitLOK7k2N8f9bQng1-RbXhnkSVeMXYcnR1GziknaIFUII0HXsJwTD7pjOyaFL9BwgsbWsLbrhfZfzoMwKJCilG9EyJRYfiZnuN8gG_oReC8lSz807XBTUxUtHAiOORnOjrFRmM0reybkU-V4thNZzlvd9dyelVKnKw7FevPSjGG81_BF8LAifwlV-flTipCJQsdzhaw8G3WhL-QIw8jtrTVKydjf8gj9n8Bo5URdLN0pGbaM1_Lg"/></span>
+</button>
+</div>
+<!-- Card 2 -->
+<div class="relative rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(27,28,26,0.06)] group aspect-[3/4]">
+<img alt="Artisan Pizza" class="w-full h-full object-cover" data-alt="rustic slice of artisan pizza with fresh mozzarella, basil leaves, and blistered crust on dark slate background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDBzs8q74PtJYUzt8IV5V1Knj0QfBVCUVA1lbBMJujVp-ahWX-eOeRTg71GcBlFxyFQjJ4SCoANPMdEk3ixl9rNhbscs5vZKezXfhgz0Ottf7aD3r_8F_unAeF3F_A6TnheKnIH4o6YptlmlgbXs35t6qEpxJhaDfpGctTYF-8V6MJmIwAXywfHTThVzIVmbjI-RNxEpwqfDIUfZ1bkksNyvZ531MABIIzaGyVd7UUB7-2_y3SDxDOQ3v8Hbxt8ZunVh9GyLpRp6s"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-4 flex flex-col justify-end text-on-primary">
+<h3 class="font-bold text-lg leading-tight mb-2 tracking-wide drop-shadow-md">Pizza Rústica <br/>Margarita</h3>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Author" class="w-6 h-6 rounded-full border border-white/30 object-cover" data-alt="portrait of a bearded man in a chef jacket looking thoughtfully" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOlSAN9A444WRJb1gy261Cy1CzMSsUASf0CrpEoOibQcQK1UYixhfFlyz-ffa94N1xneNTJVGfgbdzONcRPIC92zrMS30mYcepH0ql3GasRLYOvgPxsU1UpY0jCUoIpPWUZKVg_ITcAOT9HgzAjaLopDxfXHH8YTaf66cAFiUdtI-BcApHnhsrChnx2HhjZ7Pin9a8zTcNNKzT_R-8UoDkt-0FWg0RTn3914T8VNyGYRxmbBzsvQxgoFUQIqPBvPH1JglGnS_QTHU"/>
+<span class="text-xs font-medium text-white/90">Chef Juan</span>
+</div>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform">
+<span class="material-symbols-outlined fill text-[18px]"><img alt="Bookmark" class="w-5 h-5 object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uh8ovuYmjhVtxbEFpx4iJh5_bitLOK7k2N8f9bQng1-RbXhnkSVeMXYcnR1GziknaIFUII0HXsJwTD7pjOyaFL9BwgsbWsLbrhfZfzoMwKJCilG9EyJRYfiZnuN8gG_oReC8lSz807XBTUxUtHAiOORnOjrFRmM0reybkU-V4thNZzlvd9dyelVKnKw7FevPSjGG81_BF8LAifwlV-flTipCJQsdzhaw8G3WhL-QIw8jtrTVKydjf8gj9n8Bo5URdLN0pGbaM1_Lg"/></span>
+</button>
+</div>
+<!-- Card 3 -->
+<div class="relative rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(27,28,26,0.06)] group aspect-[3/4]">
+<img alt="Pancakes" class="w-full h-full object-cover" data-alt="stack of fluffy blueberry pancakes dripping with maple syrup on a white ceramic plate with soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97RIDTQXGDRYyCSf7JJrbgeUGYQ-xP6S-sUci2i0vXWWPCttpKHhpDM_S3Wk2D0792QlQ_mN9JwppEcGSxbu-W142rPU5jfPpffwdxmb9TD310sPz9q3xAYQI7IdfV86qJ-GxpzNVWlhK4yu7C7H5kHwd00_LH701X-sGe4Bs6wtN2gwNyDD84OQe--jI8YNt6xTjonv4UB82hACwfJkwnM10SPe9MvbNzCj-rROc9EuJtuBphZZWMaVXWzrTrAd_VgI4Qbf1yM8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-4 flex flex-col justify-end text-on-primary">
+<h3 class="font-bold text-lg leading-tight mb-2 tracking-wide drop-shadow-md">Pancakes <br/>Esponjosos</h3>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Author" class="w-6 h-6 rounded-full border border-white/30 object-cover" data-alt="close up portrait of a smiling woman with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZFxNvIxa6eq8kGJJ2KgeafPSetsL9sUnIhIv9uV8cvIol0c0-T0mZv9mXfQYn_njIi7qorLuop7gULUrWJPaY5pNZAFkTY-G_gDrod5cSY7VPx1KiR6D2KS_JCkRH82dftLxfH-TCaS9K02bbcnvCtoPzdVguFdf0VneAAAVn6T3vzNRcvB-1T4chkRoBBod3TrfUcbOvBPUuK7KKOCyvI_-yQg5ulr_PE8I6CzMW-YrHqoRO7T3Hbm9sQOfXdbVW8RnzQo48A0o"/>
+<span class="text-xs font-medium text-white/90">Ana Cocina</span>
+</div>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform">
+<span class="material-symbols-outlined fill text-[18px]"><img alt="Bookmark" class="w-5 h-5 object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uh8ovuYmjhVtxbEFpx4iJh5_bitLOK7k2N8f9bQng1-RbXhnkSVeMXYcnR1GziknaIFUII0HXsJwTD7pjOyaFL9BwgsbWsLbrhfZfzoMwKJCilG9EyJRYfiZnuN8gG_oReC8lSz807XBTUxUtHAiOORnOjrFRmM0reybkU-V4thNZzlvd9dyelVKnKw7FevPSjGG81_BF8LAifwlV-flTipCJQsdzhaw8G3WhL-QIw8jtrTVKydjf8gj9n8Bo5URdLN0pGbaM1_Lg"/></span>
+</button>
+</div>
+<!-- Card 4 -->
+<div class="relative rounded-xl overflow-hidden shadow-[0px_12px_32px_rgba(27,28,26,0.06)] group aspect-[3/4]">
+<img alt="Avocado Toast" class="w-full h-full object-cover" data-alt="avocado toast with poached egg and microgreens on rustic sourdough bread bright clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTFTS_2zKqi2mb6xojONjyJEWs9u41mJKrZXIgQjyYB80BWJLI3xTnLYncVpx44L0OkrDvPXrTmbVek6Ay5Wd7BAmK8mNV1ZvUmJxiY1ggP32eicaQ7rgyjtSB_QWnUcY0oJcvbEzR1GYsb3YxtFa56eEfYKJvXC0MrL2MPDrQ5fDkr0sWyInlrfZ3FwMbiyycK5rZLg0Tc_UCupLSp4wCURufBNwz3XAnB3KHFr4_XEilQ_ZCAnsHmX7sGknjC6Ly-pE0HcpCNtA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-4 flex flex-col justify-end text-on-primary">
+<h3 class="font-bold text-lg leading-tight mb-2 tracking-wide drop-shadow-md">Tostada Avo <br/>&amp; Huevo</h3>
+<div class="flex items-center gap-2 mt-1">
+<img alt="Author" class="w-6 h-6 rounded-full border border-white/30 object-cover" data-alt="portrait of a young woman with natural makeup looking directly at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMYISjLZr4KnwrQCnYhaePoUcHBfXvX4tqEDm1iqUOfj_f2r44VVh0ECukDH7KQOuSHPOztrzcaZRTF1CoY7ZScbz1oS5uVXrOo4X7XbOZ6h15Jd_fuW0izNH7ufWMncH7om3Ye0oLCuiACFsjwCbrY2ZXg3cwKFAGzuOMqeaMnz8Y-D_-XkL5H_WkMmwp6bxRF-A1VKXqw9AhQRJr23SCzkEc6h2SbXRHPHgptbzcgs3JEwDvaxWWofOVlccRQIQ75FeFyWOPy1E"/>
+<span class="text-xs font-medium text-white/90">Sano y Rico</span>
+</div>
+</div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform">
+<span class="material-symbols-outlined fill text-[18px]"><img alt="Bookmark" class="w-5 h-5 object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uh8ovuYmjhVtxbEFpx4iJh5_bitLOK7k2N8f9bQng1-RbXhnkSVeMXYcnR1GziknaIFUII0HXsJwTD7pjOyaFL9BwgsbWsLbrhfZfzoMwKJCilG9EyJRYfiZnuN8gG_oReC8lSz807XBTUxUtHAiOORnOjrFRmM0reybkU-V4thNZzlvd9dyelVKnKw7FevPSjGG81_BF8LAifwlV-flTipCJQsdzhaw8G3WhL-QIw8jtrTVKydjf8gj9n8Bo5URdLN0pGbaM1_Lg"/></span>
+</button>
+</div>
+<!-- Loading/More indicator area -->
+<div class="flex items-center justify-center py-8 w-full col-span-2">
+<div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+<div class="w-2 h-2 bg-primary rounded-full animate-pulse mx-1" style="animation-delay: 0.2s"></div>
+<div class="w-2 h-2 bg-primary rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar (From Shared Components) -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md rounded-full px-2 py-3 bg-white/80 dark:bg-[#1b1c1a]/80 backdrop-blur-md shadow-[0px_12px_32px_rgba(27,28,26,0.06)] z-50 flex justify-around items-center mx-auto">
+<a class="flex items-center justify-center text-[#5f5e5e] dark:text-[#d5c4b2] p-3 hover:text-[#855400] dark:hover:text-[#e8a855] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined text-[26px]">home</span>
+</a>
+<a class="flex items-center justify-center text-[#5f5e5e] dark:text-[#d5c4b2] p-3 hover:text-[#855400] dark:hover:text-[#e8a855] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined text-[26px]">kitchen</span>
+</a>
+<!-- Center Prominent Icon -->
+<a class="flex items-center justify-center bg-primary-container/20 text-primary p-4 rounded-full -mt-6 shadow-[0px_8px_16px_rgba(232,168,85,0.2)] hover:bg-primary-container/30 transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined text-[32px] fill">restaurant</span>
+</a>
+<a class="flex items-center justify-center text-[#5f5e5e] dark:text-[#d5c4b2] p-3 hover:text-[#855400] dark:hover:text-[#e8a855] transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined text-[26px]">search</span>
+</a>
+<!-- Active Profile Tab (Semantic match for "My Recipes/Saved") -->
+<a class="flex items-center justify-center bg-[#855400] text-white rounded-full p-3 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[26px] fill">person</span>
+</a>
+</nav>
+<!-- Fade for bottom scroll -->
+<div class="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none z-30"></div>
+</body></html>

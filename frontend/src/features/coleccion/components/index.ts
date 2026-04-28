@@ -1,1 +1,6 @@
-// Sprint 3+
+export { ContenidoColeccion } from './contenidoColeccion'
+export { HeaderColeccion } from './headerColeccion'
+export { TarjetaColeccion } from './tarjetaColeccion'
+export { GridRecetasColeccion } from './gridRecetasColeccion'
+export { EstadoVacioMisRecetas } from './estadoVacioMisRecetas'
+export { EstadoVacioGuardadas } from './estadoVacioGuardadas'

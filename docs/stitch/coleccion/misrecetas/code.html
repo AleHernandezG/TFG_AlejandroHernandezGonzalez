@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>¡Mis Recetas!</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#855400",
+                      "tertiary-fixed": "#cae6ff",
+                      "surface-container-low": "#f4f4f0",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#e9e8e4",
+                      "on-secondary-fixed-variant": "#474747",
+                      "tertiary-container": "#7abbec",
+                      "outline": "#837566",
+                      "on-error": "#ffffff",
+                      "surface-dim": "#dbdad6",
+                      "secondary": "#5f5e5e",
+                      "on-secondary-container": "#656464",
+                      "on-background": "#1b1c1a",
+                      "secondary-fixed": "#e4e2e1",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#643e00",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e3e2df",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#ffddb7",
+                      "surface-container": "#efeeea",
+                      "primary-fixed-dim": "#fcba65",
+                      "on-tertiary-fixed": "#001e30",
+                      "tertiary": "#136490",
+                      "primary": "#855400",
+                      "on-tertiary-fixed-variant": "#004b70",
+                      "background": "#faf9f5",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#514538",
+                      "surface": "#faf9f5",
+                      "secondary-container": "#e4e2e1",
+                      "on-secondary-fixed": "#1b1c1c",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#1b1c1a",
+                      "inverse-on-surface": "#f2f1ed",
+                      "outline-variant": "#d5c4b2",
+                      "on-primary-fixed-variant": "#653e00",
+                      "secondary-fixed-dim": "#c8c6c6",
+                      "inverse-surface": "#2f312e",
+                      "tertiary-fixed-dim": "#8dcdff",
+                      "on-primary-fixed": "#2a1700",
+                      "primary-container": "#e8a855",
+                      "on-tertiary-container": "#004b6f",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#fcba65",
+                      "surface-bright": "#faf9f5",
+                      "surface-container-highest": "#e3e2df"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Plus Jakarta Sans"],
+                      "display": ["Plus Jakarta Sans"],
+                      "body": ["Plus Jakarta Sans"],
+                      "label": ["Plus Jakarta Sans"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined[data-weight="fill"] { font-variation-settings: 'FILL' 1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background pb-32">
+<!-- Header Section -->
+<header class="px-6 pt-10 pb-6 bg-surface-container-lowest shadow-[0px_12px_32px_rgba(27,28,26,0.02)] sticky top-0 z-40">
+<h1 class="font-headline text-3xl text-on-background tracking-tight mb-1 text-center">
+            ¡<span class="font-bold italic text-primary">Mis Recetas</span>!
+        </h1>
+<p class="font-body text-secondary text-sm text-center">12 recetas publicadas</p>
+<!-- Toggle Switcher -->
+<div class="mt-6 flex bg-surface-container-high rounded-full p-1 w-full max-w-sm mx-auto">
+<button class="flex-1 py-2.5 px-4 text-sm font-semibold rounded-full text-on-surface-variant bg-transparent transition-all">
+                Guardadas
+            </button>
+<button class="flex-1 py-2.5 px-4 text-sm font-semibold rounded-full bg-primary text-on-primary shadow-sm transition-all">
+                Mis recetas
+            </button>
+</div>
+</header>
+<!-- Main Content: Recipe Grid -->
+<main class="px-5 pt-8 pb-10">
+<div class="grid grid-cols-2 gap-4">
+<!-- Recipe Card 1 -->
+<article class="relative aspect-[3/4] rounded-xl overflow-hidden group cursor-pointer bg-surface-container-low shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<img alt="Tazón de ensalada vibrante con hojas verdes frescas, tomates cherry y aderezo ligero, luz natural de ventana" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="Vibrant healthy salad bowl with fresh greens, cherry tomatoes, and light dressing, bright natural window lighting, warm mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp1C3u7bZLg22KyFPw-pQNj0tzH6De9YdvBnjoOU_NY4Ih6_LXadeIhOk2bPa4Y2mhPfO4uLai6Tvg-PmB_tiqm2n4bgWOw4WSDUi67Rw4Of_NjciTo3sdZQNxGWUYGZHVuCcVFow83a12Li0qD9JtnhglnPBwWI6zsUp7Jt_n6fenQBHwPY9uekrm0F0bPLCTl28k8QEA9S7Ekc4UoXv8DMiIVha4NVUKUVBWE7uMrBR3aoaxOitUEKEK6sac73OwNg9Xdi4PTro"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<button aria-label="Opciones" class="absolute top-3 right-3 z-20 text-white/80 hover:text-white">
+<span class="material-symbols-outlined text-xl">more_horiz</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full p-4 z-20 flex flex-col justify-end">
+<h3 class="font-headline font-bold text-white text-base leading-tight mb-2">Ensalada de Verano</h3>
+<div class="flex items-center gap-2">
+<img alt="Avatar del usuario" class="w-5 h-5 rounded-full object-cover border border-white/20" data-alt="Portrait of young woman smiling naturally, warm soft lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqiOqvk1PZfjuUbP1fhPFj2CKFxiUZFNK2d_4tWhxLAnPe3xBV4zAd3yAsazcBMp0sYk4qh30f5l3lBl123SM7Ej58Z0-KE2HP_bELBeI8E6ODuyPTINFzJUMXdVQ7-yjS1WcGF4Zv7TCghc-_8wCH-ah3T743s8wOCwp7K7nYpeY615S1KGNu8CRjJHvN1Y5XoFuT611bVqaSUOAK17xsRKp0Zze9EpnwLDNighgiP9Qnspo2E5_BK3VaWSYNNdFl8jvn7aGTkdg"/>
+<span class="font-label text-white/90 text-xs font-medium">Tú</span>
+</div>
+</div>
+</article>
+<!-- Recipe Card 2 -->
+<article class="relative aspect-[3/4] rounded-xl overflow-hidden group cursor-pointer bg-surface-container-low shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<img alt="Pasta artesanal con salsa de tomate rico, albahaca fresca y queso parmesano rallado" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="Artisan pasta with rich red tomato sauce, fresh basil garnish, grated parmesan cheese, rustic dark background, dramatic side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmtTWaL3bdb2PPJ3-0Gn-onCMHh7WOpBTSmPMYXHTRzI6menmAV_atipKBkVWz2GXz9GwCjM4DUJ1EGauznqScuoY_NQvnbOANuXYHR_48B-u5-HNS5KuZankvyznWQZGITm6irWu0i9obL8OrD8MtqDkLc5QyRO7Rv9rYF29VGUEIR6nMIsNHN5zd6zUsoedE_FDywNJAcPSU28jdzlC5F17nHzMdbimStNFe7-7tXcwdf1AVbRBaRi6v1dNuyo9X_bZ9oYWWEUk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<button aria-label="Opciones" class="absolute top-3 right-3 z-20 text-white/80 hover:text-white">
+<span class="material-symbols-outlined text-xl">more_horiz</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full p-4 z-20 flex flex-col justify-end">
+<h3 class="font-headline font-bold text-white text-base leading-tight mb-2">Pasta Rústica</h3>
+<div class="flex items-center gap-2">
+<img alt="Avatar del usuario" class="w-5 h-5 rounded-full object-cover border border-white/20" data-alt="Portrait of young woman smiling naturally, warm soft lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2iqccbvQ9r8EaqUg5PpUyFovpFsHOhU3QKUBq6prR-QW2smGOYPtWRHmWPQgYr932apWt_sE7jVgL-XRe4UMgSMrnrAMcWQmkrOEcQuclRm5V5j2LEGUKgiorLr2IjwytcdLEGVexQhc2UtdPW1UtR62lwKEzHXELu2hY_2dMHZp4dyrlOY3j-ENRldwd_8qoPfv-FcUOvlen9a256z_DYkUmXEqQ6Nr2mjBJlRvWczFgnM0gs9ZqRhkAGMkA2FRTRBMo478bSjk"/>
+<span class="font-label text-white/90 text-xs font-medium">Tú</span>
+</div>
+</div>
+</article>
+<!-- Recipe Card 3 -->
+<article class="relative aspect-[3/4] rounded-xl overflow-hidden group cursor-pointer bg-surface-container-low shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<img alt="Avena matutina con frutos rojos y miel sobre mesa de madera clara" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="Morning oatmeal bowl topped with fresh berries, drizzled honey, light wood table, bright morning sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRTfW3MYL6yQ_ylIBgqwGn4MicVT88hmbNqiI3waZYqEYQ_ZSsRmHgw0jMa0wwX3vCBHIXjS98aT4UStysxHaW5BpwrPLO0avwwYrC2kyzpT_MBjj24ZjRLgkpvBZJWdgHH3YUztgedeaIW2qFRh1mKmmnm1QHbJLYbcDgeZPAQlKk9gExVmlOvUIPqb4sG7fyhgUZLC8Zw7bDoFQJP-Zt3xAULsvIofucjSG5s0LbejgXKXGPPTleNEtWMfLhhvh99OQuU2E02nA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<button aria-label="Opciones" class="absolute top-3 right-3 z-20 text-white/80 hover:text-white">
+<span class="material-symbols-outlined text-xl">more_horiz</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full p-4 z-20 flex flex-col justify-end">
+<h3 class="font-headline font-bold text-white text-base leading-tight mb-2">Avena Frutal</h3>
+<div class="flex items-center gap-2">
+<img alt="Avatar del usuario" class="w-5 h-5 rounded-full object-cover border border-white/20" data-alt="Portrait of young woman smiling naturally, warm soft lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAai8r7qnQT2bkYHvQR00tc3Fp1MSpM5nJES_JcOvNeJMgnxAD724YL9Fk5g_EFhhimnzA1wF_emupOo6xzZ4gMDjG_tqqVS1mlmBx1iU4VxA8RIF006eRFp1dF_NVw7JE3kNDplZr9ay5irFPX6Y5I5y04TJHdr6pAR9Tj8l4oVGbBkNgBqR966QiT6I9vvsNpFkbJRgqq1NNpHia4e_vghIXYpfmtCUx5fiUBo-_0V9t8zXcYlXU5AFuKQzsvnTFNB3RmK55VKI4"/>
+<span class="font-label text-white/90 text-xs font-medium">Tú</span>
+</div>
+</div>
+</article>
+<!-- Recipe Card 4 -->
+<article class="relative aspect-[3/4] rounded-xl overflow-hidden group cursor-pointer bg-surface-container-low shadow-[0px_12px_32px_rgba(27,28,26,0.06)]">
+<img alt="Brochetas de carne a la parrilla humeantes con vegetales" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="Grilled meat skewers sizzling on barbecue with vegetables, smoke rising, outdoor golden hour light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ0I_OiThIzgKM59NPjhgfqb9_8vjltdcMUnAofUnf774uwle66L7vE-qZZ031pioDdda3fzptRHHtqSim3JIPhGSd57xYMVQqQLNsev8NvHphQRh57WWN9yyJgalvBjM8bDDisn55TRKJvJ9M2_FQJZIcoRVYqQt4Y7EdUzKD_ubufEZsi7jxdwph4DSH8oUAv357tmycY1FLD3TerkxFbADtjsm_WWiivhZxPd3mVkeNZywqN6pGF1HaMBlkyNrFSxpGwmDLaFs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+<button aria-label="Opciones" class="absolute top-3 right-3 z-20 text-white/80 hover:text-white">
+<span class="material-symbols-outlined text-xl">more_horiz</span>
+</button>
+<div class="absolute bottom-0 left-0 w-full p-4 z-20 flex flex-col justify-end">
+<h3 class="font-headline font-bold text-white text-base leading-tight mb-2">Brochetas BBQ</h3>
+<div class="flex items-center gap-2">
+<img alt="Avatar del usuario" class="w-5 h-5 rounded-full object-cover border border-white/20" data-alt="Portrait of young woman smiling naturally, warm soft lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCFm3lQOpOcFYYXuPbRgAGTb1ySEFnZ2t9Ki6OqB8UDHLyqwMrRIN2RHfiRLA6JBU4G1Lu5d1vptpL9_hAEjEw5kVmnXub_96EB5MSV0QfsukysMgkp_T-H69AxcW0pgKQ8C-_NKmjQ_i4UhCsFeBKEVnfbirPvmG2MONLg6fzmEV6CDaChKza2qN2Kq0u9AXAJXkC9sBPXM1tZH0Fp92acerAbc2YqiXHx-v6dMEH1vnd5QKCRF5cNUUufiOZmdh2O2RaDHcWPKI"/>
+<span class="font-label text-white/90 text-xs font-medium">Tú</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Scroll Indicator -->
+<div class="flex justify-center items-center gap-1.5 mt-8">
+<div class="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+<div class="w-6 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-lg z-50 flex justify-around items-center bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-full px-2 py-2 shadow-[0px_12px_32px_rgba(27,28,26,0.1)]">
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 py-2 px-4 hover:text-orange-600 dark:hover:text-orange-200 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="explore">explore</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase mt-1">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 py-2 px-4 hover:text-orange-600 dark:hover:text-orange-200 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase mt-1">Kitchen</span>
+</a>
+<!-- FAB Placeholder space if needed, otherwise standard nav item -->
+<div class="flex flex-col items-center justify-center -mt-6">
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-primary/30 active:scale-95 transition-transform border-4 border-background">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 py-2 px-4 hover:text-orange-600 dark:hover:text-orange-200 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="group">group</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase mt-1">Social</span>
+</a>
+<!-- Active Profile Tab -->
+<a class="flex flex-col items-center justify-center bg-orange-100 dark:bg-orange-900/40 text-orange-900 dark:text-orange-100 rounded-full py-2 px-4 hover:text-orange-600 dark:hover:text-orange-200 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="person" data-weight="fill">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold tracking-wide uppercase mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

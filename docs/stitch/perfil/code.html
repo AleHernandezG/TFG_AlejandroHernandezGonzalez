@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ajustes - Cookr</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#855400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e3e2df",
+                        "surface-container-high": "#e9e8e4",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#5f5e5e",
+                        "on-secondary-container": "#656464",
+                        "error-container": "#ffdad6",
+                        "outline": "#837566",
+                        "background": "#faf9f5",
+                        "surface-container-low": "#f4f4f0",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e3e2df",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "secondary-container": "#e4e2e1",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary-fixed": "#001e30",
+                        "on-tertiary-container": "#004b6f",
+                        "on-secondary-fixed-variant": "#474747",
+                        "inverse-primary": "#fcba65",
+                        "surface": "#faf9f5",
+                        "tertiary-fixed": "#cae6ff",
+                        "on-tertiary-fixed-variant": "#004b70",
+                        "primary-fixed": "#ffddb7",
+                        "surface-tint": "#855400",
+                        "on-surface-variant": "#514538",
+                        "tertiary-fixed-dim": "#8dcdff",
+                        "tertiary-container": "#7abbec",
+                        "primary-container": "#e8a855",
+                        "error": "#ba1a1a",
+                        "on-surface": "#1b1c1a",
+                        "on-primary-fixed": "#2a1700",
+                        "outline-variant": "#d5c4b2",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2f312e",
+                        "primary-fixed-dim": "#fcba65",
+                        "on-primary-fixed-variant": "#653e00",
+                        "on-primary-container": "#643e00",
+                        "on-background": "#1b1c1a",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dbdad6",
+                        "surface-container": "#efeeea",
+                        "tertiary": "#136490",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "4": "1.4rem",
+                        "5": "1.75rem",
+                        "6": "2rem",
+                        "8": "3rem",
+                        "10": "4rem",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Plus Jakarta Sans", "sans-serif"],
+                        "label": ["Plus Jakarta Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex justify-center antialiased">
+<div class="w-full max-w-[390px] min-h-screen flex flex-col bg-surface overflow-hidden relative shadow-2xl">
+<!-- TopAppBar (From JSON) -->
+<header class="sticky top-0 z-50 flex items-center justify-center w-full px-6 py-6 bg-[#faf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl shadow-[0px_12px_32px_rgba(27,28,26,0.06)] h-auto">
+<h1 class="font-display font-bold tracking-[0.02em] text-lg text-on-surface absolute left-1/2 transform -translate-x-1/2">PERFIL</h1>
+<!-- Spacer for centering -->
+</header>
+<main class="flex-1 overflow-y-auto px-5 py-6 pb-24 space-y-6">
+<!-- Profile Card -->
+<section class="bg-surface-container-low rounded-2xl p-6 flex flex-col items-center shadow-[0px_12px_32px_rgba(27,28,26,0.06)] relative overflow-hidden">
+<!-- Decorative subtle gradient backdrop -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface-container-highest to-transparent opacity-30"></div>
+<div class="relative mb-4 z-10">
+<div class="w-20 h-20 rounded-full border-2 border-primary-container p-0.5">
+<img alt="User Avatar" class="w-full h-full rounded-full object-cover" data-alt="Portrait of a young woman with natural makeup looking directly at the camera with soft warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOLsMKLeO-ud_xn9QmLPjVGVUC2DDf3htAnbKNpHytkhfm5GlPY6UT5FEvRsKHrDu7ILB8foTh41G8-xf7QQYdoAJFsz0FxGWJItROGr1jh0wx06d59og9DdEr2H0bsy2AiOlhfYkXBG7oS9dm4hYdSW9UQtj8qidka9MY7MhZ1CeXXVZRtwUSbqUAwzgyAL4SjcARaVIhR4qVa2oB21YQ8YMkx0_40AFm0bB5GZUrHofah43zobrkRKpzNp-9gm3OIzYRxcmoVGo"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-surface-container-lowest rounded-full p-1.5 shadow-sm border border-surface-variant text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="photo_camera" data-weight="fill" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+</button>
+</div>
+<h2 class="font-display font-bold text-xl tracking-[0.02em] text-on-surface z-10">Ana García</h2>
+<button class="mt-1 text-sm font-label text-secondary tracking-wide hover:text-primary transition-colors z-10">Editar perfil</button>
+</section>
+<!-- Group 1: Cuenta -->
+<section class="space-y-3">
+<h3 class="font-label text-xs uppercase tracking-[0.05em] text-secondary px-2">Cuenta</h3>
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(27,28,26,0.06)] overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors border-b border-surface-variant/30">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="lock">lock</span>
+<span class="font-body text-base text-on-surface">Cambiar contraseña</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-body text-base text-on-surface">Cambiar preferencias y alérgenos</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Group 2: Permisos -->
+<section class="space-y-3">
+<h3 class="font-label text-xs uppercase tracking-[0.05em] text-secondary px-2">Permisos</h3>
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(27,28,26,0.06)] overflow-hidden">
+<div class="flex items-center justify-between p-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="location_on">location_on</span>
+<span class="font-body text-base text-on-surface">Localización</span>
+</div>
+<!-- Toggle ON -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-surface-variant/30">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="camera">camera</span>
+<span class="font-body text-base text-on-surface">Cámara</span>
+</div>
+<!-- Toggle OFF -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="notifications">notifications</span>
+<span class="font-body text-base text-on-surface">Notificaciones</span>
+</div>
+<!-- Toggle ON -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Group 3: Sesión -->
+<section class="pt-2">
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0px_12px_32px_rgba(27,28,26,0.06)] overflow-hidden">
+<button class="w-full flex items-center justify-center p-4 hover:bg-error-container/20 transition-colors">
+<span class="font-body font-semibold text-base text-error">Cerrar sesión</span>
+</button>
+</div>
+</section>
+<!-- Bottom Actions -->
+<section class="flex gap-4 pt-6 mt-8 border-t border-surface-variant/30">
+<button class="flex-1 py-3.5 px-4 rounded-full border border-outline-variant text-on-surface font-body font-semibold tracking-wide hover:bg-surface-container-low transition-colors active:scale-95 text-center">
+                    Volver
+                </button>
+<button class="flex-1 py-3.5 px-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-body font-semibold tracking-wide shadow-md hover:shadow-lg transition-all active:scale-95 text-center">
+                    Guardar
+                </button>
+</section>
+<!-- Footer -->
+<footer class="pt-10 pb-6 text-center space-y-1">
+<p class="font-label text-xs text-secondary/60">Cookr v1.0.0</p>
+<p class="font-label text-[10px] text-secondary/40">TFG · Alejandro Hernández</p>
+</footer>
+</main>
+</div>
+</body></html>

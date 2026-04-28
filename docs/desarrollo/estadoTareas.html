@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-04-27 · Sprint 3 activo · Fase 3 de 7</div>
+    <div class="meta">Actualizado: 2026-04-28 · Sprint 3 activo · Fase 3 de 7</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter review"><div class="num">2</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">16</div><div class="label">Urgencia media</div></div>
+    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">60</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">64</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -394,21 +394,21 @@
         <tr>
           <td class="id">UI-021</td>
           <td class="desc">
-            <strong>Vista Guardadas — colección de recetas guardadas por el usuario</strong>
-            <small>Subpestaña dentro de /coleccion. Actualmente filtra POSTS_MOCK donde guardado === true (mock). Pendiente: conectar al endpoint GET /api/usuarios/:id/guardadas cuando exista el backend de recetas. El componente ya existe en app/(main)/coleccion/page.tsx.</small>
-            <span class="source">📄 app/(main)/coleccion/page.tsx · features/recetas/data/datosFeed.ts</span>
+            <strong>Vista Guardadas — cuadrícula portrait 2 cols con bookmark</strong>
+            <small>Rediseñada con Stitch (docs/stitch/coleccion/guardadas/). Header sticky con título editorial "¡Mis recetas Guardadas!" en brand italic + segmented control pill. Grid 2 cols aspect-[3/4], gradient overlay bottom, bookmark filled (bg-white/80 glass) top-right. AnimatePresence fade en cambio de pestaña. Datos mock en features/coleccion/data/datosColeccion.ts. Pendiente: conectar BE Fase 5.</small>
+            <span class="source">📄 features/coleccion/components/ · features/coleccion/data/datosColeccion.ts · app/(main)/coleccion/page.tsx</span>
           </td>
-          <td><span class="status review">👁️ FE mock listo · BE pendiente</span></td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">UI-022</td>
           <td class="desc">
-            <strong>Vista Mis Recetas — recetas creadas por el usuario</strong>
-            <small>Subpestaña dentro de /coleccion. Actualmente muestra 2 posts mock como placeholder. Pendiente: crear modelo Receta en BD, endpoint GET /api/usuarios/:id/recetas y conectar aquí. Estado vacío ya implementado con CTA "Crear receta" → /crear-receta.</small>
-            <span class="source">📄 app/(main)/coleccion/page.tsx · UI-018 (formulario crear receta)</span>
+            <strong>Vista Mis Recetas — cuadrícula portrait 2 cols con menú ···</strong>
+            <small>Rediseñada con Stitch (docs/stitch/coleccion/misrecetas/). Mismo layout que Guardadas pero título "¡Mis Recetas!" y botón top-right MoreHorizontal (blanco) en lugar de bookmark. Estado vacío con ChefHat + CTA "Crear primera receta" → /crear-receta. Datos mock con 4 recetas propias. TypeScript 0 errores. Pendiente: conectar BE Fase 5.</small>
+            <span class="source">📄 features/coleccion/components/ · features/coleccion/data/datosColeccion.ts · app/(main)/coleccion/page.tsx</span>
           </td>
-          <td><span class="status review">👁️ FE mock listo · BE pendiente</span></td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>

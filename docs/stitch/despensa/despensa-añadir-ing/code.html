@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Despensa - Cookr</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#474747",
+                        "tertiary-fixed": "#cae6ff",
+                        "inverse-surface": "#2f312e",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#fcba65",
+                        "on-primary-fixed-variant": "#653e00",
+                        "primary": "#855400",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1a",
+                        "on-background": "#1b1c1a",
+                        "tertiary": "#136490",
+                        "outline-variant": "#d5c4b2",
+                        "surface": "#faf9f5",
+                        "surface-container-low": "#f4f4f0",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#643e00",
+                        "surface-tint": "#855400",
+                        "outline": "#837566",
+                        "on-tertiary-container": "#004b6f",
+                        "on-tertiary-fixed": "#001e30",
+                        "on-primary-fixed": "#2a1700",
+                        "inverse-primary": "#fcba65",
+                        "background": "#faf9f5",
+                        "surface-dim": "#dbdad6",
+                        "surface-container-highest": "#e3e2df",
+                        "surface-bright": "#faf9f5",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#ffddb7",
+                        "secondary-container": "#e4e2e1",
+                        "tertiary-fixed-dim": "#8dcdff",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface-container": "#efeeea",
+                        "on-surface-variant": "#514538",
+                        "surface-variant": "#e3e2df",
+                        "secondary": "#5f5e5e",
+                        "tertiary-container": "#7abbec",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#656464",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004b70",
+                        "primary-container": "#e8a855",
+                        "surface-container-high": "#e9e8e4",
+                        "on-secondary-fixed": "#1b1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Plus Jakarta Sans", "sans-serif"],
+                        "label": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        /* Hide scrollbar for neatness, optional */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full flex flex-col relative overflow-hidden bg-background">
+<!-- Background Content (Pantry List - Blurred/Darkened for Overlay) -->
+<main class="flex-1 overflow-y-auto px-6 pt-24 pb-32 filter blur-[2px] brightness-75 transition-all duration-300 pointer-events-none">
+<!-- Mock TopAppBar -->
+<header class="fixed top-0 w-full z-10 bg-[#faf9f5]/80 dark:bg-[#1b1c1a]/80 backdrop-blur-xl flex items-center px-6 py-4 shadow-[0px_12px_32px_rgba(27,28,26,0.04)]">
+<button class="mr-4 scale-95 active:transition-transform hover:opacity-80 transition-opacity text-[#855400] dark:text-[#e8a855]">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold tracking-[0.03em] text-[#855400] dark:text-[#e8a855]">Despensa</h1>
+</header>
+<!-- Mock Content -->
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-lowest rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">egg</span>
+</div>
+<div>
+<h3 class="font-semibold text-on-surface">Huevos</h3>
+<p class="text-sm text-secondary">12 unidades</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<div>
+<h3 class="font-semibold text-on-surface">Aceite de Oliva</h3>
+<p class="text-sm text-secondary">500 ml</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">grain</span>
+</div>
+<div>
+<h3 class="font-semibold text-on-surface">Arroz</h3>
+<p class="text-sm text-secondary">1 kg</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Sheet Overlay Container -->
+<div class="absolute inset-0 z-50 flex flex-col justify-end pointer-events-none">
+<!-- Scrim (Optional, typically added to obscure background entirely, here we used filter on main) -->
+<div class="absolute inset-0 bg-on-background/20 pointer-events-auto"></div>
+<!-- The Bottom Sheet -->
+<div class="bg-surface w-full rounded-t-xl shadow-[0px_-12px_32px_rgba(27,28,26,0.06)] pointer-events-auto flex flex-col max-h-[795px]">
+<!-- Drag Handle Bar -->
+<div class="w-full flex justify-center pt-4 pb-2">
+<div class="w-12 h-1.5 bg-surface-variant rounded-full"></div>
+</div>
+<!-- Sheet Header -->
+<div class="px-6 pb-4 pt-2">
+<h2 class="text-2xl font-bold text-on-surface tracking-[0.02em] font-display">Añadir ingrediente</h2>
+</div>
+<!-- Sheet Content (Scrollable if needed) -->
+<div class="px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-6">
+<!-- Search/Name Input -->
+<div class="flex flex-col gap-3">
+<label class="text-sm font-semibold tracking-wide text-on-surface-variant uppercase font-label">Nombre del ingrediente</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary" data-icon="search">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-full py-3.5 pl-12 pr-4 text-on-surface placeholder:text-secondary focus:ring-2 focus:ring-primary focus:outline-none font-body transition-shadow" placeholder="Ej. Tomate" type="text"/>
+</div>
+<!-- Suggestion Chips -->
+<div class="flex flex-wrap gap-2 mt-1">
+<button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-variant transition-colors">Tomate</button>
+<button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-variant transition-colors">Cebolla</button>
+<button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant text-sm font-medium hover:bg-surface-variant transition-colors">Ajo</button>
+</div>
+</div>
+<!-- Quantity & Unit Row -->
+<div class="flex flex-col gap-3">
+<label class="text-sm font-semibold tracking-wide text-on-surface-variant uppercase font-label">Cantidad</label>
+<div class="flex gap-4">
+<!-- Number Input -->
+<div class="flex-1 relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-3.5 px-4 text-on-surface placeholder:text-secondary focus:ring-2 focus:ring-primary focus:outline-none font-body text-center text-lg transition-shadow" placeholder="0" type="number"/>
+<!-- Optional +/- Steppers could go here, but keeping it clean per mobile native feel -->
+</div>
+<!-- Unit Selector -->
+<div class="flex-[1.5] relative">
+<select class="w-full bg-surface-container-highest border-none rounded-xl py-3.5 pl-4 pr-10 text-on-surface focus:ring-2 focus:ring-primary focus:outline-none font-body appearance-none transition-shadow text-lg">
+<option value="g">g (gramos)</option>
+<option value="kg">kg (kilos)</option>
+<option value="ml">ml (mililitros)</option>
+<option value="l">l (litros)</option>
+<option value="unidades">unidades</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-secondary pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sheet Actions (Sticky at bottom) -->
+<div class="px-6 py-6 bg-surface flex flex-col sm:flex-row-reverse gap-3 mt-auto">
+<button class="w-full sm:w-auto flex-1 bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 px-6 rounded-full font-bold text-center tracking-wide hover:opacity-90 transition-opacity shadow-[0px_4px_12px_rgba(133,84,0,0.2)]">
+                    Añadir
+                </button>
+<button class="w-full sm:w-auto flex-1 bg-transparent text-primary py-4 px-6 rounded-full font-bold text-center tracking-wide hover:bg-surface-variant transition-colors">
+                    Cancelar
+                </button>
+</div>
+<!-- Bottom safe area padding for modern phones -->
+<div class="h-6 bg-surface w-full"></div>
+</div>
+</div>
+</body></html>
