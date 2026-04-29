@@ -17,6 +17,23 @@ declare global {
 
 //Funcion para que no se pueda acceder a ciertas rutas sin un token valido
 //Vamos sin estar autenticado, por ejemplo las de llamadas api necesitan un token.
+export function optionalAuth(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): void {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    try {
+      req.usuario = verificarToken(token);
+    } catch {
+      // token inválido → seguimos sin usuario
+    }
+  }
+  next();
+}
+
 export function requerirAuth(
   req: Request,
   res: Response,

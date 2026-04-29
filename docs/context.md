@@ -284,14 +284,9 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 2 completado y aprobado al 100%.
-Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001.
+Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009.
 
-Sprint 3 — pendientes (revisión del autor):
+Sprint 3 — pendientes:
 
-- **FE:** DET-001 — Guardar receta (persistente, conectar al BE)
-- **FE:** DET-002 — Like persistente en recetas (optimistic update TanStack Query)
-- **FE:** DET-009 — Carrusel de recetas similares funcional
-- **FE:** UI-018 — Formulario multi-step crear receta (RHF + Zod, 3-4 pasos)
-- **DOCS:** DOCS-002 — Renombrar archivos phase-reports/changes de pendientes a completados
-- **SETUP:** SETUP-008 — CI/CD GitHub Actions (alpha en main)
+- **FE:** UI-018 — Formulario multi-step crear receta (👁️ pendiente revisión final)
+- **FE:** STRUCT-001 — Scaffolding vistas Sprint 3+ (👁️ pendiente revisión)

@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface IUsuario {
   nombre: string;
   correo: string;
@@ -10,5 +12,6 @@ export interface IUsuario {
   googleId?: string;
   alergias: string[];
   preferencias: string[];
+  recetasGuardadas?: Types.ObjectId[];
   fechaRegistro: Date;
 }

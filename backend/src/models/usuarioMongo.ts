@@ -54,6 +54,11 @@ const usuarioSchema = new Schema<IUsuarioDoc>({
     type: [String],
     default: [],
   },
+  recetasGuardadas: {
+    type: [Schema.Types.ObjectId],
+    ref: "Receta",
+    default: [],
+  },
   fechaRegistro: {
     type: Date,
     default: Date.now,

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integración Recetas — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.25rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Integración Recetas — BE + FE</h1>
+  <p>Sprint 3 · 2026-04-29 · Tareas REC-001–009 / DET-001 / DET-002 / DET-009 — BE + FE completados · TypeScript 0 errores</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#be">Backend</a>
+  <a href="#fe">Frontend</a>
+  <a href="#endpoints">Endpoints</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#ts">TypeScript</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header"><span>📋</span><h2>Resumen de tareas completadas</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>ID</th><th>Tarea</th><th>Capa</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>REC-001</td><td>Modelo Receta — IReceta + recetaMongo.ts + recetaRepository.ts</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-002</td><td>GET /api/recetas — feed paginado con filtros</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-003</td><td>GET /api/recetas/:id — detalle completo + similares</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-004</td><td>POST /api/recetas/:id/like — toggle autenticado</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-005</td><td>POST /api/recetas/:id/guardar — toggle autenticado</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-006</td><td>GET /api/recetas/:id/similares — 6 tarjetas</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-007</td><td>recetasService.ts FE + hooks TanStack Query</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-008</td><td>feedHome.tsx conectado a useRecetasFeed</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>REC-009</td><td>page.tsx detalle conectado a recetasService.obtenerPorId</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>DET-001</td><td>Guardar receta — toggle persistente con optimistic update</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>DET-002</td><td>Like persistente — optimistic update con rollback</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>DET-009</td><td>Carrusel similares — datos reales desde BE</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header"><span>🏗️</span><h2>Arquitectura del módulo de recetas</h2></div>
+    <div class="section-body">
+      <h3>Patrón de capas BE</h3>
+      <div class="flow">
+        <span class="flow-node">recetas.routes.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasController.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetaRepository.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetaMongo.ts / usuarioMongo.ts</span>
+      </div>
+
+      <h3>Patrón de capas FE</h3>
+      <div class="flow">
+        <span class="flow-node">page.tsx (SC)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">apiClient.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">BE /api/recetas</span>
+      </div>
+      <div class="flow">
+        <span class="flow-node">feedHome.tsx (CC)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useRecetasFeed</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">BE /api/recetas</span>
+      </div>
+
+      <h3>Middlewares de autenticación</h3>
+      <ul>
+        <li><code>optionalAuth</code> — GET endpoints públicos pero user-aware (liked/guardado se calculan si hay token)</li>
+        <li><code>requerirAuth</code> — POST toggles (like, guardar) exigen token válido → 401 si no lo hay</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BACKEND -->
+  <section id="be">
+    <div class="section-header"><span>⚙️</span><h2>Backend — ficheros creados / modificados</h2></div>
+    <div class="section-body">
+
+      <h3>backend/src/types/receta.ts — interfaces puras (REC-001)</h3>
+      <p>Interfaces de dominio sin acoplamiento a Mongoose. Patrón idéntico a <code>types/usuario.ts</code>.</p>
+      <pre>export interface IIngredienteReceta { nombre: string; cantidad: number; unidad: string; }
+export interface IMacrosReceta { calorias: number; proteinas: number; carbos: number; grasas: number; }
+export interface IComentarioReceta { autorId: Types.ObjectId; autorNombre: string; avatarUrl: string | null; texto: string; fecha: Date; }
+export interface IReceta {
+  autorId: Types.ObjectId; titulo: string; descripcion: string; imagenUrl: string;
+  tiempo: string; dificultad: "Fácil" | "Media" | "Difícil"; porciones: number;
+  categorias: string[]; ingredientes: IIngredienteReceta[]; pasos: string[];
+  alergenos: string[]; macros: IMacrosReceta;
+  likes: Types.ObjectId[]; listaComentarios: IComentarioReceta[]; fechaPublicacion: Date;
+}</pre>
+
+      <h3>backend/src/models/recetaMongo.ts — Schema Mongoose (REC-001)</h3>
+      <ul>
+        <li><code>ingredienteSchema</code> y <code>macrosSchema</code> con <code>{ _id: false }</code> (sin ID extra en subdocumentos)</li>
+        <li><code>comentarioSchema</code> con <code>autorId ref "Usuario"</code>, <code>avatarUrl</code> nullable</li>
+        <li><code>autorId: ref "Usuario"</code>, <code>likes: [ObjectId] ref "Usuario"</code></li>
+        <li><code>dificultad: enum ["Fácil", "Media", "Difícil"]</code></li>
+        <li><code>fechaPublicacion: default Date.now</code></li>
+      </ul>
+
+      <h3>backend/src/repositories/recetaRepository.ts — lógica de datos (REC-001–006)</h3>
+      <ul>
+        <li><strong>Tipos de respuesta:</strong> <code>PostFeedRespuesta</code>, <code>RecetaDetalleRespuesta</code>, <code>FiltrosFeed</code> — espejo del FE</li>
+        <li><strong><code>docAPostFeed()</code>:</strong> transforma doc lean → PostFeed. Calcula <code>liked</code> y <code>guardado</code> por usuario</li>
+        <li><strong><code>nombreAUsername()</code>:</strong> deriva <code>username</code> del nombre (normalize NFD, lowercase, strip special chars)</li>
+        <li><strong><code>obtenerGuardadasSet()</code>:</strong> fetches <code>recetasGuardadas</code> del usuario como <code>Set&lt;string&gt;</code> para lookup O(1)</li>
+        <li><strong><code>findAll()</code>:</strong> paginación + filtros q (regex i), dificultad ($in), alergenos ($nin para exclusión)</li>
+        <li><strong><code>findById()</code>:</strong> detalle completo con similares embebidos (misma dificultad o categorías)</li>
+        <li><strong><code>findSimilares()</code>:</strong> standalone para el endpoint GET /similares</li>
+        <li><strong><code>toggleLike()</code>:</strong> modifica Document (no lean), push/filter por ObjectId, devuelve <code>{ liked, totalLikes }</code></li>
+        <li><strong><code>toggleGuardado()</code>:</strong> modifica <code>usuario.recetasGuardadas</code>, devuelve <code>{ guardado }</code></li>
+      </ul>
+
+      <h3>backend/src/middlewares/autenticacion.ts — optionalAuth añadido</h3>
+      <pre>export function optionalAuth(req, _res, next): void {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    try { req.usuario = verificarToken(token); } catch { /* sigue sin usuario */ }
+  }
+  next();
+}</pre>
+
+      <h3>backend/src/types/usuario.ts + usuarioMongo.ts — recetasGuardadas</h3>
+      <p>Añadido <code>recetasGuardadas?: Types.ObjectId[]</code> a <code>IUsuario</code> y el campo <code>{ type: [ObjectId], ref: "Receta", default: [] }</code> al schema de Mongoose.</p>
+
+      <h3>backend/src/routes/recetas.routes.ts — rutas (REC-002–006)</h3>
+      <pre>router.get("/",              optionalAuth, recetasController.obtenerFeed);
+router.get("/:id",           optionalAuth, recetasController.obtenerPorId);
+router.get("/:id/similares", optionalAuth, recetasController.obtenerSimilares);
+router.post("/:id/like",     requerirAuth, recetasController.toggleLike);
+router.post("/:id/guardar",  requerirAuth, recetasController.toggleGuardado);</pre>
+
+      <h3>backend/src/app.ts</h3>
+      <pre>app.use("/api/recetas", recetasRoutes);</pre>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section id="fe">
+    <div class="section-header"><span>🖥️</span><h2>Frontend — ficheros creados / modificados</h2></div>
+    <div class="section-body">
+
+      <h3>frontend/src/components/providers.tsx — QueryClientProvider (REC-007)</h3>
+      <p>Añadido <code>QueryClientProvider</code> con <code>useState(() => new QueryClient())</code> para evitar compartir instancia entre renders. Wrappea a <code>SessionProvider</code>.</p>
+
+      <h3>frontend/src/services/recetasService.ts — capa HTTP (REC-007)</h3>
+      <ul>
+        <li><code>obtenerFeed(filtros, token?)</code> — GET /api/recetas con query params serializados</li>
+        <li><code>obtenerPorId(id, token?)</code> — GET /api/recetas/:id; devuelve <code>null</code> en lugar de lanzar si 404</li>
+        <li><code>obtenerSimilares(recetaId, token?)</code> — GET /api/recetas/:id/similares</li>
+        <li><code>toggleLike(recetaId, token)</code> — POST /api/recetas/:id/like</li>
+        <li><code>toggleGuardado(recetaId, token)</code> — POST /api/recetas/:id/guardar</li>
+      </ul>
+      <p>Token opcional en GETs (optionalAuth BE). Obligatorio en POSTs. Headers <code>Authorization: Bearer</code> solo si token presente.</p>
+
+      <h3>frontend/src/features/recetas/hooks/ — hooks TanStack Query (REC-007)</h3>
+      <table>
+        <thead><tr><th>Hook</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>useRecetasFeed</td><td>useQuery</td><td>Feed paginado. queryKey incluye q, filtrosAvanzados, pagina. staleTime 2 min. placeholderData prev.</td></tr>
+          <tr><td>useToggleLike</td><td>useMutation</td><td>Invalida queries feed + detalle tras éxito.</td></tr>
+          <tr><td>useToggleGuardado</td><td>useMutation</td><td>Invalida queries feed + detalle tras éxito.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>feedHome.tsx — datos reales (REC-008)</h3>
+      <p>Eliminado <code>POSTS_MOCK</code> y filtrado local. Conectado a <code>useRecetasFeed({ q: busquedaDebounciada, filtrosAvanzados })</code>. <code>isLoading</code> → skeletons; <code>isError</code> → mensaje error; datos vacíos → SearchX. El debounce sigue activo (300 ms) y se suma al estado de carga.</p>
+
+      <h3>app/(main)/recetas/[id]/page.tsx — Server Component real (REC-009)</h3>
+      <pre>export default async function PaginaDetalleReceta({ params }) {
+  const session = await getServerSession(opcionesAuth)
+  const receta = await recetasService.obtenerPorId(params.id, session?.user?.backendToken)
+  if (!receta) notFound()
+  return &lt;DetalleRecetaCliente receta={receta} /&gt;
+}</pre>
+      <p>Server Component: Axios funciona en Node.js sin configuración extra. La sesión se obtiene con <code>getServerSession</code> para pasar el token al BE si el usuario está logado.</p>
+
+      <h3>detalleRecetaCliente.tsx — useToggleGuardado (DET-001)</h3>
+      <p>Reemplazado toggle local por <code>useToggleGuardado(receta.id)</code>. Patrón optimistic: setState inmediato + mutación BE; rollback en <code>onError</code>.</p>
+
+      <h3>cabeceraReceta.tsx — useToggleLike (DET-002)</h3>
+      <p>Reemplazado toggle local por <code>useToggleLike(receta.id)</code>. Mismo patrón optimistic: estado local para respuesta inmediata, rollback si el BE falla. El contador de likes muestra el nuevo valor antes de que confirme el servidor.</p>
+
+      <p><strong>DET-009 (similares):</strong> Los similares llegan ya incluidos dentro de <code>RecetaDetalleRespuesta</code> (campo <code>similares: PostFeed[]</code>), calculados por <code>findById()</code> en el repo BE. No hace falta un hook separado; <code>DetalleRecetaCliente</code> los pasa directamente a <code>CarruselSimilares</code>.</p>
+    </div>
+  </section>
+
+  <!-- ENDPOINTS -->
+  <section id="endpoints">
+    <div class="section-header"><span>🔌</span><h2>Endpoints — contrato BE ↔ FE</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Método + Ruta</th><th>Auth</th><th>Query / Body</th><th>Respuesta</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>GET /api/recetas</td>
+            <td>optionalAuth</td>
+            <td><code>?q, dificultad, alergenos, pagina, limite</code></td>
+            <td><code>{ recetas: PostFeed[], total }</code></td>
+          </tr>
+          <tr>
+            <td>GET /api/recetas/:id</td>
+            <td>optionalAuth</td>
+            <td>—</td>
+            <td><code>RecetaDetalle</code> (con campo <code>similares</code>)</td>
+          </tr>
+          <tr>
+            <td>GET /api/recetas/:id/similares</td>
+            <td>optionalAuth</td>
+            <td>—</td>
+            <td><code>PostFeed[]</code> (6 items)</td>
+          </tr>
+          <tr>
+            <td>POST /api/recetas/:id/like</td>
+            <td>requerirAuth</td>
+            <td>Body vacío</td>
+            <td><code>{ liked: boolean, totalLikes: number }</code></td>
+          </tr>
+          <tr>
+            <td>POST /api/recetas/:id/guardar</td>
+            <td>requerirAuth</td>
+            <td>Body vacío</td>
+            <td><code>{ guardado: boolean }</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Filtros del feed</h3>
+      <ul>
+        <li><code>q</code> — texto libre, busca en <code>titulo</code> y <code>descripcion</code> con regex insensible a mayúsculas</li>
+        <li><code>dificultad</code> — CSV ("Fácil,Media") → <code>$in</code> en MongoDB</li>
+        <li><code>alergenos</code> — CSV de IDs → <code>$nin</code> (excluye recetas que tengan alguno de esos alérgenos)</li>
+        <li><code>pagina / limite</code> — paginación; límite máximo 50 (clampado en controller)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FLUJOS -->
+  <section id="flujos">
+    <div class="section-header"><span>🔄</span><h2>Flujos de datos</h2></div>
+    <div class="section-body">
+
+      <h3>Feed del Home — usuario sin sesión</h3>
+      <div class="flow">
+        <span class="flow-node">feedHome renders</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useRecetasFeed({})</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">GET /api/recetas</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">optionalAuth (sin token)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">liked=false, guardado=false en todas</span>
+      </div>
+
+      <h3>Feed del Home — usuario con sesión</h3>
+      <div class="flow">
+        <span class="flow-node">useSession() → token</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">GET /api/recetas + Bearer token</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">optionalAuth decodifica usuario</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">liked/guardado calculados por receta</span>
+      </div>
+
+      <h3>Toggle like — optimistic update</h3>
+      <ol style="padding-left:1.2rem; font-size:0.83rem; color:#d4d4d4;">
+        <li>Usuario pulsa el corazón</li>
+        <li>Estado local: <code>setLiked(!liked)</code>, <code>setLikes(±1)</code> — UI instantánea</li>
+        <li>Mutación: <code>POST /api/recetas/:id/like</code> con Bearer token</li>
+        <li>Si éxito → invalidate queries (feed + detalle) para sincronizar con BE</li>
+        <li>Si error → rollback: <code>setLiked(prev)</code>, <code>setLikes(prev)</code></li>
+      </ol>
+
+      <h3>Guardar receta — optimistic update (mismo patrón)</h3>
+      <div class="flow">
+        <span class="flow-node">toggleGuardado()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">setState optimistic</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">POST .../guardar</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">onError → rollback</span>
+      </div>
+
+      <h3>Detalle de receta — Server Component</h3>
+      <div class="flow">
+        <span class="flow-node">Next.js SSR</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">getServerSession (token)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasService.obtenerPorId</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Axios Node.js → BE</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">RecetaDetalle (con similares)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">DetalleRecetaCliente (props)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPESCRIPT -->
+  <section id="ts">
+    <div class="section-header"><span>✅</span><h2>Verificación TypeScript</h2></div>
+    <div class="section-body">
+      <pre>$ cd backend && npx tsc --noEmit
+# (sin output) → 0 errores
+
+$ cd frontend && npx tsc --noEmit
+# (sin output) → 0 errores</pre>
+      <p>Ambas capas pasan el check estático sin errores ni warnings. El campo <code>recetasGuardadas</code> está correctamente tipado tanto en <code>IUsuario</code> como en el schema de Mongoose. El <code>optionalAuth</code> extiende <code>Express.Request</code> con el mismo campo <code>usuario?</code> que ya usaba <code>requerirAuth</code>.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

@@ -6,8 +6,8 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { motion } from 'framer-motion'
 import { SearchX } from 'lucide-react'
 import { useState } from 'react'
-import { POSTS_MOCK } from '../../data/datosFeed'
 import type { FiltrosAvanzados } from '../../types/receta.types'
+import { useRecetasFeed } from '../../hooks/useRecetasFeed'
 import { TarjetaPost } from './tarjetaPost'
 
 function TarjetaPostSkeleton() {
@@ -33,32 +33,14 @@ export function FeedHome() {
   })
 
   const busquedaDebounciada = useDebounce(busqueda, 300)
-  const cargando = busqueda !== busquedaDebounciada
 
-  const postsFiltrados = POSTS_MOCK.filter((post) => {
-    if (busquedaDebounciada !== '') {
-      const q = busquedaDebounciada.toLowerCase()
-      if (
-        !post.receta.titulo.toLowerCase().includes(q) &&
-        !post.receta.descripcion.toLowerCase().includes(q) &&
-        !post.autor.nombre.toLowerCase().includes(q)
-      )
-        return false
-    }
-
-    if (
-      filtrosAvanzados.dificultad.length > 0 &&
-      !filtrosAvanzados.dificultad.includes(post.receta.dificultad)
-    )
-      return false
-
-    if (filtrosAvanzados.alergenos.length > 0) {
-      const postAlergenos = post.receta.alergenos ?? []
-      if (filtrosAvanzados.alergenos.some((a) => postAlergenos.includes(a))) return false
-    }
-
-    return true
+  const { data, isLoading, isError } = useRecetasFeed({
+    q: busquedaDebounciada,
+    filtrosAvanzados,
   })
+
+  const recetas = data?.recetas ?? []
+  const cargando = isLoading || busqueda !== busquedaDebounciada
 
   return (
     <>
@@ -75,8 +57,13 @@ export function FeedHome() {
             <TarjetaPostSkeleton />
             <TarjetaPostSkeleton />
           </>
-        ) : postsFiltrados.length > 0 ? (
-          postsFiltrados.map((post, i) => (
+        ) : isError ? (
+          <div className="flex flex-col items-center gap-2 px-8 py-16 text-center">
+            <p className="text-base font-semibold text-foreground">Error al cargar recetas</p>
+            <p className="text-sm text-muted-foreground">Inténtalo de nuevo más tarde</p>
+          </div>
+        ) : recetas.length > 0 ? (
+          recetas.map((post, i) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 18 }}

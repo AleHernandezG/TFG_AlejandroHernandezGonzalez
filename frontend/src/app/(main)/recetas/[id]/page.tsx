@@ -1,4 +1,7 @@
-import { RECETA_DETALLE_MOCK } from '@/features/recetas/data/datosDetalle'
+import { notFound } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { opcionesAuth } from '@/lib/auth'
+import { recetasService } from '@/services/recetasService'
 import { DetalleRecetaCliente } from '@/features/recetas/components'
 
 export const metadata = {
@@ -6,10 +9,12 @@ export const metadata = {
   description: 'Ingredientes, pasos y nutrición de la receta.',
 }
 
-// Server Component — en Fase 5 se sustituye el mock por:
-//   const receta = await recetasService.obtenerPorId(params.id)
-//   y se añade useRecetaDetalle(id) hook. Los componentes NO cambian.
-export default function PaginaDetalleReceta() {
-  const receta = RECETA_DETALLE_MOCK
+export default async function PaginaDetalleReceta({ params }: { params: { id: string } }) {
+  const session = await getServerSession(opcionesAuth)
+  const token = session?.user?.backendToken
+
+  const receta = await recetasService.obtenerPorId(params.id, token)
+  if (!receta) notFound()
+
   return <DetalleRecetaCliente receta={receta} />
 }

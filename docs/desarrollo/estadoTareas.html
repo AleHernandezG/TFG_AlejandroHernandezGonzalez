@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">64</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">76</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -255,31 +255,31 @@
           <td class="id">DET-001</td>
           <td class="desc">
             <strong>Guardar receta (persistente)</strong>
-            <small>El botón de guardar en el detalle de receta ya existe visualmente pero solo guarda en memoria local. Hay que conectarlo al backend con un endpoint toggle y Zustand.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Toggle persistente con optimistic update. BE: POST /api/recetas/:id/guardar + recetasGuardadas en usuarioMongo. FE: useToggleGuardado(receta.id) en detalleRecetaCliente.tsx — setState optimistic + rollback en onError.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleGuardado.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-002</td>
           <td class="desc">
             <strong>Like persistente en recetas</strong>
-            <small>El contador de likes existe en la UI pero es local. Hay que conectarlo al backend con optimistic update de TanStack Query.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Toggle persistente con optimistic update. BE: POST /api/recetas/:id/like. FE: useToggleLike(receta.id) en cabeceraReceta.tsx — setLiked + setLikes ±1 inmediato, rollback completo si el BE falla.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleLike.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-009</td>
           <td class="desc">
             <strong>Carrusel de recetas similares funcional</strong>
-            <small>El carrusel muestra datos mock. Cuando haya datos reales, habrá que crear el endpoint GET /api/recetas/:id/similares. El componente no cambia.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Similares incluidos en la respuesta de GET /api/recetas/:id (campo similares: PostFeed[]). recetaRepository.findById() los calcula con $or [{categorias: $in}, {dificultad}]. CarruselSimilares recibe datos reales sin cambiar su interfaz.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
-          <td><span class="urg alta">Alta</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">CAROUSEL-001</td>
@@ -595,6 +595,130 @@
           </td>
           <td><span class="status review">👁️ Pendiente revisión</span></td>
           <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── FE: Tareas DET faltantes ── -->
+        <tr>
+          <td class="id">DET-001</td>
+          <td class="desc">
+            <strong>Guardar receta — toggle persistente FE + BE</strong>
+            <small>El botón BookmarkCheck en heroReceta.tsx y cabeceraReceta.tsx guarda solo en useState local. Hay que: (1) crear endpoint BE POST /api/recetas/:id/guardar (toggle), (2) añadir recetasService.toggleGuardado(id) en src/services/recetasService.ts, (3) mutación TanStack Query con optimistic update +/- guardado, (4) mover estado a Zustand recetasStore para sincronizar hero y cabecera.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · cabeceraReceta.tsx · detalleRecetaCliente.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-002</td>
+          <td class="desc">
+            <strong>Like persistente en recetas — toggle FE + BE</strong>
+            <small>El contador de likes en cabeceraReceta.tsx y tarjetaPost.tsx es local (useState). Hay que: (1) crear endpoint BE POST /api/recetas/:id/like (toggle), (2) recetasService.toggleLike(id), (3) mutación TanStack Query con optimistic update (contador +1/-1 instantáneo, rollback si falla el BE).</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · features/recetas/components/home/tarjetaPost.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-009</td>
+          <td class="desc">
+            <strong>Carrusel de recetas similares — datos reales</strong>
+            <small>carruselSimilares.tsx muestra datos mock. Los links ya apuntan a /recetas/:id correctamente; el componente no cambia. Hay que: (1) crear endpoint BE GET /api/recetas/:id/similares (devuelve PostFeed[] del mismo estilo/categoría), (2) recetasService.obtenerSimilares(id), (3) hook useSimilares(id) con TanStack Query, (4) sustituir el array mock en detalleRecetaCliente.tsx.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/carruselSimilares.tsx · detalleRecetaCliente.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── BE: Integración Sprint 2 (Home + Detalle) ── -->
+        <tr>
+          <td class="id">REC-001</td>
+          <td class="desc">
+            <strong>Modelo Receta BE — schema Mongoose + interface IReceta + repository</strong>
+            <small>Creados: types/receta.ts (IReceta pura), models/recetaMongo.ts (sub-schemas ingrediente/macros/comentario con _id:false), repositories/recetaRepository.ts (findAll, findById, findSimilares, toggleLike, toggleGuardado). TypeScript 0 errores.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/types/receta.ts · backend/src/models/recetaMongo.ts · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-002</td>
+          <td class="desc">
+            <strong>GET /api/recetas — Feed del Home</strong>
+            <small>Implementado. optionalAuth, filtros q (regex)/dificultad ($in)/alergenos ($nin), paginación skip/limit. Devuelve { recetas: PostFeed[], total }. liked/guardado calculados si hay token. Montado en app.ts como /api/recetas.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/routes/recetas.routes.ts · backend/src/controllers/recetasController.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-003</td>
+          <td class="desc">
+            <strong>GET /api/recetas/:id — Detalle completo de receta</strong>
+            <small>Implementado. Devuelve RecetaDetalleRespuesta con ingredientes, pasos, macros, alérgenos, similares embebidos (6 tarjetas). 404 si id inválido o no existe. optionalAuth. Avanza DET-008 a Sprint 3.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (findById)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-004</td>
+          <td class="desc">
+            <strong>POST /api/recetas/:id/like — Toggle like BE</strong>
+            <small>requerirAuth. Toggle: push/filter del ObjectId de usuario en el array likes del documento Receta. Devuelve { liked, totalLikes }. Campo likes: [ObjectId] ya en recetaMongo.ts.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (toggleLike)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-005</td>
+          <td class="desc">
+            <strong>POST /api/recetas/:id/guardar — Toggle guardar BE</strong>
+            <small>requerirAuth. Campo recetasGuardadas: [ObjectId] añadido a IUsuario + usuarioMongo.ts. Toggle en array del usuario. Devuelve { guardado }. Complementa DET-001.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (toggleGuardado) · backend/src/models/usuarioMongo.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-006</td>
+          <td class="desc">
+            <strong>GET /api/recetas/:id/similares — Carrusel similares BE</strong>
+            <small>optionalAuth. Devuelve PostFeed[] — recetas con misma dificultad o categorías compartidas, excluyendo la actual, límite 6. También incluidos en RecetaDetalleRespuesta.similares (GET /:id). Complementa DET-009.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (findSimilares)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-007</td>
+          <td class="desc">
+            <strong>recetasService.ts FE + hooks TanStack Query</strong>
+            <small>Creados: services/recetasService.ts (obtenerFeed, obtenerPorId, obtenerSimilares, toggleLike, toggleGuardado), hooks useRecetasFeed / useToggleLike / useToggleGuardado. QueryClientProvider añadido a providers.tsx. TypeScript 0 errores.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · frontend/src/services/recetasService.ts · frontend/src/features/recetas/hooks/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-008</td>
+          <td class="desc">
+            <strong>Conectar Home feed — datos reales</strong>
+            <small>POSTS_MOCK y filtrado local eliminados de feedHome.tsx. Conectado a useRecetasFeed({q, filtrosAvanzados}). isLoading → 3 skeletons; isError → mensaje; sin resultados → SearchX. Debounce 300ms sigue activo. TarjetaPost sin cambios.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · features/recetas/components/home/feedHome.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-009</td>
+          <td class="desc">
+            <strong>Conectar Detalle de receta — datos reales</strong>
+            <small>RECETA_DETALLE_MOCK eliminado. Server Component usa getServerSession + recetasService.obtenerPorId(params.id, token). notFound() si null. Componentes hijo (heroReceta, cabeceraReceta, tabsReceta...) sin cambios. Avanzó DET-008 de Fase 5 a Sprint 3.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · app/(main)/recetas/[id]/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
         </tr>
       </tbody>
     </table>

@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Share2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
+import { useToggleLike } from '../../hooks/useToggleLike'
 import type { RecetaDetalle } from '../../types/receta.types'
 
 function tiempoRelativo(fechaIso: string): string {
@@ -25,12 +26,17 @@ type Props = {
 export function CabeceraReceta({ receta }: Props) {
   const [liked, setLiked] = useState(receta.liked)
   const [likes, setLikes] = useState(receta.likes)
+  const { mutate: mutarLike } = useToggleLike(receta.id)
 
   function toggleLike() {
-    setLiked((prev) => {
-      const siguiente = !prev
-      setLikes((l) => (siguiente ? l + 1 : l - 1))
-      return siguiente
+    const siguiente = !liked
+    setLiked(siguiente)
+    setLikes((l) => (siguiente ? l + 1 : l - 1))
+    mutarLike(undefined, {
+      onError: () => {
+        setLiked((prev) => !prev)
+        setLikes((l) => (siguiente ? l - 1 : l + 1))
+      },
     })
   }
 

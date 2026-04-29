@@ -7,6 +7,7 @@ import { TabsReceta } from './tabsReceta'
 import { PasosReceta } from './pasosReceta'
 import { ComentariosReceta } from './comentariosReceta'
 import { CarruselSimilares } from './carruselSimilares'
+import { useToggleGuardado } from '../../hooks/useToggleGuardado'
 import type { RecetaDetalle } from '../../types/receta.types'
 
 type Props = {
@@ -15,9 +16,13 @@ type Props = {
 
 export function DetalleRecetaCliente({ receta }: Props) {
   const [guardado, setGuardado] = useState(receta.guardado)
+  const { mutate: mutarGuardado } = useToggleGuardado(receta.id)
 
   function toggleGuardado() {
     setGuardado((prev) => !prev)
+    mutarGuardado(undefined, {
+      onError: () => setGuardado((prev) => !prev),
+    })
   }
 
   return (
