@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { PestanaColeccion } from '../types/coleccion.types'
+import type { PestanaColeccion } from '@/features/coleccion/types/coleccion.types'
 
 interface Props {
   pestana: PestanaColeccion

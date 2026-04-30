@@ -1,4 +1,4 @@
-import type { PestanaColeccion, RecetaColeccion } from '../types/coleccion.types'
+import type { PestanaColeccion, RecetaColeccion } from '@/features/coleccion/types/coleccion.types'
 import { TarjetaColeccion } from './tarjetaColeccion'
 
 interface Props {

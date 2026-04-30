@@ -6,8 +6,8 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { motion } from 'framer-motion'
 import { SearchX } from 'lucide-react'
 import { useState } from 'react'
-import type { FiltrosAvanzados } from '../../types/receta.types'
-import { useRecetasFeed } from '../../hooks/useRecetasFeed'
+import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
+import { useRecetasFeed } from '@/features/recetas/hooks/useRecetasFeed'
 import { TarjetaPost } from './tarjetaPost'
 
 function TarjetaPostSkeleton() {

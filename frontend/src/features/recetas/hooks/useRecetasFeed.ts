@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { recetasService, type FiltrosFeed } from "@/services/recetasService";
-import type { FiltrosAvanzados } from "../types/receta.types";
+import type { FiltrosAvanzados } from "@/features/recetas/types/receta.types";
 
 interface UseRecetasFeedParams {
   q?: string;

@@ -6,8 +6,8 @@ import { Heart, MessageCircle, Share2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
-import { useToggleLike } from '../../hooks/useToggleLike'
-import type { RecetaDetalle } from '../../types/receta.types'
+import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
+import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
 function tiempoRelativo(fechaIso: string): string {
   const diff = Date.now() - new Date(fechaIso).getTime()

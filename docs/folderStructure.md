@@ -118,12 +118,20 @@ src/
 │   │   ├── data/               # datosIngredientes.ts — pendiente
 │   │   ├── hooks/              # useDespensa.ts — pendiente Fase 5
 │   │   └── types/              # tipos de despensa — pendiente
-│   ├── coleccion/              # ⏳ Sprint 3+ — estructura creada
+│   ├── coleccion/              # ✅ Sprint 3 — UI-021 · UI-022
 │   │   ├── components/
-│   │   │   └── index.ts        # Barrel export vacío
+│   │   │   ├── headerColeccion.tsx        # 'use client' · sticky header + toggle pestañas
+│   │   │   ├── tarjetaColeccion.tsx       # 'use client' · card portrait 3/4
+│   │   │   ├── gridRecetasColeccion.tsx   # server · grid 2 cols
+│   │   │   ├── estadoVacioMisRecetas.tsx  # server · ChefHat + CTA crear
+│   │   │   ├── estadoVacioGuardadas.tsx   # server · Bookmark + CTA explorar
+│   │   │   ├── contenidoColeccion.tsx     # 'use client' · estado pestañas + AnimatePresence
+│   │   │   └── index.ts
 │   │   ├── data/
+│   │   │   └── datosColeccion.ts          # 4 guardadas + 4 propias (mock — conectar BE Fase 5)
 │   │   ├── hooks/              # useColeccion.ts — pendiente Fase 5
 │   │   └── types/
+│   │       └── coleccion.types.ts         # PestanaColeccion · RecetaColeccion
 │   ├── chat/                   # ⏳ Sprint 3+ — estructura creada
 │   │   ├── components/
 │   │   │   └── index.ts        # Barrel export vacío
@@ -217,7 +225,7 @@ Todos los imports usan `@/` como raíz de `src/`.
 | `recetas` | ✅ Aprobado | `home/` ×10 (FeedHome, DrawerFiltros, TarjetaPost…) · `detalleReceta/` ×7 · `/coleccion` (page) |
 | `perfil` | ⏳ Sprint 4 | Pendiente (structure por crear) |
 | `despensa` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
-| `coleccion` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
+| `coleccion` | ✅ Sprint 3 · mock | 6 componentes (headerColeccion, tarjetaColeccion, gridRecetasColeccion, estadoVacio×2, contenidoColeccion) · `datosColeccion.ts` · `coleccion.types.ts` |
 | `chat` | ⏳ Sprint 3+ estructura | `components/index.ts` (barrel) · `data/` · `hooks/` · `types/` creados |
 | `grupos` | ⏳ Sprint 6 | Pendiente |
 

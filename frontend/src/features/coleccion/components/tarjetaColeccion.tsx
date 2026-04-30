@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Bookmark, MoreHorizontal } from 'lucide-react'
-import type { PestanaColeccion, RecetaColeccion } from '../types/coleccion.types'
+import type { PestanaColeccion, RecetaColeccion } from '@/features/coleccion/types/coleccion.types'
 
 interface Props {
   receta: RecetaColeccion

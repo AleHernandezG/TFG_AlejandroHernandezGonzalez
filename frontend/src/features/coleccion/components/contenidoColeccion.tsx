@@ -6,8 +6,8 @@ import { HeaderColeccion } from './headerColeccion'
 import { GridRecetasColeccion } from './gridRecetasColeccion'
 import { EstadoVacioMisRecetas } from './estadoVacioMisRecetas'
 import { EstadoVacioGuardadas } from './estadoVacioGuardadas'
-import { MIS_RECETAS, RECETAS_GUARDADAS } from '../data/datosColeccion'
-import type { PestanaColeccion } from '../types/coleccion.types'
+import { MIS_RECETAS, RECETAS_GUARDADAS } from '@/features/coleccion/data/datosColeccion'
+import type { PestanaColeccion } from '@/features/coleccion/types/coleccion.types'
 
 const variantesContenido: Variants = {
   oculto: { opacity: 0, y: 10 },

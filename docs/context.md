@@ -53,6 +53,7 @@
 - ✅ [UI-019] NavBar inferior refactorizada — patrón FAB (Material Design / WhatsApp): Cookr IA como botón flotante sobre la nav, nav con 5 ítems planos (Inicio · Despensa · Discover · Colección · Perfil). Sidebar PC actualizado con los 6 destinos
 - ✅ [UI-020] Vista /coleccion — dos subpestañas: "Guardadas" (mock) y "Mis recetas" (mock). Estado vacío con CTA en Mis recetas. Mobile: columna TarjetaPost. Desktop: sidebar + max-w-2xl
 - ✅ [DOCS-004] Mapa de navegación — esquema de conexiones entre vistas (rutas, acciones de navegación)
+- ✅ [RULES-001] Imports FE — 8 ficheros corregidos: rutas relativas cross-folder (`../../hooks/`, `../../types/`, `../types/`, `../data/`) convertidas a absolutas `@/features/...` — cumplimiento rules.md §15
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -284,7 +285,7 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009.
+Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
 
 Sprint 3 — pendientes:
 

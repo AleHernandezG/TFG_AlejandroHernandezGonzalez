@@ -7,8 +7,8 @@ import { TabsReceta } from './tabsReceta'
 import { PasosReceta } from './pasosReceta'
 import { ComentariosReceta } from './comentariosReceta'
 import { CarruselSimilares } from './carruselSimilares'
-import { useToggleGuardado } from '../../hooks/useToggleGuardado'
-import type { RecetaDetalle } from '../../types/receta.types'
+import { useToggleGuardado } from '@/features/recetas/hooks/useToggleGuardado'
+import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
 type Props = {
   receta: RecetaDetalle

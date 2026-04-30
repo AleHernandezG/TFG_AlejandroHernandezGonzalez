@@ -377,6 +377,18 @@ router.post("/:id/guardar",  requerirAuth, recetasController.toggleGuardado);</p
 $ cd frontend && npx tsc --noEmit
 # (sin output) → 0 errores</pre>
       <p>Ambas capas pasan el check estático sin errores ni warnings. El campo <code>recetasGuardadas</code> está correctamente tipado tanto en <code>IUsuario</code> como en el schema de Mongoose. El <code>optionalAuth</code> extiende <code>Express.Request</code> con el mismo campo <code>usuario?</code> que ya usaba <code>requerirAuth</code>.</p>
+
+      <h3>Corrección imports — rules.md §15 [RULES-001]</h3>
+      <p>Detectados imports cross-folder con rutas relativas (<code>../../hooks/</code>, <code>../../types/</code>, <code>../types/</code>). Corregidos a rutas absolutas <code>@/features/recetas/...</code> en 4 ficheros del módulo para cumplir la regla "todos los imports usan <code>@/</code>".</p>
+      <table>
+        <thead><tr><th>Fichero</th><th>Antes</th><th>Después</th></tr></thead>
+        <tbody>
+          <tr><td>feedHome.tsx</td><td><code>../../types/receta.types</code><br><code>../../hooks/useRecetasFeed</code></td><td><code>@/features/recetas/types/receta.types</code><br><code>@/features/recetas/hooks/useRecetasFeed</code></td></tr>
+          <tr><td>detalleRecetaCliente.tsx</td><td><code>../../hooks/useToggleGuardado</code><br><code>../../types/receta.types</code></td><td><code>@/features/recetas/hooks/useToggleGuardado</code><br><code>@/features/recetas/types/receta.types</code></td></tr>
+          <tr><td>cabeceraReceta.tsx</td><td><code>../../hooks/useToggleLike</code><br><code>../../types/receta.types</code></td><td><code>@/features/recetas/hooks/useToggleLike</code><br><code>@/features/recetas/types/receta.types</code></td></tr>
+          <tr><td>useRecetasFeed.ts</td><td><code>../types/receta.types</code></td><td><code>@/features/recetas/types/receta.types</code></td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 

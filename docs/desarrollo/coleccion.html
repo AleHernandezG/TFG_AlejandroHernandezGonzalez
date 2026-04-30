@@ -597,6 +597,26 @@ coleccion.types.ts ← contratos de datos</pre>
     </div>
   </section>
 
+  <!-- CORRECCIÓN IMPORTS -->
+  <section id="imports">
+    <div class="section-header">
+      <span class="section-icon">🔧</span>
+      <h2>Corrección imports — rules.md §15 [RULES-001]</h2>
+    </div>
+    <div class="section-body">
+      <p>Detectados imports cross-folder con rutas relativas (<code>../types/</code>, <code>../data/</code>). Corregidos a rutas absolutas <code>@/features/coleccion/...</code> en 4 componentes del módulo para cumplir la regla "todos los imports usan <code>@/</code>".</p>
+      <table>
+        <thead><tr><th>Fichero</th><th>Antes</th><th>Después</th></tr></thead>
+        <tbody>
+          <tr><td>contenidoColeccion.tsx</td><td><code>../data/datosColeccion</code><br><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/data/datosColeccion</code><br><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>tarjetaColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>headerColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>gridRecetasColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <!-- TODOS FASE 5 -->
   <section id="todos">
     <div class="section-header">
