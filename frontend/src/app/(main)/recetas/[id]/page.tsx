@@ -4,6 +4,8 @@ import { opcionesAuth } from '@/lib/auth'
 import { recetasService } from '@/services/recetasService'
 import { DetalleRecetaCliente } from '@/features/recetas/components'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Detalle de receta — Cookr',
   description: 'Ingredientes, pasos y nutrición de la receta.',

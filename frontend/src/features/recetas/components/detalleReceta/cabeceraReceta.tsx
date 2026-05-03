@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Heart, MessageCircle, Share2, UserCheck, UserPlus } from 'lucide-react'
+import { Check, Heart, MessageCircle, Share2, UserCheck, UserPlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -28,11 +29,19 @@ type Props = {
 
 export function CabeceraReceta({ receta }: Props) {
   const { data: session } = useSession()
+  const router = useRouter()
   const [liked, setLiked] = useState(receta.liked)
   const [likes, setLikes] = useState(receta.likes)
   const [siguiendo, setSiguiendo] = useState(receta.sigueAlAutor)
+  const [urlCopiada, setUrlCopiada] = useState(false)
   const { mutate: mutarLike } = useToggleLike(receta.id)
   const { mutate: mutarSeguir, isPending: siguiendoPending } = useToggleSeguir(receta.autor.id, receta.id)
+
+  useEffect(() => {
+    setLiked(receta.liked)
+    setLikes(receta.likes)
+    setSiguiendo(receta.sigueAlAutor)
+  }, [receta.liked, receta.likes, receta.sigueAlAutor])
 
   const esPropiaReceta = session?.user?.id === receta.autor.id || !receta.autor.id
 
@@ -41,6 +50,7 @@ export function CabeceraReceta({ receta }: Props) {
     setLiked(siguiente)
     setLikes((l) => (siguiente ? l + 1 : l - 1))
     mutarLike(undefined, {
+      onSuccess: () => router.refresh(),
       onError: () => {
         setLiked((prev) => !prev)
         setLikes((l) => (siguiente ? l - 1 : l + 1))
@@ -48,10 +58,30 @@ export function CabeceraReceta({ receta }: Props) {
     })
   }
 
+  async function handleCompartir() {
+    const url = window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: receta.receta.titulo, url })
+      } catch {
+        // usuario canceló el share sheet nativo — no hacer nada
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url)
+        setUrlCopiada(true)
+        setTimeout(() => setUrlCopiada(false), 2000)
+      } catch {
+        // clipboard no disponible — sin feedback
+      }
+    }
+  }
+
   function toggleSeguir() {
     const siguiente = !siguiendo
     setSiguiendo(siguiente)
     mutarSeguir(undefined, {
+      onSuccess: () => router.refresh(),
       onError: () => setSiguiendo((prev) => !prev),
     })
   }
@@ -149,9 +179,12 @@ export function CabeceraReceta({ receta }: Props) {
           </button>
 
           {/* Compartir */}
-          <button className="flex flex-col items-center gap-0.5 text-muted-foreground">
-            <Share2 size={22} />
-            <span className="text-[10px] font-bold">Compartir</span>
+          <button
+            onClick={handleCompartir}
+            className={`flex flex-col items-center gap-0.5 transition-colors ${urlCopiada ? 'text-brand' : 'text-muted-foreground'}`}
+          >
+            {urlCopiada ? <Check size={22} /> : <Share2 size={22} />}
+            <span className="text-[10px] font-bold">{urlCopiada ? '¡Copiado!' : 'Compartir'}</span>
           </button>
         </div>
       </div>

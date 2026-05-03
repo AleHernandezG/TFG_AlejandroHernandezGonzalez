@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAgregarComentario } from '../../hooks/useAgregarComentario'
 import type { Comentario } from '../../types/receta.types'
 
@@ -25,18 +26,31 @@ type Props = {
 
 export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
   const { data: session } = useSession()
+  const router = useRouter()
   const [texto, setTexto] = useState('')
   const [listaLocal, setListaLocal] = useState<Comentario[]>(comentarios)
-  const { mutate: enviar, isPending } = useAgregarComentario(recetaId)
+  const { mutate: enviar } = useAgregarComentario(recetaId)
 
   const preview = listaLocal.slice(0, 3)
 
   function handleEnviar() {
     if (!texto.trim()) return
-    enviar(texto, {
-      onSuccess: (nuevoComentario) => {
-        setListaLocal((prev) => [nuevoComentario, ...prev])
-        setTexto('')
+    const textoTrimmed = texto.trim()
+
+    const optimista: Comentario = {
+      autorNombre: session?.user?.name ?? 'Tú',
+      avatarUrl: session?.user?.image ?? null,
+      texto: textoTrimmed,
+      fecha: new Date().toISOString(),
+    }
+    setListaLocal((prev) => [optimista, ...prev])
+    setTexto('')
+
+    enviar(textoTrimmed, {
+      onSuccess: () => router.refresh(),
+      onError: () => {
+        setListaLocal((prev) => prev.filter((c) => c !== optimista))
+        setTexto(textoTrimmed)
       },
     })
   }
@@ -72,9 +86,9 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
               size="sm"
               className="rounded-full h-8 px-4 text-xs font-bold"
               onClick={handleEnviar}
-              disabled={isPending || !texto.trim()}
+              disabled={!texto.trim()}
             >
-              {isPending ? 'Enviando…' : 'Publicar'}
+              Publicar
             </Button>
           </div>
         </div>
