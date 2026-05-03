@@ -3,6 +3,7 @@ import { Receta } from "../models/recetaMongo";
 import { Usuario } from "../models/usuarioMongo";
 import {
   FiltrosFeed,
+  IComentarioReceta,
   PostFeedRespuesta,
   RecetaDetalleRespuesta,
 } from "../types/receta";
@@ -23,9 +24,11 @@ function docAPostFeed(
   doc: Record<string, unknown>,
   usuarioId?: string,
   guardadasSet?: Set<string>,
+  seguidosSet?: Set<string>,
 ): PostFeedRespuesta {
   const autor = doc.autorId as UsuarioPopulado;
   const id = (doc._id as Types.ObjectId).toString();
+  const autorId = autor?._id?.toString() ?? "";
   const likesArr = doc.likes as Types.ObjectId[];
   const comentariosArr = doc.listaComentarios as unknown[];
 
@@ -33,10 +36,12 @@ function docAPostFeed(
     ? likesArr.some((lid) => lid.toString() === usuarioId)
     : false;
   const guardado = guardadasSet ? guardadasSet.has(id) : false;
+  const sigueAlAutor = seguidosSet ? seguidosSet.has(autorId) : false;
 
   return {
     id,
     autor: {
+      id: autorId,
       nombre: autor?.nombre ?? "Cookr User",
       username: autor?.nombre ? nombreAUsername(autor.nombre) : "cookruser",
       avatarUrl:
@@ -54,11 +59,11 @@ function docAPostFeed(
     comentarios: comentariosArr.length,
     guardado,
     liked,
+    sigueAlAutor,
     fechaPublicacion: (doc.fechaPublicacion as Date).toISOString(),
   };
 }
 
-//Para si ahy que buscar una receta si un usuario la tiene guardada quq evaya mas rapido
 async function obtenerGuardadasSet(usuarioId: string): Promise<Set<string>> {
   const usuario = await Usuario.findById(usuarioId)
     .select("recetasGuardadas")
@@ -68,12 +73,21 @@ async function obtenerGuardadasSet(usuarioId: string): Promise<Set<string>> {
   return new Set(ids.map((id) => id.toString()));
 }
 
+async function obtenerSeguidosSet(usuarioId: string): Promise<Set<string>> {
+  const usuario = await Usuario.findById(usuarioId)
+    .select("seguidos")
+    .lean()
+    .exec();
+  const ids = (usuario?.seguidos as Types.ObjectId[] | undefined) ?? [];
+  return new Set(ids.map((id) => id.toString()));
+}
+
 export const recetaRepository = {
   async findAll(
     filtros: FiltrosFeed = {},
     usuarioId?: string,
   ): Promise<{ recetas: PostFeedRespuesta[]; total: number }> {
-    const { q, dificultad, alergenos, pagina = 1, limite = 20 } = filtros;
+    const { q, dificultad, alergenos, pagina = 1, limite = 20, excluirPropio } = filtros;
 
     const query: Record<string, unknown> = {};
 
@@ -87,21 +101,13 @@ export const recetaRepository = {
       query["dificultad"] = { $in: dificultad };
     }
     if (alergenos && alergenos.length > 0) {
-      // Excluir recetas que tengan alguno de los alérgenos indicados
       query["alergenos"] = { $nin: alergenos };
     }
+    if (excluirPropio && usuarioId) {
+      query["autorId"] = { $ne: new Types.ObjectId(usuarioId) };
+    }
 
-    // Solo traemos las recetas de la página solicitada, no todas de golpe
     const skip = (pagina - 1) * limite;
-
-    //   Receta.find(query)           // busca recetas que cumplan los filtros
-    // .populate("autorId",       // en vez de guardar solo el ID del autor,
-    //    "nombre foto")          // trae su nombre y foto directamente
-    // .sort({ fechaPublicacion: -1 })  // ordena de más nueva a más antigua
-    // .skip(skip)                // salta las recetas de páginas anteriores
-    // .limit(limite)             // coge solo las de esta página (ej: 20)
-    // .lean()                    // devuelve objetos JS simples, no documentos Mongoose (más rápido)
-    // .exec()                    // ejecuta la consulta
 
     const [docs, total] = await Promise.all([
       Receta.find(query)
@@ -111,17 +117,16 @@ export const recetaRepository = {
         .limit(limite)
         .lean()
         .exec(),
-      Receta.countDocuments(query), //Toatal de recetas que se devuelven
+      Receta.countDocuments(query),
     ]);
 
-    //Sacar en un set las recetas guardadas de un user para que sea mas rapido las consulta
-    const guardadasSet = usuarioId
-      ? await obtenerGuardadasSet(usuarioId)
-      : undefined;
+    const [guardadasSet, seguidosSet] = usuarioId
+      ? await Promise.all([obtenerGuardadasSet(usuarioId), obtenerSeguidosSet(usuarioId)])
+      : [undefined, undefined];
 
     return {
       recetas: docs.map((doc) =>
-        docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet),
+        docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet, seguidosSet),
       ),
       total,
     };
@@ -140,14 +145,15 @@ export const recetaRepository = {
 
     if (!doc) return null;
 
-    const guardadasSet = usuarioId
-      ? await obtenerGuardadasSet(usuarioId)
-      : undefined;
+    const [guardadasSet, seguidosSet] = usuarioId
+      ? await Promise.all([obtenerGuardadasSet(usuarioId), obtenerSeguidosSet(usuarioId)])
+      : [undefined, undefined];
 
     const base = docAPostFeed(
       doc as Record<string, unknown>,
       usuarioId,
       guardadasSet,
+      seguidosSet,
     );
 
     // Recetas similares: misma dificultad o categorías compartidas
@@ -165,7 +171,7 @@ export const recetaRepository = {
       .exec();
 
     const similares = similaresDocs.map((s) =>
-      docAPostFeed(s as Record<string, unknown>, usuarioId, guardadasSet),
+      docAPostFeed(s as Record<string, unknown>, usuarioId, guardadasSet, seguidosSet),
     );
 
     type ComentarioLean = {
@@ -219,6 +225,10 @@ export const recetaRepository = {
       ? await obtenerGuardadasSet(usuarioId)
       : undefined;
 
+    const [guardadasSet2, seguidosSet2] = usuarioId
+      ? await Promise.all([obtenerGuardadasSet(usuarioId), obtenerSeguidosSet(usuarioId)])
+      : [undefined, undefined];
+
     const docs = await Receta.find({
       _id: { $ne: recetaId },
       $or: [
@@ -233,7 +243,7 @@ export const recetaRepository = {
       .exec();
 
     return docs.map((doc) =>
-      docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet),
+      docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet2, seguidosSet2),
     );
   },
 
@@ -261,6 +271,43 @@ export const recetaRepository = {
 
     await receta.save();
     return { liked: !yaLiked, totalLikes: receta.likes.length };
+  },
+
+  async agregarComentario(
+    recetaId: string,
+    usuarioId: string,
+    texto: string,
+  ): Promise<{ autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }> {
+    if (!Types.ObjectId.isValid(recetaId)) {
+      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    }
+
+    const [receta, usuario] = await Promise.all([
+      Receta.findById(recetaId),
+      Usuario.findById(usuarioId).select("nombre foto").lean().exec(),
+    ]);
+
+    if (!receta) throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    if (!usuario) throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
+
+    const fecha = new Date();
+    const comentario = {
+      autorId: new Types.ObjectId(usuarioId),
+      autorNombre: usuario.nombre,
+      avatarUrl: usuario.foto ?? null,
+      texto: texto.trim(),
+      fecha,
+    };
+
+    receta.listaComentarios.push(comentario as IComentarioReceta);
+    await receta.save();
+
+    return {
+      autorNombre: comentario.autorNombre,
+      avatarUrl: comentario.avatarUrl,
+      texto: comentario.texto,
+      fecha: fecha.toISOString(),
+    };
   },
 
   async toggleGuardado(

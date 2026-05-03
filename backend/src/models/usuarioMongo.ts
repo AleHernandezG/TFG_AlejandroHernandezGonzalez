@@ -59,6 +59,16 @@ const usuarioSchema = new Schema<IUsuarioDoc>({
     ref: "Receta",
     default: [],
   },
+  seguidos: {
+    type: [Schema.Types.ObjectId],
+    ref: "Usuario",
+    default: [],
+  },
+  seguidores: {
+    type: [Schema.Types.ObjectId],
+    ref: "Usuario",
+    default: [],
+  },
   fechaRegistro: {
     type: Date,
     default: Date.now,

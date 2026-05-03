@@ -25,4 +25,14 @@ export const recetasService = {
   async toggleGuardado(recetaId: string, usuarioId: string) {
     return recetaRepository.toggleGuardado(recetaId, usuarioId);
   },
+
+  async agregarComentario(recetaId: string, usuarioId: string, texto: string) {
+    if (!texto || texto.trim().length === 0) {
+      throw Object.assign(new Error("El comentario no puede estar vacío"), { status: 400 });
+    }
+    if (texto.trim().length > 500) {
+      throw Object.assign(new Error("El comentario no puede superar 500 caracteres"), { status: 400 });
+    }
+    return recetaRepository.agregarComentario(recetaId, usuarioId, texto);
+  },
 };

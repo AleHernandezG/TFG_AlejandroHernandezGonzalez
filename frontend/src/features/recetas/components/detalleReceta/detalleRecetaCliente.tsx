@@ -44,7 +44,7 @@ export function DetalleRecetaCliente({ receta }: Props) {
             porcionesBase={receta.porciones}
           />
           <PasosReceta pasos={receta.pasos} />
-          <ComentariosReceta comentarios={receta.listaComentarios} total={receta.comentarios} />
+          <ComentariosReceta recetaId={receta.id} comentarios={receta.listaComentarios} total={receta.comentarios} />
           <CarruselSimilares recetas={receta.similares} />
         </div>
       </div>
@@ -72,7 +72,7 @@ export function DetalleRecetaCliente({ receta }: Props) {
         {/* Columna derecha: pasos + comentarios + similares */}
         <div className="overflow-y-auto pt-6">
           <PasosReceta pasos={receta.pasos} />
-          <ComentariosReceta comentarios={receta.listaComentarios} total={receta.comentarios} />
+          <ComentariosReceta recetaId={receta.id} comentarios={receta.listaComentarios} total={receta.comentarios} />
           <CarruselSimilares recetas={receta.similares} />
         </div>
       </div>

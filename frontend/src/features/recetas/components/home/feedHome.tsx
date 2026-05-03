@@ -37,6 +37,7 @@ export function FeedHome() {
   const { data, isLoading, isError } = useRecetasFeed({
     q: busquedaDebounciada,
     filtrosAvanzados,
+    excluirPropio: true,
   })
 
   const recetas = data?.recetas ?? []

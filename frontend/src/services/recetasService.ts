@@ -7,6 +7,7 @@ export interface FiltrosFeed {
   alergenos?: string[];
   pagina?: number;
   limite?: number;
+  excluirPropio?: boolean;
 }
 
 export interface RespuestaFeed {
@@ -21,6 +22,7 @@ function serializarFiltros(filtros: FiltrosFeed): Record<string, string> {
   if (filtros.alergenos?.length) params.alergenos = filtros.alergenos.join(",");
   if (filtros.pagina) params.pagina = String(filtros.pagina);
   if (filtros.limite) params.limite = String(filtros.limite);
+  if (filtros.excluirPropio) params.excluirPropio = "true";
   return params;
 }
 
@@ -64,6 +66,19 @@ export const recetasService = {
     const { data } = await apiClient.post<{ guardado: boolean }>(
       `/recetas/${recetaId}/guardar`,
       {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data;
+  },
+
+  async agregarComentario(
+    recetaId: string,
+    texto: string,
+    token: string,
+  ): Promise<{ autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }> {
+    const { data } = await apiClient.post(
+      `/recetas/${recetaId}/comentarios`,
+      { texto },
       { headers: { Authorization: `Bearer ${token}` } },
     );
     return data;

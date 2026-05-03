@@ -9,5 +9,6 @@ router.get("/:id", optionalAuth, recetasController.obtenerPorId);
 router.get("/:id/similares", optionalAuth, recetasController.obtenerSimilares);
 router.post("/:id/like", requerirAuth, recetasController.toggleLike);
 router.post("/:id/guardar", requerirAuth, recetasController.toggleGuardado);
+router.post("/:id/comentarios", requerirAuth, recetasController.agregarComentario);
 
 export default router;

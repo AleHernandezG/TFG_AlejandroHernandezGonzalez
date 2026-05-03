@@ -5,6 +5,7 @@ export const RECETA_DETALLE_MOCK: RecetaDetalle = {
   // ── Datos base PostFeed ───────────────────────────────────────────
   id: '10',
   autor: {
+    id: '',
     nombre: 'Alejandro Romero',
     username: 'alejandrococinero',
     avatarUrl: 'https://picsum.photos/seed/avatardetalle/80/80',
@@ -21,6 +22,7 @@ export const RECETA_DETALLE_MOCK: RecetaDetalle = {
   comentarios: 64,
   guardado: false,
   liked: false,
+  sigueAlAutor: false,
   fechaPublicacion: '2026-04-10T07:00:00.000Z',
 
   // ── Detalle extendido ─────────────────────────────────────────────

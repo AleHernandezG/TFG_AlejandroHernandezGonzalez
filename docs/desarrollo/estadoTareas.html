@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-04-28 · Sprint 3 activo · Fase 3 de 7</div>
+    <div class="meta">Actualizado: 2026-05-03 · Sprint 4 activo · Fase 4 de 7</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">2</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter review"><div class="num">6</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">76</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">81</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -597,35 +597,35 @@
           <td><span class="urg media">Media</span></td>
         </tr>
 
-        <!-- ── FE: Tareas DET faltantes ── -->
+        <!-- ── FE: DET completadas Sprint 3 (entradas anteriores actualizadas) ── -->
         <tr>
           <td class="id">DET-001</td>
           <td class="desc">
             <strong>Guardar receta — toggle persistente FE + BE</strong>
-            <small>El botón BookmarkCheck en heroReceta.tsx y cabeceraReceta.tsx guarda solo en useState local. Hay que: (1) crear endpoint BE POST /api/recetas/:id/guardar (toggle), (2) añadir recetasService.toggleGuardado(id) en src/services/recetasService.ts, (3) mutación TanStack Query con optimistic update +/- guardado, (4) mover estado a Zustand recetasStore para sincronizar hero y cabecera.</small>
-            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · cabeceraReceta.tsx · detalleRecetaCliente.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+            <small>BE: POST /api/recetas/:id/guardar + recetasGuardadas en usuarioMongo (REC-005). FE: useToggleGuardado(receta.id) en detalleRecetaCliente.tsx — setState optimistic + rollback en onError (REC-007).</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleGuardado.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-002</td>
           <td class="desc">
             <strong>Like persistente en recetas — toggle FE + BE</strong>
-            <small>El contador de likes en cabeceraReceta.tsx y tarjetaPost.tsx es local (useState). Hay que: (1) crear endpoint BE POST /api/recetas/:id/like (toggle), (2) recetasService.toggleLike(id), (3) mutación TanStack Query con optimistic update (contador +1/-1 instantáneo, rollback si falla el BE).</small>
-            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · features/recetas/components/home/tarjetaPost.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+            <small>BE: POST /api/recetas/:id/like (REC-004). FE: useToggleLike(receta.id) en cabeceraReceta.tsx — setLiked + setLikes ±1 inmediato, rollback completo si el BE falla (REC-007).</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleLike.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DET-009</td>
           <td class="desc">
             <strong>Carrusel de recetas similares — datos reales</strong>
-            <small>carruselSimilares.tsx muestra datos mock. Los links ya apuntan a /recetas/:id correctamente; el componente no cambia. Hay que: (1) crear endpoint BE GET /api/recetas/:id/similares (devuelve PostFeed[] del mismo estilo/categoría), (2) recetasService.obtenerSimilares(id), (3) hook useSimilares(id) con TanStack Query, (4) sustituir el array mock en detalleRecetaCliente.tsx.</small>
-            <span class="source">📄 features/recetas/components/detalleReceta/carruselSimilares.tsx · detalleRecetaCliente.tsx · docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Similares incluidos en la respuesta de GET /api/recetas/:id (campo similares: PostFeed[]). recetaRepository.findById() los calcula con $or [{categorias: $in}, {dificultad}]. CarruselSimilares recibe datos reales sin cambiar su interfaz (REC-003 + REC-006).</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 3</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
 
@@ -850,21 +850,81 @@
           <td class="id">SVC-001</td>
           <td class="desc">
             <strong>Crear recetasService.ts — capa HTTP para recetas</strong>
-            <small>No existe ningún service para recetas. Sin él, cuando se conecte el backend (TODO-CR-01, CR-02) los componentes harían llamadas directas violando la arquitectura. Crear src/services/recetasService.ts con los métodos: crear(datos), obtenerPorId(id), obtenerFeed(filtros), toggleLike(id), toggleGuardada(id). Necesario antes de Fase 5.</small>
-            <span class="source">📄 src/services/ · docs/rules.md §1 · TODO-CR-01 · TODO-CR-02</span>
+            <small>Completado en Sprint 3 como parte de REC-007. services/recetasService.ts implementado con obtenerFeed, obtenerPorId, obtenerSimilares, toggleLike, toggleGuardado + hooks TanStack Query.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · frontend/src/services/recetasService.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 3 (REC-007)</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">DOM-003</td>
           <td class="desc">
             <strong>Crear modelo MongoDB — Receta</strong>
-            <small>No existe ningún schema Mongoose para recetas. Bloquea todos los endpoints de recetas (crear, obtener feed, detalle, like, guardar). Schema: titulo, descripcion, autor (ref Usuario), foto (url Cloudinary), ingredientes[], pasos[], dietas[], alergenos[], dificultad, tiempo, porciones, likes (ref[]), guardadoPor (ref[]), creadoEn. Separar IReceta en types/receta.ts e IRecetaDoc en models/recetaMongo.ts.</small>
-            <span class="source">📄 backend/src/models/ · backend/src/types/ · docs/rules.md §6 · docs/folderStructure.md</span>
+            <small>Completado en Sprint 3 como parte de REC-001. types/receta.ts (IReceta pura) + models/recetaMongo.ts (sub-schemas ingrediente/macros/comentario con _id:false) + repositories/recetaRepository.ts.</small>
+            <span class="source">📄 docs/desarrollo/integracionRecetas.html · backend/src/types/receta.ts · backend/src/models/recetaMongo.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3 (REC-001)</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FEED-001</td>
+          <td class="desc">
+            <strong>Excluir recetas propias del feed de home</strong>
+            <small>El feed muestra todas las recetas incluyendo las del propio usuario. Filtrar en el backend añadiendo el parámetro excluirAutor al endpoint GET /api/recetas, o en el FE descartando las tarjetas donde autorId === session.user.id.</small>
+            <span class="source">📄 features/recetas/components/feed/ · backend/src/controllers/recetaController.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">LIKE-001</td>
+          <td class="desc">
+            <strong>Like persistente en BD — toggle único por usuario</strong>
+            <small>Actualmente el like es optimista en cliente pero no persiste en BD ni valida unicidad. Hay que: (1) endpoint PATCH /api/recetas/:id/like que añada/elimine el userId del array likes del documento, (2) validar que un usuario solo puede dar un like, (3) devolver el conteo actualizado, (4) conectar el hook useLike() con mutación TanStack Query real.</small>
+            <span class="source">📄 backend/src/models/recetaMongo.ts · frontend/src/services/recetasService.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COM-001</td>
+          <td class="desc">
+            <strong>Comentarios persistentes en BD (ver + añadir)</strong>
+            <small>Complementa DET-004 y DET-005: los comentarios deben guardarse en MongoDB y cargarse al volver a la receta. Endpoints: POST /api/recetas/:id/comentarios (crear, requiere auth) + GET /api/recetas/:id/comentarios (paginado). El modelo Receta ya tiene el subdocumento comentario (_id:false). Actualizar el input del detalle para usar la mutación real en lugar del mock.</small>
+            <span class="source">📄 backend/src/models/recetaMongo.ts · backend/src/routes/recetasRouter.ts · DET-004 · DET-005</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SOC-001</td>
+          <td class="desc">
+            <strong>Botón Seguir / Dejar de seguir en detalle de receta</strong>
+            <small>Añadir junto al avatar del autor en la vista detalle un botón toggle Seguir/Siguiendo. Endpoint: POST /api/usuarios/:id/seguir (toggle add/remove). Los usuarios que sigues aparecen en tu feed de home. Verificar que el modelo Usuario tiene campos seguidores/seguidos. Actualizar el feed para filtrar por seguidos cuando hay sesión activa.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/ · backend/src/models/usuarioMongo.ts · backend/src/routes/usuariosRouter.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">ALEG-001</td>
+          <td class="desc">
+            <strong>Revisar rutas de iconos de alérgenos en todos los componentes</strong>
+            <small>Verificar que todos los componentes que muestran alérgenos (tarjeta feed, vista detalle, filtros) usan las rutas correctas de los SVG/PNG en /public. Comprobar que los imports no están rotos y que los iconos se renderizan en dev y en build (next/image vs img).</small>
+            <span class="source">📄 features/recetas/components/ · public/icons/alergenos/</span>
           </td>
           <td><span class="status pending">⏳ Sprint 4</span></td>
-          <td><span class="urg alta">Alta</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">STRUCT-002</td>
+          <td class="desc">
+            <strong>Scaffolding vistas /despensa, /discover y /perfil</strong>
+            <small>Las rutas existen pero no tienen contenido funcional. /despensa: gestión de ingredientes en casa. /discover: feed global sin filtro de seguidos (explorar). /perfil: datos del usuario + mis recetas + recetas guardadas. Cada una necesita su layout, skeleton de carga y conexión mínima con el backend.</small>
+            <span class="source">📄 frontend/src/app/(app)/despensa · /discover · /perfil</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>
     </table>

@@ -44,15 +44,16 @@ export interface IReceta {
 // ── Tipos de respuesta API (contrato con el frontend) ─────────────────────────
 
 export interface FiltrosFeed {
-  q?: string; //Texto de búsqueda -> Macarrones con tomate
+  q?: string;
   dificultad?: string[];
   alergenos?: string[];
-  //Par no mostarr todas las recetas de golpe sino por paginas y cuantas por pagina
   pagina?: number;
   limite?: number;
+  excluirPropio?: boolean;
 }
 
 interface AutorRespuesta {
+  id: string;
   nombre: string;
   username: string;
   avatarUrl: string;
@@ -75,6 +76,7 @@ export interface PostFeedRespuesta {
   comentarios: number;
   guardado: boolean;
   liked: boolean;
+  sigueAlAutor: boolean;
   fechaPublicacion: string;
 }
 

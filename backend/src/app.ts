@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import authRoutes from "./routes/auth.routes";
 import recetasRoutes from "./routes/recetas.routes";
+import usuariosRoutes from "./routes/usuarios.routes";
 import { manejadorErrores } from "./middlewares/errores";
 
 
@@ -23,6 +24,7 @@ app.use(
 app.use(express.json()); // Pa parsear el cuerpo de las peticiones como JSON
 app.use("/api/auth", authRoutes);
 app.use("/api/recetas", recetasRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 
 // GET /api/health — health check público (sin auth).
 // Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.
