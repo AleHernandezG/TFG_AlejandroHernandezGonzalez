@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, MessageCircle, Share2 } from 'lucide-react'
+import { Heart, MessageCircle, Share2, UserCheck, UserPlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
 import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
+import { useToggleSeguir } from '@/features/recetas/hooks/useToggleSeguir'
+import { useSession } from 'next-auth/react'
 import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
 function tiempoRelativo(fechaIso: string): string {
@@ -24,9 +27,14 @@ type Props = {
 }
 
 export function CabeceraReceta({ receta }: Props) {
+  const { data: session } = useSession()
   const [liked, setLiked] = useState(receta.liked)
   const [likes, setLikes] = useState(receta.likes)
+  const [siguiendo, setSiguiendo] = useState(receta.sigueAlAutor)
   const { mutate: mutarLike } = useToggleLike(receta.id)
+  const { mutate: mutarSeguir, isPending: siguiendoPending } = useToggleSeguir(receta.autor.id, receta.id)
+
+  const esPropiaReceta = session?.user?.id === receta.autor.id || !receta.autor.id
 
   function toggleLike() {
     const siguiente = !liked
@@ -37,6 +45,14 @@ export function CabeceraReceta({ receta }: Props) {
         setLiked((prev) => !prev)
         setLikes((l) => (siguiente ? l - 1 : l + 1))
       },
+    })
+  }
+
+  function toggleSeguir() {
+    const siguiente = !siguiendo
+    setSiguiendo(siguiente)
+    mutarSeguir(undefined, {
+      onError: () => setSiguiendo((prev) => !prev),
     })
   }
 
@@ -77,7 +93,7 @@ export function CabeceraReceta({ receta }: Props) {
 
       {/* Fila 2: Autor (izquierda) + Acciones sociales en columna (derecha) */}
       <div className="flex items-center justify-between">
-        {/* Autor */}
+        {/* Autor + botón seguir */}
         <div className="flex items-center gap-2.5">
           <Avatar className="h-10 w-10 ring-2 ring-[var(--warm-bg)]">
             <AvatarImage src={receta.autor.avatarUrl} alt={receta.autor.nombre} />
@@ -91,6 +107,21 @@ export function CabeceraReceta({ receta }: Props) {
               {tiempoRelativo(receta.fechaPublicacion)}
             </span>
           </div>
+          {session && !esPropiaReceta && (
+            <Button
+              variant={siguiendo ? 'secondary' : 'default'}
+              size="sm"
+              className="ml-1 h-7 rounded-full px-3 text-xs font-bold gap-1"
+              onClick={toggleSeguir}
+              disabled={siguiendoPending}
+            >
+              {siguiendo ? (
+                <><UserCheck size={13} /> Siguiendo</>
+              ) : (
+                <><UserPlus size={13} /> Seguir</>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Acciones sociales — icono encima, número/label debajo */}

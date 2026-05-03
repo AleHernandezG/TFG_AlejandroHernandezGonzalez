@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { IUsuario } from "../types/usuario";
 import { IUsuarioDoc, Usuario } from "../models/usuarioMongo";
 
@@ -60,6 +61,42 @@ export const usuarioRepository = {
       { alergias: datos.alergias, preferencias: datos.preferencias, perfilCompleto: true },
       { new: true },
     ),
+
+  async toggleSeguir(
+    seguidorId: string,
+    seguidoId: string,
+  ): Promise<{ siguiendo: boolean }> {
+    if (!Types.ObjectId.isValid(seguidorId) || !Types.ObjectId.isValid(seguidoId)) {
+      throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
+    }
+    if (seguidorId === seguidoId) {
+      throw Object.assign(new Error("No puedes seguirte a ti mismo"), { status: 400 });
+    }
+
+    const [seguidor, seguido] = await Promise.all([
+      Usuario.findById(seguidorId),
+      Usuario.findById(seguidoId),
+    ]);
+
+    if (!seguidor || !seguido) {
+      throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
+    }
+
+    const seguidoObjId = new Types.ObjectId(seguidoId);
+    const seguidorObjId = new Types.ObjectId(seguidorId);
+    const yaSiguiendo = (seguidor.seguidos ?? []).some((id) => id.equals(seguidoObjId));
+
+    if (yaSiguiendo) {
+      seguidor.seguidos = (seguidor.seguidos ?? []).filter((id) => !id.equals(seguidoObjId));
+      seguido.seguidores = (seguido.seguidores ?? []).filter((id) => !id.equals(seguidorObjId));
+    } else {
+      seguidor.seguidos = [...(seguidor.seguidos ?? []), seguidoObjId];
+      seguido.seguidores = [...(seguido.seguidores ?? []), seguidorObjId];
+    }
+
+    await Promise.all([seguidor.save(), seguido.save()]);
+    return { siguiendo: !yaSiguiendo };
+  },
 };
 
 export type { IUsuario };

@@ -104,8 +104,9 @@ export const opcionesAuth: NextAuthOptions = {
           token.backendToken = result.token;
           token.rol = result.usuario.rol;
           token.perfilCompleto = result.perfilCompleto;
-        } catch {
-          // Si falla la llamada al backend, el login continúa sin backendToken
+        } catch (err) {
+          console.error("[NextAuth] Error llamando a POST /auth/google:", err);
+          throw new Error("No se pudo conectar con el servidor. Inténtalo de nuevo.");
         }
       }
 

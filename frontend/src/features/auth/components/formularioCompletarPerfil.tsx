@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { SelectorChips } from "@/components/common/selectorChips";
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from "@/config/opcionesUsuario";
@@ -89,7 +89,18 @@ export function FormularioCompletarPerfil() {
         {/* Footer */}
         <div className="mt-auto flex flex-col gap-3">
           {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
+            <>
+              <p className="text-sm text-destructive text-center">{error}</p>
+              {!session?.user?.backendToken && (
+                <Button
+                  variant="outline"
+                  className="w-full rounded-full"
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                >
+                  Cerrar sesión y reintentar
+                </Button>
+              )}
+            </>
           )}
           <p className="text-xs text-muted-foreground text-center">
             Puedes cambiar esto en cualquier momento desde Ajustes

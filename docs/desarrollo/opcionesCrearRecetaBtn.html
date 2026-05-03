@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opciones — Botón Crear Receta — Cookr</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    /* Sección */
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .section-header h2 { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* Badge de referentes */
+    .refs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-left: auto; }
+    .ref { font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; background: #f9731611; color: #f97316; border: 1px solid #f9731633; }
+    .ref.insta { background: #e1306c11; color: #e1306c; border-color: #e1306c33; }
+    .ref.tiktok { background: #69c9d011; color: #69c9d0; border-color: #69c9d033; }
+    .ref.twitter { background: #1d9bf011; color: #1d9bf0; border-color: #1d9bf033; }
+    .ref.notion { background: #ffffff11; color: #e5e5e5; border-color: #ffffff22; }
+    .ref.pinterest { background: #bd081c11; color: #bd081c; border-color: #bd081c33; }
+    .ref.airbnb { background: #ff585811; color: #ff5858; border-color: #ff585833; }
+
+    /* Grid de opciones */
+    .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+
+    /* Tarjeta de opción */
+    .option-card { background: #111; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
+    .option-card:hover { border-color: #f97316; }
+    .option-card.recomendado { border-color: #f97316; }
+    .option-meta { padding: 0.75rem 1rem; border-bottom: 1px solid #1f1f1f; display: flex; align-items: center; gap: 0.5rem; }
+    .option-num { font-family: monospace; font-size: 0.7rem; font-weight: 700; color: #f97316; background: #f9731622; border: 1px solid #f9731633; border-radius: 999px; padding: 0.1rem 0.5rem; }
+    .option-name { font-size: 0.82rem; font-weight: 700; color: #fff; }
+    .option-badge { font-size: 0.62rem; font-weight: 700; padding: 0.12rem 0.45rem; border-radius: 999px; margin-left: auto; }
+    .option-badge.rec { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .option-badge.alt { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .option-badge.no  { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+
+    /* Mockup del teléfono */
+    .phone-wrap { display: flex; justify-content: center; padding: 1rem 1rem 0; }
+    .phone { width: 200px; background: #faf9f5; border-radius: 32px; border: 2px solid #333; overflow: hidden; position: relative; min-height: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .phone-status { height: 28px; background: #faf9f5; display: flex; align-items: center; justify-content: center; }
+    .notch { width: 60px; height: 16px; background: #111; border-radius: 0 0 12px 12px; }
+    .phone-screen { background: #faf9f5; min-height: 290px; position: relative; overflow: hidden; }
+
+    /* Elementos UI del mock */
+    .mock-header { background: #fff; padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0eeea; }
+    .mock-logo { font-size: 0.7rem; font-weight: 800; color: #92400e; font-style: italic; }
+    .mock-avatar { width: 22px; height: 22px; border-radius: 50%; background: #e7e5e0; }
+    .mock-feed { padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .mock-card { background: #fff; border-radius: 10px; overflow: hidden; height: 80px; position: relative; }
+    .mock-card-img { width: 100%; height: 100%; background: linear-gradient(135deg, #e7e5e0, #d4d0c8); }
+    .mock-card-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.3rem 0.4rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
+    .mock-card-title { font-size: 0.45rem; font-weight: 700; color: #fff; }
+
+    /* Navbar mock */
+    .mock-navbar { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #f0eeea; padding: 0.4rem 0.5rem; display: flex; align-items: center; justify-content: space-around; height: 44px; }
+    .mock-nav-icon { width: 16px; height: 16px; border-radius: 3px; background: #d4d0c8; }
+    .mock-nav-icon.active { background: #92400e; }
+
+    /* FAB */
+    .mock-fab { position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; border-radius: 50%; background: #92400e; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(146,64,14,0.4); z-index: 10; }
+    .mock-fab-icon { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; }
+
+    /* FAB esquina */
+    .mock-fab-corner { position: absolute; bottom: 56px; right: 10px; width: 34px; height: 34px; border-radius: 50%; background: #92400e; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(146,64,14,0.4); z-index: 10; }
+
+    /* Botón + en navbar */
+    .mock-nav-plus { width: 28px; height: 20px; background: #92400e; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .mock-nav-plus span { color: #fff; font-size: 0.65rem; font-weight: 700; line-height: 1; }
+
+    /* Header action */
+    .mock-header-plus { width: 22px; height: 22px; border-radius: 6px; background: #92400e; display: flex; align-items: center; justify-content: center; }
+    .mock-header-plus span { color: #fff; font-size: 0.65rem; font-weight: 700; }
+
+    /* Coleccion tab btn */
+    .mock-collection-btn { margin: 0.4rem 0.6rem; background: #92400e; border-radius: 8px; padding: 0.3rem 0.5rem; display: flex; align-items: center; gap: 0.3rem; }
+    .mock-collection-btn span { font-size: 0.45rem; font-weight: 700; color: #fff; }
+
+    /* Speed dial */
+    .mock-speed-dial { position: absolute; bottom: 52px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; z-index: 10; }
+    .mock-dial-item { background: #fff; border: 1px solid #e7e5e0; border-radius: 6px; padding: 0.15rem 0.3rem; font-size: 0.38rem; color: #92400e; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .mock-dial-main { width: 34px; height: 34px; border-radius: 50%; background: #92400e; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(146,64,14,0.4); }
+
+    /* Descripción de la opción */
+    .option-desc { padding: 0.75rem 1rem 1rem; }
+    .option-desc p { font-size: 0.8rem; color: #a3a3a3; line-height: 1.6; margin-bottom: 0.5rem; }
+    .option-desc p:last-child { margin-bottom: 0; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.75rem; }
+    .pros, .cons { background: #1a1a1a; border-radius: 8px; padding: 0.5rem 0.75rem; }
+    .pros h4 { font-size: 0.65rem; font-weight: 700; color: #4ade80; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .cons h4 { font-size: 0.65rem; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .pros ul, .cons ul { list-style: none; display: flex; flex-direction: column; gap: 0.2rem; }
+    .pros li, .cons li { font-size: 0.72rem; color: #a3a3a3; padding-left: 0.8rem; position: relative; }
+    .pros li::before { content: '✓'; position: absolute; left: 0; color: #4ade80; font-size: 0.65rem; }
+    .cons li::before { content: '×'; position: absolute; left: 0; color: #f87171; font-size: 0.65rem; }
+
+    /* Sección de análisis */
+    .analysis { background: #111; border: 1px solid #2a2a2a; border-radius: 10px; padding: 1.25rem; }
+    .analysis h3 { font-size: 0.82rem; font-weight: 700; color: #f97316; margin-bottom: 0.75rem; }
+    .analysis p { font-size: 0.82rem; color: #a3a3a3; line-height: 1.7; }
+
+    /* Tabla de decisión */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1a1a1a; }
+    .score { font-family: monospace; font-weight: 700; }
+    .score.s5 { color: #4ade80; }
+    .score.s4 { color: #a3e635; }
+    .score.s3 { color: #fbbf24; }
+    .score.s2 { color: #f87171; }
+
+    .recomendacion { background: #f97316; color: #fff; border-radius: 10px; padding: 1.25rem; }
+    .recomendacion h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .recomendacion p { font-size: 0.83rem; line-height: 1.6; opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Opciones — Punto de entrada "Crear Receta"</h1>
+  <p>UI-018 · 2026-05-03 · Patrones de apps modernas y mejores prácticas</p>
+</header>
+
+<nav>
+  <a href="#contexto">Contexto</a>
+  <a href="#opciones">Opciones</a>
+  <a href="#decision">Tabla decisión</a>
+  <a href="#recomendacion">Recomendación</a>
+</nav>
+
+<main>
+
+  <!-- CONTEXTO -->
+  <section id="contexto">
+    <div class="section-header">
+      <span>🎯</span>
+      <h2>Contexto de diseño</h2>
+    </div>
+    <div class="section-body">
+      <div class="analysis">
+        <h3>Regla de diseño — Acción principal siempre visible</h3>
+        <p>
+          En apps de contenido generado por el usuario (Instagram, TikTok, Pinterest, Airbnb Experiences),
+          la acción de <strong>crear contenido</strong> es la más importante después de consumirlo.
+          El patrón universal es: la CTA de creación debe ser accesible desde cualquier pantalla
+          con máximo 1 tap, sin interrumpir el flujo de consumo. La discoverability es clave —
+          el usuario no debe tener que buscar dónde crear.
+        </p>
+        <p style="margin-top:0.75rem">
+          Cookr tiene un <strong>FAB central (ChefHat)</strong> en la NavBar que ya actúa como acceso al chat IA.
+          Esto condiciona las opciones: el "slot premium" ya está ocupado.
+          Las soluciones deben trabajar con esa restricción.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPCIONES -->
+  <section id="opciones">
+    <div class="section-header">
+      <span>📱</span>
+      <h2>Opciones de diseño</h2>
+    </div>
+    <div class="section-body">
+      <div class="options-grid">
+
+        <!-- OPCIÓN 1: FAB flotante esquina inferior derecha -->
+        <div class="option-card recomendado">
+          <div class="option-meta">
+            <span class="option-num">A</span>
+            <span class="option-name">FAB esquina inferior derecha</span>
+            <div class="refs">
+              <span class="ref insta">Instagram</span>
+              <span class="ref airbnb">Airbnb</span>
+            </div>
+            <span class="option-badge rec">Recomendado</span>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-status"><div class="notch"></div></div>
+              <div class="phone-screen">
+                <div class="mock-header">
+                  <span class="mock-logo">Cookr</span>
+                  <div class="mock-avatar"></div>
+                </div>
+                <div class="mock-feed">
+                  <div class="mock-card">
+                    <div class="mock-card-img"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Pasta carbonara</div></div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-img" style="background:linear-gradient(135deg,#d4c8b8,#c8bca8)"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Buddha bowl</div></div>
+                  </div>
+                </div>
+                <!-- FAB esquina -->
+                <div class="mock-fab-corner">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </div>
+                <div class="mock-navbar">
+                  <div class="mock-nav-icon active"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-fab-icon" style="background:transparent;border:none;opacity:0"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-nav-icon"></div>
+                </div>
+                <!-- ChefHat FAB central existente -->
+                <div class="mock-fab">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="6" y1="13" x2="18" y2="13"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="option-desc">
+            <p>
+              Un segundo FAB redondo <strong>en la esquina inferior derecha</strong>, justo encima de la NavBar.
+              Icono <code>Plus</code> o <code>PencilLine</code>. Tamaño ligeramente menor que el ChefHat
+              central para mantener la jerarquía. Solo aparece en las vistas donde crear tiene sentido
+              (Home, Colección, Discover). Se oculta al hacer scroll hacia abajo y reaparece al subir
+              (patrón Instagram).
+            </p>
+            <div class="pros-cons">
+              <div class="pros">
+                <h4>A favor</h4>
+                <ul>
+                  <li>Siempre visible, 1 tap</li>
+                  <li>No ocupa espacio de navegación</li>
+                  <li>Patrón conocido (Instagram, Maps)</li>
+                  <li>No choca con el ChefHat</li>
+                  <li>Fácil de ocultar en vistas sin creación</li>
+                </ul>
+              </div>
+              <div class="cons">
+                <h4>En contra</h4>
+                <ul>
+                  <li>Dos FABs en pantalla (puede saturar)</li>
+                  <li>Requiere z-index cuidado para no tapar contenido</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPCIÓN 2: Botón + en la NavBar -->
+        <div class="option-card">
+          <div class="option-meta">
+            <span class="option-num">B</span>
+            <span class="option-name">Ítem "+" en la NavBar</span>
+            <div class="refs">
+              <span class="ref twitter">Twitter/X</span>
+              <span class="ref tiktok">TikTok</span>
+            </div>
+            <span class="option-badge alt">Alternativa</span>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-status"><div class="notch"></div></div>
+              <div class="phone-screen">
+                <div class="mock-header">
+                  <span class="mock-logo">Cookr</span>
+                  <div class="mock-avatar"></div>
+                </div>
+                <div class="mock-feed">
+                  <div class="mock-card">
+                    <div class="mock-card-img"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Pasta carbonara</div></div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-img" style="background:linear-gradient(135deg,#d4c8b8,#c8bca8)"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Buddha bowl</div></div>
+                  </div>
+                </div>
+                <div class="mock-navbar">
+                  <div class="mock-nav-icon active"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-fab-icon" style="background:transparent;border:none;opacity:0"></div>
+                  <div class="mock-nav-plus"><span>+</span></div>
+                  <div class="mock-nav-icon"></div>
+                </div>
+                <div class="mock-fab">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="6" y1="13" x2="18" y2="13"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="option-desc">
+            <p>
+              Sustituir uno de los ítems de la NavBar (p. ej. Discover) por un botón <code>+</code>
+              con fondo brand. TikTok usa exactamente este patrón — el botón de grabar ocupa
+              la posición central de la tab bar. Aquí iría en posición 4 (antes de Perfil)
+              ya que el central está ocupado por ChefHat.
+            </p>
+            <div class="pros-cons">
+              <div class="pros">
+                <h4>A favor</h4>
+                <ul>
+                  <li>Siempre visible en la barra</li>
+                  <li>Sin FAB extra en pantalla</li>
+                  <li>Jerarquía visual clara</li>
+                </ul>
+              </div>
+              <div class="cons">
+                <h4>En contra</h4>
+                <ul>
+                  <li>Quita un destino de navegación</li>
+                  <li>Confuso: ¿es nav o acción?</li>
+                  <li>Rompe el patrón de 5 ítems actuales</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPCIÓN 3: Botón en header de Home -->
+        <div class="option-card">
+          <div class="option-meta">
+            <span class="option-num">C</span>
+            <span class="option-name">Botón en el header de Home</span>
+            <div class="refs">
+              <span class="ref notion">Notion</span>
+              <span class="ref airbnb">Linear</span>
+            </div>
+            <span class="option-badge alt">Alternativa</span>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-status"><div class="notch"></div></div>
+              <div class="phone-screen">
+                <div class="mock-header">
+                  <span class="mock-logo">Cookr</span>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <div class="mock-header-plus"><span>+</span></div>
+                    <div class="mock-avatar"></div>
+                  </div>
+                </div>
+                <div class="mock-feed">
+                  <div class="mock-card">
+                    <div class="mock-card-img"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Pasta carbonara</div></div>
+                  </div>
+                  <div class="mock-card">
+                    <div class="mock-card-img" style="background:linear-gradient(135deg,#d4c8b8,#c8bca8)"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Buddha bowl</div></div>
+                  </div>
+                </div>
+                <div class="mock-navbar">
+                  <div class="mock-nav-icon active"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-fab-icon" style="background:transparent;border:none;opacity:0"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-nav-icon"></div>
+                </div>
+                <div class="mock-fab">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="6" y1="13" x2="18" y2="13"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="option-desc">
+            <p>
+              Un icono <code>PencilLine</code> o <code>Plus</code> en la esquina superior derecha
+              del header de la vista Home. Patrón de apps de productividad (Notion, Things, Bear).
+              Solo visible desde Home, no persiste en otras vistas.
+            </p>
+            <div class="pros-cons">
+              <div class="pros">
+                <h4>A favor</h4>
+                <ul>
+                  <li>Sin elemento flotante extra</li>
+                  <li>Diseño limpio</li>
+                  <li>Posición predecible (esquina derecha)</li>
+                </ul>
+              </div>
+              <div class="cons">
+                <h4>En contra</h4>
+                <ul>
+                  <li>Solo accesible desde Home</li>
+                  <li>Header ya tiene avatar (puede saturar)</li>
+                  <li>Menos discoverable</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPCIÓN 4: Desde Colección / Mis Recetas -->
+        <div class="option-card">
+          <div class="option-meta">
+            <span class="option-num">D</span>
+            <span class="option-name">CTA en Colección — Mis Recetas</span>
+            <div class="refs">
+              <span class="ref pinterest">Pinterest</span>
+              <span class="ref airbnb">Airbnb</span>
+            </div>
+            <span class="option-badge alt">Complementario</span>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-status"><div class="notch"></div></div>
+              <div class="phone-screen">
+                <div class="mock-header">
+                  <span class="mock-logo" style="font-size:0.65rem">Mi Colección</span>
+                </div>
+                <div style="padding:0.4rem 0.6rem">
+                  <div style="display:flex;gap:4px;margin-bottom:0.5rem">
+                    <div style="flex:1;background:#92400e;border-radius:6px;padding:0.2rem;text-align:center;font-size:0.42rem;color:#fff;font-weight:700">Guardadas</div>
+                    <div style="flex:1;background:#e7e5e0;border-radius:6px;padding:0.2rem;text-align:center;font-size:0.42rem;color:#525252;font-weight:700">Mis recetas</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                    <div class="mock-card" style="height:60px;"><div class="mock-card-img"></div></div>
+                    <div class="mock-card" style="height:60px;background:#f5f3ef;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                      <div style="font-size:0.38rem;color:#92400e;font-weight:700;text-align:center;">+ Nueva<br>receta</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mock-navbar">
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-fab-icon" style="background:transparent;border:none;opacity:0"></div>
+                  <div class="mock-nav-icon active"></div>
+                  <div class="mock-nav-icon"></div>
+                </div>
+                <div class="mock-fab">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="6" y1="13" x2="18" y2="13"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="option-desc">
+            <p>
+              La pestaña "Mis Recetas" de /coleccion ya tiene un estado vacío con CTA "Crear primera receta".
+              Se puede añadir también una <strong>tarjeta fantasma</strong> al principio del grid
+              con borde punteado y <code>+</code> brand — patrón Pinterest para crear tableros.
+              Funciona como acceso contextual: cuando el usuario está viendo sus recetas,
+              es el momento más natural para crear una nueva.
+            </p>
+            <div class="pros-cons">
+              <div class="pros">
+                <h4>A favor</h4>
+                <ul>
+                  <li>Contextual y natural</li>
+                  <li>Integrado en el grid sin elemento extra</li>
+                  <li>Pinterest lo usa con gran éxito</li>
+                </ul>
+              </div>
+              <div class="cons">
+                <h4>En contra</h4>
+                <ul>
+                  <li>Solo desde /coleccion</li>
+                  <li>No sirve como punto de entrada principal</li>
+                  <li>Requiere 2 taps (NavBar → Colección → crear)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPCIÓN 5: Speed Dial -->
+        <div class="option-card">
+          <div class="option-meta">
+            <span class="option-num">E</span>
+            <span class="option-name">Speed Dial expandible</span>
+            <div class="refs">
+              <span class="ref">Material Design 3</span>
+              <span class="ref airbnb">Outlook</span>
+            </div>
+            <span class="option-badge no">Descartable</span>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="phone-status"><div class="notch"></div></div>
+              <div class="phone-screen">
+                <div class="mock-header">
+                  <span class="mock-logo">Cookr</span>
+                  <div class="mock-avatar"></div>
+                </div>
+                <div class="mock-feed">
+                  <div class="mock-card">
+                    <div class="mock-card-img"></div>
+                    <div class="mock-card-overlay"><div class="mock-card-title">Pasta carbonara</div></div>
+                  </div>
+                </div>
+                <div class="mock-speed-dial">
+                  <div class="mock-dial-item">✍️ Crear receta</div>
+                  <div class="mock-dial-item">📷 Foto rápida</div>
+                  <div class="mock-dial-main">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                </div>
+                <div class="mock-navbar">
+                  <div class="mock-nav-icon active"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-fab-icon" style="background:transparent;border:none;opacity:0"></div>
+                  <div class="mock-nav-icon"></div>
+                  <div class="mock-nav-icon"></div>
+                </div>
+                <div class="mock-fab">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/><line x1="6" y1="13" x2="18" y2="13"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="option-desc">
+            <p>
+              Un FAB esquina que al pulsarse expande opciones: "Crear receta", "Foto rápida", etc.
+              Material Design 3 llama a esto Extended FAB + Speed Dial. Muy potente si hay múltiples
+              acciones de creación, pero Cookr de momento solo tiene una (crear receta).
+            </p>
+            <div class="pros-cons">
+              <div class="pros">
+                <h4>A favor</h4>
+                <ul>
+                  <li>Escalable a futuras acciones</li>
+                  <li>No satura si hay 1 sola opción</li>
+                </ul>
+              </div>
+              <div class="cons">
+                <h4>En contra</h4>
+                <ul>
+                  <li>Overkill para una sola acción</li>
+                  <li>Añade complejidad de animación</li>
+                  <li>Tres FABs en pantalla (saturación)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLA DECISIÓN -->
+  <section id="decision">
+    <div class="section-header">
+      <span>📊</span>
+      <h2>Tabla de decisión</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Opción</th>
+            <th>Discoverable</th>
+            <th>1 tap desde cualquier vista</th>
+            <th>No satura la UI</th>
+            <th>Escala a futuro</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>A — FAB esquina derecha</strong></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s4">4</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s5">19/20</span></td>
+          </tr>
+          <tr>
+            <td>B — Ítem + en NavBar</td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s3">3</span></td>
+            <td><span class="score s3">3</span></td>
+            <td><span class="score s3">16/20</span></td>
+          </tr>
+          <tr>
+            <td>C — Botón en header Home</td>
+            <td><span class="score s3">3</span></td>
+            <td><span class="score s2">2</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s4">4</span></td>
+            <td><span class="score s3">14/20</span></td>
+          </tr>
+          <tr>
+            <td>D — CTA en Colección (complementario)</td>
+            <td><span class="score s2">2</span></td>
+            <td><span class="score s2">2</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s4">4</span></td>
+            <td><span class="score s3">13/20</span></td>
+          </tr>
+          <tr>
+            <td>E — Speed Dial</td>
+            <td><span class="score s4">4</span></td>
+            <td><span class="score s4">4</span></td>
+            <td><span class="score s2">2</span></td>
+            <td><span class="score s5">5</span></td>
+            <td><span class="score s3">15/20</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RECOMENDACIÓN -->
+  <section id="recomendacion">
+    <div class="section-header">
+      <span>✅</span>
+      <h2>Recomendación</h2>
+    </div>
+    <div class="section-body">
+      <div class="recomendacion">
+        <h3>Opción A + D combinadas</h3>
+        <p>
+          <strong>Primario:</strong> FAB redondo brand con icono PencilLine en la esquina inferior derecha,
+          visible en /home, /discover y /coleccion. Se oculta al hacer scroll hacia abajo (misma lógica que
+          la NavBar ya existente) y reaparece al subir. Posición: <code>fixed bottom-24 right-4 z-40</code>
+          para quedar justo encima de la NavBar sin solapar el ChefHat central. Tamaño 48px vs 56px del ChefHat —
+          jerarquía clara. Patrón exacto de Instagram Stories y Google Maps.
+        </p>
+        <p style="margin-top:0.75rem">
+          <strong>Complementario:</strong> Tarjeta fantasma "+" al inicio del grid de Mis Recetas en /coleccion
+          (Opción D). Es el acceso contextual más natural — el usuario está mirando sus recetas y
+          quiere añadir una nueva. Este es el patrón que usa Pinterest para crear tableros y
+          Airbnb para añadir propiedades.
+        </p>
+        <p style="margin-top:0.75rem">
+          <strong>No recomendado:</strong> Modificar la NavBar (Opción B) porque rompe los 5 ítems
+          actuales aprobados y confunde navegación con acción. El Speed Dial (E) añade complejidad
+          innecesaria para una sola acción.
+        </p>
+      </div>
+
+      <div class="analysis">
+        <h3>Implementación técnica</h3>
+        <p>
+          El FAB (Opción A) se puede añadir directamente al layout <code>app/(main)/layout.tsx</code>
+          como componente <code>BotonCrearReceta</code> con <code>'use client'</code> y
+          <code>usePathname()</code> para ocultarse en <code>/chat</code> (donde no hay NavBar)
+          y en <code>/crear-receta</code> (ya estamos en la vista).
+          La lógica de scroll-hide puede compartir el mismo <code>useScrollDirection</code>
+          que usa la NavBar si existe, o añadirse con un <code>useEffect</code> sobre
+          <code>window.scrollY</code>. La tarjeta fantasma en /coleccion es solo UI —
+          un Link con borde punteado brand en <code>gridRecetasColeccion.tsx</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

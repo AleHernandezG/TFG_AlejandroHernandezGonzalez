@@ -1,6 +1,7 @@
 export type DificultadReceta = 'Fácil' | 'Media' | 'Difícil'
 
 export type Autor = {
+  id: string
   nombre: string
   username: string
   avatarUrl: string
@@ -29,6 +30,7 @@ export type PostFeed = {
   comentarios: number
   guardado: boolean
   liked: boolean
+  sigueAlAutor: boolean
   fechaPublicacion: string // ISO 8601
 }
 

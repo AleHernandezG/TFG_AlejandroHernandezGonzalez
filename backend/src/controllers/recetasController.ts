@@ -13,7 +13,7 @@ function manejarError(res: Response, error: unknown): void {
 export const recetasController = {
   async obtenerFeed(req: Request, res: Response): Promise<void> {
     try {
-      const { q, dificultad, alergenos, pagina, limite } = req.query;
+      const { q, dificultad, alergenos, pagina, limite, excluirPropio } = req.query;
 
       const filtros = {
         q: typeof q === "string" ? q : undefined,
@@ -27,6 +27,7 @@ export const recetasController = {
             : undefined,
         pagina: pagina ? Math.max(1, Number(pagina)) : 1,
         limite: limite ? Math.min(50, Number(limite)) : 20,
+        excluirPropio: excluirPropio === "true",
       };
 
       const resultado = await recetasService.obtenerFeed(
@@ -82,6 +83,24 @@ export const recetasController = {
         req.usuario!.id
       );
       res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async agregarComentario(req: Request, res: Response): Promise<void> {
+    try {
+      const { texto } = req.body as { texto?: string };
+      if (typeof texto !== "string") {
+        res.status(400).json({ error: "El campo texto es obligatorio" });
+        return;
+      }
+      const resultado = await recetasService.agregarComentario(
+        req.params.id,
+        req.usuario!.id,
+        texto
+      );
+      res.status(201).json(resultado);
     } catch (error) {
       manejarError(res, error);
     }

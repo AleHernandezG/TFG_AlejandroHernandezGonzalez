@@ -7,7 +7,9 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "lint": "tsc --noEmit",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed": "ts-node --transpile-only src/scripts/seed.ts",
+    "seed:force": "ts-node --transpile-only src/scripts/seed.ts -- --force"
   },
   "dependencies": {
     "@types/nodemailer": "^8.0.0",

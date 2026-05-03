@@ -13,5 +13,7 @@ export interface IUsuario {
   alergias: string[];
   preferencias: string[];
   recetasGuardadas?: Types.ObjectId[];
+  seguidos?: Types.ObjectId[];
+  seguidores?: Types.ObjectId[];
   fechaRegistro: Date;
 }

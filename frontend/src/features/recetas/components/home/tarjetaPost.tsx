@@ -1,6 +1,8 @@
 'use client'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
+import { useToggleGuardado } from '@/features/recetas/hooks/useToggleGuardado'
 import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
@@ -26,12 +28,28 @@ export function TarjetaPost({ post }: TarjetaPostProps) {
   const [likes, setLikes] = useState(post.likes)
   const [guardado, setGuardado] = useState(post.guardado)
 
+  const { mutate: mutarLike } = useToggleLike(post.id)
+  const { mutate: mutarGuardado } = useToggleGuardado(post.id)
+
   const toggleLike = () => {
-    setLikes((prev) => (liked ? prev - 1 : prev + 1))
-    setLiked((prev) => !prev)
+    const siguiente = !liked
+    setLiked(siguiente)
+    setLikes((prev) => (siguiente ? prev + 1 : prev - 1))
+    mutarLike(undefined, {
+      onError: () => {
+        setLiked((prev) => !prev)
+        setLikes((prev) => (siguiente ? prev - 1 : prev + 1))
+      },
+    })
   }
 
-  const toggleGuardado = () => setGuardado((prev) => !prev)
+  const toggleGuardado = () => {
+    const siguiente = !guardado
+    setGuardado(siguiente)
+    mutarGuardado(undefined, {
+      onError: () => setGuardado((prev) => !prev),
+    })
+  }
 
   return (
     <article className="border-b border-border bg-background px-4 py-4">
