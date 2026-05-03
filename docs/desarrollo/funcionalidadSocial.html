@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funcionalidad Social — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.25rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.arch { background: #a855f722; color: #c084fc; border: 1px solid #a855f733; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+
+    .note { background: #1c1a14; border-left: 3px solid #f97316; padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; color: #d4d4d4; }
+    .note strong { color: #f97316; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Funcionalidad Social — Likes, Comentarios, Seguir, Feed</h1>
+  <p>Sprint 4 · 2026-05-03 · Tareas FEED-001 / LIKE-001 / COM-001 / SOC-001 — BE + FE completados</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#be">Backend</a>
+  <a href="#fe">Frontend</a>
+  <a href="#sync">Sincronización</a>
+  <a href="#decisiones">Decisiones</a>
+  <a href="#archivos">Archivos</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header"><span>📋</span><h2>Resumen de tareas completadas</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>ID</th><th>Tarea</th><th>Capa</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>FEED-001</td>
+            <td>Feed con filtros funcionales — búsqueda debounce + filtros avanzados conectados al BE real. Query key incluye <code>!!token</code> para refetch al cargar sesión. <code>staleTime: 0</code> para siempre refetch en mount.</td>
+            <td><span class="badge fe">FE</span></td>
+            <td><span class="badge done">✅ Completado</span></td>
+          </tr>
+          <tr>
+            <td>LIKE-001</td>
+            <td>Toggle like persistente. Display-only en feed (contador), interactivo en vista detalle. Optimistic update local + <code>router.refresh()</code> en onSuccess para resincronizar props SSR.</td>
+            <td><span class="badge be">BE</span> <span class="badge fe">FE</span></td>
+            <td><span class="badge done">✅ Completado</span></td>
+          </tr>
+          <tr>
+            <td>COM-001</td>
+            <td>Añadir comentarios con actualización optimista. El comentario aparece instantáneamente en la lista local; si falla, se elimina y se restaura el texto. <code>router.refresh()</code> en onSuccess sincroniza el conteo desde BD.</td>
+            <td><span class="badge be">BE</span> <span class="badge fe">FE</span></td>
+            <td><span class="badge done">✅ Completado</span></td>
+          </tr>
+          <tr>
+            <td>SOC-001</td>
+            <td>Botón Seguir/Siguiendo con estado inicial correcto desde SSR. <code>export const dynamic = 'force-dynamic'</code> en la página de detalle evita que el router cache de Next.js sirva renders stale con <code>sigueAlAutor: false</code>.</td>
+            <td><span class="badge be">BE</span> <span class="badge fe">FE</span></td>
+            <td><span class="badge done">✅ Completado</span></td>
+          </tr>
+          <tr>
+            <td>DET-003</td>
+            <td>Botón Compartir funcional. <code>navigator.share()</code> en móvil (share sheet nativo). Fallback <code>navigator.clipboard.writeText()</code> en escritorio con feedback visual "¡Copiado!" 2 s. Sin backend, sin nuevo hook — API del navegador.</td>
+            <td><span class="badge fe">FE</span></td>
+            <td><span class="badge done">✅ Completado</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header"><span>🏗️</span><h2>Arquitectura — problema de sincronización SSR ↔ Client</h2></div>
+    <div class="section-body">
+      <p>La vista de detalle de receta (<code>/recetas/[id]</code>) es un <strong>Server Component</strong> que llama al BE en el servidor con <code>getServerSession</code> y pasa los datos como props al Client Component <code>DetalleRecetaCliente</code>. Esto significa que <strong>TanStack Query no gestiona el estado de detalle</strong> — los datos viven como props de React, no en caché del cliente.</p>
+
+      <h3>Por qué invalidateQueries no era suficiente</h3>
+      <p>Al hacer <code>queryClient.invalidateQueries(["recetas", "detalle", id])</code> desde un hook de mutación, no había ninguna query con esa clave en caché (la página se renderizó en servidor), por lo que la invalidación no tenía efecto visible. Los contadores de like y comentarios en la vista detalle quedaban desactualizados hasta recargar con F5.</p>
+
+      <h3>Solución elegida: <code>router.refresh()</code></h3>
+      <div class="flow">
+        <div class="flow-node">Usuario hace like / comenta / guarda / sigue</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Optimistic update local (UI instantánea)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">mutate() al BE</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">onSuccess: router.refresh()</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Next.js re-corre el Server Component</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">useEffect sincroniza props → estado local</div>
+      </div>
+
+      <p style="margin-top:0.75rem"><code>router.refresh()</code> no es una recarga de página completa (no hay flash); es una llamada silenciosa que re-ejecuta los Server Components de la ruta actual y actualiza las props de todos los Client Components suscritos, sin perder el estado no-relacionado (scroll, inputs abiertos, etc.).</p>
+
+      <h3>Por qué useEffect es necesario</h3>
+      <p>Los Client Components de React no actualizan automáticamente su estado local cuando cambian las props del padre (comportamiento estándar de React). Se añade un <code>useEffect</code> con las props como dependencias para sincronizar el estado local (<code>liked</code>, <code>likes</code>, <code>siguiendo</code>) cuando el Server Component devuelve datos frescos tras el <code>refresh()</code>.</p>
+
+      <pre>// cabeceraReceta.tsx
+useEffect(() => {
+  setLiked(receta.liked)
+  setLikes(receta.likes)
+  setSiguiendo(receta.sigueAlAutor)
+}, [receta.liked, receta.likes, receta.sigueAlAutor])</pre>
+    </div>
+  </section>
+
+  <!-- BACKEND -->
+  <section id="be">
+    <div class="section-header"><span>⚙️</span><h2>Backend — endpoints sociales</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Auth</th><th>Lógica</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>POST /api/recetas/:id/like</td>
+            <td>Requerida</td>
+            <td>Toggle: si el userId ya está en el array <code>likes[]</code> del modelo Receta lo elimina (<code>$pull</code>), si no lo añade (<code>$addToSet</code>). Devuelve <code>{ liked, totalLikes }</code>.</td>
+          </tr>
+          <tr>
+            <td>POST /api/recetas/:id/guardar</td>
+            <td>Requerida</td>
+            <td>Toggle en el modelo Usuario: añade o elimina el recetaId del array <code>recetasGuardadas[]</code>. Devuelve <code>{ guardado }</code>.</td>
+          </tr>
+          <tr>
+            <td>POST /api/recetas/:id/comentarios</td>
+            <td>Requerida</td>
+            <td>Crea un subdocumento Comentario con <code>autorId</code>, <code>texto</code> y <code>fecha</code>. Lo inserta en <code>comentarios[]</code> de la Receta. Devuelve el comentario creado.</td>
+          </tr>
+          <tr>
+            <td>POST /api/usuarios/:id/seguir</td>
+            <td>Requerida</td>
+            <td>Toggle en ambos modelos: añade/elimina el seguidor del array <code>seguidores[]</code> del usuario objetivo y actualiza <code>siguiendo[]</code> del usuario autenticado. Devuelve <code>{ siguiendo }</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Middleware de autenticación</h3>
+      <p>Todos los endpoints sociales usan <code>requerirAuth</code> (extrae y valida el JWT del header <code>Authorization: Bearer &lt;token&gt;</code>). El endpoint GET /api/recetas y GET /api/recetas/:id usan <code>optionalAuth</code> para devolver campos personalizados (<code>liked</code>, <code>guardado</code>, <code>sigueAlAutor</code>) cuando hay sesión, o sus valores por defecto (<code>false</code>) cuando no la hay.</p>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section id="fe">
+    <div class="section-header"><span>🖥️</span><h2>Frontend — hooks y componentes</h2></div>
+    <div class="section-body">
+
+      <h3>useRecetasFeed.ts — cambios para FEED-001</h3>
+      <p>Dos cambios en la query key y staleTime para que el feed siempre muestre datos frescos y autenticados:</p>
+      <pre>queryKey: ["recetas", "feed", q ?? "", filtrosAvanzados, pagina, excluirPropio, !!token],
+staleTime: 0,</pre>
+      <ul>
+        <li><code>!!token</code> en la key: cuando la sesión carga (token pasa de <code>undefined</code> a string), la key cambia y TanStack Query hace un nuevo fetch con el header de autenticación. Sin esto, el feed inicial se servía sin auth y los campos <code>guardado</code> y <code>liked</code> eran siempre <code>false</code>.</li>
+        <li><code>staleTime: 0</code>: el feed siempre se refetch al volver a la vista (mount), garantizando que los cambios hechos en la vista de detalle se reflejen al volver al feed.</li>
+      </ul>
+
+      <h3>tarjetaPost.tsx — simplificación para FEED-001 / LIKE-001</h3>
+      <p>Los likes y comentarios en la tarjeta del feed son <strong>solo informativos</strong> (no interactivos). Se eliminó toda la lógica de <code>useToggleLike</code> del componente. El único botón interactivo que queda es el de guardado (bookmark).</p>
+      <p><strong>Por qué:</strong> tener dos superficies de interacción para el like (feed + detalle) con estado SSR en el detalle y estado de cliente en el feed creaba desincronización difícil de gestionar. La decisión de simplificar el feed a display-only elimina el problema de raíz y sigue siendo UX válido (Instagram también muestra el conteo en el feed sin permitir like directo en algunas vistas).</p>
+      <pre>// Solo display — sin onClick, sin estado local de like
+&lt;div className="flex items-center gap-1.5"&gt;
+  &lt;Heart className="h-5 w-5 text-muted-foreground" strokeWidth={1.8} /&gt;
+  &lt;span className="text-sm text-muted-foreground"&gt;{post.likes}&lt;/span&gt;
+&lt;/div&gt;</pre>
+
+      <h3>useToggleLike.ts — simplificado</h3>
+      <p>Versión final sin <code>onMutate</code> (el optimistic update lo gestiona el estado local de <code>cabeceraReceta.tsx</code>). En <code>onSuccess</code> invalida las queries del feed para que al volver los contadores sean correctos.</p>
+      <pre>onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: ["recetas", "feed"] })
+  queryClient.invalidateQueries({ queryKey: ["recetas", "detalle", recetaId] })
+},</pre>
+
+      <h3>useToggleGuardado.ts — patrón onMutate</h3>
+      <p>El guardado sí mantiene <code>onMutate</code> con snapshot y rollback porque el bookmark <strong>sí es interactivo en el feed</strong>. El flujo completo: snapshot → update optimista en caché → en onError rollback → en onSettled invalidate.</p>
+
+      <h3>useAgregarComentario.ts — simplificado</h3>
+      <p>Igual que useToggleLike: el optimistic update lo gestiona el estado local de <code>comentariosReceta.tsx</code> (añade el comentario a <code>listaLocal</code> antes de que el servidor responda). El hook solo invalida queries en <code>onSuccess</code>.</p>
+
+      <h3>comentariosReceta.tsx — optimistic update local</h3>
+      <pre>const optimista: Comentario = {
+  autorNombre: session?.user?.name ?? 'Tú',
+  avatarUrl: session?.user?.image ?? null,
+  texto: textoTrimmed,
+  fecha: new Date().toISOString(),
+}
+setListaLocal((prev) => [optimista, ...prev])
+setTexto('')
+
+enviar(textoTrimmed, {
+  onSuccess: () => router.refresh(),
+  onError: () => {
+    setListaLocal((prev) => prev.filter((c) => c !== optimista))
+    setTexto(textoTrimmed)   // restaura el texto para que el usuario no lo pierda
+  },
+})</pre>
+
+      <h3>detalleRecetaCliente.tsx</h3>
+      <p>Añadido <code>useRouter</code> y <code>router.refresh()</code> en el <code>onSuccess</code> de <code>mutarGuardado</code>. Antes solo hacía el optimistic update local sin resincronizar con el servidor.</p>
+
+      <h3>cabeceraReceta.tsx — botón Compartir (DET-003)</h3>
+      <p>Añadido estado <code>urlCopiada</code> y función <code>handleCompartir</code>. En móvil abre el share sheet nativo del SO; en escritorio copia la URL al portapapeles y muestra feedback visual durante 2 segundos.</p>
+      <pre>const [urlCopiada, setUrlCopiada] = useState(false)
+
+async function handleCompartir() {
+  const url = window.location.href
+  if (navigator.share) {
+    try { await navigator.share({ title: receta.receta.titulo, url }) } catch {}
+  } else {
+    try {
+      await navigator.clipboard.writeText(url)
+      setUrlCopiada(true)
+      setTimeout(() => setUrlCopiada(false), 2000)
+    } catch {}
+  }
+}</pre>
+      <p>El botón cambia de icono (<code>Share2</code> → <code>Check</code>) y de label ("Compartir" → "¡Copiado!") con <code>text-brand</code> mientras <code>urlCopiada === true</code>. No se necesita hook ni service porque no es una llamada HTTP — es una API del navegador, equivalente a <code>router.push()</code> en términos de capa arquitectónica.</p>
+
+      <h3>page.tsx (/recetas/[id]) — export dynamic</h3>
+      <p>Añadido <code>export const dynamic = 'force-dynamic'</code>. Sin esto, Next.js cachea el render del Server Component en el router cache del cliente. Al navegar de vuelta a la misma receta, Next.js servía el render antiguo (con <code>sigueAlAutor: false</code>) en lugar de hacer un nuevo fetch. Con <code>force-dynamic</code>, cada visita a la ruta re-ejecuta el Server Component en el servidor.</p>
+      <pre>export const dynamic = 'force-dynamic'</pre>
+    </div>
+  </section>
+
+  <!-- SINCRONIZACIÓN -->
+  <section id="sync">
+    <div class="section-header"><span>🔄</span><h2>Sincronización feed ↔ detalle</h2></div>
+    <div class="section-body">
+      <h3>Flujo completo de un like</h3>
+      <div class="flow" style="flex-direction:column; align-items:flex-start; gap:0.4rem;">
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">1. Click en ❤️ en cabeceraReceta</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">setLiked(!liked), setLikes(±1) — UI instantánea</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">2. mutarLike() — POST /api/recetas/:id/like</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">3a. onSuccess → router.refresh()</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Server Component re-fetch → useEffect sincroniza estado</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">3b. onSuccess → invalidateQueries(["recetas","feed"])</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Feed marca sus queries stale → refetch al volver</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">4. onError → rollback setLiked, setLikes</div>
+        </div>
+      </div>
+
+      <h3>Flujo completo de un comentario</h3>
+      <div class="flow" style="flex-direction:column; align-items:flex-start; gap:0.4rem;">
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">1. Click en Publicar</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">setListaLocal([comentario_optimista, ...prev]) — aparece inmediatamente</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">2. enviar(texto) — POST /api/recetas/:id/comentarios</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">3a. onSuccess → router.refresh() → lista real desde BD</div>
+        </div>
+        <div class="flow" style="gap:0.5rem">
+          <div class="flow-node">3b. onError → eliminar optimista de lista, restaurar texto</div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Limitación conocida:</strong> si el usuario navega muy rápido de vuelta al feed antes de que <code>router.refresh()</code> complete, el feed puede mostrar el valor pre-mutación durante un instante. Esto es aceptable para un TFG y se resolvería en producción con WebSockets o un estado global Zustand compartido entre feed y detalle.
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISIONES -->
+  <section id="decisiones">
+    <div class="section-header"><span>🤔</span><h2>Decisiones de diseño</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Decisión</th><th>Alternativa descartada</th><th>Motivo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>router.refresh()</code> como mecanismo de sync</td>
+            <td><code>invalidateQueries</code> en el detalle</td>
+            <td>El detalle no tiene queries TanStack — es SSR puro. <code>invalidateQueries</code> no tenía efecto porque no había nada en caché que invalidar.</td>
+          </tr>
+          <tr>
+            <td>Likes/comentarios display-only en el feed</td>
+            <td>Interactivos en feed con onMutate en caché</td>
+            <td>Mantener dos superficies de interacción (feed + detalle) sincronizadas con SSR es complejo y propenso a bugs. Display-only en feed elimina el problema sin sacrificar UX relevante.</td>
+          </tr>
+          <tr>
+            <td><code>export const dynamic = 'force-dynamic'</code></td>
+            <td>Revalidación con <code>revalidatePath</code></td>
+            <td><code>revalidatePath</code> requiere llamarse desde Server Actions o Route Handlers. Como las mutaciones se hacen desde Client Components vía hooks, <code>force-dynamic</code> es la solución más directa.</td>
+          </tr>
+          <tr>
+            <td><code>!!token</code> en la query key del feed</td>
+            <td>Forzar refetch manual al detectar sesión</td>
+            <td>TanStack Query refetch automáticamente cuando la key cambia. Al incluir <code>!!token</code>, el paso de no-autenticado a autenticado (booleano cambia de <code>false</code> a <code>true</code>) dispara el refetch con las credenciales correctas sin código adicional.</td>
+          </tr>
+          <tr>
+            <td>Optimistic update local en el componente</td>
+            <td>Optimistic update vía <code>onMutate</code> en el hook</td>
+            <td>El detalle es SSR, no hay query en caché para actualizar con <code>setQueryData</code>. El estado local del componente es la única capa de estado disponible; el hook solo invalida el feed.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARCHIVOS -->
+  <section id="archivos">
+    <div class="section-header"><span>📁</span><h2>Archivos modificados</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>frontend/src/features/recetas/hooks/useRecetasFeed.ts</td>
+            <td>Añadido <code>!!token</code> a la query key; <code>staleTime</code> a <code>0</code></td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/hooks/useToggleLike.ts</td>
+            <td>Simplificado a <code>invalidateQueries</code> en onSuccess; eliminado patrón <code>onMutate</code></td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/hooks/useToggleGuardado.ts</td>
+            <td>Mantenido patrón <code>onMutate</code> con snapshot/rollback (bookmark sí es interactivo en feed)</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/hooks/useAgregarComentario.ts</td>
+            <td>Simplificado a <code>invalidateQueries</code> en onSuccess; optimistic update movido al componente</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/home/tarjetaPost.tsx</td>
+            <td>Eliminada interacción de like; likes y comentarios son display-only; bookmark funcional con <code>useEffect</code> de sync</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx</td>
+            <td>Añadido <code>useRouter</code>; <code>router.refresh()</code> en <code>onSuccess</code> de like y seguir; <code>useEffect</code> ampliado para sincronizar <code>liked</code>, <code>likes</code> y <code>siguiendo</code></td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/detalleReceta/comentariosReceta.tsx</td>
+            <td>Añadido <code>useRouter</code>; optimistic update local con rollback en onError; <code>router.refresh()</code> en onSuccess</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/detalleReceta/detalleRecetaCliente.tsx</td>
+            <td>Añadido <code>useRouter</code>; <code>router.refresh()</code> en <code>onSuccess</code> de guardado</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx</td>
+            <td>(DET-003) Añadido <code>urlCopiada</code> state, <code>handleCompartir</code> async, importado <code>Check</code> de lucide. Botón Compartir ahora con onClick funcional + feedback visual</td>
+          </tr>
+          <tr>
+            <td>frontend/src/app/(main)/recetas/[id]/page.tsx</td>
+            <td>Añadido <code>export const dynamic = 'force-dynamic'</code> para evitar render cacheado con estado social incorrecto</td>
+          </tr>
+          <tr>
+            <td>frontend/tailwind.config.ts</td>
+            <td>Añadido keyframe <code>slide</code> y animation <code>slide</code> (requerido para la barra de carga; puede limpiarse si no se usa)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">81</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">82</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -870,40 +870,40 @@
           <td class="id">FEED-001</td>
           <td class="desc">
             <strong>Excluir recetas propias del feed de home</strong>
-            <small>El feed muestra todas las recetas incluyendo las del propio usuario. Filtrar en el backend añadiendo el parámetro excluirAutor al endpoint GET /api/recetas, o en el FE descartando las tarjetas donde autorId === session.user.id.</small>
-            <span class="source">📄 features/recetas/components/feed/ · backend/src/controllers/recetaController.ts</span>
+            <small>Implementado: el repositorio aplica { autorId: { $ne: userId } } cuando el parámetro excluirPropio=true llega al endpoint GET /api/recetas. El FE pasa excluirPropio: true en useRecetasFeed solo cuando hay sesión activa (!!token incluido en la query key para refetch automático al cargar la sesión). staleTime: 0 garantiza que el feed siempre obtiene datos frescos al montar.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useRecetasFeed.ts · frontend/src/features/recetas/components/home/feedHome.tsx</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">LIKE-001</td>
           <td class="desc">
             <strong>Like persistente en BD — toggle único por usuario</strong>
-            <small>Actualmente el like es optimista en cliente pero no persiste en BD ni valida unicidad. Hay que: (1) endpoint PATCH /api/recetas/:id/like que añada/elimine el userId del array likes del documento, (2) validar que un usuario solo puede dar un like, (3) devolver el conteo actualizado, (4) conectar el hook useLike() con mutación TanStack Query real.</small>
-            <span class="source">📄 backend/src/models/recetaMongo.ts · frontend/src/services/recetasService.ts</span>
+            <small>Implementado: endpoint POST /api/recetas/:id/like que añade/elimina el userId del array likes con toggle (un like por usuario). Devuelve { liked, totalLikes }. FE: hook useToggleLike con mutación TanStack Query y actualización optimista en cabeceraReceta. En el feed las tarjetas muestran el contador de likes solo como dato informativo (sin interacción) para evitar problemas de sincronía entre vistas. La vista detalle llama a router.refresh() en onSuccess para refrescar los datos SSR tras cada acción.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useToggleLike.ts · frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx · frontend/src/features/recetas/components/home/tarjetaPost.tsx</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">COM-001</td>
           <td class="desc">
             <strong>Comentarios persistentes en BD (ver + añadir)</strong>
-            <small>Complementa DET-004 y DET-005: los comentarios deben guardarse en MongoDB y cargarse al volver a la receta. Endpoints: POST /api/recetas/:id/comentarios (crear, requiere auth) + GET /api/recetas/:id/comentarios (paginado). El modelo Receta ya tiene el subdocumento comentario (_id:false). Actualizar el input del detalle para usar la mutación real en lugar del mock.</small>
-            <span class="source">📄 backend/src/models/recetaMongo.ts · backend/src/routes/recetasRouter.ts · DET-004 · DET-005</span>
+            <small>Implementado: endpoint POST /api/recetas/:id/comentarios que guarda en listaComentarios del documento Receta (requiere auth). El FE usa hook useAgregarComentario con actualización optimista local (el comentario aparece al instante) y llama a router.refresh() en onSuccess para recargar la lista desde el servidor. El contador de comentarios se muestra en la tarjeta del feed. Estado vacío muestra "Sé el primero en comentar".</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useAgregarComentario.ts · frontend/src/features/recetas/components/detalleReceta/comentariosReceta.tsx</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
           <td class="id">SOC-001</td>
           <td class="desc">
             <strong>Botón Seguir / Dejar de seguir en detalle de receta</strong>
-            <small>Añadir junto al avatar del autor en la vista detalle un botón toggle Seguir/Siguiendo. Endpoint: POST /api/usuarios/:id/seguir (toggle add/remove). Los usuarios que sigues aparecen en tu feed de home. Verificar que el modelo Usuario tiene campos seguidores/seguidos. Actualizar el feed para filtrar por seguidos cuando hay sesión activa.</small>
-            <span class="source">📄 features/recetas/components/detalleReceta/ · backend/src/models/usuarioMongo.ts · backend/src/routes/usuariosRouter.ts</span>
+            <small>Implementado: esquema Usuario con arrays seguidos[] y seguidores[]. Endpoint POST /api/usuarios/:id/seguir (toggle add/remove, devuelve { siguiendo }). FE: botón Seguir/Siguiendo en cabeceraReceta junto al avatar del autor, oculto en recetas propias. Estado inicial sigueAlAutor viene del SSR (page.tsx con export const dynamic = 'force-dynamic' para evitar caché). Llamada a router.refresh() en onSuccess para mantener sincronía.</small>
+            <span class="source">📄 backend/src/models/usuarioMongo.ts · backend/src/repositories/usuarioRepository.ts · frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx · frontend/src/app/(main)/recetas/[id]/page.tsx</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -915,6 +915,16 @@
           </td>
           <td><span class="status pending">⏳ Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-003</td>
+          <td class="desc">
+            <strong>Compartir receta — Web Share API + fallback clipboard</strong>
+            <small>Botón Compartir en cabeceraReceta.tsx ahora funcional. En móvil usa navigator.share() que abre el share sheet nativo del SO (WhatsApp, Telegram, copia de enlace, etc.). En escritorio (sin navigator.share) copia la URL al portapapeles con navigator.clipboard.writeText(). Feedback visual: icono Share2 → Check y label "Compartir" → "¡Copiado!" durante 2 segundos con color text-brand. Estado urlCopiada local (useState). Sin backend ni nuevo hook — es una API del navegador, no una llamada HTTP. TypeScript: función async con bloques try/catch separados para share y clipboard. Sin breaking changes en otros componentes.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · docs/desarrollo/funcionalidadSocial.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
           <td class="id">STRUCT-002</td>
@@ -955,11 +965,11 @@
         <tr>
           <td class="id">DET-003</td>
           <td class="desc">
-            <strong>Compartir receta (Web Share API)</strong>
-            <small>El botón de compartir existe pero no tiene handler. Hay que implementar navigator.share() con fallback a copiar URL al portapapeles.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <strong>Compartir receta (Web Share API) — movido a Sprint 4</strong>
+            <small>Ver entrada actualizada en la sección Sprint 4.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>

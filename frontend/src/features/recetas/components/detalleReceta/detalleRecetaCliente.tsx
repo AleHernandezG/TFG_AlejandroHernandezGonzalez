@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { HeroReceta } from './heroReceta'
 import { CabeceraReceta } from './cabeceraReceta'
 import { TabsReceta } from './tabsReceta'
@@ -15,12 +16,14 @@ type Props = {
 }
 
 export function DetalleRecetaCliente({ receta }: Props) {
+  const router = useRouter()
   const [guardado, setGuardado] = useState(receta.guardado)
   const { mutate: mutarGuardado } = useToggleGuardado(receta.id)
 
   function toggleGuardado() {
     setGuardado((prev) => !prev)
     mutarGuardado(undefined, {
+      onSuccess: () => router.refresh(),
       onError: () => setGuardado((prev) => !prev),
     })
   }

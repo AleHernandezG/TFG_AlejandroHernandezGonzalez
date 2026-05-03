@@ -25,9 +25,9 @@ export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio 
   };
 
   return useQuery({
-    queryKey: ["recetas", "feed", q ?? "", filtrosAvanzados, pagina, excluirPropio],
+    queryKey: ["recetas", "feed", q ?? "", filtrosAvanzados, pagina, excluirPropio, !!token],
     queryFn: () => recetasService.obtenerFeed(filtros, token),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 0,
     placeholderData: (prev) => prev,
   });
 }

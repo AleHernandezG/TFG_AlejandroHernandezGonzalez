@@ -1,9 +1,9 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-04-17
-**Sprint Actual:** Sprint 3 — activo
-**Modelo:** FE nuevas vistas mock + BE sprint anterior real + BD necesaria
-**Fase:** Fase 2 de 7 — Recetas (FE mock) + Autenticación (BE real)
+**Fecha:** 2026-05-03
+**Sprint Actual:** Sprint 4 — activo
+**Modelo:** FE vistas reales conectadas a BE + BD MongoDB real
+**Fase:** Fase 2 de 7 — Recetas (FE + BE real) + Funcionalidad Social
 
 > Reglas de desarrollo, arquitectura, colores, nomenclatura y diseño → `docs/rules.md`
 
@@ -54,6 +54,11 @@
 - ✅ [UI-020] Vista /coleccion — dos subpestañas: "Guardadas" (mock) y "Mis recetas" (mock). Estado vacío con CTA en Mis recetas. Mobile: columna TarjetaPost. Desktop: sidebar + max-w-2xl
 - ✅ [DOCS-004] Mapa de navegación — esquema de conexiones entre vistas (rutas, acciones de navegación)
 - ✅ [RULES-001] Imports FE — 8 ficheros corregidos: rutas relativas cross-folder (`../../hooks/`, `../../types/`, `../types/`, `../data/`) convertidas a absolutas `@/features/...` — cumplimiento rules.md §15
+- ✅ [FEED-001] Feed con filtros funcionales — búsqueda debounce + filtros avanzados conectados al BE real. `!!token` en query key + `staleTime: 0` para refetch autenticado en mount
+- ✅ [LIKE-001] Toggle like persistente en vista detalle — optimistic update local + `router.refresh()` en onSuccess para resincronizar props SSR. Likes display-only en feed
+- ✅ [COM-001] Añadir comentarios con optimistic update — aparece en lista local inmediatamente, rollback en onError, `router.refresh()` en onSuccess sincroniza conteo real desde BD
+- ✅ [SOC-001] Botón Seguir/Siguiendo con estado inicial correcto — `export const dynamic = 'force-dynamic'` en page.tsx evita render cacheado con `sigueAlAutor: false`; `router.refresh()` sincroniza tras toggle
+- ✅ [DET-003] Botón Compartir funcional — `navigator.share()` en móvil (share sheet nativo del SO), fallback `navigator.clipboard.writeText()` en escritorio con feedback visual "¡Copiado!" 2 s. Sin BE, sin nuevo hook.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -224,7 +229,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/api/auth/[...nextauth]` | Route handler NextAuth | ✅ |
 | `/home` | Home / Feed de recetas — mobile + PC responsive | ✅ Aprobado autor |
 | NavBar inferior (`(main)/layout.tsx`) | Componente global | ✅ Aprobado autor |
-| `/recetas/[id]` | Detalle de receta — mock (datos reales en DET-008) | ✅ Aprobado autor |
+| `/recetas/[id]` | Detalle de receta — BE real, SSR con `force-dynamic`, likes/comentarios/guardar/seguir funcionales | ✅ Sprint 4 |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
 | `/coleccion` | Mi colección — Guardadas y Mis recetas, grid 2 cols portrait, stitch aprobado | ✅ Aprobado autor |
 | `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | 👁️ Pendiente revisión |
@@ -243,6 +248,10 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `BE /api/auth/recuperar-contrasena` | Endpoint real | ✅ Sprint 2 BE |
 | `BE /api/auth/nueva-contrasena` | Endpoint real | ✅ Sprint 2 BE |
 | `BE /api/health` | Health check público (sin auth) — usado por scripts/keep-alive.sh | ✅ Sprint 3 |
+| `BE POST /api/recetas/:id/like` | Toggle like autenticado — añade/elimina userId del array likes[] | ✅ Sprint 4 |
+| `BE POST /api/recetas/:id/guardar` | Toggle guardado autenticado — añade/elimina recetaId en Usuario.recetasGuardadas[] | ✅ Sprint 4 |
+| `BE POST /api/recetas/:id/comentarios` | Añadir comentario autenticado — inserta subdocumento en Receta.comentarios[] | ✅ Sprint 4 |
+| `BE POST /api/usuarios/:id/seguir` | Toggle seguir autenticado — actualiza seguidores[] y siguiendo[] en ambos usuarios | ✅ Sprint 4 |
 
 ## Estructura del Proyecto
 
@@ -285,9 +294,12 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 3 activo — completados: UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
+Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003.
 
-Sprint 3 — pendientes:
+Sprint 3 completados (referencia): UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
+
+Sprint 4 — pendientes:
 
 - **FE:** UI-018 — Formulario multi-step crear receta (👁️ pendiente revisión final)
 - **FE:** STRUCT-001 — Scaffolding vistas Sprint 3+ (👁️ pendiente revisión)
+- **FE+BE:** Vistas pendientes de Stitch: /despensa, /chat, /perfil, /discover
