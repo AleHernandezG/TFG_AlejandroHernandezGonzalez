@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-03 · Sprint 4 activo · Fase 4 de 7</div>
+    <div class="meta">Actualizado: 2026-05-05 · Sprint 4 activo · Fase 4 de 7</div>
   </div>
 </header>
 
@@ -98,9 +98,9 @@
   <div class="counters">
     <div class="counter review"><div class="num">6</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
+    <div class="counter media"><div class="num">13</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">82</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">89</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -830,10 +830,10 @@
           <td class="id">DET-005</td>
           <td class="desc">
             <strong>Añadir comentario en una receta</strong>
-            <small>No existe input de comentario todavía. Hay que añadir un textarea + mutación TanStack Query y requerir sesión activa (NextAuth).</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Implementado vía COM-001. textarea (maxLength 500) + hook useAgregarComentario (TanStack Query mutación) + comprobación de sesión NextAuth (input solo visible si hay sesión). Actualización optimista local + rollback si falla el BE. Estado vacío "Sé el primero en comentar".</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/comentariosReceta.tsx · features/recetas/hooks/useAgregarComentario.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -936,6 +936,86 @@
           <td><span class="status pending">⏳ Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
+        <tr>
+          <td class="id">UI-029</td>
+          <td class="desc">
+            <strong>Tarjeta fantasma "+ Nueva receta" en Mis Recetas</strong>
+            <small>Primera celda del grid de Mis Recetas en /coleccion: tarjeta aspect-[3/4] con borde punteado brand, círculo con icono Plus brand y texto "Nueva receta". Enlaza directamente a /crear-receta. Solo aparece en la pestaña "mis-recetas", no en "guardadas". Patrón contextual (Opción D de opcionesCrearRecetaBtn.html). Sin hooks ni BE — puramente UI. Server component, 0 colores hardcodeados, imports @/.</small>
+            <span class="source">📄 features/coleccion/components/gridRecetasColeccion.tsx · docs/desarrollo/opcionesCrearRecetaBtn.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-001</td>
+          <td class="desc">
+            <strong>Autocompletado de ingredientes con fuente real</strong>
+            <small>Reemplazado el mock de 30 ingredientes (datosIngredientes.ts, eliminado) por src/config/ingredientes.ts con 200+ ingredientes en 17 categorías, aliases multilingüe (español/inglés/catalán) y alérgenos EU completos (14 ids). seccionIngredientes.tsx ahora llama a buscarIngredientes(valor, 6) del nuevo fichero — busca contra nombre principal Y aliases. Filtrado client-side sin latencia de red.</small>
+            <span class="source">📄 src/config/ingredientes.ts · features/recetas/components/crearReceta/seccionIngredientes.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">ALERG-002</td>
+          <td class="desc">
+            <strong>Alérgenos desde la fuente de ingredientes real</strong>
+            <small>features/recetas/utils/detectarAlergenos.ts reescrito como re-export de @/config/ingredientes (detectarAlergenos + obtenerIngrediente + AlergenoId). La nueva detectarAlergenos usa obtenerIngrediente() con matching exacto por nombre y aliases — más preciso que el matching parcial anterior. Imports de formularioCrearReceta.tsx y previsualizacionReceta.tsx corregidos a @/features/recetas/utils/detectarAlergenos (alias @/ en lugar de rutas relativas cross-folder).</small>
+            <span class="source">📄 features/recetas/utils/detectarAlergenos.ts · src/config/ingredientes.ts · formularioCrearReceta.tsx · previsualizacionReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-002</td>
+          <td class="desc">
+            <strong>Capa de infraestructura para ingredientes externos — service + store</strong>
+            <small>ingredientesService.ts: stub para futura integración con Edamam Food Database API (buscarEdamam devuelve [] hasta Fase 6). ingredientesCustomStore.ts: Zustand persist store que guarda ingredientes que el usuario encontró vía Edamam; persiste en localStorage con la key 'cookr-ingredientes-custom'. Métodos: añadir (deduplica por nombre), buscarEnCustom (filtra por nombre + aliases, devuelve máx 4), limpiar.</small>
+            <span class="source">📄 src/services/ingredientesService.ts · src/stores/ingredientesCustomStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-003</td>
+          <td class="desc">
+            <strong>Hook useAutocompletadoIngredientes — local + custom + Edamam fallback</strong>
+            <small>features/recetas/hooks/useAutocompletadoIngredientes.ts. Orden de prioridad: (1) buscarIngredientes(query) — local instantáneo, 239 ingredientes; (2) buscarEnCustom(query) — caché Zustand persist; combinados 1+2 antes de evaluar si hay suficientes (≥3). Si hay menos de 3 resultados combinados: debounce 300ms → ingredientesService.buscarEdamam() (placeholder Fase 6). Retorna: { sugerencias: DatoIngrediente[], cargando: boolean, esFallback: boolean }.</small>
+            <span class="source">📄 src/features/recetas/hooks/useAutocompletadoIngredientes.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-004</td>
+          <td class="desc">
+            <strong>seccionIngredientes.tsx — usa useAutocompletadoIngredientes</strong>
+            <small>Reemplazado el filtrado inline (buscarIngredientes(valor, 6) directo en el handler) por el hook. Estado refactorizado: sugerencias:{idx,lista} → inputActivo:{idx,query} + hook. El dropdown ahora renderiza DatoIngrediente[].nombre en lugar de string[]. La lógica de debounce y fallback queda en el hook, el componente solo gestiona qué fila está activa.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">CREAR-001</td>
+          <td class="desc">
+            <strong>Tutorial crear receta activado por datos reales del usuario</strong>
+            <small>Actualmente MOCK_ES_PRIMER_USUARIO = false hardcodeado en formularioCrearReceta.tsx, por lo que el PopUpTutorial y el TutorialCrearReceta (stepper) nunca se muestran. La lógica real: consultar desde la BD si el usuario actualmente logueado tiene numRecetasCreadas === 0 (o campo equivalente). Si es 0, mostrar el popup al entrar en /crear-receta. Requiere: exponer el conteo de recetas propias del usuario en la sesión NextAuth (o hacer una llamada al BE al montar el componente). No requiere nuevo endpoint si se añade el dato al callback de sesión.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · lib/auth.ts · backend/src/types/usuario.ts</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CREAR-002</td>
+          <td class="desc">
+            <strong>Publicar receta real — endpoint BE + servicio FE + subida de foto</strong>
+            <small>Actualmente handlePublicar() en previsualizacionReceta.tsx tiene un setTimeout(1000) mock que simula publicar y redirige a /home sin persistir nada. Implementación completa: (BE) añadir POST /api/recetas con requerirAuth al router; crear recetasController.crear, recetasService.crear y recetaRepository.crear; aceptar foto como base64 en el body JSON (la imagen se guarda como string en IReceta.imagenUrl). (FE) añadir método crear() a frontend/src/services/recetasService.ts; reemplazar setTimeout por la llamada real en handlePublicar(); mostrar estado de carga y gestionar errores. Depende de DEBT-009 (useCrearReceta hook) para mantener la separación de capas.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/routes/recetas.routes.ts · backend/src/services/recetasService.ts · backend/src/controllers/recetasController.ts · frontend/src/services/recetasService.ts</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -952,6 +1032,26 @@
         <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
       </thead>
       <tbody>
+        <tr>
+          <td class="id">HANDS-001</td>
+          <td class="desc">
+            <strong>Modo manos libres en previsualizacionReceta / detalleReceta</strong>
+            <small>El botón "Modo manos libres" existe en previsualizacionReceta.tsx y en pasosReceta.tsx (detalleReceta) pero no tiene onClick — no hace nada. Feature prevista: lectura TTS (Text-to-Speech) de los pasos con la Web Speech API, avance por voz o tap, pantalla always-on. No bloquea ninguna otra tarea. Se puede abordar de forma independiente en Sprint 5.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · features/recetas/components/detalleReceta/pasosReceta.tsx</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-001</td>
+          <td class="desc">
+            <strong>Información nutricional automática — integración Edamam API</strong>
+            <small>La sección "Información nutricional" en previsualizacionReceta.tsx y en detalleReceta muestra un placeholder con "—" para calorías, proteínas, carbohidratos y grasas. La integración prevista: al publicar una receta (CREAR-002), llamar a Edamam Nutrition Analysis API con los ingredientes y guardar los macros en IReceta.macros. El plan de Fase 6 incluye también integrar Edamam Food Database para INGR-001. Requiere key de API de Edamam (tier gratuito: 100 llamadas/mes).</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/types/receta.ts (IMacrosReceta)</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 6 (Fase 6)</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
         <tr>
           <td class="id">UI-010 / UI-011 / UI-012 / UI-013</td>
           <td class="desc">

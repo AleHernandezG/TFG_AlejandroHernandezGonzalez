@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autocompletado de Ingredientes — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; margin-top: 0.2rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* Tarjeta base */
+    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .card-header h2 { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .card-body { padding: 1.25rem; }
+    .icon { font-size: 1.1rem; }
+
+    /* Badge sprint */
+    .badge { font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; white-space: nowrap; }
+    .badge.s4 { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .badge.fase6 { background: #6b728022; color: #9ca3af; border: 1px solid #6b728044; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+
+    /* Código */
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #111; border: 1px solid #2a2a2a; border-radius: 5px; padding: 0.1rem 0.45rem; color: #f97316; }
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; line-height: 1.7; }
+    pre .comment { color: #525252; }
+    pre .kw { color: #c084fc; }
+    pre .str { color: #4ade80; }
+    pre .fn { color: #60a5fa; }
+    pre .type { color: #fbbf24; }
+    pre .num { color: #f97316; }
+
+    /* Flujo / steps */
+    .flow { display: flex; flex-direction: column; gap: 0; }
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: #f97316; color: #000; font-weight: 800; font-size: 0.72rem; display: flex; align-items: center; justify-content: center; margin-top: 0.1rem; }
+    .step-num.grey { background: #333; color: #737373; }
+    .step-content strong { display: block; color: #fff; font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .step-content p { font-size: 0.8rem; color: #a3a3a3; }
+    .step-content code { font-size: 0.73rem; }
+
+    /* Archivos */
+    .file-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .file-row { display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.75rem 1rem; background: #111; border: 1px solid #222; border-radius: 8px; }
+    .file-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .file-path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; display: block; margin-bottom: 0.25rem; }
+    .file-desc { font-size: 0.79rem; color: #a3a3a3; }
+    .file-desc strong { color: #d4d4d4; }
+
+    /* Tabla comparativa */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 0.9rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 0.9rem; border-bottom: 1px solid #1f1f1f; font-size: 0.81rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td.mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; }
+    td.ok { color: #4ade80; font-weight: 600; }
+    td.no { color: #525252; }
+
+    /* Callout */
+    .callout { display: flex; gap: 0.85rem; padding: 1rem 1.1rem; border-radius: 8px; font-size: 0.81rem; line-height: 1.55; }
+    .callout.info { background: #1e3a5f; border: 1px solid #2563eb44; color: #93c5fd; }
+    .callout.warn { background: #3d2700; border: 1px solid #f9731644; color: #fdba74; }
+    .callout.tip { background: #14401a; border: 1px solid #22c55e44; color: #86efac; }
+    .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+    p { font-size: 0.83rem; color: #a3a3a3; line-height: 1.65; }
+    p + p { margin-top: 0.75rem; }
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; margin-bottom: 0.5rem; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Autocompletado de Ingredientes — Cookr</h1>
+  <div class="meta">Sprint 4 · INGR-001 → INGR-004 · 2026-05-05</div>
+</header>
+
+<nav>
+  <a href="#que">¿Qué se hizo?</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#flujo">Cómo funciona</a>
+  <a href="#integracion">Integración</a>
+  <a href="#antes-despues">Antes / Después</a>
+  <a href="#fase6">Fase 6</a>
+</nav>
+
+<main>
+
+  <!-- ── QUÉ SE HIZO ── -->
+  <section class="card" id="que">
+    <div class="card-header">
+      <span class="icon">🎯</span>
+      <h2>¿Qué se hizo?</h2>
+      <span class="badge done">✅ Completado</span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:1rem;">
+      <p>
+        Se reemplazó el autocompletado de ingredientes <strong>inline</strong> que filtraba sobre 30 items mock
+        por un sistema en capas que funciona con <strong>239 ingredientes reales</strong>, caché persistente del usuario
+        y arquitectura lista para conectar Edamam en Fase 6.
+      </p>
+      <div class="two-col">
+        <div style="background:#1a0a0a;border:1px solid #3d1111;border-radius:8px;padding:1rem;">
+          <h3 style="color:#f87171;margin-bottom:0.5rem;">❌ Antes</h3>
+          <p style="color:#737373;">
+            30 ingredientes hardcodeados en <code>datosIngredientes.ts</code>.<br>
+            Filtrado inline dentro del componente con <code>buscarIngredientes(valor, 6)</code> directo en el handler.<br>
+            Sin capas: el componente hacía todo.
+          </p>
+        </div>
+        <div style="background:#0a1a0e;border:1px solid #113d1e;border-radius:8px;padding:1rem;">
+          <h3 style="color:#4ade80;margin-bottom:0.5rem;">✅ Ahora</h3>
+          <p style="color:#737373;">
+            239 ingredientes en <code>ingredientes.ts</code> con aliases multilingüe.<br>
+            Hook <code>useAutocompletadoIngredientes</code> encapsula toda la lógica.<br>
+            3 capas: config → store → hook → componente.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ARCHIVOS ── -->
+  <section class="card" id="archivos">
+    <div class="card-header">
+      <span class="icon">📁</span>
+      <h2>Archivos involucrados</h2>
+    </div>
+    <div class="card-body">
+      <div class="file-list">
+
+        <div class="file-row">
+          <span class="file-icon">📦</span>
+          <div>
+            <span class="file-path">src/config/ingredientes.ts</span>
+            <span class="file-desc">
+              <strong>Fuente de datos canónica.</strong>
+              239 ingredientes con <code>nombre</code>, <code>aliases[]</code> (español/inglés/catalán),
+              <code>alergenos[]</code> (14 EU) y <code>categoria</code>.
+              Funciones: <code>buscarIngredientes</code>, <code>detectarAlergenos</code>, <code>obtenerIngrediente</code>.
+              <em>Este fichero no se toca en este sprint — es la base.</em>
+            </span>
+          </div>
+        </div>
+
+        <div class="file-row">
+          <span class="file-icon">🔌</span>
+          <div>
+            <span class="file-path">src/services/ingredientesService.ts</span>
+            <span class="file-desc">
+              <strong>Servicio HTTP para ingredientes externos.</strong>
+              Método <code>buscarEdamam(query)</code> — ahora devuelve <code>[]</code> (stub).
+              En Fase 6 se sustituye el cuerpo por la llamada real a Edamam Food Database.
+              El hook lo llama, pero el componente no lo conoce.
+            </span>
+          </div>
+        </div>
+
+        <div class="file-row">
+          <span class="file-icon">💾</span>
+          <div>
+            <span class="file-path">src/stores/ingredientesCustomStore.ts</span>
+            <span class="file-desc">
+              <strong>Caché de ingredientes del usuario.</strong>
+              Zustand + <code>persist</code> → guarda en <code>localStorage</code> con key <code>cookr-ingredientes-custom</code>.
+              Cuando en Fase 6 Edamam devuelva un ingrediente que el usuario seleccione,
+              se añade aquí. La próxima vez aparece sin necesidad de red.
+            </span>
+          </div>
+        </div>
+
+        <div class="file-row">
+          <span class="file-icon">🪝</span>
+          <div>
+            <span class="file-path">src/features/recetas/hooks/useAutocompletadoIngredientes.ts</span>
+            <span class="file-desc">
+              <strong>El núcleo de la lógica.</strong>
+              Recibe un <code>query: string</code> y devuelve <code>{ sugerencias, cargando, esFallback }</code>.
+              Gestiona el orden de búsqueda, el debounce y el estado de carga.
+            </span>
+          </div>
+        </div>
+
+        <div class="file-row">
+          <span class="file-icon">🖥️</span>
+          <div>
+            <span class="file-path">src/features/recetas/components/crearReceta/seccionIngredientes.tsx</span>
+            <span class="file-desc">
+              <strong>Componente actualizado.</strong>
+              Antes gestionaba el estado de sugerencias y el filtrado. Ahora solo sabe
+              qué fila está activa (<code>inputActivo</code>) y delega todo al hook.
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CÓMO FUNCIONA ── -->
+  <section class="card" id="flujo">
+    <div class="card-header">
+      <span class="icon">⚙️</span>
+      <h2>Cómo funciona — orden de búsqueda</h2>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:1.25rem;">
+
+      <p>El hook busca en 3 fuentes en orden. Si una fuente da suficientes resultados, no consulta las siguientes.</p>
+
+      <div class="flow">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>buscarIngredientes(query) — local, 0 ms</strong>
+            <p>
+              Filtra los 239 ingredientes de <code>ingredientes.ts</code> contra <code>nombre</code>
+              y <code>aliases[]</code>. Instantáneo, sin red.
+              Ejemplos: escribir <em>"bacon"</em> → encuentra <em>Panceta</em>;
+              <em>"chicken"</em> → <em>Pechuga de pollo</em>.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>buscarEnCustom(query) — Zustand persist, 0 ms</strong>
+            <p>
+              Busca en los ingredientes que el usuario añadió previamente (Fase 6).
+              También instantáneo. Los resultados de 1 y 2 se combinan (sin duplicados por nombre)
+              antes de decidir si hay suficientes.
+            </p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num" style="background:#333;color:#737373">3</div>
+          <div class="step-content">
+            <strong>ingredientesService.buscarEdamam(query) — red, 300 ms debounce</strong>
+            <p>
+              Solo se llama si los resultados de 1+2 son <strong>menos de 3</strong>.
+              Actualmente devuelve <code>[]</code> (placeholder). En Fase 6 conecta con Edamam.
+              El debounce evita llamadas en cada tecla.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <span>
+          Con 239 ingredientes locales cubriendo las recetas comunes, el paso 3 prácticamente nunca
+          se ejecutará en el uso diario. El sistema está preparado para escalar sin cambiar el componente.
+        </span>
+      </div>
+
+      <h3>El hook en código</h3>
+      <pre><span class="kw">export function</span> <span class="fn">useAutocompletadoIngredientes</span>(<span class="type">query</span>: <span class="kw">string</span>) {
+  <span class="comment">// estado local</span>
+  <span class="kw">const</span> [sugerencias, setSugerencias] = <span class="fn">useState</span>&lt;<span class="type">DatoIngrediente</span>[]&gt;([])
+  <span class="kw">const</span> buscarEnCustom = <span class="fn">useIngredientesCustomStore</span>(s =&gt; s.buscarEnCustom)
+
+  <span class="fn">useEffect</span>(() =&gt; {
+    <span class="fn">clearTimeout</span>(debounceRef.current)           <span class="comment">// cancelar debounce anterior</span>
+
+    <span class="kw">if</span> (query.length &lt; <span class="num">2</span>) { <span class="fn">setSugerencias</span>([]); <span class="kw">return</span> }
+
+    <span class="comment">// Paso 1 + 2: local + custom, sin red</span>
+    <span class="kw">const</span> locales   = <span class="fn">buscarIngredientes</span>(query)
+    <span class="kw">const</span> custom    = <span class="fn">buscarEnCustom</span>(query)
+    <span class="kw">const</span> combinados = [...locales, ...custom.filter(c =&gt; !locales.some(l =&gt; l.nombre === c.nombre))]
+
+    <span class="kw">if</span> (combinados.length &gt;= <span class="num">3</span>) {
+      <span class="fn">setSugerencias</span>(combinados); <span class="kw">return</span>   <span class="comment">// suficiente → no llama a Edamam</span>
+    }
+
+    <span class="comment">// Paso 3: Edamam con debounce 300 ms</span>
+    debounceRef.current = <span class="fn">setTimeout</span>(<span class="kw">async</span> () =&gt; {
+      <span class="kw">const</span> externos = <span class="kw">await</span> ingredientesService.<span class="fn">buscarEdamam</span>(query)
+      <span class="fn">setSugerencias</span>([...combinados, ...externos])
+    }, <span class="num">300</span>)
+  }, [query, buscarEnCustom])
+
+  <span class="kw">return</span> { sugerencias, cargando, esFallback }
+}</pre>
+
+    </div>
+  </section>
+
+  <!-- ── INTEGRACIÓN ── -->
+  <section class="card" id="integracion">
+    <div class="card-header">
+      <span class="icon">🔗</span>
+      <h2>Cómo está integrado — capas</h2>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:1.25rem;">
+
+      <p>Sigue exactamente el patrón obligatorio de <code>docs/rules.md §1</code>:</p>
+
+      <pre>Componente (seccionIngredientes.tsx)
+    ↓  solo sabe qué fila está activa
+<span class="fn">useAutocompletadoIngredientes</span>(query)
+    ↓  local: directo    ↓  red: debounce 300ms
+<span class="fn">buscarIngredientes</span>()      <span class="fn">ingredientesService.buscarEdamam</span>()
+<span class="fn">buscarEnCustom</span>()          ↓
+(config/ + store/)        <span class="fn">apiClient</span>  ← (Fase 6)
+</pre>
+
+      <h3>El componente — antes y después</h3>
+      <pre><span class="comment">// ANTES — lógica mezclada en el componente</span>
+<span class="kw">function</span> <span class="fn">handleNombreChange</span>(idx, valor) {
+  <span class="kw">if</span> (valor.length &lt; <span class="num">2</span>) { <span class="fn">setSugerencias</span>(<span class="kw">null</span>); <span class="kw">return</span> }
+  <span class="kw">const</span> resultados = <span class="fn">buscarIngredientes</span>(valor, <span class="num">6</span>)      <span class="comment">// filtrado inline</span>
+  <span class="fn">setSugerencias</span>(resultados.length &gt; <span class="num">0</span> ? { idx, lista: resultados.map(r =&gt; r.nombre) } : <span class="kw">null</span>)
+}
+
+<span class="comment">// DESPUÉS — componente solo gestiona estado visual</span>
+<span class="kw">const</span> [inputActivo, setInputActivo] = <span class="fn">useState</span>&lt;{ idx: <span class="kw">number</span>; query: <span class="kw">string</span> } | <span class="kw">null</span>&gt;(<span class="kw">null</span>)
+<span class="kw">const</span> { sugerencias } = <span class="fn">useAutocompletadoIngredientes</span>(inputActivo?.query ?? <span class="str">''</span>)
+
+<span class="kw">function</span> <span class="fn">handleNombreChange</span>(idx, valor) {
+  <span class="fn">setInputActivo</span>(valor.length &gt;= <span class="num">2</span> ? { idx, query: valor } : <span class="kw">null</span>)
+}</pre>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span>
+          El componente rastrea <strong>qué fila está activa</strong> (<code>inputActivo.idx</code>) para mostrar
+          el dropdown solo en el input correcto. La lista de sugerencias viene del hook
+          y se comparte para todas las filas — solo hay una búsqueda activa al mismo tiempo.
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ANTES / DESPUÉS TABLA ── -->
+  <section class="card" id="antes-despues">
+    <div class="card-header">
+      <span class="icon">📊</span>
+      <h2>Comparativa rápida</h2>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <table>
+        <thead>
+          <tr>
+            <th>Aspecto</th>
+            <th>Antes (Sprint 3)</th>
+            <th>Ahora (Sprint 4)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ingredientes disponibles</td>
+            <td>30 (mock)</td>
+            <td class="ok">239 reales + categorías</td>
+          </tr>
+          <tr>
+            <td>Búsqueda por alias</td>
+            <td class="no">No</td>
+            <td class="ok">Sí — inglés, catalán, variantes</td>
+          </tr>
+          <tr>
+            <td>Lógica de búsqueda</td>
+            <td>Inline en el componente</td>
+            <td class="ok">Encapsulada en el hook</td>
+          </tr>
+          <tr>
+            <td>Fallback externo</td>
+            <td class="no">No</td>
+            <td class="ok">Arquitectura lista (Edamam Fase 6)</td>
+          </tr>
+          <tr>
+            <td>Caché de usuario</td>
+            <td class="no">No</td>
+            <td class="ok">Zustand persist en localStorage</td>
+          </tr>
+          <tr>
+            <td>Detección de alérgenos</td>
+            <td>Matching parcial, 30 items</td>
+            <td class="ok">Matching exacto por nombre + alias, 239 items</td>
+          </tr>
+          <tr>
+            <td>Cumple rules.md §1</td>
+            <td class="no">No (lógica en componente)</td>
+            <td class="ok">Sí (Componente → Hook → Service)</td>
+          </tr>
+          <tr>
+            <td>Para conectar Edamam</td>
+            <td class="no">Refactor completo</td>
+            <td class="ok">Solo cambiar el cuerpo de buscarEdamam()</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── FASE 6 ── -->
+  <section class="card" id="fase6">
+    <div class="card-header">
+      <span class="icon">🔮</span>
+      <h2>Qué queda para Fase 6 (Edamam)</h2>
+      <span class="badge fase6">Fase 6</span>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:1rem;">
+
+      <p>
+        Toda la arquitectura está puesta. Para que Edamam funcione de verdad solo hace falta
+        <strong>un único cambio</strong> en un único fichero:
+      </p>
+
+      <pre><span class="comment">// src/services/ingredientesService.ts — solo cambiar esto:</span>
+buscarEdamam: <span class="kw">async</span> (query: <span class="kw">string</span>): <span class="type">Promise</span>&lt;<span class="type">DatoIngrediente</span>[]&gt; =&gt; {
+  <span class="comment">// FASE 6 — descomentar y mapear la respuesta de Edamam:</span>
+  <span class="comment">// const res = await apiClient.get('/ingredientes/buscar', { params: { q: query } })</span>
+  <span class="comment">// return res.data.map(mapEdamamToIngrediente)</span>
+  <span class="kw">return</span> []   <span class="comment">← borrar esta línea</span>
+}</pre>
+
+      <p>El backend necesitará un endpoint <code>GET /api/ingredientes/buscar?q=</code> que llame
+      a la Edamam Food Database API con <code>EDAMAM_APP_ID</code> y <code>EDAMAM_APP_KEY</code>.</p>
+
+      <p>Cuando el usuario seleccione un ingrediente de Edamam, se añade al store con
+      <code>useIngredientesCustomStore().añadir(ingrediente)</code> para que la próxima vez
+      aparezca sin red.</p>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span>
+          El tier gratuito de Edamam Food Database permite <strong>100 llamadas/mes</strong>.
+          El debounce de 300 ms + el umbral de ≥3 resultados locales protegen de
+          llamadas innecesarias — en la práctica, casi nunca se llegará a llamar a la API.
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>
