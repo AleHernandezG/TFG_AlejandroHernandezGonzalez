@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-import { NOMBRES_INGREDIENTES } from '../../data/datosIngredientes'
+import { useAutocompletadoIngredientes } from '@/features/recetas/hooks/useAutocompletadoIngredientes'
 import { UNIDADES_INGREDIENTE, type DatosCrearReceta } from '../../types/crearReceta.schema'
 
 export function SeccionIngredientes() {
@@ -15,23 +15,17 @@ export function SeccionIngredientes() {
   } = useFormContext<DatosCrearReceta>()
 
   const { fields, append, remove } = useFieldArray({ control, name: 'ingredientes' })
-  const [sugerencias, setSugerencias] = useState<{ idx: number; lista: string[] } | null>(null)
+  const [inputActivo, setInputActivo] = useState<{ idx: number; query: string } | null>(null)
+  const { sugerencias } = useAutocompletadoIngredientes(inputActivo?.query ?? '')
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   function handleNombreChange(idx: number, valor: string) {
-    if (valor.length < 2) {
-      setSugerencias(null)
-      return
-    }
-    const filtradas = NOMBRES_INGREDIENTES.filter((n) =>
-      n.toLowerCase().includes(valor.toLowerCase())
-    ).slice(0, 6)
-    setSugerencias(filtradas.length > 0 ? { idx, lista: filtradas } : null)
+    setInputActivo(valor.length >= 2 ? { idx, query: valor } : null)
   }
 
   function seleccionarSugerencia(idx: number, nombre: string) {
     setValue(`ingredientes.${idx}.nombre`, nombre, { shouldValidate: true })
-    setSugerencias(null)
+    setInputActivo(null)
   }
 
   return (
@@ -58,7 +52,7 @@ export function SeccionIngredientes() {
                   name={name}
                   ref={(el) => { rhfRef(el); inputRefs.current[i] = el }}
                   onChange={(e) => { rhfOnChange(e); handleNombreChange(i, e.target.value) }}
-                  onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setSugerencias(null), 150) }}
+                  onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setInputActivo(null), 150) }}
                   placeholder="Ej. Harina"
                   autoComplete="off"
                   className={[
@@ -68,15 +62,15 @@ export function SeccionIngredientes() {
                     errors.ingredientes?.[i]?.nombre ? 'border-destructive' : 'border-border',
                   ].join(' ')}
                 />
-                {sugerencias?.idx === i && (
+                {sugerencias.length > 0 && inputActivo?.idx === i && (
                   <ul className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 overflow-hidden">
-                    {sugerencias.lista.map((s) => (
+                    {sugerencias.map((s) => (
                       <li
-                        key={s}
-                        onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s) }}
+                        key={s.nombre}
+                        onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s.nombre) }}
                         className="px-3 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
                       >
-                        {s}
+                        {s.nombre}
                       </li>
                     ))}
                   </ul>

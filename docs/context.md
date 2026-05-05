@@ -59,6 +59,8 @@
 - ✅ [COM-001] Añadir comentarios con optimistic update — aparece en lista local inmediatamente, rollback en onError, `router.refresh()` en onSuccess sincroniza conteo real desde BD
 - ✅ [SOC-001] Botón Seguir/Siguiendo con estado inicial correcto — `export const dynamic = 'force-dynamic'` en page.tsx evita render cacheado con `sigueAlAutor: false`; `router.refresh()` sincroniza tras toggle
 - ✅ [DET-003] Botón Compartir funcional — `navigator.share()` en móvil (share sheet nativo del SO), fallback `navigator.clipboard.writeText()` en escritorio con feedback visual "¡Copiado!" 2 s. Sin BE, sin nuevo hook.
+- ✅ [UI-029] Tarjeta fantasma "+ Nueva receta" en Mis Recetas — primera celda del grid en `/coleccion` (pestaña `mis-recetas`), `aspect-[3/4]` borde punteado brand, icono Plus brand, enlaza a `/crear-receta`. Solo en pestaña mis-recetas. Patrón contextual Pinterest/Airbnb (Opción D).
+- ✅ [INGR-001 + ALERG-002] Ingredientes reales — `src/config/ingredientes.ts` con 200+ ingredientes (17 categorías), aliases multilingüe (ES/EN/CA), alérgenos EU completos. `buscarIngredientes()` sustituye filtro manual. `detectarAlergenos.ts` re-exporta desde config (fuente única). `datosIngredientes.ts` eliminado.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
@@ -294,7 +296,7 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003.
+Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003, UI-029.
 
 Sprint 3 completados (referencia): UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
 
@@ -303,3 +305,13 @@ Sprint 4 — pendientes:
 - **FE:** UI-018 — Formulario multi-step crear receta (👁️ pendiente revisión final)
 - **FE:** STRUCT-001 — Scaffolding vistas Sprint 3+ (👁️ pendiente revisión)
 - **FE+BE:** Vistas pendientes de Stitch: /despensa, /chat, /perfil, /discover
+- **FE+BE:** CREAR-002 — Publicar receta real: BE endpoint `POST /api/recetas` (controller + service + repository) + método `crear()` en `frontend/src/services/recetasService.ts` + subida foto (base64 en body) + reemplazar `setTimeout` mock en `previsualizacionReceta.tsx`. Depende de DEBT-009 (useCrearReceta hook).
+- **FE:** CREAR-001 — Tutorial crear receta activado por datos reales: mostrar PopUpTutorial solo si el usuario no tiene recetas creadas (`numRecetasCreadas === 0` desde BD). Actualmente `MOCK_ES_PRIMER_USUARIO = false` hardcodeado.
+- ~~**FE:** INGR-001 — Autocompletado ingredientes con fuente real~~ ✅ Completado: `@/config/ingredientes.ts` con 200+ ingredientes, aliases y alérgenos EU. `buscarIngredientes()` sustituye el filtro manual de 30 items.
+- ~~**FE:** ALERG-002 — Alérgenos desde la nueva fuente~~ ✅ Completado: `detectarAlergenos.ts` ahora re-exporta desde `@/config/ingredientes.ts`. Función usa `obtenerIngrediente()` con matching exacto + aliases.
+- **FE+BE:** DEBT-009 — Extraer `useCrearReceta` hook para separar lógica de envío del componente `formularioCrearReceta.tsx` y `previsualizacionReceta.tsx`.
+
+Sprint 5+ — pendientes:
+
+- **FE:** HANDS-001 — Modo manos libres: botón visible en preview y detalleReceta sin `onClick`. Feature TTS + avance por voz.
+- **FE+BE:** NUTR-001 — Información nutricional automática via Edamam API (Fase 6). Placeholder en preview y detalleReceta con "—".

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
 import { useCrearRecetaStore } from '@/stores/useCrearRecetaStore'
-import { detectarAlergenos } from '../../utils/detectarAlergenos'
+import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
 import { ETIQUETAS_DIFICULTAD } from '../../types/crearReceta.schema'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 
