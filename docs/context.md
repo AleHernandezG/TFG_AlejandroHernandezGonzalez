@@ -236,9 +236,9 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/coleccion` | Mi colección — Guardadas y Mis recetas, grid 2 cols portrait, stitch aprobado | ✅ Aprobado autor |
 | `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | ✅ Aprobado · Sprint 4 |
 | `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + publicar real | ✅ Aprobado · Sprint 4 |
-| `/despensa` | Despensa virtual — FE mock completa: lista ingredientes + añadir/editar/eliminar + Sheet + autocompletado + Dialog "ingrediente duplicado" (bloquea añadir si ya existe, case-insensitive) | 👁️ Pendiente revisión · Sprint 4 |
-| `/chat` | Chat IA — FE mock completa: estado vacío 3 chips, burbujas usuario/IA, IndicadorPensando, BarraInputChat auto-resize, chatStore Zustand mock 1.4s. HeaderChat: botón ← + título centrado + spacer (sin botón top-right historial) + pill "Ver historial" | 👁️ Pendiente revisión · Sprint 4 |
-| `/perfil` | Ajustes de usuario — FE mock: avatar card display-only (sin "Editar nombre"), cambiar contraseña (mock), preferencias+alérgenos chips, toggles permisos, cerrar sesión. Un solo botón CTA "Guardar cambios" full-width (sin "Volver") | 👁️ Pendiente revisión · Sprint 4 |
+| `/despensa` | Despensa virtual — FE mock completa: lista ingredientes + añadir/editar/eliminar + Sheet + autocompletado + Dialog "ingrediente duplicado" (bloquea añadir si ya existe, case-insensitive) | ✅ Aprobado autor · Sprint 4 |
+| `/chat` | Chat IA — FE mock completa: estado vacío 3 chips, burbujas usuario/IA, IndicadorPensando, BarraInputChat auto-resize, chatStore Zustand mock 1.4s. HeaderChat: botón ← + título centrado + spacer (sin botón top-right historial) + pill "Ver historial" | ✅ Aprobado autor · Sprint 4 |
+| `/perfil` | Ajustes de usuario — FE mock: avatar card display-only (sin "Editar nombre"), cambiar contraseña (mock), preferencias+alérgenos chips, toggles permisos, cerrar sesión. Un solo botón CTA "Guardar cambios" full-width (sin "Volver") | ✅ Aprobado autor · Sprint 4 |
 | `/discover` | Discover — feed global trending + eventos temáticos | ⏳ Sprint 5+ — pendiente Stitch |
 | `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | ✅ Aprobado · Sprint 4 |
 | `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | ✅ Aprobado · Sprint 4 |
@@ -304,9 +304,9 @@ Sprint 4 — pendientes sin comenzar:
 
 - ~~**FE:** UI-018 — Formulario multi-step crear receta~~ ✅ Aprobado.
 - ~~**FE:** STRUCT-001 — Scaffolding vistas Sprint 3+~~ ✅ Aprobado.
-- ~~**FE:** DESP-001 — Vista /despensa~~ 👁️ Pendiente revisión.
-- ~~**FE:** PERF-001 — Vista /perfil~~ 👁️ Pendiente revisión.
-- ~~**FE:** CHAT-001 — Vista /chat~~ 👁️ Pendiente revisión.
+- ~~**FE:** DESP-001 — Vista /despensa~~ ✅ Aprobado autor.
+- ~~**FE:** PERF-001 — Vista /perfil~~ ✅ Aprobado autor.
+- ~~**FE:** CHAT-001 — Vista /chat~~ ✅ Aprobado autor.
 - **FE+BE:** Vistas pendientes de Stitch: /discover
 - **FE:** CREAR-001 — Tutorial crear receta activado por datos reales: mostrar PopUpTutorial solo si el usuario no tiene recetas creadas (`numRecetasCreadas === 0` desde BD). Actualmente `MOCK_ES_PRIMER_USUARIO = false` hardcodeado.
 - ~~**FE:** INGR-001 — Autocompletado ingredientes con fuente real~~ ✅ Completado.
