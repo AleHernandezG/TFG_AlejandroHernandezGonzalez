@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { HeaderColeccion } from './headerColeccion'
 import { GridRecetasColeccion } from './gridRecetasColeccion'
 import { EstadoVacioMisRecetas } from './estadoVacioMisRecetas'
 import { EstadoVacioGuardadas } from './estadoVacioGuardadas'
-import { MIS_RECETAS, RECETAS_GUARDADAS } from '@/features/coleccion/data/datosColeccion'
+import { useRecetasGuardadas } from '@/features/coleccion/hooks/useRecetasGuardadas'
+import { useMisRecetas } from '@/features/coleccion/hooks/useMisRecetas'
 import type { PestanaColeccion } from '@/features/coleccion/types/coleccion.types'
 
 const variantesContenido: Variants = {
@@ -15,11 +17,28 @@ const variantesContenido: Variants = {
   salir: { opacity: 0, y: -6, transition: { duration: 0.15, ease: 'easeIn' } },
 }
 
-export function ContenidoColeccion() {
-  const [pestana, setPestana] = useState<PestanaColeccion>('guardadas')
+function GridSkeletonColeccion() {
+  return (
+    <div className="px-5 pt-8 pb-10 grid grid-cols-2 gap-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="aspect-[3/4] rounded-xl bg-muted animate-pulse" />
+      ))}
+    </div>
+  )
+}
 
-  const recetas = pestana === 'guardadas' ? RECETAS_GUARDADAS : MIS_RECETAS
-  const vacio = recetas.length === 0
+export function ContenidoColeccion() {
+  const searchParams = useSearchParams()
+  const tabInicial: PestanaColeccion =
+    searchParams.get('tab') === 'mis-recetas' ? 'mis-recetas' : 'guardadas'
+  const [pestana, setPestana] = useState<PestanaColeccion>(tabInicial)
+
+  const { data: guardadas = [], isLoading: cargandoGuardadas } = useRecetasGuardadas()
+  const { data: misRecetas = [], isLoading: cargandoMisRecetas } = useMisRecetas()
+
+  const recetas = pestana === 'guardadas' ? guardadas : misRecetas
+  const cargando = pestana === 'guardadas' ? cargandoGuardadas : cargandoMisRecetas
+  const vacio = !cargando && recetas.length === 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,7 +52,9 @@ export function ContenidoColeccion() {
           animate="visible"
           exit="salir"
         >
-          {vacio ? (
+          {cargando ? (
+            <GridSkeletonColeccion />
+          ) : vacio ? (
             pestana === 'guardadas' ? (
               <EstadoVacioGuardadas />
             ) : (

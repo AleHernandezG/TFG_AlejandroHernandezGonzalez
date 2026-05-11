@@ -1,1 +1,7 @@
-// Sprint 3+
+export { ContenidoChat } from './contenidoChat'
+export { HeaderChat } from './headerChat'
+export { EstadoVacioChat } from './estadoVacioChat'
+export { BurbujaUsuario } from './burbujaUsuario'
+export { BurbujaIA } from './burbujaIA'
+export { IndicadorPensando } from './indicadorPensando'
+export { BarraInputChat } from './barraInputChat'

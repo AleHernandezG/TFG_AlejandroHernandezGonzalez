@@ -3,13 +3,15 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Check, Heart, MessageCircle, Share2, UserCheck, UserPlus } from 'lucide-react'
+import { Check, Heart, MessageCircle, Share2, Trash2, UserCheck, UserPlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
 import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
 import { useToggleSeguir } from '@/features/recetas/hooks/useToggleSeguir'
+import { useEliminarReceta } from '@/features/coleccion/hooks/useEliminarReceta'
 import { useSession } from 'next-auth/react'
 import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
@@ -34,8 +36,10 @@ export function CabeceraReceta({ receta }: Props) {
   const [likes, setLikes] = useState(receta.likes)
   const [siguiendo, setSiguiendo] = useState(receta.sigueAlAutor)
   const [urlCopiada, setUrlCopiada] = useState(false)
+  const [confirmandoEliminar, setConfirmandoEliminar] = useState(false)
   const { mutate: mutarLike } = useToggleLike(receta.id)
   const { mutate: mutarSeguir, isPending: siguiendoPending } = useToggleSeguir(receta.autor.id, receta.id)
+  const { mutate: eliminar, isPending: eliminando } = useEliminarReceta()
 
   useEffect(() => {
     setLiked(receta.liked)
@@ -186,8 +190,53 @@ export function CabeceraReceta({ receta }: Props) {
             {urlCopiada ? <Check size={22} /> : <Share2 size={22} />}
             <span className="text-[10px] font-bold">{urlCopiada ? '¡Copiado!' : 'Compartir'}</span>
           </button>
+
+          {/* Eliminar — solo visible para el autor */}
+          {esPropiaReceta && session && (
+            <button
+              onClick={() => setConfirmandoEliminar(true)}
+              className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-destructive transition-colors"
+            >
+              <Trash2 size={22} />
+              <span className="text-[10px] font-bold">Eliminar</span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Dialog confirmación eliminar */}
+      <Dialog open={confirmandoEliminar} onOpenChange={setConfirmandoEliminar}>
+        <DialogContent className="max-w-sm rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle>¿Eliminar receta?</DialogTitle>
+            <DialogDescription>Esta acción no se puede deshacer.</DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setConfirmandoEliminar(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1"
+              disabled={eliminando}
+              onClick={() =>
+                eliminar(receta.id, {
+                  onSuccess: () => {
+                    setConfirmandoEliminar(false)
+                    router.push('/coleccion?tab=mis-recetas')
+                  },
+                })
+              }
+            >
+              {eliminando ? 'Eliminando...' : 'Eliminar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

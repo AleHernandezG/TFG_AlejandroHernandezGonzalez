@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vista Perfil — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-size: 0.78rem; color: #737373; margin-left: auto; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; margin-top: 1.25rem; }
+    h3:first-child { margin-top: 0; }
+
+    p { font-size: 0.85rem; color: #a3a3a3; margin-bottom: 0.75rem; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    .path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #60a5fa; }
+    .id   { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.76rem; color: #d4d4d4; overflow-x: auto; margin: 0.75rem 0; line-height: 1.8; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #1f1f1f; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.3rem; white-space: nowrap; }
+    .tag.done    { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+    .tag.review  { background: #f9731622; color: #fb923c;  border: 1px solid #f9731633; }
+    .tag.pending { background: #3b82f622; color: #60a5fa;  border: 1px solid #3b82f633; }
+    .tag.mock    { background: #eab30822; color: #fbbf24;  border: 1px solid #eab30833; }
+    .tag.fase5   { background: #8b5cf622; color: #c084fc;  border: 1px solid #8b5cf633; }
+    .tag.reuse   { background: #06b6d422; color: #22d3ee;  border: 1px solid #06b6d433; }
+
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .tree .new     { color: #4ade80; }
+    .tree .exists  { color: #737373; }
+    .tree .comment { color: #525252; font-style: italic; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { font-size: 0.72rem; font-weight: 700; color: #f97316; background: #f9731622; border: 1px solid #f9731633; border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; }
+    .step-txt { font-size: 0.84rem; color: #d4d4d4; }
+    .step-txt small { display: block; margin-top: 0.2rem; font-size: 0.76rem; color: #525252; }
+
+    .comp-list { display: flex; flex-direction: column; gap: 0; }
+    .comp-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid #1f1f1f; }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-name { font-family: monospace; font-size: 0.76rem; color: #60a5fa; min-width: 290px; }
+    .comp-desc { font-size: 0.8rem; color: #a3a3a3; flex: 1; }
+
+    .layer-row { display: flex; align-items: center; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid #1f1f1f; }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-label { font-size: 0.75rem; font-weight: 700; color: #f97316; min-width: 120px; }
+    .layer-detail { font-size: 0.8rem; color: #a3a3a3; }
+
+    .callout { background: #111; border-left: 3px solid #f97316; border-radius: 0 8px 8px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; font-size: 0.82rem; color: #a3a3a3; line-height: 1.7; }
+    .callout strong { color: #d4d4d4; }
+
+    .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .stat { background: #111; border: 1px solid #2a2a2a; border-radius: 10px; padding: 0.75rem 1.1rem; min-width: 110px; }
+    .stat .val { font-size: 1.4rem; font-weight: 800; color: #f97316; }
+    .stat .lbl { font-size: 0.7rem; color: #525252; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .section-card { background: #111; border: 1px solid #2a2a2a; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+    .section-card .sc-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; margin-bottom: 0.5rem; }
+    .section-card .sc-items { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+    .section-card .sc-items li { font-size: 0.8rem; color: #a3a3a3; padding-left: 1rem; position: relative; }
+    .section-card .sc-items li::before { content: '→'; position: absolute; left: 0; color: #525252; font-size: 0.72rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Vista Perfil — FE Mock</h1>
+  </div>
+  <span class="badge">PERF-001</span>
+  <div class="meta">Sprint 4 · 2026-05-08 · Fase 4 de 7</div>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#ficheros">Ficheros</a>
+  <a href="#store">Store Zustand</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#stitch">Diseño / Stitch</a>
+  <a href="#fase5">Fase 5</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen</h2>
+    </div>
+    <div class="section-body">
+      <div class="stat-row">
+        <div class="stat"><div class="val">11</div><div class="lbl">Ficheros creados</div></div>
+        <div class="stat"><div class="val">7</div><div class="lbl">Componentes</div></div>
+        <div class="stat"><div class="val">1</div><div class="lbl">Store Zustand</div></div>
+        <div class="stat"><div class="val">2</div><div class="lbl">Dialogs</div></div>
+      </div>
+      <p>
+        Implementación completa del FE mock de la vista <code>/perfil</code>. La pantalla de ajustes
+        permite al usuario ver y editar su nombre, cambiar su contraseña (simulado en Sprint 4),
+        gestionar sus preferencias dietéticas y alérgenos con chips, activar/desactivar permisos
+        del dispositivo con toggles accesibles, y cerrar sesión.
+      </p>
+      <p>
+        Toda la lógica vive en <code>perfilStore.ts</code> (Zustand en memoria). La integración real
+        con el backend se realizará en <strong>Fase 5</strong>. El cambio de contraseña real contra BE
+        se activará en Fase 5 (PUT /api/usuarios/me/contrasena).
+      </p>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header">
+      <span class="section-icon">🏗️</span>
+      <h2>Arquitectura de capas</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Mismo patrón que /despensa: <strong>Page (SC) → ContenidoPerfil (CC) → Store</strong>.
+        La página es un Server Component que solo decide el layout mobile/desktop.
+      </p>
+
+      <div style="margin: 1rem 0;">
+        <div class="layer-row">
+          <span class="layer-label">Page (SC)</span>
+          <span class="layer-detail"><code>app/(main)/perfil/page.tsx</code> — layout mobile (<code>lg:hidden</code>) / desktop (<code>SidebarNavPc</code> + <code>max-w-lg</code>)</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Orquestador (CC)</span>
+          <span class="layer-detail"><code>ContenidoPerfil</code> — consume store, gestiona <code>dialogContrasena</code> y <code>dialogPreferencias</code> (booleans)</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Store</span>
+          <span class="layer-detail"><code>usePerfilStore</code> (Zustand) — nombre, email, avatar, dietas[], alergenos[], permisos{}</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Datos mock</span>
+          <span class="layer-detail"><code>datosPerfil.ts</code> — usuario inicial con datos de prueba</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Reutilizados</span>
+          <span class="layer-detail"><code>ALERGENOS_OPCIONES</code> + <code>DIETAS_OPCIONES</code> de <code>config/opcionesUsuario.ts</code> · <code>SidebarNavPc</code> de recetas</span>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>signOut de NextAuth:</strong> el botón "Cerrar sesión" llama directamente a
+        <code>signOut({ callbackUrl: '/login' })</code> de <code>next-auth/react</code> — no hay
+        store ni servicio intermedio, ya que la sesión la gestiona NextAuth, no Zustand.
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHEROS -->
+  <section id="ficheros">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Estructura de ficheros creados</h2>
+    </div>
+    <div class="section-body">
+      <div class="tree">
+        <div><span class="exists">frontend/src/</span></div>
+        <div style="padding-left:1.2rem"><span class="exists">app/(main)/perfil/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">page.tsx</span> <span class="comment">— reemplaza placeholder "Próximamente"</span></div>
+        <div style="padding-left:1.2rem"><span class="new">features/perfil/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">types/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">perfil.types.ts</span> <span class="comment">— PermisoKey · PermisosPerfil · DatosPerfil</span></div>
+        <div style="padding-left:2.4rem"><span class="new">data/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">datosPerfil.ts</span> <span class="comment">— mock usuario inicial</span></div>
+        <div style="padding-left:2.4rem"><span class="new">components/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">index.ts</span> <span class="comment">— barrel exports</span></div>
+        <div style="padding-left:3.6rem"><span class="new">contenidoPerfil.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">tarjetaAvatarPerfil.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">grupoAjustes.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">filaAjuste.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">filaTogglePermiso.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">dialogCambiarContrasena.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">dialogPreferenciasAlergenos.tsx</span></div>
+        <div style="padding-left:1.2rem"><span class="new">stores/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">perfilStore.ts</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORE ZUSTAND -->
+  <section id="store">
+    <div class="section-header">
+      <span class="section-icon">🗃️</span>
+      <h2>Store Zustand — perfilStore</h2>
+    </div>
+    <div class="section-body">
+      <h3>Shape del estado</h3>
+      <pre>
+interface PerfilState {
+  nombre:    string
+  email:     string
+  avatar:    string | null
+  dietas:    string[]
+  alergenos: string[]
+  permisos:  { ubicacion: boolean; camara: boolean; notificaciones: boolean }
+  actualizarNombre:    (nombre: string) => void
+  actualizarAvatar:    (url: string) => void
+  actualizarDietas:    (dietas: string[]) => void
+  actualizarAlergenos: (alergenos: string[]) => void
+  togglePermiso:       (key: PermisoKey) => void
+}</pre>
+
+      <h3>Datos mock iniciales</h3>
+      <pre>
+export const DATOS_PERFIL_MOCK: DatosPerfil = {
+  nombre:    'Alejandro Hernández',
+  email:     'alejeshernandez0407@gmail.com',
+  avatar:    null,
+  dietas:    ['mediterranea'],
+  alergenos: ['lacteos', 'huevo'],
+  permisos:  { ubicacion: true, camara: false, notificaciones: true },
+}</pre>
+
+      <h3>Decisiones de diseño</h3>
+      <table>
+        <thead>
+          <tr><th>Decisión</th><th>Alternativa descartada</th><th>Por qué</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Zustand sin <code>persist</code></td>
+            <td>LocalStorage</td>
+            <td>Sprint 4 es mock. Los datos reales vendrán del BE en Fase 5</td>
+          </tr>
+          <tr>
+            <td><code>togglePermiso(key)</code> genérico</td>
+            <td>3 acciones separadas</td>
+            <td>Evita duplicar la misma lógica <code>!prev[key]</code> tres veces</td>
+          </tr>
+          <tr>
+            <td><code>signOut</code> directo en componente</td>
+            <td>Acción en store</td>
+            <td>La sesión la gestiona NextAuth, no Zustand. No tiene sentido delegar a un store que no la controla</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header">
+      <span class="section-icon">🧩</span>
+      <h2>Componentes</h2>
+    </div>
+    <div class="section-body">
+      <div class="comp-list">
+        <div class="comp-row">
+          <span class="comp-name">contenidoPerfil.tsx<br/><span style="color:#525252; font-size:0.68rem;">Client Component</span></span>
+          <span class="comp-desc">
+            Orquestador principal. Importa el store, gestiona dos booleans de dialogs
+            (<code>dialogContrasena</code>, <code>dialogPreferencias</code>). Renderiza en orden:
+            header sticky glassmorphism → <code>TarjetaAvatarPerfil</code> → 3 <code>GrupoAjustes</code>
+            → botón único "Guardar cambios" (full-width, <code>bg-brand rounded-full</code>, llama a <code>router.back()</code>)
+            → footer version → 2 dialogs. El botón "Volver" outline fue eliminado — solo existe el CTA de guardar.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">tarjetaAvatarPerfil.tsx</span>
+          <span class="comp-desc">
+            Card con fondo <code>var(--warm-bg)</code> + gradiente decorativo. Muestra avatar 80px
+            (con <code>UserCircle2</code> de fallback si <code>avatar === null</code>) + botón cámara
+            superpuesto (icono decorativo, sin lógica en Sprint 4) + nombre en negrita + email muted.
+            <strong>Componente puramente de presentación</strong> — no tiene <code>useState</code>
+            ni Dialog. El botón "Editar nombre" y el Dialog de edición inline fueron eliminados.
+            Props: <code>nombre</code>, <code>email</code>, <code>avatar</code> (sin <code>onGuardarNombre</code>).
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">grupoAjustes.tsx</span>
+          <span class="comp-desc">
+            Contenedor genérico: recibe un <code>titulo: string</code> y <code>children: ReactNode</code>.
+            Renderiza el label de sección en uppercase/tracking y una card <code>bg-card rounded-2xl</code>
+            con sombra ambiente. No tiene lógica propia — es puramente presentacional.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">filaAjuste.tsx</span>
+          <span class="comp-desc">
+            Fila genérica de ajuste de tipo "navegar". Props: <code>icono: LucideIcon</code>,
+            <code>label</code>, <code>onClick</code>, <code>separador?: boolean</code>.
+            Muestra el icono muted + label + chevron derecha. Hover → <code>bg-[var(--warm-bg)]</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">filaTogglePermiso.tsx</span>
+          <span class="comp-desc">
+            Fila con toggle accesible: usa <code>role="switch"</code> + <code>aria-checked</code> en
+            lugar del elemento <code>&lt;input type="checkbox"&gt;</code> invisible. El switch está
+            implementado con Tailwind puro (sin shadcn Switch que no está instalado): círculo blanco
+            que se traslada de <code>translate-x-[2px]</code> a <code>translate-x-[22px]</code> con
+            <code>transition-transform</code>. Color activo: <code>bg-brand</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">dialogCambiarContrasena.tsx</span>
+          <span class="comp-desc">
+            Dialog shadcn con formulario RHF + Zod. Schema: contraseña actual (mínimo 1 char) +
+            nueva (mín. 8 chars, 1 letra, 1 número) + confirmar (debe coincidir con nueva).
+            En Sprint 4 el <code>onSubmit</code> es mock: <code>await setTimeout(600ms)</code> y muestra
+            estado éxito con <code>CheckCircle2</code>. El submit real contra
+            <code>PUT /api/usuarios/me/contrasena</code> se activará en Fase 5.
+            Ambos campos de contraseña tienen botón toggle de visibilidad.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">dialogPreferenciasAlergenos.tsx</span>
+          <span class="comp-desc">
+            Dialog shadcn con <code>max-h-[85vh] overflow-y-auto</code> (scrollable en móvil).
+            Dos secciones: chips de <strong>Dieta</strong> (10 opciones de <code>DIETAS_OPCIONES</code>)
+            y chips de <strong>Alérgenos</strong> (14 opciones de <code>ALERGENOS_OPCIONES</code> con imagen webp).
+            Usa estado local <code>draft</code> hasta que el usuario pulsa "Guardar preferencias",
+            que llama a <code>onGuardar(dietas, alergenos)</code> y actualiza el store.
+            Reutiliza directamente las constantes de <code>config/opcionesUsuario.ts</code>.
+          </span>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Componentes genéricos reutilizables:</strong> <code>GrupoAjustes</code>,
+        <code>FilaAjuste</code> y <code>FilaTogglePermiso</code> no tienen lógica de perfil —
+        son primitivos de layout. Si en el futuro se implementan más secciones de ajustes
+        (/notificaciones, /privacidad), podrían moverse a <code>components/common/</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJOS DE INTERACCIÓN -->
+  <section id="flujos">
+    <div class="section-header">
+      <span class="section-icon">↔️</span>
+      <h2>Flujos de interacción</h2>
+    </div>
+    <div class="section-body">
+
+      <h3 style="color:#525252; text-decoration:line-through;">Editar nombre <span style="font-size:0.7rem; text-decoration:none;">(eliminado — Sprint 4)</span></h3>
+      <p style="font-size:0.8rem; color:#525252; margin-bottom:1rem;">
+        La funcionalidad "Editar nombre" fue retirada de <code>TarjetaAvatarPerfil</code> en Sprint 4.
+        El nombre se mostrará como dato de solo lectura hasta que se implemente la edición de perfil
+        completa contra el backend en Fase 5.
+      </p>
+
+      <h3 style="margin-top:1.5rem;">Cambiar contraseña (mock Sprint 4)</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa "Cambiar contraseña"
+          <small>ContenidoPerfil → setDialogContrasena(true)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">Dialog con 3 campos: contraseña actual + nueva + confirmar</div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">Submit valida con Zod → <code>isSubmitting</code> 600ms → muestra estado éxito
+          <small>Sprint 4: mock. Fase 5: PUT /api/usuarios/me/contrasena</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">Botón "Cerrar" resetea el form y cierra el dialog</div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Cambiar preferencias y alérgenos</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa "Cambiar preferencias y alérgenos"
+          <small>ContenidoPerfil → setDialogPreferencias(true)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">Dialog abre con estado draft inicializado desde el store</div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">Usuario activa/desactiva chips de dieta y alérgenos
+          <small>Cambios en estado draft local del dialog — no afectan al store hasta confirmar</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">Usuario pulsa "Guardar preferencias"
+          <small>onGuardar(dietas, alergenos) → store.actualizarDietas() + store.actualizarAlergenos()</small></div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Toggle de permiso</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa el toggle en cualquier fila de la sección "Permisos"
+          <small>FilaTogglePermiso → onToggle() → store.togglePermiso('ubicacion'|'camara'|'notificaciones')</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">El store actualiza el campo correspondiente en <code>permisos</code> — el toggle se anima inmediatamente</div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Cerrar sesión</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa "Cerrar sesión" (rojo)
+          <small>handleCerrarSesion() → signOut({ callbackUrl: '/login' }) de next-auth/react</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">NextAuth destruye la sesión y redirige a /login</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISEÑO / STITCH -->
+  <section id="stitch">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <h2>Diseño — referencia Stitch</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        El stitch de /perfil sigue el mismo sistema editorial "The Digital Gourmet" que el resto de vistas.
+        Traducciones de Stitch a Cookr:
+      </p>
+      <table>
+        <thead>
+          <tr><th>Stitch muestra</th><th>Cookr implementa</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Header sticky con glassmorphism</td>
+            <td><code>bg-background/80 backdrop-blur-md border-b border-border/30</code></td>
+          </tr>
+          <tr>
+            <td>Profile card con fondo crema y gradiente decorativo</td>
+            <td><code>bg-[var(--warm-bg)]</code> + <code>bg-gradient-to-br from-[var(--warm-bg-accent)]</code></td>
+          </tr>
+          <tr>
+            <td>Avatar con borde naranja y botón cámara</td>
+            <td><code>border-2 border-brand/30</code> + <code>Camera</code> icon (Lucide) en <code>bg-card rounded-full</code></td>
+          </tr>
+          <tr>
+            <td>Groups card fondo blanco con sombra ambient</td>
+            <td><code>bg-card rounded-2xl shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]</code></td>
+          </tr>
+          <tr>
+            <td>Toggle ON con color naranja primario</td>
+            <td><code>bg-brand</code> cuando activo, <code>bg-muted</code> cuando inactivo</td>
+          </tr>
+          <tr>
+            <td>Botón CTA naranja con gradiente "Guardar"</td>
+            <td><code>bg-brand text-brand-foreground rounded-full w-full</code> — único botón de acción (sin "Volver" outline)</td>
+          </tr>
+          <tr>
+            <td>"Cerrar sesión" en rojo destructive, centrado</td>
+            <td><code>text-destructive hover:bg-destructive/5</code></td>
+          </tr>
+          <tr>
+            <td>Label de grupo en uppercase gris pequeño</td>
+            <td><code>text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>No-Line Rule:</strong> las separaciones entre grupos de ajustes se consiguen con
+        el cambio de fondo (<code>bg-background</code> → <code>bg-card</code>), no con bordes de 1px.
+        Solo se usa <code>border-b border-border/20</code> entre filas del mismo grupo, donde
+        la separación es necesaria para distinguir ítems adyacentes.
+      </div>
+    </div>
+  </section>
+
+  <!-- FASE 5 -->
+  <section id="fase5">
+    <div class="section-header">
+      <span class="section-icon">🔌</span>
+      <h2>Integración BE — Fase 5</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr><th>Fichero / Endpoint</th><th>Cambio necesario</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="path">stores/perfilStore.ts</td>
+            <td>Cargar datos del usuario real desde <code>GET /api/usuarios/me</code> al montar. Acciones de editar invocan al servicio antes de actualizar el store (optimista o secuencial).</td>
+          </tr>
+          <tr>
+            <td class="path">services/perfilService.ts</td>
+            <td>Crear con métodos: <code>getMiPerfil()</code>, <code>actualizarNombre(nombre)</code>, <code>cambiarContrasena(actual, nueva)</code>, <code>actualizarPreferencias(dietas, alergenos)</code>.</td>
+          </tr>
+          <tr>
+            <td class="path">features/perfil/hooks/usePerfil.ts</td>
+            <td>Opcionalmente crear hook TanStack Query para <code>getMiPerfil()</code> con <code>staleTime</code> largo (el perfil cambia poco).</td>
+          </tr>
+          <tr>
+            <td class="path">dialogCambiarContrasena.tsx</td>
+            <td>Reemplazar <code>setTimeout mock</code> por llamada a <code>perfilService.cambiarContrasena()</code>. Manejar 400 (contraseña incorrecta) con mensaje de error.</td>
+          </tr>
+          <tr>
+            <td class="path">BE PUT /api/usuarios/me/contrasena</td>
+            <td>Endpoint nuevo: verifica <code>bcrypt.compare(contrasenaActual)</code>, hashea nueva y actualiza en BD.</td>
+          </tr>
+          <tr>
+            <td class="path">BE PUT /api/usuarios/me/preferencias</td>
+            <td>Guarda <code>dietas[]</code> y <code>alergenos[]</code> en el documento usuario de MongoDB.</td>
+          </tr>
+          <tr>
+            <td class="path">data/datosPerfil.ts</td>
+            <td>Puede quedar como fallback offline o eliminarse cuando el BE siempre esté disponible.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Sesión NextAuth:</strong> cuando el BE integre el perfil real, el callback <code>session</code>
+        de <code>lib/auth.ts</code> debe enriquecer el token con <code>nombre</code>, <code>avatar</code>,
+        <code>dietas</code> y <code>alergenos</code> para que el store pueda inicializarse desde la sesión
+        en lugar de hacer un fetch adicional en cada montaje.
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

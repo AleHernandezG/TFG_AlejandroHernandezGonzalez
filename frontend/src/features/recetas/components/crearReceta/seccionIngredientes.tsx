@@ -32,105 +32,110 @@ export function SeccionIngredientes() {
     <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
       <h2 className="text-base font-extrabold text-foreground mb-4">Ingredientes</h2>
 
-      {/* Cabecera columnas */}
-      <div className="grid grid-cols-[1fr_80px_90px_28px] gap-2 mb-2 px-1">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nombre</span>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cantidad</span>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Unidad</span>
-        <span />
-      </div>
-
       <div className="space-y-3">
         {fields.map((field, i) => {
           const { ref: rhfRef, onChange: rhfOnChange, onBlur: rhfOnBlur, name } = register(`ingredientes.${i}.nombre`)
           return (
-          <div key={field.id} className="relative">
-            <div className="grid grid-cols-[1fr_80px_90px_28px] gap-2 items-start">
-              {/* Nombre con autocompletado */}
-              <div className="relative">
-                <input
-                  name={name}
-                  ref={(el) => { rhfRef(el); inputRefs.current[i] = el }}
-                  onChange={(e) => { rhfOnChange(e); handleNombreChange(i, e.target.value) }}
-                  onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setInputActivo(null), 150) }}
-                  placeholder="Ej. Harina"
-                  autoComplete="off"
-                  className={[
-                    'w-full bg-background border rounded-xl px-3 py-2.5 text-sm text-foreground',
-                    'placeholder:text-muted-foreground',
-                    'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                    errors.ingredientes?.[i]?.nombre ? 'border-destructive' : 'border-border',
-                  ].join(' ')}
-                />
-                {sugerencias.length > 0 && inputActivo?.idx === i && (
-                  <ul className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 overflow-hidden">
-                    {sugerencias.map((s) => (
-                      <li
-                        key={s.nombre}
-                        onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s.nombre) }}
-                        className="px-3 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
-                      >
-                        {s.nombre}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            <div key={field.id} className="relative">
+              {/* Card por ingrediente */}
+              <div className={[
+                'rounded-xl bg-background border overflow-hidden',
+                (errors.ingredientes?.[i]?.nombre || errors.ingredientes?.[i]?.cantidad || errors.ingredientes?.[i]?.unidad)
+                  ? 'border-destructive'
+                  : 'border-border',
+              ].join(' ')}>
+
+                {/* Fila 1: Nombre + Trash */}
+                <div className="flex items-center gap-2 px-4 relative">
+                  <div className="flex-1 relative">
+                    <input
+                      name={name}
+                      ref={(el) => { rhfRef(el); inputRefs.current[i] = el }}
+                      onChange={(e) => { rhfOnChange(e); handleNombreChange(i, e.target.value) }}
+                      onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setInputActivo(null), 150) }}
+                      placeholder="Ej. Harina de trigo"
+                      autoComplete="off"
+                      className="w-full h-12 bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    />
+                    {sugerencias.length > 0 && inputActivo?.idx === i && (
+                      <ul className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 overflow-hidden">
+                        {sugerencias.map((s) => (
+                          <li
+                            key={s.nombre}
+                            onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s.nombre) }}
+                            className="px-4 py-3 text-sm text-foreground hover:bg-muted cursor-pointer"
+                          >
+                            {s.nombre}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  {fields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => remove(i)}
+                      className="shrink-0 text-muted-foreground hover:text-destructive transition-colors p-1"
+                      aria-label="Eliminar ingrediente"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Separador */}
+                <div className="h-px bg-border/50" />
+
+                {/* Fila 2: Cantidad + Unidad */}
+                <div className="flex divide-x divide-border/50">
+                  <div className="flex-1 px-4 py-1">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
+                      Cantidad
+                    </span>
+                    <input
+                      {...register(`ingredientes.${i}.cantidad`)}
+                      placeholder="100"
+                      inputMode="decimal"
+                      className={[
+                        'w-full h-10 bg-transparent text-sm text-foreground',
+                        'placeholder:text-muted-foreground focus:outline-none',
+                        errors.ingredientes?.[i]?.cantidad ? 'text-destructive' : '',
+                      ].join(' ')}
+                    />
+                  </div>
+                  <div className="flex-1 px-4 py-1">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
+                      Unidad
+                    </span>
+                    <select
+                      {...register(`ingredientes.${i}.unidad`)}
+                      className={[
+                        'w-full h-10 bg-transparent text-sm text-foreground focus:outline-none',
+                        errors.ingredientes?.[i]?.unidad ? 'text-destructive' : '',
+                      ].join(' ')}
+                    >
+                      <option value="">–</option>
+                      {UNIDADES_INGREDIENTE.map((u) => (
+                        <option key={u} value={u}>
+                          {u}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {/* Cantidad */}
-              <input
-                {...register(`ingredientes.${i}.cantidad`)}
-                placeholder="100"
-                inputMode="decimal"
-                className={[
-                  'w-full bg-background border rounded-xl px-3 py-2.5 text-sm text-foreground text-center',
-                  'placeholder:text-muted-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                  errors.ingredientes?.[i]?.cantidad ? 'border-destructive' : 'border-border',
-                ].join(' ')}
-              />
-
-              {/* Unidad */}
-              <select
-                {...register(`ingredientes.${i}.unidad`)}
-                className={[
-                  'w-full bg-background border rounded-xl px-2 py-2.5 text-sm text-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                  errors.ingredientes?.[i]?.unidad ? 'border-destructive' : 'border-border',
-                ].join(' ')}
-              >
-                <option value="">–</option>
-                {UNIDADES_INGREDIENTE.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
-
-              {/* Eliminar */}
-              {fields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => remove(i)}
-                  className="text-muted-foreground hover:text-destructive transition-colors p-0.5 mt-2"
-                  aria-label="Eliminar ingrediente"
-                >
-                  <Trash2 size={16} />
-                </button>
+              {/* Error inline */}
+              {(errors.ingredientes?.[i]?.nombre ||
+                errors.ingredientes?.[i]?.cantidad ||
+                errors.ingredientes?.[i]?.unidad) && (
+                <p className="text-xs text-destructive mt-1 pl-1">
+                  {errors.ingredientes?.[i]?.nombre?.message ||
+                    errors.ingredientes?.[i]?.cantidad?.message ||
+                    errors.ingredientes?.[i]?.unidad?.message}
+                </p>
               )}
             </div>
-
-            {/* Errores fila */}
-            {(errors.ingredientes?.[i]?.nombre ||
-              errors.ingredientes?.[i]?.cantidad ||
-              errors.ingredientes?.[i]?.unidad) && (
-              <p className="text-xs text-destructive mt-1 pl-1">
-                {errors.ingredientes?.[i]?.nombre?.message ||
-                  errors.ingredientes?.[i]?.cantidad?.message ||
-                  errors.ingredientes?.[i]?.unidad?.message}
-              </p>
-            )}
-          </div>
           )
         })}
       </div>

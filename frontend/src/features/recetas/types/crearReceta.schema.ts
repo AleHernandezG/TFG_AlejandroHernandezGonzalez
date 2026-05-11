@@ -34,6 +34,20 @@ export const esquemaCrearReceta = z.object({
 
 export type DatosCrearReceta = z.infer<typeof esquemaCrearReceta>
 
+export interface DatosRecetaNueva {
+  titulo: string
+  descripcion: string
+  tiempo: number
+  unidadTiempo: 'min' | 'h'
+  porciones: number
+  dificultad: 'facil' | 'media' | 'dificil'
+  dietas: string[]
+  alergenos: string[]
+  ingredientes: { nombre: string; cantidad: string; unidad: string }[]
+  pasos: { texto: string }[]
+  imagenBase64?: string
+}
+
 export type DificultadInterna = 'facil' | 'media' | 'dificil'
 
 export const ETIQUETAS_DIFICULTAD: Record<DificultadInterna, string> = {
@@ -43,11 +57,16 @@ export const ETIQUETAS_DIFICULTAD: Record<DificultadInterna, string> = {
 }
 
 export const UNIDADES_INGREDIENTE = [
-  'g',
-  'kg',
-  'ml',
-  'l',
-  'cucharada',
-  'unidad',
+  // Peso
+  'g', 'kg', 'mg',
+  // Volumen
+  'ml', 'cl', 'dl', 'l',
+  // Medidas de cocina
+  'cucharadita', 'cucharada', 'taza', 'pizca',
+  // Conteo
+  'unidad', 'diente', 'hoja', 'rama', 'rebanada',
+  // Envases
+  'lata', 'sobre', 'bolsa',
+  // Impreciso
   'al gusto',
 ] as const

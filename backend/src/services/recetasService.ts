@@ -1,5 +1,5 @@
 import { recetaRepository } from "../repositories/recetaRepository";
-import { FiltrosFeed } from "../types/receta";
+import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
 
 export const recetasService = {
   async obtenerFeed(filtros: FiltrosFeed, usuarioId?: string) {
@@ -34,5 +34,26 @@ export const recetasService = {
       throw Object.assign(new Error("El comentario no puede superar 500 caracteres"), { status: 400 });
     }
     return recetaRepository.agregarComentario(recetaId, usuarioId, texto);
+  },
+
+  async obtenerGuardadas(usuarioId: string) {
+    return recetaRepository.findGuardadas(usuarioId);
+  },
+
+  async obtenerMisRecetas(usuarioId: string) {
+    return recetaRepository.findPorAutor(usuarioId);
+  },
+
+  async crear(datos: DatosCrearRecetaBody, autorId: string) {
+    return recetaRepository.crear(datos, autorId);
+  },
+
+  async eliminar(recetaId: string, usuarioId: string) {
+    try {
+      await recetaRepository.eliminar(recetaId, usuarioId);
+    } catch (err) {
+      const e = err as Error & { status?: number };
+      throw Object.assign(new Error(e.message), { status: e.status ?? 500 });
+    }
   },
 };

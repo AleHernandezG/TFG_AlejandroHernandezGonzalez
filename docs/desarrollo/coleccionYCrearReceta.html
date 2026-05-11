@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sprint 4 — Colección + Crear Receta Real | Cookr TFG</title>
+  <style>
+    :root {
+      --brand: #c97a2c;
+      --bg: #faf9f7;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --code-bg: #f3f4f6;
+      --success: #16a34a;
+      --warning: #d97706;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #1f2937; line-height: 1.6; }
+    header { background: var(--brand); color: white; padding: 2rem 2.5rem; }
+    header h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: .25rem; }
+    header p { opacity: .85; font-size: .95rem; }
+    nav { background: white; border-bottom: 1px solid var(--border); padding: .75rem 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { color: var(--brand); text-decoration: none; font-size: .875rem; font-weight: 600; }
+    nav a:hover { text-decoration: underline; }
+    main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+    section { margin-bottom: 3rem; }
+    h2 { font-size: 1.4rem; font-weight: 800; color: #111; margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--brand); }
+    h3 { font-size: 1.1rem; font-weight: 700; color: #374151; margin: 1.25rem 0 .5rem; }
+    h4 { font-size: .95rem; font-weight: 700; color: var(--brand); margin: 1rem 0 .4rem; }
+    p { margin-bottom: .75rem; color: #374151; }
+    code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: .15em .4em; font-size: .875em; font-family: 'Cascadia Code', 'Fira Code', monospace; color: #c7254e; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; margin: .75rem 0 1rem; font-size: .82rem; line-height: 1.65; }
+    pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+    .badge { display: inline-block; padding: .2em .65em; border-radius: 999px; font-size: .75rem; font-weight: 700; }
+    .badge-be { background: #dbeafe; color: #1d4ed8; }
+    .badge-fe { background: #dcfce7; color: #15803d; }
+    .badge-new { background: #fef3c7; color: #b45309; }
+    .badge-mod { background: #f3e8ff; color: #7e22ce; }
+    .badge-del { background: #fee2e2; color: #b91c1c; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+    .card h4 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; margin: .75rem 0 1rem; }
+    th { background: var(--code-bg); text-align: left; padding: .5rem .75rem; border: 1px solid var(--border); font-weight: 700; }
+    td { padding: .45rem .75rem; border: 1px solid var(--border); vertical-align: top; }
+    tr:nth-child(even) { background: #f9fafb; }
+    .flow { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; padding: .75rem 1rem; background: var(--code-bg); border-radius: 8px; font-size: .875rem; margin: .75rem 0; }
+    .flow span { background: white; border: 1px solid var(--border); border-radius: 6px; padding: .25rem .65rem; font-weight: 600; }
+    .flow .arrow { color: var(--muted); font-size: 1.2rem; }
+    .callout { background: #fffbeb; border-left: 4px solid var(--warning); padding: .9rem 1.1rem; border-radius: 0 8px 8px 0; margin: .75rem 0; font-size: .875rem; }
+    .callout.success { background: #f0fdf4; border-color: var(--success); }
+    ul { padding-left: 1.5rem; margin-bottom: .75rem; }
+    li { margin-bottom: .3rem; }
+    .file-list { list-style: none; padding: 0; }
+    .file-list li { display: flex; align-items: flex-start; gap: .5rem; padding: .35rem 0; border-bottom: 1px solid var(--border); font-size: .875rem; }
+    .file-list li:last-child { border-bottom: none; }
+    footer { text-align: center; padding: 2rem; color: var(--muted); font-size: .8rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Sprint 4 — Colección &amp; Crear Receta Real</h1>
+  <p>Cookr TFG · Implementación completa: BE endpoints + FE hooks + FE componentes</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#backend">Backend</a>
+  <a href="#services">Services FE</a>
+  <a href="#hooks">Hooks FE</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#flujos">Flujos de uso</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#notas">Notas técnicas</a>
+</nav>
+
+<main>
+
+<!-- ──────────────────── RESUMEN ──────────────────── -->
+<section id="resumen">
+  <h2>Resumen ejecutivo</h2>
+  <p>
+    Este sprint conecta las vistas de <strong>Colección</strong> (<em>Guardadas</em> y <em>Mis Recetas</em>)
+    con datos reales del backend, e implementa el flujo completo de <strong>creación de receta</strong>
+    incluyendo persistencia en MongoDB. Se reemplazaron todos los datos mock por llamadas HTTP reales.
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Tareas completadas</h4>
+      <ul>
+        <li>COL-001 · GET /api/recetas/guardadas</li>
+        <li>COL-002 · GET /api/recetas/mis-recetas</li>
+        <li>COL-007 · DELETE /api/recetas/:id</li>
+        <li>API-013 · POST /api/recetas (crear)</li>
+        <li>COL-004 · Colección conectada a BE</li>
+        <li>COL-005 · Bookmark funcional (desguardar)</li>
+        <li>COL-006 · Botón ··· con Sheet + Dialog eliminar</li>
+        <li>CREAR-002 · Publicar receta real</li>
+        <li>DEBT-009 · Hook useCrearReceta extraído</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Arquitectura aplicada</h4>
+      <div class="flow">
+        <span>Componente</span><span class="arrow">→</span>
+        <span>Hook</span><span class="arrow">→</span>
+        <span>Service</span><span class="arrow">→</span>
+        <span>apiClient</span><span class="arrow">→</span>
+        <span>Backend</span>
+      </div>
+      <div class="flow">
+        <span>Route</span><span class="arrow">→</span>
+        <span>Controller</span><span class="arrow">→</span>
+        <span>Service</span><span class="arrow">→</span>
+        <span>Repository</span><span class="arrow">→</span>
+        <span>MongoDB</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────── BACKEND ──────────────────── -->
+<section id="backend">
+  <h2>Backend <span class="badge badge-be">Express + TypeScript</span></h2>
+
+  <h3>Nuevos tipos — <code>backend/src/types/receta.ts</code></h3>
+  <pre><code>// Tipo de respuesta para Colección (tarjetas portrait)
+export interface RecetaColeccion {
+  id: string
+  titulo: string
+  imagenUrl: string
+  autor: { nombre: string; avatarUrl: string }
+}
+
+// Body del endpoint POST /api/recetas
+export interface DatosCrearRecetaBody {
+  titulo: string; descripcion: string
+  tiempo: number; unidadTiempo: 'min' | 'h'
+  porciones: number; dificultad: 'facil' | 'media' | 'dificil'
+  dietas: string[]; alergenos: string[]
+  ingredientes: { nombre: string; cantidad: string; unidad: string }[]
+  pasos: { texto: string }[]
+  imagenBase64?: string
+}</code></pre>
+
+  <h3>Validación Zod — <code>backend/src/lib/validadores.ts</code></h3>
+  <pre><code>export const esquemaCrearRecetaBody = z.object({
+  titulo:       z.string().min(3).max(100),
+  descripcion:  z.string().min(10).max(300),
+  tiempo:       z.number().int().min(1),
+  unidadTiempo: z.enum(["min", "h"]),
+  porciones:    z.number().int().min(1),
+  dificultad:   z.enum(["facil", "media", "dificil"]),
+  dietas:       z.array(z.string()).default([]),
+  alergenos:    z.array(z.string()).default([]),
+  ingredientes: z.array(z.object({ nombre, cantidad, unidad })).min(1),
+  pasos:        z.array(z.object({ texto: z.string().min(10) })).min(1),
+  imagenBase64: z.string().optional(),
+})</code></pre>
+
+  <h3>Repository — <code>backend/src/repositories/recetaRepository.ts</code></h3>
+  <p>Se añadieron 4 métodos nuevos al repositorio existente:</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>findGuardadas(usuarioId)</h4>
+      <p>Obtiene <code>recetasGuardadas[]</code> del documento Usuario, luego hace un <code>find({ _id: { $in: ids } })</code> proyectando solo los campos necesarios para la tarjeta de colección.</p>
+    </div>
+    <div class="card">
+      <h4>findPorAutor(usuarioId)</h4>
+      <p>Hace <code>find({ autorId: new ObjectId(userId) })</code> con <code>sort({ fechaPublicacion: -1 })</code>. Devuelve las recetas propias más recientes primero.</p>
+    </div>
+    <div class="card">
+      <h4>crear(datos, autorId)</h4>
+      <p>Mapea <code>dificultad</code> (facil→Fácil, media→Media, dificil→Difícil), concatena <code>tiempo + unidadTiempo</code>, convierte cantidades string→number. Macros en 0 hasta integración Edamam (Sprint 6).</p>
+    </div>
+    <div class="card">
+      <h4>eliminar(recetaId, usuarioId)</h4>
+      <p>Verifica que el <code>autorId</code> del documento coincide con el <code>usuarioId</code> del token. Lanza <code>Error({ status: 403 })</code> si no. Lanza <code>404</code> si la receta no existe.</p>
+    </div>
+  </div>
+
+  <h3>Rutas — <code>backend/src/routes/recetas.routes.ts</code></h3>
+  <div class="callout">
+    <strong>⚠️ Orden crítico:</strong> <code>/guardadas</code> y <code>/mis-recetas</code> deben declararse
+    ANTES de <code>/:id</code> en el router. De lo contrario Express captura
+    "guardadas" y "mis-recetas" como valores del parámetro <code>:id</code>.
+  </div>
+  <pre><code>router.get("/guardadas",   requerirAuth, recetasController.obtenerGuardadas)
+router.get("/mis-recetas", requerirAuth, recetasController.obtenerMisRecetas)
+router.post("/",           requerirAuth, recetasController.crear)
+// A continuación las rutas con :id
+router.get("/:id",         optionalAuth, recetasController.obtenerPorId)
+router.delete("/:id",      requerirAuth, recetasController.eliminar)</code></pre>
+</section>
+
+<!-- ──────────────────── SERVICES FE ──────────────────── -->
+<section id="services">
+  <h2>Services FE <span class="badge badge-fe">TypeScript</span></h2>
+
+  <h3>Nuevo — <code>frontend/src/services/coleccionService.ts</code></h3>
+  <p>Service HTTP dedicado a la feature Colección. Sigue la regla: los hooks no conocen URLs.</p>
+  <pre><code>export const coleccionService = {
+  obtenerGuardadas(token): GET /recetas/guardadas  → RecetaColeccion[]
+  obtenerMisRecetas(token): GET /recetas/mis-recetas → RecetaColeccion[]
+  eliminarReceta(recetaId, token): DELETE /recetas/:id
+}</code></pre>
+
+  <h3>Modificado — <code>frontend/src/services/recetasService.ts</code></h3>
+  <p>Se añadió el método <code>crear()</code>:</p>
+  <pre><code>async crear(datos: DatosRecetaNueva, token: string): Promise&lt;{ id: string }&gt; {
+  const { data } = await apiClient.post('/recetas', datos, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return data
+}</code></pre>
+</section>
+
+<!-- ──────────────────── HOOKS ──────────────────── -->
+<section id="hooks">
+  <h2>Hooks FE <span class="badge badge-fe">TanStack Query</span></h2>
+
+  <table>
+    <tr>
+      <th>Hook</th><th>Archivo</th><th>Tipo</th><th>Descripción</th>
+    </tr>
+    <tr>
+      <td><code>useRecetasGuardadas</code></td>
+      <td><code>features/coleccion/hooks/</code></td>
+      <td><code>useQuery</code></td>
+      <td>Obtiene las recetas guardadas del usuario. <code>enabled: !!token</code> — no lanza si no hay sesión.</td>
+    </tr>
+    <tr>
+      <td><code>useMisRecetas</code></td>
+      <td><code>features/coleccion/hooks/</code></td>
+      <td><code>useQuery</code></td>
+      <td>Obtiene las recetas propias. <code>staleTime: 0</code> para re-fetch al montar.</td>
+    </tr>
+    <tr>
+      <td><code>useEliminarReceta</code></td>
+      <td><code>features/coleccion/hooks/</code></td>
+      <td><code>useMutation</code></td>
+      <td>DELETE receta por ID. En <code>onSuccess</code> invalida <code>['coleccion', 'mis-recetas']</code>.</td>
+    </tr>
+    <tr>
+      <td><code>useCrearReceta</code></td>
+      <td><code>features/recetas/hooks/</code></td>
+      <td>Custom async</td>
+      <td>Detecta alérgenos de ingredientes, llama a <code>recetasService.crear()</code>, limpia el store Zustand, redirige a <code>/coleccion?tab=mis-recetas</code>.</td>
+    </tr>
+  </table>
+
+  <h3>Patrón de token en todos los hooks</h3>
+  <pre><code>const { data: session } = useSession()
+const token = session?.user?.backendToken ?? ''
+// backendToken se define en lib/auth.ts en el callback session() de NextAuth</code></pre>
+</section>
+
+<!-- ──────────────────── COMPONENTES ──────────────────── -->
+<section id="componentes">
+  <h2>Componentes FE actualizados</h2>
+
+  <h3>contenidoColeccion.tsx — Mocks → Hooks + Skeleton + Tab URL</h3>
+  <p>Cambios principales:</p>
+  <ul>
+    <li>Eliminado import de <code>datosColeccion.ts</code> (mocks)</li>
+    <li>Añadidos <code>useRecetasGuardadas()</code> y <code>useMisRecetas()</code></li>
+    <li>Lee <code>?tab=mis-recetas</code> del URL con <code>useSearchParams()</code> — activa la pestaña correcta tras crear una receta</li>
+    <li>Estado de carga → <code>GridSkeletonColeccion</code> (4 celdas <code>animate-pulse</code>)</li>
+    <li>Estado vacío se muestra solo cuando <code>!cargando &amp;&amp; recetas.length === 0</code></li>
+  </ul>
+  <pre><code>const tabInicial = searchParams.get('tab') === 'mis-recetas' ? 'mis-recetas' : 'guardadas'
+const [pestana, setPestana] = useState&lt;PestanaColeccion&gt;(tabInicial)
+// Tras publicar receta, useCrearReceta redirige a /coleccion?tab=mis-recetas
+// → ContenidoColeccion arranca en 'mis-recetas' y ve la nueva receta</code></pre>
+
+  <h3>tarjetaColeccion.tsx — Bookmark + Sheet/Dialog</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Bookmark (pestaña Guardadas)</h4>
+      <p>Actualización optimista local: <code>setGuardado(false)</code> → la tarjeta desaparece instantáneamente. Si la llamada al BE falla, <code>onError</code> llama <code>setGuardado(true)</code> para rollback visual.</p>
+      <pre><code>const { mutate: toggleGuardado } = useToggleGuardado(receta.id)
+setGuardado(false)  // optimista
+toggleGuardado(undefined, { onError: () => setGuardado(true) })</code></pre>
+    </div>
+    <div class="card">
+      <h4>Botón ··· (pestaña Mis Recetas)</h4>
+      <p>Abre un <code>Sheet</code> de shadcn/ui desde abajo con dos opciones: <em>Eliminar</em> (activa) y <em>Editar</em> (desactivada hasta Sprint 5). Eliminar abre un <code>Dialog</code> de confirmación antes de llamar al BE.</p>
+      <pre><code>// Sheet → Dialog → confirmar
+// onSuccess: setEliminada(true) → return null → tarjeta desaparece</code></pre>
+    </div>
+  </div>
+
+  <h3>previsualizacionReceta.tsx — Publicar real</h3>
+  <p>Se eliminó el mock de <code>setTimeout</code> y se conectó al hook <code>useCrearReceta</code>:</p>
+  <ul>
+    <li>Se eliminó <code>useState(publicando)</code> del componente</li>
+    <li>Se importó <code>useCrearReceta</code> del hook</li>
+    <li>El botón "Publicar receta" llama directamente a <code>publicar()</code></li>
+    <li>Se añade feedback de error bajo los botones si la petición falla</li>
+    <li>Tras publicar redirige a <code>/coleccion?tab=mis-recetas</code> (no a /home)</li>
+  </ul>
+</section>
+
+<!-- ──────────────────── FLUJOS ──────────────────── -->
+<section id="flujos">
+  <h2>Flujos de uso</h2>
+
+  <h3>Flujo: Crear receta</h3>
+  <ol>
+    <li>Usuario rellena el formulario multi-step en <code>/crear-receta</code></li>
+    <li>Datos se guardan en Zustand (<code>useCrearRecetaStore</code>)</li>
+    <li>Navega a <code>/crear-receta/revisar</code> — vista previa completa</li>
+    <li>Pulsa "Publicar receta" → <code>useCrearReceta.publicar()</code></li>
+    <li>Hook detecta alérgenos de ingredientes con <code>detectarAlergenos()</code></li>
+    <li>Llama a <code>recetasService.crear(datos, token)</code> → <code>POST /api/recetas</code></li>
+    <li>BE valida con Zod, guarda en MongoDB, devuelve <code>{ id }</code></li>
+    <li>Hook limpia el store Zustand y redirige a <code>/coleccion?tab=mis-recetas</code></li>
+    <li>La nueva receta aparece en la primera posición de "Mis recetas"</li>
+  </ol>
+
+  <h3>Flujo: Ver colección guardada</h3>
+  <ol>
+    <li>Usuario navega a <code>/coleccion</code></li>
+    <li><code>useRecetasGuardadas()</code> llama a <code>GET /api/recetas/guardadas</code></li>
+    <li>BE obtiene <code>recetasGuardadas[]</code> del documento Usuario, luego popula los documentos Receta</li>
+    <li>Mientras carga: skeleton de 4 celdas <code>animate-pulse</code></li>
+    <li>Tarjetas aparecen con animación <code>AnimatePresence</code></li>
+    <li>Bookmark → desguarda con actualización optimista</li>
+  </ol>
+
+  <h3>Flujo: Eliminar receta propia</h3>
+  <ol>
+    <li>Usuario pulsa ··· en una tarjeta de "Mis recetas"</li>
+    <li>Sheet sube desde abajo con opciones</li>
+    <li>Pulsa "Eliminar receta" → se abre Dialog de confirmación</li>
+    <li>Confirma → <code>useEliminarReceta.mutate(recetaId)</code></li>
+    <li>BE verifica <code>autorId === usuarioId</code> (403 si no coincide)</li>
+    <li>Devuelve 204 → <code>setEliminada(true)</code> → tarjeta desaparece</li>
+    <li>Cache <code>['coleccion', 'mis-recetas']</code> se invalida automáticamente</li>
+  </ol>
+</section>
+
+<!-- ──────────────────── ARCHIVOS ──────────────────── -->
+<section id="archivos">
+  <h2>Archivos del sprint</h2>
+
+  <h3>Creados <span class="badge badge-new">new</span></h3>
+  <ul class="file-list">
+    <li><span class="badge badge-be">BE</span> <code>backend/src/</code> — No hay archivos nuevos (métodos añadidos a existentes)</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/services/coleccionService.ts</code></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/hooks/useRecetasGuardadas.ts</code></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/hooks/useMisRecetas.ts</code></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/hooks/useEliminarReceta.ts</code></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/hooks/useCrearReceta.ts</code></li>
+  </ul>
+
+  <h3>Modificados <span class="badge badge-mod">mod</span></h3>
+  <ul class="file-list">
+    <li><span class="badge badge-be">BE</span> <code>backend/src/types/receta.ts</code> — +RecetaColeccion, +DatosCrearRecetaBody</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/lib/validadores.ts</code> — +esquemaCrearRecetaBody</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/repositories/recetaRepository.ts</code> — +findGuardadas, +findPorAutor, +crear, +eliminar</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/services/recetasService.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/controllers/recetasController.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/routes/recetas.routes.ts</code> — +4 rutas (orden /guardadas antes de /:id)</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/services/recetasService.ts</code> — +crear()</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/types/crearReceta.schema.ts</code> — +DatosRecetaNueva</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/components/contenidoColeccion.tsx</code> — mocks→hooks, skeleton, tab URL</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/components/tarjetaColeccion.tsx</code> — Bookmark+Sheet+Dialog</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/components/crearReceta/previsualizacionReceta.tsx</code> — useCrearReceta real</li>
+  </ul>
+
+  <h3>Candidatos a eliminar (cuando se confirme el deploy)</h3>
+  <ul class="file-list">
+    <li><span class="badge badge-del">del</span> <code>frontend/src/features/coleccion/data/datosColeccion.ts</code> — ya no es importado por ningún componente</li>
+  </ul>
+</section>
+
+<!-- ──────────────────── NOTAS ──────────────────── -->
+<section id="notas">
+  <h2>Notas técnicas y decisiones de diseño</h2>
+
+  <h3>Imagen como base64</h3>
+  <p>Para el MVP, las fotos de recetas se envían como cadena base64 en el JSON body y se almacenan directamente en MongoDB como <code>imagenUrl</code>. Esto es funcional pero no escala para imágenes grandes. En <strong>Sprint 6</strong> se migrará a Cloudinary con subida directa desde el cliente.</p>
+  <div class="callout">En producción, base64 de una foto (~500KB) equivale a ~700KB de datos en el body JSON. Para el TFG es aceptable; para escalar, usar CDN (Cloudinary/S3).</div>
+
+  <h3>Macros en 0 (placeholder)</h3>
+  <p>El modelo Mongoose requiere el campo <code>macros</code>. Al crear una receta se guarda <code>{ calorias: 0, proteinas: 0, carbos: 0, grasas: 0 }</code>. La integración con Edamam para cálculo nutricional real está planificada para <strong>Sprint 6</strong>.</p>
+
+  <h3>Alérgenos detectados en el hook</h3>
+  <p>El hook <code>useCrearReceta</code> llama a <code>detectarAlergenos(ingredientes)</code> antes de enviar al BE. Esto aprovecha el mapa estático de 200+ ingredientes con sus alérgenos EU ya implementado en <code>@/config/ingredientes.ts</code>. El backend no tiene su propia función de detección — valida solo que el campo sea un <code>string[]</code>.</p>
+
+  <h3>Actualización optimista en desguardar</h3>
+  <p>Al pulsar el Bookmark en "Guardadas", la tarjeta desaparece visualmente antes de que el backend confirme. Si la petición falla, el <code>onError</code> del mutation hace rollback (<code>setGuardado(true)</code>) para restaurar el estado visual.</p>
+
+  <h3>Invalidación de caché tras eliminar</h3>
+  <p><code>useEliminarReceta</code> invalida <code>['coleccion', 'mis-recetas']</code> en <code>onSuccess</code>. Esto provoca un refetch del servidor para mantener consistencia. La tarjeta ya se ha marcado como eliminada localmente (<code>setEliminada(true)</code>) para feedback inmediato.</p>
+
+  <h3>Dificultad: mapeo FE→BE</h3>
+  <p>El formulario FE usa identificadores sin acentos (<code>'facil'</code>, <code>'media'</code>, <code>'dificil'</code>) por compatibilidad con Zod enums y convenciones React. El modelo Mongoose almacena los valores con mayúsculas y acentos (<code>'Fácil'</code>, <code>'Media'</code>, <code>'Difícil'</code>). El mapeo se hace en el repository con <code>MAPA_DIFICULTAD</code>.</p>
+
+  <div class="callout success">
+    <strong>✅ TypeScript:</strong> <code>tsc --noEmit</code> ejecutado en backend y frontend sin errores.
+    Ambos compilados limpiamente tras todos los cambios del sprint.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Cookr TFG · Sprint 4 · Generado 2026-05-06
+</footer>
+
+</body>
+</html>

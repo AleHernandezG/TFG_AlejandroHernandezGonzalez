@@ -2,11 +2,19 @@ import { Types } from "mongoose";
 import { Receta } from "../models/recetaMongo";
 import { Usuario } from "../models/usuarioMongo";
 import {
+  DatosCrearRecetaBody,
   FiltrosFeed,
   IComentarioReceta,
   PostFeedRespuesta,
+  RecetaColeccion,
   RecetaDetalleRespuesta,
 } from "../types/receta";
+
+const MAPA_DIFICULTAD: Record<string, "Fácil" | "Media" | "Difícil"> = {
+  facil: "Fácil",
+  media: "Media",
+  dificil: "Difícil",
+};
 
 type UsuarioPopulado = { _id: Types.ObjectId; nombre: string; foto?: string };
 
@@ -335,5 +343,102 @@ export const recetaRepository = {
 
     await usuario.save();
     return { guardado: !yaGuardado };
+  },
+
+  async findGuardadas(usuarioId: string): Promise<RecetaColeccion[]> {
+    const usuario = await Usuario.findById(usuarioId)
+      .select("recetasGuardadas")
+      .lean()
+      .exec();
+    const ids = (usuario?.recetasGuardadas as Types.ObjectId[] | undefined) ?? [];
+    if (ids.length === 0) return [];
+
+    const docs = await Receta.find({ _id: { $in: ids } })
+      .populate("autorId", "nombre foto")
+      .select("_id titulo imagenUrl autorId")
+      .lean()
+      .exec();
+
+    return docs.map((doc) => {
+      const autor = doc.autorId as unknown as { _id: Types.ObjectId; nombre: string; foto?: string };
+      return {
+        id: (doc._id as Types.ObjectId).toString(),
+        titulo: doc.titulo as string,
+        imagenUrl: doc.imagenUrl as string,
+        autor: {
+          nombre: autor?.nombre ?? "Cookr User",
+          avatarUrl: autor?.foto ?? "",
+        },
+      };
+    });
+  },
+
+  async findPorAutor(usuarioId: string): Promise<RecetaColeccion[]> {
+    const docs = await Receta.find({ autorId: new Types.ObjectId(usuarioId) })
+      .populate("autorId", "nombre foto")
+      .select("_id titulo imagenUrl autorId")
+      .sort({ fechaPublicacion: -1 })
+      .lean()
+      .exec();
+
+    return docs.map((doc) => {
+      const autor = doc.autorId as unknown as { _id: Types.ObjectId; nombre: string; foto?: string };
+      return {
+        id: (doc._id as Types.ObjectId).toString(),
+        titulo: doc.titulo as string,
+        imagenUrl: doc.imagenUrl as string,
+        autor: {
+          nombre: autor?.nombre ?? "Cookr User",
+          avatarUrl: autor?.foto ?? "",
+        },
+      };
+    });
+  },
+
+  async crear(datos: DatosCrearRecetaBody, autorId: string): Promise<{ id: string }> {
+    const tiempoStr = `${datos.tiempo} ${datos.unidadTiempo}`;
+    const dificultad = MAPA_DIFICULTAD[datos.dificultad];
+
+    const doc = await Receta.create({
+      autorId: new Types.ObjectId(autorId),
+      titulo: datos.titulo,
+      descripcion: datos.descripcion,
+      imagenUrl: datos.imagenBase64 ?? "",
+      tiempo: tiempoStr,
+      dificultad,
+      porciones: datos.porciones,
+      categorias: datos.dietas,
+      ingredientes: datos.ingredientes.map((ing) => ({
+        nombre: ing.nombre,
+        cantidad: parseFloat(ing.cantidad) || 0,
+        unidad: ing.unidad,
+      })),
+      pasos: datos.pasos.map((p) => p.texto),
+      alergenos: datos.alergenos,
+      macros: { calorias: 0, proteinas: 0, carbos: 0, grasas: 0 },
+      likes: [],
+      listaComentarios: [],
+      fechaPublicacion: new Date(),
+    });
+
+    return { id: doc._id.toString() };
+  },
+
+  async eliminar(recetaId: string, usuarioId: string): Promise<void> {
+    if (!Types.ObjectId.isValid(recetaId)) {
+      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    }
+
+    const receta = await Receta.findById(recetaId).select("autorId").lean().exec();
+    if (!receta) {
+      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    }
+
+    const autorIdStr = (receta.autorId as Types.ObjectId).toString();
+    if (autorIdStr !== usuarioId) {
+      throw Object.assign(new Error("No tienes permiso para eliminar esta receta"), { status: 403 });
+    }
+
+    await Receta.deleteOne({ _id: recetaId });
   },
 };
