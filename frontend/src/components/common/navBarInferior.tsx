@@ -19,7 +19,7 @@ type EnlaceNav = {
   etiqueta: string
 }
 
-const RUTAS_SIN_NAVBAR = ['/']
+const RUTAS_SIN_NAVBAR = ['/', '/chat']
 
 const enlaces: EnlaceNav[] = [
   { href: '/home',      Icono: Home,           etiqueta: 'Inicio'    },

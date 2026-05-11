@@ -1,0 +1,7 @@
+export { ContenidoPerfil } from './contenidoPerfil'
+export { TarjetaAvatarPerfil } from './tarjetaAvatarPerfil'
+export { GrupoAjustes } from './grupoAjustes'
+export { FilaAjuste } from './filaAjuste'
+export { FilaTogglePermiso } from './filaTogglePermiso'
+export { DialogCambiarContrasena } from './dialogCambiarContrasena'
+export { DialogPreferenciasAlergenos } from './dialogPreferenciasAlergenos'

@@ -1,7 +1,10 @@
+import { Suspense } from 'react'
+import { ContenidoChat } from '@/features/chat/components'
+
 export default function PaginaChat() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <p className="text-muted-foreground">Próximamente</p>
-    </main>
+    <Suspense>
+      <ContenidoChat />
+    </Suspense>
   )
 }

@@ -80,6 +80,27 @@ export interface PostFeedRespuesta {
   fechaPublicacion: string;
 }
 
+export interface RecetaColeccion {
+  id: string
+  titulo: string
+  imagenUrl: string
+  autor: { nombre: string; avatarUrl: string }
+}
+
+export interface DatosCrearRecetaBody {
+  titulo: string
+  descripcion: string
+  tiempo: number
+  unidadTiempo: 'min' | 'h'
+  porciones: number
+  dificultad: 'facil' | 'media' | 'dificil'
+  dietas: string[]
+  alergenos: string[]
+  ingredientes: { nombre: string; cantidad: string; unidad: string }[]
+  pasos: { texto: string }[]
+  imagenBase64?: string
+}
+
 export interface RecetaDetalleRespuesta extends PostFeedRespuesta {
   categorias: string[];
   pasos: string[];

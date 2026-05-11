@@ -1,5 +1,6 @@
 import { apiClient } from "./apiClient";
 import type { PostFeed, RecetaDetalle, FiltrosAvanzados } from "@/features/recetas/types/receta.types";
+import type { DatosRecetaNueva } from "@/features/recetas/types/crearReceta.schema";
 
 export interface FiltrosFeed {
   q?: string;
@@ -79,6 +80,15 @@ export const recetasService = {
     const { data } = await apiClient.post(
       `/recetas/${recetaId}/comentarios`,
       { texto },
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data;
+  },
+
+  async crear(datos: DatosRecetaNueva, token: string): Promise<{ id: string }> {
+    const { data } = await apiClient.post<{ id: string }>(
+      '/recetas',
+      datos,
       { headers: { Authorization: `Bearer ${token}` } },
     );
     return data;

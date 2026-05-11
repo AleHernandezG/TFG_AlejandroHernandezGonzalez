@@ -21,7 +21,7 @@ app.use(
   }),
 );
 
-app.use(express.json()); // Pa parsear el cuerpo de las peticiones como JSON
+app.use(express.json({ limit: '10mb' })); // Pa parsear el cuerpo de las peticiones como JSON
 app.use("/api/auth", authRoutes);
 app.use("/api/recetas", recetasRoutes);
 app.use("/api/usuarios", usuariosRoutes);

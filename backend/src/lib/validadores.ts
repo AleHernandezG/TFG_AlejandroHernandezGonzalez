@@ -47,3 +47,27 @@ export const esquemaCompletarPerfil = z.object({
 export const esquemaReenviarVerificacion = z.object({
   correo: z.string().email("Correo no válido").trim().toLowerCase(),
 });
+
+export const esquemaCrearRecetaBody = z.object({
+  titulo:       z.string().min(3, "El título debe tener al menos 3 caracteres").max(100),
+  descripcion:  z.string().min(10, "La descripción debe tener al menos 10 caracteres").max(300),
+  tiempo:       z.number().int().min(1, "El tiempo debe ser al menos 1"),
+  unidadTiempo: z.enum(["min", "h"]),
+  porciones:    z.number().int().min(1, "Debe haber al menos 1 porción"),
+  dificultad:   z.enum(["facil", "media", "dificil"]),
+  dietas:       z.array(z.string()).default([]),
+  alergenos:    z.array(z.string()).default([]),
+  ingredientes: z
+    .array(
+      z.object({
+        nombre:   z.string().min(1, "El nombre del ingrediente es obligatorio"),
+        cantidad: z.string().min(1, "La cantidad es obligatoria"),
+        unidad:   z.string(),
+      }),
+    )
+    .min(1, "Añade al menos un ingrediente"),
+  pasos: z
+    .array(z.object({ texto: z.string().min(10, "El paso debe tener al menos 10 caracteres") }))
+    .min(1, "Añade al menos un paso"),
+  imagenBase64: z.string().optional(),
+});

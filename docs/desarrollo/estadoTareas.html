@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-05 · Sprint 4 activo · Fase 4 de 7</div>
+    <div class="meta">Actualizado: 2026-05-08 · Sprint 4 activo · Fase 4 de 7 · Despensa + Perfil + Chat implementados</div>
   </div>
 </header>
 
@@ -96,9 +96,9 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">6</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">13</div><div class="label">Urgencia media</div></div>
+    <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">12</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
     <div class="counter done"><div class="num">89</div><div class="label">Completadas</div></div>
   </div>
@@ -418,7 +418,7 @@
             <small>Flujo completo: /crear-receta (formulario RHF+Zod) → validación → /crear-receta/revisar (preview) → publicar mock → /home. PopUp tutorial (primer usuario), PopUp error (validación), stepper tutorial, detección automática de alérgenos. Store Zustand compartido entre formulario y preview. 15 ficheros nuevos, TypeScript 0 errores.</small>
             <span class="source">📄 features/recetas/components/crearReceta/ · stores/useCrearRecetaStore.ts · docs/crearReceta.html</span>
           </td>
-          <td><span class="status review">👁️ UX fixes aplicados · pendiente revisión final</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -593,7 +593,7 @@
             <small>Estructura de carpetas para features/despensa/, features/coleccion/, features/chat/ con components/index.ts (barrel vacío // Sprint 3+), data/, hooks/ y types/. Pages placeholder Server Component en app/(main)/despensa/, /chat/, /perfil/. Carpetas docs/stitch/ para despensa, coleccion, chat, discover, perfil. docs/tareas-vistas-pendientes.md creado con spec completa de componentes, stores y datos mock por vista. docs/context.md, folderStructure.md y roadmap.md actualizados.</small>
             <span class="source">📄 features/despensa/ · features/coleccion/ · features/chat/ · app/(main)/despensa/page.tsx · app/(main)/chat/page.tsx · app/(main)/perfil/page.tsx · docs/tareas-vistas-pendientes.md</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
 
@@ -840,10 +840,10 @@
           <td class="id">DEBT-009<br><small style="color:#525252">→ UI-026</small></td>
           <td class="desc">
             <strong>Extraer useCrearReceta hook — formularioCrearReceta + previsualizacionReceta</strong>
-            <small>formularioCrearReceta.tsx tiene onSubmitValido() inline y previsualizacionReceta.tsx tiene handlePublicar() inline. Viola la regla Componente → Hook → Service → apiClient (docs/rules.md §1). Crear features/recetas/hooks/useCrearReceta.ts que gestione el estado de envío, el loading y las llamadas al service. Los componentes quedan solo con UI.</small>
-            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · previsualizacionReceta.tsx · docs/rules.md §1</span>
+            <small>Implementado: features/recetas/hooks/useCrearReceta.ts creado. Detecta alérgenos, llama a recetasService.crear(), limpia el store Zustand y redirige a /coleccion?tab=mis-recetas. previsualizacionReceta.tsx simplificado — elimina useState(publicando) y handlePublicar() inline.</small>
+            <span class="source">📄 features/recetas/hooks/useCrearReceta.ts · previsualizacionReceta.tsx · docs/desarrollo/coleccionYCrearReceta.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -996,6 +996,105 @@
           <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
+        <!-- ── Colección — conectar BE ── -->
+        <tr>
+          <td class="id">COL-001</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas/guardadas — recetas guardadas del usuario</strong>
+            <small>Implementado: recetaRepository.findGuardadas() busca en usuarioMongo.recetasGuardadas y popula los documentos Receta. Ruta añadida ANTES de /:id en el router para evitar colisión de parámetros.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-002</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas/mis-recetas — recetas creadas por el usuario</strong>
+            <small>Implementado: recetaRepository.findPorAutor() con filtro { autorId } + sort fechaPublicacion desc. Ruta añadida ANTES de /:id.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-007</td>
+          <td class="desc">
+            <strong>BE: DELETE /api/recetas/:id — eliminar receta propia</strong>
+            <small>Implementado: recetaRepository.eliminar() verifica autorId === userId (403 si no coincide, 404 si no existe). Respuesta 204 sin cuerpo.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-004</td>
+          <td class="desc">
+            <strong>FE: hooks useRecetasGuardadas + useMisRecetas — conectar contenidoColeccion.tsx</strong>
+            <small>Implementado: hooks TanStack Query en features/coleccion/hooks/. contenidoColeccion.tsx reemplaza mocks por hooks reales, añade GridSkeletonColeccion (animate-pulse) durante carga, y lee ?tab=mis-recetas del URL con useSearchParams.</small>
+            <span class="source">📄 features/coleccion/hooks/useRecetasGuardadas.ts · useMisRecetas.ts · contenidoColeccion.tsx · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-005</td>
+          <td class="desc">
+            <strong>FE: Bookmark funcional — desguardar desde /coleccion (pestaña Guardadas)</strong>
+            <small>Implementado: tarjetaColeccion.tsx usa useToggleGuardado(receta.id). Actualización optimista: setGuardado(false) inmediato + return null si !guardado. Rollback en onError.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-006</td>
+          <td class="desc">
+            <strong>FE: Botón ··· funcional — eliminar receta desde /coleccion (pestaña Mis recetas)</strong>
+            <small>Implementado: tarjetaColeccion.tsx abre Sheet (shadcn) con opciones → Dialog de confirmación → useEliminarReceta.mutate(). Actualización optimista: setEliminada(true) en onSuccess. Opción "Editar" desactivada hasta Sprint 5.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx · features/coleccion/hooks/useEliminarReceta.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── Despensa ── -->
+        <tr>
+          <td class="id">DESP-001</td>
+          <td class="desc">
+            <strong>Vista /despensa — FE completa con mock (Sprint 4)</strong>
+            <small>FE completa: types/despensa.types.ts · datosDespensa.ts (12 items mock + EMOJIS map + getEmojiIngrediente) · despensaStore.ts (Zustand: añadir/editar/eliminar, estado inicial con mock). Componentes: headerDespensa (título editorial + contador) · barraAnadirIngrediente (pill CTA + botón + brand) · estadoVacioDespensa (ShoppingBasket + CTA) · tarjetaIngrediente (emoji avatar + nombre + cantidad + pencil/trash, AnimatePresence exit) · listaIngredientes (AnimatePresence) · sheetAnadirIngrediente (Sheet shadcn + input + autocompletado + chips rápidas + cantidad/unidad + detección duplicados case-insensitive → Dialog "ya está en tu despensa") · dialogEditarIngrediente (Dialog shadcn + form pre-rellenado) · contenidoDespensa (orquestador client) · page.tsx (mobile + desktop SidebarNavPc). Stitch: docs/stitch/despensa/.</small>
+            <span class="source">📄 features/despensa/ · stores/despensaStore.ts · app/(main)/despensa/page.tsx · docs/stitch/despensa/</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Vista /perfil ── -->
+        <tr>
+          <td class="id">PERF-001</td>
+          <td class="desc">
+            <strong>Vista /perfil — FE completa con mock (Sprint 4)</strong>
+            <small>FE completa: types/perfil.types.ts · datosPerfil.ts (mock: nombre, email, dietas, alérgenos, permisos) · perfilStore.ts (Zustand: actualizarDietas, actualizarAlergenos, togglePermiso). Componentes: tarjetaAvatarPerfil (display-only: avatar 80px + camera button, sin "Editar nombre" ni Dialog) · grupoAjustes · filaAjuste · filaTogglePermiso (switch role=switch) · dialogCambiarContrasena (RHF + Zod, mock submit) · dialogPreferenciasAlergenos (chips Dieta + Alérgenos) · contenidoPerfil (orquestador, botón único "Guardar cambios" full-width, sin botón "Volver"). page.tsx: mobile + desktop. Stitch: docs/stitch/perfil/.</small>
+            <span class="source">📄 features/perfil/ · stores/perfilStore.ts · app/(main)/perfil/page.tsx · docs/stitch/perfil/</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Vista /chat ── -->
+        <tr>
+          <td class="id">CHAT-001</td>
+          <td class="desc">
+            <strong>Vista /chat — FE completa con mock (Sprint 4)</strong>
+            <small>Chat IA full-screen sin NavBar. Estado vacío con 3 chips sugeridos. Burbujas usuario (derecha, bg-brand) y IA (izquierda, bg-card + chef avatar). IndicadorPensando animado (Framer Motion). BarraInputChat sticky bottom con textarea auto-resize. chatStore Zustand con enviarMensaje + getMockRespuesta (1.4s delay). ContenidoChat usa fixed inset-0 z-[60] overlay. NavBar oculto en /chat. HeaderChat: botón ← + título centrado + spacer (sin botón "Historial" top-right) + pill "Ver historial". 10 ficheros nuevos.</small>
+            <span class="source">📄 features/chat/ · stores/chatStore.ts · app/(main)/chat/page.tsx · docs/stitch/chat/</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Crear receta ── -->
         <tr>
           <td class="id">CREAR-001</td>
           <td class="desc">
@@ -1010,11 +1109,73 @@
           <td class="id">CREAR-002</td>
           <td class="desc">
             <strong>Publicar receta real — endpoint BE + servicio FE + subida de foto</strong>
-            <small>Actualmente handlePublicar() en previsualizacionReceta.tsx tiene un setTimeout(1000) mock que simula publicar y redirige a /home sin persistir nada. Implementación completa: (BE) añadir POST /api/recetas con requerirAuth al router; crear recetasController.crear, recetasService.crear y recetaRepository.crear; aceptar foto como base64 en el body JSON (la imagen se guarda como string en IReceta.imagenUrl). (FE) añadir método crear() a frontend/src/services/recetasService.ts; reemplazar setTimeout por la llamada real en handlePublicar(); mostrar estado de carga y gestionar errores. Depende de DEBT-009 (useCrearReceta hook) para mantener la separación de capas.</small>
-            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/routes/recetas.routes.ts · backend/src/services/recetasService.ts · backend/src/controllers/recetasController.ts · frontend/src/services/recetasService.ts</span>
+            <small>Implementado: BE POST /api/recetas con validación Zod + recetaRepository.crear(). FE: recetasService.crear() + useCrearReceta hook. previsualizacionReceta.tsx usa publicar() del hook en lugar de setTimeout. Foto como base64 en el body. Redirección a /coleccion?tab=mis-recetas tras publicar.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/routes/recetas.routes.ts · features/recetas/hooks/useCrearReceta.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Fixes y mejoras UI Sprint 4 ── -->
+        <tr>
+          <td class="id">FIX-001</td>
+          <td class="desc">
+            <strong>BE: Fix publicar receta con foto — express.json limit 10mb</strong>
+            <small>El límite por defecto de express.json() es 100 KB. Las fotos en base64 superan fácilmente 500 KB, provocando un 413 Payload Too Large antes de llegar al controller. Fix: app.use(express.json({ limit: '10mb' })) en app.ts.</small>
+            <span class="source">📄 backend/src/app.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FIX-002</td>
+          <td class="desc">
+            <strong>FE: Fix redirect a ?tab=mis-recetas tras publicar — Suspense en coleccion/page.tsx</strong>
+            <small>useSearchParams() en contenidoColeccion.tsx requiere un Suspense boundary en Next.js 14 App Router. Sin él, searchParams era null en el render inicial y tabInicial siempre era 'guardadas', ignorando el parámetro de URL. Fix: envolver ContenidoColeccion en &lt;Suspense&gt; en page.tsx (mobile y desktop).</small>
+            <span class="source">📄 app/(main)/coleccion/page.tsx · features/coleccion/components/contenidoColeccion.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-001</td>
+          <td class="desc">
+            <strong>FE: Botón ··· de tarjetaColeccion más visible — círculo bg-white/20</strong>
+            <small>El botón MoreHorizontal pasó de text-white/80 sin fondo a un círculo w-8 h-8 con bg-white/20 backdrop-blur-sm, igual que el botón bookmark de la pestaña Guardadas. Affordance visual consistente entre las dos pestañas.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-002</td>
+          <td class="desc">
+            <strong>FE: Botón Eliminar en detalle receta — solo visible para el autor</strong>
+            <small>Icono Trash2 añadido a la fila de acciones sociales en cabeceraReceta.tsx (junto a Compartir), visible solo cuando session.user.id === receta.autor.id. Abre Dialog de confirmación. En onSuccess redirige a /coleccion?tab=mis-recetas. Reutiliza useEliminarReceta hook de coleccion.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · features/coleccion/hooks/useEliminarReceta.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-003</td>
+          <td class="desc">
+            <strong>FE: seccionIngredientes rediseñada — card por ingrediente, dos filas, 20 unidades</strong>
+            <small>Cada ingrediente es ahora una card con borde: fila superior con el nombre a ancho completo (h-12, autocompletado funcional) + icono eliminar; separador; fila inferior con Cantidad | Unidad divididos en dos columnas. Unidades ampliadas de 7 a 20 (g, kg, mg, ml, cl, dl, l, cucharadita, cucharada, taza, pizca, unidad, diente, hoja, rama, rebanada, lata, sobre, bolsa, al gusto). Targets mínimos h-12 en nombre, h-10 en cantidad/unidad.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · features/recetas/types/crearReceta.schema.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-004</td>
+          <td class="desc">
+            <strong>FE: seccionPasos con textarea auto-resize — el texto siempre visible</strong>
+            <small>El textarea de cada paso crece automáticamente con el contenido (onInput → scrollHeight), eliminando el scroll interno. Arranca con min-h de 80px (3 filas) y se expande sin límite. resize-none + overflow-hidden evitan el scroll visual dentro del campo. Target mínimo py-3.5 para mayor comodidad en móvil.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionPasos.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>
     </table>
@@ -1126,10 +1287,10 @@
           <td class="id">API-013</td>
           <td class="desc">
             <strong>BE: POST /api/recetas — crear receta</strong>
-            <small>Endpoint para persistir recetas creadas desde el formulario. Requiere DOM-003 (modelo Receta) y SVC-001 (recetasService.ts). Flujo: Controller → recetaService.crear(datos, autorId) → recetaRepository.crear(doc). Si hay foto: llamada a imagenService.subirFoto(file) → Cloudinary. Respuesta 201 con el id de la receta creada. Desbloquea TODO-CR-01 y TODO-CR-02.</small>
-            <span class="source">📄 backend/src/routes/ · backend/src/controllers/ · TODO-CR-01 · TODO-CR-02 · DOM-003</span>
+            <small>Implementado en Sprint 4: recetaRepository.crear() mapea dificultad (facil→Fácil), concatena tiempo+unidadTiempo, convierte cantidades string→number. Foto almacenada como base64 en imagenUrl (MVP; Cloudinary en Sprint 6). Macros en 0 hasta Edamam (Sprint 6).</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
           </td>
-          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1245,7 +1406,7 @@
             <small>onSubmitValido() en formularioCrearReceta.tsx y handlePublicar() en previsualizacionReceta.tsx están directamente en el componente visual. Viola la regla Componente → Hook → Service → apiClient. Si cambia la llamada al backend hay que buscar el componente UI. Resolver con useCrearReceta.ts en features/recetas/hooks/.</small>
             <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · previsualizacionReceta.tsx · docs/rules.md §1</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>

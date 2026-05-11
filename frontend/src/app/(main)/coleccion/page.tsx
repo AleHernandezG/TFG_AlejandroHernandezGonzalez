@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { ContenidoColeccion } from '@/features/coleccion/components'
 import { SidebarNavPc } from '@/features/recetas/components'
 
@@ -6,7 +7,9 @@ export default function PaginaColeccion() {
     <>
       {/* Mobile */}
       <div className="min-h-screen bg-background lg:hidden">
-        <ContenidoColeccion />
+        <Suspense>
+          <ContenidoColeccion />
+        </Suspense>
       </div>
 
       {/* Desktop */}
@@ -14,7 +17,9 @@ export default function PaginaColeccion() {
         <SidebarNavPc />
         <main className="min-h-screen flex-1 bg-background pl-64">
           <div className="mx-auto max-w-2xl py-10">
-            <ContenidoColeccion />
+            <Suspense>
+              <ContenidoColeccion />
+            </Suspense>
           </div>
         </main>
       </div>

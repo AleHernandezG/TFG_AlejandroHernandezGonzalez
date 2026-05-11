@@ -39,7 +39,7 @@ const recetaSchema = new Schema<IRecetaDoc>({
   autorId: { type: Schema.Types.ObjectId, ref: "Usuario", required: true },
   titulo: { type: String, required: true, trim: true, maxlength: 120 },
   descripcion: { type: String, required: true, trim: true, maxlength: 1200 },
-  imagenUrl: { type: String, required: true },
+  imagenUrl: { type: String, default: '' },
   tiempo: { type: String, required: true },
   dificultad: {
     type: String,

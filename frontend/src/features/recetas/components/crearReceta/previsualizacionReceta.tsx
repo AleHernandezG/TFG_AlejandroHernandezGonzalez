@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowLeft, Headphones, Heart, MessageCircle, Share2 } from 'lucide-react'
@@ -12,11 +12,12 @@ import { useCrearRecetaStore } from '@/stores/useCrearRecetaStore'
 import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
 import { ETIQUETAS_DIFICULTAD } from '../../types/crearReceta.schema'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
+import { useCrearReceta } from '@/features/recetas/hooks/useCrearReceta'
 
 export function PrevisualizacionReceta() {
   const router = useRouter()
-  const { datos, fotoPreview, limpiar } = useCrearRecetaStore()
-  const [publicando, setPublicando] = useState(false)
+  const { datos, fotoPreview } = useCrearRecetaStore()
+  const { publicar, publicando, error } = useCrearReceta()
 
   useEffect(() => {
     if (!datos) router.replace('/crear-receta')
@@ -31,15 +32,6 @@ export function PrevisualizacionReceta() {
     .filter(Boolean) as string[]
 
   const tiempoTexto = `${datos.tiempo} ${datos.unidadTiempo}`
-
-  function handlePublicar() {
-    setPublicando(true)
-    // TODO Fase 5: recetasService.crear(datos)
-    setTimeout(() => {
-      limpiar()
-      router.push('/home')
-    }, 1000)
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -251,13 +243,16 @@ export function PrevisualizacionReceta() {
             ← Seguir editando
           </Button>
           <Button
-            onClick={handlePublicar}
+            onClick={publicar}
             disabled={publicando}
             className="flex-1 h-12 rounded-xl bg-brand text-brand-foreground font-bold"
           >
             {publicando ? 'Publicando...' : 'Publicar receta'}
           </Button>
         </div>
+        {error && (
+          <p className="text-xs text-destructive text-center px-5 pb-6">{error}</p>
+        )}
       </div>
     </div>
   )

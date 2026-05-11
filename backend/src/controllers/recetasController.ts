@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { recetasService } from "../services/recetasService";
+import { esquemaCrearRecetaBody } from "../lib/validadores";
 
 type ErrorConStatus = Error & { status?: number };
 
@@ -101,6 +102,47 @@ export const recetasController = {
         texto
       );
       res.status(201).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async obtenerGuardadas(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = await recetasService.obtenerGuardadas(req.usuario!.id);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async obtenerMisRecetas(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = await recetasService.obtenerMisRecetas(req.usuario!.id);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async crear(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = esquemaCrearRecetaBody.safeParse(req.body);
+      if (!resultado.success) {
+        res.status(400).json({ error: "Datos inválidos", detalle: resultado.error.flatten() });
+        return;
+      }
+      const { id } = await recetasService.crear(resultado.data, req.usuario!.id);
+      res.status(201).json({ id });
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async eliminar(req: Request, res: Response): Promise<void> {
+    try {
+      await recetasService.eliminar(req.params.id, req.usuario!.id);
+      res.status(204).send();
     } catch (error) {
       manejarError(res, error);
     }

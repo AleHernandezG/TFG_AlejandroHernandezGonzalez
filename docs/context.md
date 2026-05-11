@@ -234,14 +234,14 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/recetas/[id]` | Detalle de receta — BE real, SSR con `force-dynamic`, likes/comentarios/guardar/seguir funcionales | ✅ Sprint 4 |
 | `/completar-perfil` | Onboarding post-registro — selección de alergias y dietas | 👁️ Pendiente revisión |
 | `/coleccion` | Mi colección — Guardadas y Mis recetas, grid 2 cols portrait, stitch aprobado | ✅ Aprobado autor |
-| `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | 👁️ Pendiente revisión |
-| `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + banner + publicar mock | 👁️ Pendiente revisión |
-| `/despensa` | Despensa virtual — inventario de ingredientes del usuario | ⏳ Sprint 3 — pendiente Stitch |
-| `/chat` | Chat IA (asistente culinario Cookr IA) — sin navbar inferior | ⏳ Sprint 3 — pendiente Stitch |
-| `/perfil` | Ajustes de usuario (avatar, contraseña, preferencias, permisos) | ⏳ Sprint 3 — pendiente Stitch |
-| `/discover` | Discover — feed global trending + eventos temáticos | ⏳ Sprint 3 — pendiente Stitch |
-| `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | 👁️ Pendiente revisión |
-| `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | 👁️ Pendiente revisión |
+| `/crear-receta` | Formulario crear receta — RHF + Zod + popup tutorial + detección alérgenos | ✅ Aprobado · Sprint 4 |
+| `/crear-receta/revisar` | Previsualización antes de publicar — clone detalleReceta + publicar real | ✅ Aprobado · Sprint 4 |
+| `/despensa` | Despensa virtual — FE mock completa: lista ingredientes + añadir/editar/eliminar + Sheet + autocompletado + Dialog "ingrediente duplicado" (bloquea añadir si ya existe, case-insensitive) | 👁️ Pendiente revisión · Sprint 4 |
+| `/chat` | Chat IA — FE mock completa: estado vacío 3 chips, burbujas usuario/IA, IndicadorPensando, BarraInputChat auto-resize, chatStore Zustand mock 1.4s. HeaderChat: botón ← + título centrado + spacer (sin botón top-right historial) + pill "Ver historial" | 👁️ Pendiente revisión · Sprint 4 |
+| `/perfil` | Ajustes de usuario — FE mock: avatar card display-only (sin "Editar nombre"), cambiar contraseña (mock), preferencias+alérgenos chips, toggles permisos, cerrar sesión. Un solo botón CTA "Guardar cambios" full-width (sin "Volver") | 👁️ Pendiente revisión · Sprint 4 |
+| `/discover` | Discover — feed global trending + eventos temáticos | ⏳ Sprint 5+ — pendiente Stitch |
+| `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | ✅ Aprobado · Sprint 4 |
+| `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | ✅ Aprobado · Sprint 4 |
 | `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |
 | `frontend/src/services/authService.ts` | Servicio HTTP de auth (5 métodos) | ✅ |
 | `BE /api/auth/registro` | Endpoint real | ✅ Sprint 2 BE |
@@ -296,20 +296,30 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003, UI-029.
+Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003, UI-029, COL-001, COL-002, COL-007, COL-004, COL-005, COL-006, CREAR-002, API-013, DEBT-009, FIX-001, FIX-002, UI-AF-001, UI-AF-002, UI-AF-003, UI-AF-004, UI-018, STRUCT-001, DESP-001 (pendiente revisión), PERF-001 (pendiente revisión), CHAT-001 (pendiente revisión).
 
 Sprint 3 completados (referencia): UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
 
-Sprint 4 — pendientes:
+Sprint 4 — pendientes sin comenzar:
 
-- **FE:** UI-018 — Formulario multi-step crear receta (👁️ pendiente revisión final)
-- **FE:** STRUCT-001 — Scaffolding vistas Sprint 3+ (👁️ pendiente revisión)
-- **FE+BE:** Vistas pendientes de Stitch: /despensa, /chat, /perfil, /discover
-- **FE+BE:** CREAR-002 — Publicar receta real: BE endpoint `POST /api/recetas` (controller + service + repository) + método `crear()` en `frontend/src/services/recetasService.ts` + subida foto (base64 en body) + reemplazar `setTimeout` mock en `previsualizacionReceta.tsx`. Depende de DEBT-009 (useCrearReceta hook).
+- ~~**FE:** UI-018 — Formulario multi-step crear receta~~ ✅ Aprobado.
+- ~~**FE:** STRUCT-001 — Scaffolding vistas Sprint 3+~~ ✅ Aprobado.
+- ~~**FE:** DESP-001 — Vista /despensa~~ 👁️ Pendiente revisión.
+- ~~**FE:** PERF-001 — Vista /perfil~~ 👁️ Pendiente revisión.
+- ~~**FE:** CHAT-001 — Vista /chat~~ 👁️ Pendiente revisión.
+- **FE+BE:** Vistas pendientes de Stitch: /discover
 - **FE:** CREAR-001 — Tutorial crear receta activado por datos reales: mostrar PopUpTutorial solo si el usuario no tiene recetas creadas (`numRecetasCreadas === 0` desde BD). Actualmente `MOCK_ES_PRIMER_USUARIO = false` hardcodeado.
-- ~~**FE:** INGR-001 — Autocompletado ingredientes con fuente real~~ ✅ Completado: `@/config/ingredientes.ts` con 200+ ingredientes, aliases y alérgenos EU. `buscarIngredientes()` sustituye el filtro manual de 30 items.
-- ~~**FE:** ALERG-002 — Alérgenos desde la nueva fuente~~ ✅ Completado: `detectarAlergenos.ts` ahora re-exporta desde `@/config/ingredientes.ts`. Función usa `obtenerIngrediente()` con matching exacto + aliases.
-- **FE+BE:** DEBT-009 — Extraer `useCrearReceta` hook para separar lógica de envío del componente `formularioCrearReceta.tsx` y `previsualizacionReceta.tsx`.
+- ~~**FE:** INGR-001 — Autocompletado ingredientes con fuente real~~ ✅ Completado.
+- ~~**FE:** ALERG-002 — Alérgenos desde la nueva fuente~~ ✅ Completado.
+- ~~**FE+BE:** DEBT-009~~ ✅ Aprobado: `useCrearReceta` hook extraído en `features/recetas/hooks/useCrearReceta.ts`.
+- ~~**FE+BE:** CREAR-002~~ ✅ Aprobado: `POST /api/recetas` implementado + `recetasService.crear()` + `previsualizacionReceta.tsx` conectado.
+- ~~COL-001, COL-002, COL-007, COL-004, COL-005, COL-006~~ ✅ Aprobado: colección conectada a BE real, bookmark desguardar, Sheet/Dialog eliminar.
+- ~~**BE:** FIX-001~~ ✅ Aprobado: `express.json({ limit: '10mb' })` + `imagenUrl` no required en Mongoose — fix publicar receta.
+- ~~**FE:** FIX-002~~ ✅ Aprobado: `<Suspense>` en `coleccion/page.tsx` — fix redirect a `?tab=mis-recetas` tras publicar (useSearchParams requiere Suspense en Next.js 14).
+- ~~**FE:** UI-AF-001~~ ✅ Aprobado: botón ··· con círculo `bg-white/20 backdrop-blur-sm`.
+- ~~**FE:** UI-AF-002~~ ✅ Aprobado: botón Eliminar en detalle receta para el autor.
+- ~~**FE:** UI-AF-003~~ ✅ Aprobado: `seccionIngredientes` rediseñada — card por ingrediente, 20 unidades.
+- ~~**FE:** UI-AF-004~~ ✅ Aprobado: `seccionPasos` con textarea auto-resize.
 
 Sprint 5+ — pendientes:
 
