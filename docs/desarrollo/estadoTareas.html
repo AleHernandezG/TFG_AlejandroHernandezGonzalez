@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-08 · Sprint 4 activo · Fase 4 de 7 · Despensa + Perfil + Chat implementados</div>
+    <div class="meta">Actualizado: 2026-05-11 · Sprint 4 activo · Fase 4 de 7 · Despensa + Perfil + Chat aprobados · /discover pendiente</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">3</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter review"><div class="num">0</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">12</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">89</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">92</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -1066,7 +1066,7 @@
             <small>FE completa: types/despensa.types.ts · datosDespensa.ts (12 items mock + EMOJIS map + getEmojiIngrediente) · despensaStore.ts (Zustand: añadir/editar/eliminar, estado inicial con mock). Componentes: headerDespensa (título editorial + contador) · barraAnadirIngrediente (pill CTA + botón + brand) · estadoVacioDespensa (ShoppingBasket + CTA) · tarjetaIngrediente (emoji avatar + nombre + cantidad + pencil/trash, AnimatePresence exit) · listaIngredientes (AnimatePresence) · sheetAnadirIngrediente (Sheet shadcn + input + autocompletado + chips rápidas + cantidad/unidad + detección duplicados case-insensitive → Dialog "ya está en tu despensa") · dialogEditarIngrediente (Dialog shadcn + form pre-rellenado) · contenidoDespensa (orquestador client) · page.tsx (mobile + desktop SidebarNavPc). Stitch: docs/stitch/despensa/.</small>
             <span class="source">📄 features/despensa/ · stores/despensaStore.ts · app/(main)/despensa/page.tsx · docs/stitch/despensa/</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
@@ -1078,7 +1078,7 @@
             <small>FE completa: types/perfil.types.ts · datosPerfil.ts (mock: nombre, email, dietas, alérgenos, permisos) · perfilStore.ts (Zustand: actualizarDietas, actualizarAlergenos, togglePermiso). Componentes: tarjetaAvatarPerfil (display-only: avatar 80px + camera button, sin "Editar nombre" ni Dialog) · grupoAjustes · filaAjuste · filaTogglePermiso (switch role=switch) · dialogCambiarContrasena (RHF + Zod, mock submit) · dialogPreferenciasAlergenos (chips Dieta + Alérgenos) · contenidoPerfil (orquestador, botón único "Guardar cambios" full-width, sin botón "Volver"). page.tsx: mobile + desktop. Stitch: docs/stitch/perfil/.</small>
             <span class="source">📄 features/perfil/ · stores/perfilStore.ts · app/(main)/perfil/page.tsx · docs/stitch/perfil/</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
@@ -1090,7 +1090,7 @@
             <small>Chat IA full-screen sin NavBar. Estado vacío con 3 chips sugeridos. Burbujas usuario (derecha, bg-brand) y IA (izquierda, bg-card + chef avatar). IndicadorPensando animado (Framer Motion). BarraInputChat sticky bottom con textarea auto-resize. chatStore Zustand con enviarMensaje + getMockRespuesta (1.4s delay). ContenidoChat usa fixed inset-0 z-[60] overlay. NavBar oculto en /chat. HeaderChat: botón ← + título centrado + spacer (sin botón "Historial" top-right) + pill "Ver historial". 10 ficheros nuevos.</small>
             <span class="source">📄 features/chat/ · stores/chatStore.ts · app/(main)/chat/page.tsx · docs/stitch/chat/</span>
           </td>
-          <td><span class="status review">👁️ Pendiente revisión · Sprint 4</span></td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
