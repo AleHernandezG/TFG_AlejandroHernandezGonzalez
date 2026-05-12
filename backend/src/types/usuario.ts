@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { IItemDespensa } from "./despensa";
 
 export interface IUsuario {
   nombre: string;
@@ -16,4 +17,5 @@ export interface IUsuario {
   seguidos?: Types.ObjectId[];
   seguidores?: Types.ObjectId[];
   fechaRegistro: Date;
+  despensa?: IItemDespensa[];
 }

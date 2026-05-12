@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { useAutocompletadoIngredientes } from '@/features/recetas/hooks/useAutocompletadoIngredientes'
 import { UNIDADES_INGREDIENTE } from '@/features/recetas/types/crearReceta.schema'
 import { getEmojiIngrediente } from '@/features/despensa/data/datosDespensa'
-import { useDespensaStore } from '@/stores/despensaStore'
 import type { ItemDespensa } from '@/features/despensa/types/despensa.types'
 
 const SUGERENCIAS_RAPIDAS = ['Tomate', 'Cebolla', 'Ajo', 'Zanahoria', 'Patata', 'Huevos']
@@ -17,9 +16,10 @@ interface Props {
   abierto: boolean
   onCerrar: () => void
   onAnadir: (item: Omit<ItemDespensa, 'id'>) => void
+  ingredientesExistentes: ItemDespensa[]
 }
 
-export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir }: Props) {
+export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredientesExistentes }: Props) {
   const [nombre, setNombre] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [unidad, setUnidad] = useState('g')
@@ -27,7 +27,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir }: Props) {
   const [nombreDuplicado, setNombreDuplicado] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { sugerencias } = useAutocompletadoIngredientes(nombre)
-  const ingredientes = useDespensaStore((s) => s.ingredientes)
+  const ingredientes = ingredientesExistentes
 
   const puedeAnadir = nombre.trim().length >= 2 && Number(cantidad) > 0
 

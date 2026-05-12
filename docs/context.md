@@ -1,9 +1,9 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-05-03
-**Sprint Actual:** Sprint 4 — activo
+**Fecha:** 2026-05-12
+**Sprint Actual:** Sprint 5 — activo
 **Modelo:** FE vistas reales conectadas a BE + BD MongoDB real
-**Fase:** Fase 2 de 7 — Recetas (FE + BE real) + Funcionalidad Social
+**Fase:** Fase 5 de 7 — Integración BE /despensa completada
 
 > Reglas de desarrollo, arquitectura, colores, nomenclatura y diseño → `docs/rules.md`
 
@@ -63,6 +63,13 @@
 - ✅ [DET-006-FE] Botón "Añadir a mi despensa" en `tabsReceta.tsx` — `handleAnadirDespensa` deduplica por nombre (case-insensitive), llama a `useDespensaStore.añadir()` con emoji via `getEmojiIngrediente()`. Feedback visual 3 s. FE mock Sprint 4.
 - ✅ [CREAR-001] Tutorial primer usuario real — `MOCK_ES_PRIMER_USUARIO` eliminado; `useMisRecetas()` hook; tutorial se activa cuando `misRecetas.length === 0` al montar `formularioCrearReceta.tsx`.
 - ✅ [INGR-001 + ALERG-002] Ingredientes reales — `src/config/ingredientes.ts` con 200+ ingredientes (17 categorías), aliases multilingüe (ES/EN/CA), alérgenos EU completos. `buscarIngredientes()` sustituye filtro manual. `detectarAlergenos.ts` re-exporta desde config (fuente única). `datosIngredientes.ts` eliminado.
+- ⏳ [DESP-BE-001] BE Schema despensa — `backend/src/types/despensa.ts` (IItemDespensa), IUsuario extendido con `despensa?: IItemDespensa[]`, `itemDespensaSchema` embebido en `usuarioMongo.ts`. Pendiente revisión.
+- ⏳ [DESP-BE-002] BE Repository — `despensaRepository.ts`: obtener ($select), añadir ($push), editar ($set posicional), eliminar ($pull). Devuelve array completo en cada operación. Pendiente revisión.
+- ⏳ [DESP-BE-003] BE Service + Controller — `despensaService.ts` (delega en repo) + `despensaController.ts` (validación inputs, manejarError centralizado). Pendiente revisión.
+- ⏳ [DESP-BE-004] BE Rutas — `despensa.routes.ts` (GET / · POST / · PUT /:id · DELETE /:id, todas requerirAuth) registrado en `app.ts` como `/api/despensa`. Pendiente revisión.
+- ⏳ [DESP-FE-001] FE Service — `despensaService.ts`: 4 métodos HTTP con `Authorization: Bearer`, `normalizar()` mapea `_id` → `id`. Pendiente revisión.
+- ⏳ [DESP-FE-002] FE Hooks — `useMiDespensa.ts`: `useMiDespensa` (useQuery) + `useAñadirItem` / `useEditarItem` / `useEliminarItem` (useMutation con optimistic update + rollback). Pendiente revisión.
+- ⏳ [DESP-FE-003] FE Connect — `contenidoDespensa.tsx` usa hooks reales (isLoading spinner), `sheetAnadirIngrediente.tsx` recibe `ingredientesExistentes` como prop, `despensaStore.ts` vaciado, `tabsReceta.tsx` migrado a `useMiDespensa` + `useAñadirItem`. Pendiente revisión.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
