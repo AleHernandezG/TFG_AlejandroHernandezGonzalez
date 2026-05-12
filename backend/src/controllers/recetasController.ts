@@ -147,4 +147,18 @@ export const recetasController = {
       manejarError(res, error);
     }
   },
+
+  async obtenerFotoPreview(req: Request, res: Response): Promise<void> {
+    try {
+      const { query } = req.query;
+      if (typeof query !== "string" || !query.trim()) {
+        res.status(400).json({ error: "El parámetro query es obligatorio" });
+        return;
+      }
+      const resultado = await recetasService.obtenerFotoPreview(query.trim());
+      res.status(200).json(resultado ?? null);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
 };

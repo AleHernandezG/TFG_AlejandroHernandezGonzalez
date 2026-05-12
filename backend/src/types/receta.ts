@@ -23,11 +23,19 @@ export interface IComentarioReceta {
   fecha: Date;
 }
 
+export interface IFotoCredito {
+  fotografo: string;
+  urlFoto: string;
+  urlPerfil: string;
+}
+
 export interface IReceta {
   autorId: Types.ObjectId;
   titulo: string;
   descripcion: string;
   imagenUrl: string;
+  fotoFuente?: "usuario" | "pexels";
+  fotoCredito?: IFotoCredito | null;
   tiempo: string;
   dificultad: "Fácil" | "Media" | "Difícil";
   porciones: number;
@@ -59,10 +67,18 @@ interface AutorRespuesta {
   avatarUrl: string;
 }
 
+export interface IFotoCreditoRespuesta {
+  fotografo: string;
+  urlFoto: string;
+  urlPerfil: string;
+}
+
 interface DatosRecetaRespuesta {
   titulo: string;
   descripcion: string;
   imagenUrl: string;
+  fotoFuente?: "usuario" | "pexels";
+  fotoCredito?: IFotoCreditoRespuesta | null;
   tiempo: string;
   dificultad: string;
   alergenos: string[];

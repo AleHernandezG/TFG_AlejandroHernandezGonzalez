@@ -357,6 +357,7 @@ toggleGuardado(undefined, { onError: () => setGuardado(true) })</code></pre>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/hooks/useMisRecetas.ts</code></li>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/hooks/useEliminarReceta.ts</code></li>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/hooks/useCrearReceta.ts</code></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/hooks/useFotoPexelsPreview.ts</code> — <em>fix post-sprint</em></li>
   </ul>
 
   <h3>Modificados <span class="badge badge-mod">mod</span></h3>
@@ -364,14 +365,17 @@ toggleGuardado(undefined, { onError: () => setGuardado(true) })</code></pre>
     <li><span class="badge badge-be">BE</span> <code>backend/src/types/receta.ts</code> — +RecetaColeccion, +DatosCrearRecetaBody</li>
     <li><span class="badge badge-be">BE</span> <code>backend/src/lib/validadores.ts</code> — +esquemaCrearRecetaBody</li>
     <li><span class="badge badge-be">BE</span> <code>backend/src/repositories/recetaRepository.ts</code> — +findGuardadas, +findPorAutor, +crear, +eliminar</li>
-    <li><span class="badge badge-be">BE</span> <code>backend/src/services/recetasService.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar</li>
-    <li><span class="badge badge-be">BE</span> <code>backend/src/controllers/recetasController.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar</li>
-    <li><span class="badge badge-be">BE</span> <code>backend/src/routes/recetas.routes.ts</code> — +4 rutas (orden /guardadas antes de /:id)</li>
-    <li><span class="badge badge-fe">FE</span> <code>frontend/src/services/recetasService.ts</code> — +crear()</li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/services/recetasService.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar, +obtenerFotoPreview <em>(fix)</em></li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/controllers/recetasController.ts</code> — +obtenerGuardadas, +obtenerMisRecetas, +crear, +eliminar, +obtenerFotoPreview <em>(fix)</em></li>
+    <li><span class="badge badge-be">BE</span> <code>backend/src/routes/recetas.routes.ts</code> — +4 rutas sprint + GET /foto-preview <em>(fix)</em></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/services/recetasService.ts</code> — +crear(), +obtenerFotoPreview() <em>(fix)</em></li>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/types/crearReceta.schema.ts</code> — +DatosRecetaNueva</li>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/components/contenidoColeccion.tsx</code> — mocks→hooks, skeleton, tab URL</li>
     <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/coleccion/components/tarjetaColeccion.tsx</code> — Bookmark+Sheet+Dialog</li>
-    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/components/crearReceta/previsualizacionReceta.tsx</code> — useCrearReceta real</li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/components/crearReceta/previsualizacionReceta.tsx</code> — useCrearReceta real + foto Pexels preview <em>(fix)</em></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/hooks/useCrearReceta.ts</code> — router.push antes de limpiar() <em>(fix redirect)</em></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/src/features/recetas/components/crearReceta/seccionIngredientes.tsx</code> — dropdown fuera de overflow-hidden <em>(fix)</em></li>
+    <li><span class="badge badge-fe">FE</span> <code>frontend/next.config.mjs</code> — +images.pexels.com en remotePatterns <em>(fix)</em></li>
   </ul>
 
   <h3>Candidatos a eliminar (cuando se confirme el deploy)</h3>
@@ -407,12 +411,46 @@ toggleGuardado(undefined, { onError: () => setGuardado(true) })</code></pre>
     <strong>✅ TypeScript:</strong> <code>tsc --noEmit</code> ejecutado en backend y frontend sin errores.
     Ambos compilados limpiamente tras todos los cambios del sprint.
   </div>
+
+  <h3>Dropdown de ingredientes cortado por overflow-hidden</h3>
+  <p>
+    El <code>&lt;ul&gt;</code> de autocompletado en <code>seccionIngredientes.tsx</code> estaba dentro
+    del <code>div</code> con <code>overflow-hidden</code> del card, lo que lo recortaba visualmente.
+    Se movió fuera del card, como hermano directo del contenedor <code>relative</code>, posicionado
+    con <code>top-12</code> para quedar justo debajo de la fila del input.
+  </p>
+
+  <h3>Foto Pexels en vista previa antes de publicar</h3>
+  <p>
+    Se añadió el endpoint <code>GET /recetas/foto-preview?query=xxx</code> (sin auth) que reutiliza
+    <code>buscarFotoPexels()</code> de <code>imagenService.ts</code>. El hook <code>useFotoPexelsPreview(titulo)</code>
+    lo llama desde <code>previsualizacionReceta.tsx</code> cuando no hay foto subida.
+    Muestra "Buscando foto…" mientras carga y la atribución obligatoria de Pexels superpuesta sobre el hero.
+    La ruta se declara antes de <code>/:id</code> para que Express no la capture como parámetro.
+  </p>
+
+  <h3>Redirect a /crear-receta tras publicar — race condition</h3>
+  <p>
+    <code>router.push()</code> en Next.js App Router es <strong>asíncrono</strong>: inicia la navegación pero no la
+    completa antes de que React re-renderice. Al llamar <code>limpiar()</code>, <code>datos</code> se pone a
+    <code>null</code>, React re-renderiza síncronamente y el <code>useEffect([datos, router])</code> de la preview
+    disparaba <code>router.replace('/crear-receta')</code>, ganando la carrera a la navegación correcta.
+  </p>
+  <p>
+    Fix definitivo: la guardia de redirección sólo debe ejecutarse <strong>en el montaje</strong> (cuando el usuario
+    navega directamente a <code>/crear-receta/revisar</code> sin datos). Se captura el valor inicial con un
+    <code>useRef(datos)</code> y las deps del efecto ya no incluyen <code>datos</code>:
+  </p>
+  <pre>const datosAlMontar = useRef(datos)
+useEffect(() => {
+  if (!datosAlMontar.current) router.replace('/crear-receta')
+}, [router])   // no depende de datos — nunca re-dispara al limpiar</pre>
 </section>
 
 </main>
 
 <footer>
-  Cookr TFG · Sprint 4 · Generado 2026-05-06
+  Cookr TFG · Sprint 4 · Generado 2026-05-06 · Fixes 2026-05-12
 </footer>
 
 </body>

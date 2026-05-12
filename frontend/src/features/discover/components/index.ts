@@ -1,0 +1,6 @@
+export { ContenidoDiscover } from './contenidoDiscover'
+export { HeaderDiscover } from './headerDiscover'
+export { ChipsCategoria } from './chipsCategoria'
+export { TarjetaDestacada } from './tarjetaDestacada'
+export { TarjetaDiscover } from './tarjetaDiscover'
+export { EstadoVacioDiscover } from './estadoVacioDiscover'

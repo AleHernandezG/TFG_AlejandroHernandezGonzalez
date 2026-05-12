@@ -38,8 +38,8 @@ export function useCrearReceta() {
         },
         token,
       )
-      limpiar()
       router.push('/coleccion?tab=mis-recetas')
+      limpiar()
     } catch {
       setError('No se pudo publicar la receta. Inténtalo de nuevo.')
     } finally {

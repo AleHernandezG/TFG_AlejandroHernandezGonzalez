@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vista Discover — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-size: 0.78rem; color: #737373; margin-left: auto; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; margin-top: 1.25rem; }
+    h3:first-child { margin-top: 0; }
+
+    p { font-size: 0.85rem; color: #a3a3a3; margin-bottom: 0.75rem; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    .path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #60a5fa; }
+    .id   { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.76rem; color: #d4d4d4; overflow-x: auto; margin: 0.75rem 0; line-height: 1.8; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #1f1f1f; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.3rem; white-space: nowrap; }
+    .tag.done    { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+    .tag.review  { background: #f9731622; color: #fb923c;  border: 1px solid #f9731633; }
+    .tag.pending { background: #3b82f622; color: #60a5fa;  border: 1px solid #3b82f633; }
+    .tag.mock    { background: #eab30822; color: #fbbf24;  border: 1px solid #eab30833; }
+    .tag.fase5   { background: #8b5cf622; color: #c084fc;  border: 1px solid #8b5cf633; }
+    .tag.reuse   { background: #06b6d422; color: #22d3ee;  border: 1px solid #06b6d433; }
+
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .tree .new     { color: #4ade80; }
+    .tree .exists  { color: #737373; }
+    .tree .comment { color: #525252; font-style: italic; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .flow-num { min-width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #f97316; color: #fff; font-size: 0.7rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 0.1rem; }
+    .flow-text { font-size: 0.83rem; color: #a3a3a3; }
+    .flow-text strong { color: #e5e5e5; }
+
+    .state-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #1f1f1f; }
+    .state-row:last-child { border-bottom: none; }
+    .state-name { font-family: monospace; font-size: 0.76rem; color: #60a5fa; min-width: 180px; }
+    .state-desc { font-size: 0.82rem; color: #a3a3a3; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧭 Vista /discover — Cookr TFG</h1>
+  <span class="badge">Sprint 4</span>
+  <span class="badge" style="background:#22c55e22;color:#4ade80;border-color:#22c55e44">FE Mock</span>
+  <span class="meta">Creado: 2026-05-12 · 7 componentes · 1 data file · Stitch aprobado</span>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#tipos">Tipos</a>
+  <a href="#estado">Estado</a>
+  <a href="#filtrado">Filtrado</a>
+  <a href="#flujo">Flujo UI</a>
+  <a href="#fase5">Fase 5</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen</h2>
+    </div>
+    <div class="section-body">
+      <p>Vista <code>/discover</code> — feed de descubrimiento global con búsqueda, filtros por categoría, tarjeta de evento destacado y grid de recetas trending. Diseño basado en el sistema editorial <em>"The Digital Gourmet"</em> del Stitch.</p>
+      <p>Sprint 4: implementación <strong>FE mock completa</strong> con datos locales en <code>datosDiscover.ts</code>. Toda la lógica de filtrado es local (sin petición al backend). La integración real con el backend está planificada para Fase 5.</p>
+
+      <h3>Dos estados principales</h3>
+      <table>
+        <thead><tr><th>Estado</th><th>Condición</th><th>Qué se muestra</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Vista principal</td>
+            <td><code>query === ''</code></td>
+            <td>Header editorial + chips de categoría + tarjeta destacada + grid con tabs</td>
+          </tr>
+          <tr>
+            <td>Búsqueda activa</td>
+            <td><code>query.length &gt; 0 &amp;&amp; resultados &gt; 0</code></td>
+            <td>Header simplificado ("Cookr") + conteo de resultados + grid filtrado</td>
+          </tr>
+          <tr>
+            <td>Sin resultados</td>
+            <td><code>query.length &gt; 0 &amp;&amp; resultados === 0</code></td>
+            <td>Estado vacío con query resaltada + CTA "Limpiar búsqueda" + sugerencias populares</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARCHIVOS -->
+  <section id="archivos">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Archivos creados</h2>
+    </div>
+    <div class="section-body">
+      <div class="tree">
+        <div><span class="new">src/features/discover/</span> <span class="comment">— módulo nuevo</span></div>
+        <div>&nbsp;&nbsp;<span class="new">types/</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">discover.types.ts</span> <span class="comment">— CategoriaDiscover · TabInspiracion · RecetaDiscover · EventoDestacado</span></div>
+        <div>&nbsp;&nbsp;<span class="new">data/</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">datosDiscover.ts</span> <span class="comment">— 6 recetas mock · evento destacado · sugerencias · categorías</span></div>
+        <div>&nbsp;&nbsp;<span class="new">components/</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">contenidoDiscover.tsx</span> <span class="comment">— 'use client' · estado + filtrado + layout principal</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">headerDiscover.tsx</span> <span class="comment">— 'use client' · título editorial + barra de búsqueda pill</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">chipsCategoria.tsx</span> <span class="comment">— 'use client' · scroll horizontal, single-select</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">tarjetaDestacada.tsx</span> <span class="comment">— hero card evento de la semana</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">tarjetaDiscover.tsx</span> <span class="comment">— card 3/4 con foto, overlay gradiente, autor + likes + tiempo</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">estadoVacioDiscover.tsx</span> <span class="comment">— empty state búsqueda sin resultados</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="new">index.ts</span> <span class="comment">— barrel export</span></div>
+        <div><span class="new">src/app/(main)/discover/</span></div>
+        <div>&nbsp;&nbsp;<span class="new">page.tsx</span> <span class="comment">— server component · metadata · renderiza ContenidoDiscover</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header">
+      <span class="section-icon">🧩</span>
+      <h2>Componentes</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Componente</th>
+            <th>Tipo</th>
+            <th>Props recibidas</th>
+            <th>Responsabilidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ContenidoDiscover</code></td>
+            <td><span class="tag mock">Client</span></td>
+            <td>—</td>
+            <td>Gestiona todo el estado local (query, categoría, tab). Filtra recetas con <code>useMemo</code>. Orquesta el layout.</td>
+          </tr>
+          <tr>
+            <td><code>HeaderDiscover</code></td>
+            <td><span class="tag mock">Client</span></td>
+            <td><code>query</code>, <code>onChange</code></td>
+            <td>Muestra el título editorial <em>"Descubre lo que está trending?"</em> o el logo "Cookr" según si hay búsqueda activa. Input pill con icono de lupa y botón X.</td>
+          </tr>
+          <tr>
+            <td><code>ChipsCategoria</code></td>
+            <td><span class="tag mock">Client</span></td>
+            <td><code>categorias</code>, <code>activa</code>, <code>onChange</code></td>
+            <td>Scroll horizontal de pills de categoría. Single-select. Active chip con <code>bg-brand</code>.</td>
+          </tr>
+          <tr>
+            <td><code>TarjetaDestacada</code></td>
+            <td><span class="tag done">Server</span></td>
+            <td><code>evento: EventoDestacado</code></td>
+            <td>Hero card de evento de la semana. Fondo degradado editorial con círculos decorativos. Etiqueta con icono Sparkles.</td>
+          </tr>
+          <tr>
+            <td><code>TarjetaDiscover</code></td>
+            <td><span class="tag done">Server</span></td>
+            <td><code>receta: RecetaDiscover</code></td>
+            <td>Card <code>aspect-[3/4]</code> con foto, overlay gradiente, título, autor, tiempo y likes. Enlaza a <code>/recetas/[id]</code>.</td>
+          </tr>
+          <tr>
+            <td><code>EstadoVacioDiscover</code></td>
+            <td><span class="tag done">Server</span></td>
+            <td><code>query</code>, <code>sugerencias</code>, <code>onLimpiar</code>, <code>onSugerencia</code></td>
+            <td>Icono SearchX, mensaje con query resaltada en brand, botón "Limpiar búsqueda" y chips de sugerencias populares.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TIPOS -->
+  <section id="tipos">
+    <div class="section-header">
+      <span class="section-icon">🔷</span>
+      <h2>Tipos TypeScript</h2>
+    </div>
+    <div class="section-body">
+      <p>Definidos en <code class="path">features/discover/types/discover.types.ts</code></p>
+      <pre>
+export type CategoriaDiscover = 'Todos' | 'Desayuno' | 'Pasta' | 'Vegano' | 'Postres'
+
+export type TabInspiracion = 'nuevo' | 'reciente'
+
+export type RecetaDiscover = {
+  id: string
+  titulo: string
+  autorNombre: string
+  imagenUrl: string | null
+  tiempoMin: number
+  likes: number
+  categoria: Exclude&lt;CategoriaDiscover, 'Todos'&gt;  // nunca 'Todos'
+}
+
+export type EventoDestacado = {
+  titulo: string
+  subtitulo: string
+  etiqueta: string
+}</pre>
+
+      <h3>Mock data — datosDiscover.ts</h3>
+      <table>
+        <thead><tr><th>Constante</th><th>Contenido</th></tr></thead>
+        <tbody>
+          <tr><td><code>CATEGORIAS_DISCOVER</code></td><td>5 categorías: Todos · Desayuno · Pasta · Vegano · Postres</td></tr>
+          <tr><td><code>SUGERENCIAS_POPULARES</code></td><td>4 sugerencias para el estado vacío: Tacos de Birria · Pasta al Pesto · Ensalada Keto · Postres Sin Horno</td></tr>
+          <tr><td><code>EVENTO_DESTACADO_MOCK</code></td><td>Evento "Semana de la Cocina Mediterránea"</td></tr>
+          <tr><td><code>RECETAS_DISCOVER_MOCK</code></td><td>6 recetas con distintas categorías: 2 Pasta, 2 Vegano, 1 Postres, 1 Desayuno</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ESTADO -->
+  <section id="estado">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <h2>Estado local — ContenidoDiscover</h2>
+    </div>
+    <div class="section-body">
+      <p>Esta vista no requiere Zustand. Todo el estado es local al componente <code>ContenidoDiscover</code> ya que es UI-only (sin persistencia entre sesiones en Sprint 4).</p>
+
+      <div style="margin-top:0.75rem">
+        <div class="state-row">
+          <span class="state-name">query: string</span>
+          <span class="state-desc">Texto introducido en el input de búsqueda. Controlado directamente por el input.</span>
+        </div>
+        <div class="state-row">
+          <span class="state-name">queryDebounced: string</span>
+          <span class="state-desc">Versión debounced de <code>query</code> (300 ms) via <code>useDebounce</code> hook reutilizado de <code>hooks/useDebounce.ts</code>. Es el valor usado para filtrar recetas, evita re-filtrar en cada tecla.</span>
+        </div>
+        <div class="state-row">
+          <span class="state-name">categoriaActiva: CategoriaDiscover</span>
+          <span class="state-desc">Categoría seleccionada en los chips. Default: <code>'Todos'</code>.</span>
+        </div>
+        <div class="state-row">
+          <span class="state-name">tabActiva: TabInspiracion</span>
+          <span class="state-desc">Tab seleccionada en la sección Inspiración: <code>'nuevo'</code> (default) o <code>'reciente'</code>. En mock, 'reciente' simplemente invierte el array.</span>
+        </div>
+        <div class="state-row">
+          <span class="state-name">recetasFiltradas (memo)</span>
+          <span class="state-desc">Calculado con <code>useMemo</code>. Depende de <code>queryDebounced</code>, <code>categoriaActiva</code> y <code>tabActiva</code>. No es estado, es derivado.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTRADO -->
+  <section id="filtrado">
+    <div class="section-header">
+      <span class="section-icon">🔍</span>
+      <h2>Lógica de filtrado</h2>
+    </div>
+    <div class="section-body">
+      <p>Todo el filtrado ocurre en el <code>useMemo</code> de <code>ContenidoDiscover</code>. Sin llamada al backend en Sprint 4.</p>
+      <pre>
+const recetasFiltradas = useMemo(() => {
+  let lista = RECETAS_DISCOVER_MOCK
+
+  // 1. Filtro por categoría
+  if (categoriaActiva !== 'Todos') {
+    lista = lista.filter((r) => r.categoria === categoriaActiva)
+  }
+
+  // 2. Filtro por búsqueda (título + nombre de autor, case-insensitive)
+  if (queryDebounced) {
+    const q = queryDebounced.toLowerCase()
+    lista = lista.filter(
+      (r) => r.titulo.toLowerCase().includes(q) ||
+             r.autorNombre.toLowerCase().includes(q)
+    )
+  }
+
+  // 3. Ordenación por tab
+  return tabActiva === 'reciente' ? [...lista].reverse() : lista
+}, [queryDebounced, categoriaActiva, tabActiva])</pre>
+
+      <h3>Condiciones de renderizado</h3>
+      <table>
+        <thead><tr><th>Condición</th><th>Render</th></tr></thead>
+        <tbody>
+          <tr><td><code>!buscando</code></td><td>Muestra chips de categoría + TarjetaDestacada + section Inspiración</td></tr>
+          <tr><td><code>buscando &amp;&amp; recetasFiltradas.length === 0</code></td><td>Muestra <code>EstadoVacioDiscover</code> con el query actual</td></tr>
+          <tr><td><code>buscando &amp;&amp; recetasFiltradas.length &gt; 0</code></td><td>Muestra cabecera de resultados con conteo + grid filtrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FLUJO UI -->
+  <section id="flujo">
+    <div class="section-header">
+      <span class="section-icon">🔄</span>
+      <h2>Flujo de usuario</h2>
+    </div>
+    <div class="section-body">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-text">Usuario llega a <strong>/discover</strong>. Ve el header editorial "Descubre lo que está <em>trending?</em>", los chips de categoría, la tarjeta del evento destacado de la semana y el grid de 6 recetas en 2 columnas.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-text">Pulsa un chip de categoría (ej. "Pasta"). El grid se filtra instantáneamente mostrando solo las recetas de esa categoría con animación <code>AnimatePresence</code>.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-text">Cambia el tab a "Reciente" en la sección Inspiración. El grid invierte el orden de las recetas.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-text">Escribe en la barra de búsqueda. Tras 300 ms (debounce), el header cambia a logo simple "Cookr" y el grid muestra los resultados filtrados por título y autor.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-text">Si no hay resultados: aparece el estado vacío con el término buscado resaltado en brand, botón "Limpiar búsqueda" y 4 chips de sugerencias populares.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-text">Pulsa una tarjeta de receta → navega a <strong>/recetas/[id]</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FASE 5 -->
+  <section id="fase5">
+    <div class="section-header">
+      <span class="section-icon">🔮</span>
+      <h2>Integración BE — Fase 5</h2>
+    </div>
+    <div class="section-body">
+      <p>En Sprint 4 toda la lógica es mock local. En Fase 5 se deberá:</p>
+      <table>
+        <thead><tr><th>Qué crear</th><th>Dónde</th><th>Detalle</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Hook <code>useDiscover</code></td>
+            <td><span class="path">features/discover/hooks/useDiscover.ts</span></td>
+            <td>TanStack Query · <code>GET /api/recetas/trending</code> con params <code>categoria</code>, <code>q</code>, <code>tab</code></td>
+          </tr>
+          <tr>
+            <td>Servicio <code>discoverService</code></td>
+            <td><span class="path">services/discoverService.ts</span></td>
+            <td>Métodos <code>obtenerTrending({ categoria, q })</code> — sin Axios directo en componentes</td>
+          </tr>
+          <tr>
+            <td>Endpoint BE</td>
+            <td><span class="path">backend/src/routes/recetas.routes.ts</span></td>
+            <td><code>GET /api/recetas/trending</code> — recetas con mayor interacción reciente, paginadas</td>
+          </tr>
+          <tr>
+            <td>Evento destacado</td>
+            <td><span class="path">backend/src/routes/eventos.routes.ts</span></td>
+            <td><code>GET /api/eventos/activo</code> — evento editorial configurable desde admin</td>
+          </tr>
+          <tr>
+            <td>Actualizar <code>contenidoDiscover.tsx</code></td>
+            <td>—</td>
+            <td>Reemplazar <code>RECETAS_DISCOVER_MOCK</code> y <code>useMemo</code> local por <code>useDiscover()</code>. Los skeletons durante carga usan <code>isLoading</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Arquitectura objetivo (Fase 5)</h3>
+      <pre>
+ContenidoDiscover
+  → useDiscover(categoria, queryDebounced)
+    → discoverService.obtenerTrending(params)
+      → apiClient.get('/recetas/trending', { params })
+        → GET /api/recetas/trending
+          → recetaRepository.findTrending()</pre>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Foto Automática Pexels — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.7; }
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.8rem; color: #737373; margin-top: 0.2rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 0.9rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.6rem; }
+    .section-header h2 { font-size: 0.9rem; font-weight: 700; color: #fff; }
+    .body { padding: 1.25rem; font-size: 0.85rem; color: #d4d4d4; }
+    .body p { margin-bottom: 0.75rem; }
+    .body p:last-child { margin-bottom: 0; }
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-size: 0.78rem; overflow-x: auto; color: #a3e635; margin: 0.75rem 0; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: left; padding: 0.5rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid #1f1f1f; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; }
+    .tag.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .tag.fe { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf633; }
+    .tag.new { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .tag.upd { background: #f9731622; color: #fb923c; border: 1px solid #f9731633; }
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: #f97316; color: #fff; margin-left: auto; }
+    .flow { display: flex; flex-direction: column; gap: 0; }
+    .flow-step { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid #1f1f1f; }
+    .flow-step:last-child { border-bottom: none; }
+    .flow-num { font-size: 0.72rem; font-weight: 800; color: #f97316; min-width: 1.5rem; padding-top: 0.05rem; }
+    .flow-text { font-size: 0.83rem; color: #d4d4d4; }
+    .flow-text strong { color: #fff; }
+    .flow-text code { background: #111; border: 1px solid #2a2a2a; border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.75rem; color: #a3e635; }
+    code { background: #111; border: 1px solid #2a2a2a; border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.78rem; color: #a3e635; }
+    .note { background: #1f2937; border-left: 3px solid #f97316; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; font-size: 0.82rem; color: #d1d5db; margin: 0.75rem 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📸 Foto Automática Pexels — FOTO-001 + FOTO-002</h1>
+  <p>Foto automática al publicar receta sin imagen · Créditos Pexels obligatorios · Sprint 4</p>
+</header>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section>
+    <div class="section-header"><span>📋</span><h2>Resumen</h2><span class="badge">Sprint 4</span></div>
+    <div class="body">
+      <p>Cuando un usuario publica una receta <strong>sin subir foto</strong>, el backend busca automáticamente una imagen relacionada en <strong>Pexels API</strong> (gratuita, 200 req/h). Si la encuentra, la guarda como <code>imagenUrl</code> junto a los créditos del fotógrafo.</p>
+      <p>En la vista de detalle de receta, si la foto proviene de Pexels se muestra la atribución obligatoria: "Foto por [nombre] en Pexels" con los enlaces requeridos por la licencia Pexels.</p>
+      <div class="note">La licencia Pexels exige mostrar el nombre del fotógrafo y el enlace a la foto. FOTO-002 cubre este requisito legal.</div>
+    </div>
+  </section>
+
+  <!-- FLUJO COMPLETO -->
+  <section>
+    <div class="section-header"><span>🔄</span><h2>Flujo completo al publicar sin foto</h2></div>
+    <div class="flow">
+      <div class="flow-step"><span class="flow-num">1</span><div class="flow-text">Usuario rellena el formulario de crear receta <strong>sin subir imagen</strong> y pulsa "Publicar".</div></div>
+      <div class="flow-step"><span class="flow-num">2</span><div class="flow-text">FE envía <code>POST /api/recetas</code> con el body sin <code>imagenBase64</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">3</span><div class="flow-text">El controller valida con Zod y llama a <code>recetasService.crear()</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">4</span><div class="flow-text">El service llama a <code>recetaRepository.crear()</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">5</span><div class="flow-text">El repository detecta <code>!datos.imagenBase64</code> → llama a <code>imagenService.buscarFotoPexels(datos.titulo)</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">6</span><div class="flow-text">Pexels devuelve la foto más relevante para el título. Si falla o no hay resultados, <code>imagenUrl</code> queda vacío y <code>fotoFuente = 'usuario'</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">7</span><div class="flow-text">MongoDB guarda: <code>imagenUrl</code> (URL Pexels), <code>fotoFuente: 'pexels'</code>, <code>fotoCredito: { fotografo, urlFoto, urlPerfil }</code>.</div></div>
+      <div class="flow-step"><span class="flow-num">8</span><div class="flow-text">Al visitar la receta, SSR llama a <code>GET /api/recetas/:id</code> que devuelve los campos de crédito.</div></div>
+      <div class="flow-step"><span class="flow-num">9</span><div class="flow-text">FE: <code>heroReceta.tsx</code> muestra la imagen y, si <code>fotoFuente === 'pexels'</code>, renderiza la atribución bajo la imagen.</div></div>
+    </div>
+  </section>
+
+  <!-- ARCHIVOS -->
+  <section>
+    <div class="section-header"><span>📁</span><h2>Archivos modificados / creados</h2></div>
+    <table>
+      <thead><tr><th>Archivo</th><th>Acción</th><th>Capa</th><th>Qué hace</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>backend/src/services/imagenService.ts</code></td>
+          <td><span class="tag new">Nuevo</span></td>
+          <td><span class="tag be">BE</span></td>
+          <td>Punto único para imágenes externas. <code>buscarFotoPexels(query)</code>: llama a <code>GET /v1/search</code> con <code>Authorization: PEXELS_API_KEY</code>, devuelve url + fotografo + urlFoto + urlPerfil. Retorna <code>null</code> si no hay key, falla la red o no hay resultados.</td>
+        </tr>
+        <tr>
+          <td><code>backend/src/types/receta.ts</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag be">BE</span></td>
+          <td>Añade <code>IFotoCredito</code> e <code>IFotoCreditoRespuesta</code>. Extiende <code>IReceta</code> con <code>fotoFuente?</code> y <code>fotoCredito?</code>. Extiende <code>DatosRecetaRespuesta</code> con los mismos campos opcionales.</td>
+        </tr>
+        <tr>
+          <td><code>backend/src/models/recetaMongo.ts</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag be">BE</span></td>
+          <td>Añade <code>fotoCreditoSchema</code> (subdocumento con <code>_id: false</code>). Añade <code>fotoFuente</code> (enum, default <code>'usuario'</code>) y <code>fotoCredito</code> (nullable, default <code>null</code>) al schema principal.</td>
+        </tr>
+        <tr>
+          <td><code>backend/src/repositories/recetaRepository.ts</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag be">BE</span></td>
+          <td>
+            <strong>crear()</strong>: si <code>!imagenBase64</code> llama a Pexels y asigna url + créditos. <br>
+            <strong>docAPostFeed()</strong>: pasa <code>fotoFuente</code> y <code>fotoCredito</code> en el sub-objeto <code>receta</code> de la respuesta.
+          </td>
+        </tr>
+        <tr>
+          <td><code>frontend/src/features/recetas/types/receta.types.ts</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag fe">FE</span></td>
+          <td>Añade tipo <code>FotoCredito</code>. Extiende <code>DatosReceta</code> con <code>fotoFuente?</code> y <code>fotoCredito?</code> opcionales.</td>
+        </tr>
+        <tr>
+          <td><code>frontend/src/features/recetas/components/detalleReceta/heroReceta.tsx</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag fe">FE</span></td>
+          <td>Acepta props opcionales <code>fotoFuente</code> y <code>fotoCredito</code>. Renderiza la atribución Pexels debajo de la imagen cuando <code>fotoFuente === 'pexels'</code>: texto discreto <code>text-[11px] text-muted-foreground</code> con dos enlaces subrayados (fotografo → urlPerfil · "Pexels" → urlFoto).</td>
+        </tr>
+        <tr>
+          <td><code>frontend/src/features/recetas/components/detalleReceta/detalleRecetaCliente.tsx</code></td>
+          <td><span class="tag upd">Actualizado</span></td>
+          <td><span class="tag fe">FE</span></td>
+          <td>Pasa <code>fotoFuente</code> y <code>fotoCredito</code> como props a los dos <code>HeroReceta</code> (mobile y desktop).</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- API PEXELS -->
+  <section>
+    <div class="section-header"><span>🌐</span><h2>Pexels API — detalles técnicos</h2></div>
+    <div class="body">
+      <p><strong>Endpoint:</strong> <code>GET https://api.pexels.com/v1/search</code></p>
+      <p><strong>Parámetros:</strong></p>
+      <pre>query        → título de la receta (ej: "Pasta Carbonara")
+per_page     → 1 (solo necesitamos la primera foto)
+orientation  → landscape (fotos apaisadas, mejor para el hero)</pre>
+      <p><strong>Cabecera:</strong> <code>Authorization: PEXELS_API_KEY</code></p>
+      <p><strong>Respuesta relevante:</strong></p>
+      <pre>{
+  "photos": [{
+    "src": {
+      "large2x": "https://images.pexels.com/photos/.../large2x.jpeg",
+      "large":   "https://images.pexels.com/photos/.../large.jpeg"
+    },
+    "photographer":     "John Doe",
+    "url":              "https://www.pexels.com/photo/...",
+    "photographer_url": "https://www.pexels.com/@johndoe"
+  }]
+}</pre>
+      <p><strong>Tier gratuito:</strong> 200 req/hora · sin límite mensual · uso comercial permitido.</p>
+      <p><strong>Variable de entorno:</strong> <code>PEXELS_API_KEY</code> en <code>backend/.env</code> y en Render (Fase 6).</p>
+    </div>
+  </section>
+
+  <!-- MODELO DE DATOS -->
+  <section>
+    <div class="section-header"><span>🗄️</span><h2>Modelo de datos MongoDB — campos nuevos</h2></div>
+    <div class="body">
+      <pre>// Receta (campos añadidos)
+{
+  fotoFuente: "usuario" | "pexels",   // default: "usuario"
+  fotoCredito: {                       // null si fotoFuente === "usuario"
+    fotografo: string,
+    urlFoto:   string,   // enlace a la foto en Pexels
+    urlPerfil: string    // enlace al perfil del fotógrafo
+  } | null
+}</pre>
+      <p>Los campos son opcionales en Mongoose para compatibilidad con recetas existentes (sin foto Pexels). Si <code>fotoFuente</code> no existe en el documento se interpreta como <code>'usuario'</code>.</p>
+    </div>
+  </section>
+
+  <!-- ATRIBUCIÓN FE -->
+  <section>
+    <div class="section-header"><span>⚖️</span><h2>Atribución Pexels — FOTO-002 (obligatoria por licencia)</h2></div>
+    <div class="body">
+      <p>La licencia Pexels exige mostrar el nombre del fotógrafo y enlazar tanto a la foto como al perfil. Se muestra debajo del hero con estilo discreto:</p>
+      <pre>// heroReceta.tsx — solo se renderiza cuando fotoFuente === 'pexels'
+&lt;p className="px-5 pt-1.5 text-[11px] text-muted-foreground"&gt;
+  Foto por{' '}
+  &lt;a href={fotoCredito.urlPerfil} target="_blank" rel="noopener noreferrer"
+     className="underline underline-offset-2 hover:text-foreground"&gt;
+    {fotoCredito.fotografo}
+  &lt;/a&gt;{' '}en{' '}
+  &lt;a href={fotoCredito.urlFoto} target="_blank" rel="noopener noreferrer"
+     className="underline underline-offset-2 hover:text-foreground"&gt;
+    Pexels
+  &lt;/a&gt;
+&lt;/p&gt;</pre>
+      <div class="note">Se usa <code>rel="noopener noreferrer"</code> en todos los enlaces externos (seguridad). El texto usa <code>text-muted-foreground</code> para no interferir visualmente con el contenido de la receta.</div>
+    </div>
+  </section>
+
+  <!-- COMPATIBILIDAD -->
+  <section>
+    <div class="section-header"><span>🔁</span><h2>Compatibilidad con recetas existentes</h2></div>
+    <div class="body">
+      <p>Las recetas ya publicadas en MongoDB no tienen los campos <code>fotoFuente</code> ni <code>fotoCredito</code>. El repositorio devuelve <code>fotoFuente: 'usuario'</code> (fallback con <code>??</code>) y <code>fotoCredito: null</code>, por lo que el componente <code>heroReceta.tsx</code> nunca renderiza la atribución para estas recetas.</p>
+      <p>No es necesaria ninguna migración de datos.</p>
+    </div>
+  </section>
+
+  <!-- VARIABLES DE ENTORNO -->
+  <section>
+    <div class="section-header"><span>🔑</span><h2>Variables de entorno</h2></div>
+    <table>
+      <thead><tr><th>Variable</th><th>Entorno</th><th>Dónde añadir</th></tr></thead>
+      <tbody>
+        <tr><td><code>PEXELS_API_KEY</code></td><td>Dev + Prod</td><td><code>backend/.env</code> · Render Environment Variables (Fase 6)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PRÓXIMOS PASOS -->
+  <section>
+    <div class="section-header"><span>📅</span><h2>Estado y próximos pasos</h2></div>
+    <div class="body">
+      <p><strong>✅ FOTO-001</strong> — Completado Sprint 4. La foto se busca automáticamente en Pexels al publicar sin imagen.</p>
+      <p><strong>✅ FOTO-002</strong> — Completado Sprint 4. Atribución visible en heroReceta.tsx cuando la foto proviene de Pexels.</p>
+      <p><strong>Fase 6 — Cloudinary</strong>: en Fase 6 se sustituirá el almacenamiento base64 por Cloudinary CDN. La lógica de Pexels permanece en <code>imagenService.ts</code> (rules.md §2). Al publicar con foto propia, se subirá a Cloudinary y <code>imagenUrl</code> apuntará a la URL CDN.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

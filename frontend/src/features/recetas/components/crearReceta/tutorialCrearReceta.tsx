@@ -36,61 +36,67 @@ export function TutorialCrearReceta({ onTerminar }: Props) {
   const { icono: Icono, titulo, descripcion } = PASOS[paso]
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
-      {/* Indicadores */}
-      <div className="flex gap-1.5 mb-8">
-        {PASOS.map((_, i) => (
-          <div
-            key={i}
-            className={[
-              'h-1.5 rounded-full transition-all duration-300',
-              i === paso ? 'w-6 bg-brand' : 'w-1.5 bg-border',
-            ].join(' ')}
-          />
-        ))}
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-8">
+      <div className="w-full max-w-sm rounded-2xl bg-[var(--warm-bg-accent)] shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)] overflow-hidden">
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={paso}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.22 }}
-          className="flex flex-col items-center"
-        >
-          <div className="h-20 w-20 flex items-center justify-center rounded-full bg-brand/10 mb-6">
-            <Icono size={36} className="text-brand" />
-          </div>
-          <h2 className="text-2xl font-extrabold text-foreground mb-3">{titulo}</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">{descripcion}</p>
-        </motion.div>
-      </AnimatePresence>
+        {/* Indicadores */}
+        <div className="flex justify-center gap-1.5 pt-6 pb-2">
+          {PASOS.map((_, i) => (
+            <div
+              key={i}
+              className={[
+                'h-1.5 rounded-full transition-all duration-300',
+                i === paso ? 'w-6 bg-brand' : 'w-1.5 bg-border',
+              ].join(' ')}
+            />
+          ))}
+        </div>
 
-      <div className="mt-10 flex flex-col gap-2 w-full max-w-xs">
-        {esUltimo ? (
+        {/* Contenido animado */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={paso}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.22 }}
+            className="flex flex-col items-center px-8 py-8 text-center"
+          >
+            <div className="h-20 w-20 flex items-center justify-center rounded-full bg-brand/10 mb-6">
+              <Icono size={36} className="text-brand" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-foreground mb-3">{titulo}</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">{descripcion}</p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Botones */}
+        <div className="px-8 pb-8 flex flex-col gap-2">
+          {esUltimo ? (
+            <Button
+              onClick={onTerminar}
+              className="w-full bg-brand text-brand-foreground font-bold rounded-xl h-12"
+            >
+              Entendido
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setPaso((p) => p + 1)}
+              className="w-full bg-brand text-brand-foreground font-bold rounded-xl h-12 flex items-center justify-center gap-2"
+            >
+              Siguiente
+              <ChevronRight size={18} />
+            </Button>
+          )}
           <Button
+            variant="ghost"
             onClick={onTerminar}
-            className="w-full bg-brand text-brand-foreground font-bold rounded-xl h-12"
+            className="text-muted-foreground text-sm"
           >
-            Entendido
+            Saltar tutorial
           </Button>
-        ) : (
-          <Button
-            onClick={() => setPaso((p) => p + 1)}
-            className="w-full bg-brand text-brand-foreground font-bold rounded-xl h-12 flex items-center justify-center gap-2"
-          >
-            Siguiente
-            <ChevronRight size={18} />
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          onClick={onTerminar}
-          className="text-muted-foreground text-sm"
-        >
-          Saltar tutorial
-        </Button>
+        </div>
+
       </div>
     </div>
   )

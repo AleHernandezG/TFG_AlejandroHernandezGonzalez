@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import type { Ingrediente, MacrosReceta } from '../../types/receta.types'
+import { useDespensaStore } from '@/stores/despensaStore'
+import { getEmojiIngrediente } from '@/features/despensa/data/datosDespensa'
 
 type Props = {
   ingredientes: Ingrediente[]
@@ -19,7 +21,29 @@ const MACROS_CONFIG = [
 
 export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
   const [porciones, setPorciones] = useState(porcionesBase)
+  const [añadido, setAñadido] = useState(false)
   const factor = porciones / porcionesBase
+
+  const storeIngredientes = useDespensaStore((s) => s.ingredientes)
+  const añadir = useDespensaStore((s) => s.añadir)
+
+  function handleAnadirDespensa() {
+    const nombresEnStore = new Set(
+      storeIngredientes.map((i) => i.nombre.toLowerCase())
+    )
+    ingredientes.forEach((ing) => {
+      if (!nombresEnStore.has(ing.nombre.toLowerCase())) {
+        añadir({
+          nombre: ing.nombre,
+          cantidad: ing.cantidad,
+          unidad: ing.unidad,
+          emoji: getEmojiIngrediente(ing.nombre),
+        })
+      }
+    })
+    setAñadido(true)
+    setTimeout(() => setAñadido(false), 3000)
+  }
 
   function escalarCantidad(cantidad: number): string {
     const resultado = cantidad * factor
@@ -71,9 +95,13 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
         ))}
       </ul>
 
-      {/* Link Añadir a despensa */}
-      <button className="mb-8 flex w-full items-center justify-center text-sm font-bold text-brand transition-opacity hover:opacity-80">
-        Comparar con mi despensa
+      {/* Añadir ingredientes a la despensa */}
+      <button
+        onClick={handleAnadirDespensa}
+        disabled={añadido}
+        className="mb-8 flex w-full items-center justify-center text-sm font-bold text-brand transition-opacity hover:opacity-80 disabled:opacity-60"
+      >
+        {añadido ? '✓ Añadidos' : 'Añadir a mi despensa'}
       </button>
 
       {/* ── Nutrición ─────────────────────────────────── */}

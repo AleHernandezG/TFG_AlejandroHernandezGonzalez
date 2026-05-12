@@ -60,6 +60,8 @@
 - ✅ [SOC-001] Botón Seguir/Siguiendo con estado inicial correcto — `export const dynamic = 'force-dynamic'` en page.tsx evita render cacheado con `sigueAlAutor: false`; `router.refresh()` sincroniza tras toggle
 - ✅ [DET-003] Botón Compartir funcional — `navigator.share()` en móvil (share sheet nativo del SO), fallback `navigator.clipboard.writeText()` en escritorio con feedback visual "¡Copiado!" 2 s. Sin BE, sin nuevo hook.
 - ✅ [UI-029] Tarjeta fantasma "+ Nueva receta" en Mis Recetas — primera celda del grid en `/coleccion` (pestaña `mis-recetas`), `aspect-[3/4]` borde punteado brand, icono Plus brand, enlaza a `/crear-receta`. Solo en pestaña mis-recetas. Patrón contextual Pinterest/Airbnb (Opción D).
+- ✅ [DET-006-FE] Botón "Añadir a mi despensa" en `tabsReceta.tsx` — `handleAnadirDespensa` deduplica por nombre (case-insensitive), llama a `useDespensaStore.añadir()` con emoji via `getEmojiIngrediente()`. Feedback visual 3 s. FE mock Sprint 4.
+- ✅ [CREAR-001] Tutorial primer usuario real — `MOCK_ES_PRIMER_USUARIO` eliminado; `useMisRecetas()` hook; tutorial se activa cuando `misRecetas.length === 0` al montar `formularioCrearReceta.tsx`.
 - ✅ [INGR-001 + ALERG-002] Ingredientes reales — `src/config/ingredientes.ts` con 200+ ingredientes (17 categorías), aliases multilingüe (ES/EN/CA), alérgenos EU completos. `buscarIngredientes()` sustituye filtro manual. `detectarAlergenos.ts` re-exporta desde config (fuente única). `datosIngredientes.ts` eliminado.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
@@ -239,7 +241,7 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `/despensa` | Despensa virtual — FE mock completa: lista ingredientes + añadir/editar/eliminar + Sheet + autocompletado + Dialog "ingrediente duplicado" (bloquea añadir si ya existe, case-insensitive) | ✅ Aprobado autor · Sprint 4 |
 | `/chat` | Chat IA — FE mock completa: estado vacío 3 chips, burbujas usuario/IA, IndicadorPensando, BarraInputChat auto-resize, chatStore Zustand mock 1.4s. HeaderChat: botón ← + título centrado + spacer (sin botón top-right historial) + pill "Ver historial" | ✅ Aprobado autor · Sprint 4 |
 | `/perfil` | Ajustes de usuario — FE mock: avatar card display-only (sin "Editar nombre"), cambiar contraseña (mock), preferencias+alérgenos chips, toggles permisos, cerrar sesión. Un solo botón CTA "Guardar cambios" full-width (sin "Volver") | ✅ Aprobado autor · Sprint 4 |
-| `/discover` | Discover — feed global trending + eventos temáticos | ⏳ Sprint 5+ — pendiente Stitch |
+| `/discover` | Discover — búsqueda + chips categoría + evento destacado + grid 3 tabs (Recientes/Mejor valorados/Especiales Evento). FE mock. Búsqueda debounce 300ms + filtrado local | ✅ Completado · Sprint 4 |
 | `frontend/src/stores/useCrearRecetaStore.ts` | Zustand store — estado formulario crear receta (compartido entre /crear-receta y /crear-receta/revisar) | ✅ Aprobado · Sprint 4 |
 | `frontend/src/features/recetas/utils/detectarAlergenos.ts` | Función pura: detecta alérgenos a partir de nombres de ingredientes (mapa estático) | ✅ Aprobado · Sprint 4 |
 | `frontend/src/services/apiClient.ts` | Axios instance centralizada | ✅ |
@@ -254,6 +256,8 @@ El login con Google OAuth sigue funcionando sin restricciones.
 | `BE POST /api/recetas/:id/guardar` | Toggle guardado autenticado — añade/elimina recetaId en Usuario.recetasGuardadas[] | ✅ Sprint 4 |
 | `BE POST /api/recetas/:id/comentarios` | Añadir comentario autenticado — inserta subdocumento en Receta.comentarios[] | ✅ Sprint 4 |
 | `BE POST /api/usuarios/:id/seguir` | Toggle seguir autenticado — actualiza seguidores[] y siguiendo[] en ambos usuarios | ✅ Sprint 4 |
+| `BE GET /api/recetas` | Feed paginado con filtros opcionales: q, dificultad, alergenos, excluirPropio. optionalAuth — devuelve guardado/liked por usuario si hay token | ✅ Sprint 4 (API-014) |
+| `BE GET /api/recetas/:id` | Detalle de receta con autor populado. optionalAuth — devuelve sigueAlAutor/guardado/liked si hay token | ✅ Sprint 4 (API-014) |
 
 ## Estructura del Proyecto
 
@@ -296,7 +300,7 @@ Pendiente documentado en: docs/phase-reports/fase-0-pendientes.md [SETUP-006] [S
 
 ## Próxima Tarea
 
-Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003, UI-029, COL-001, COL-002, COL-007, COL-004, COL-005, COL-006, CREAR-002, API-013, DEBT-009, FIX-001, FIX-002, UI-AF-001, UI-AF-002, UI-AF-003, UI-AF-004, UI-018, STRUCT-001, DESP-001 (pendiente revisión), PERF-001 (pendiente revisión), CHAT-001 (pendiente revisión).
+Sprint 4 activo — completados: FEED-001, LIKE-001, COM-001, SOC-001, DET-003, UI-029, COL-001, COL-002, COL-007, COL-004, COL-005, COL-006, CREAR-002, API-013, API-014, DEBT-009, FIX-001, FIX-002, UI-AF-001, UI-AF-002, UI-AF-003, UI-AF-004, UI-018, STRUCT-001, STRUCT-002, DESP-001, PERF-001, CHAT-001, DISC-001, CREAR-001, DET-006-FE, FOTO-001, FOTO-002.
 
 Sprint 3 completados (referencia): UI-016, UI-017, UI-019 (FAB), UI-020, UI-021, UI-022, ARCH-001, ARCH-002, DOCS-001, DOCS-004, DEV-001, DET-001, DET-002, DET-009, REC-001 a REC-009, RULES-001.
 
@@ -307,8 +311,9 @@ Sprint 4 — pendientes sin comenzar:
 - ~~**FE:** DESP-001 — Vista /despensa~~ ✅ Aprobado autor.
 - ~~**FE:** PERF-001 — Vista /perfil~~ ✅ Aprobado autor.
 - ~~**FE:** CHAT-001 — Vista /chat~~ ✅ Aprobado autor.
-- **FE+BE:** Vistas pendientes de Stitch: /discover
-- **FE:** CREAR-001 — Tutorial crear receta activado por datos reales: mostrar PopUpTutorial solo si el usuario no tiene recetas creadas (`numRecetasCreadas === 0` desde BD). Actualmente `MOCK_ES_PRIMER_USUARIO = false` hardcodeado.
+- ~~**FE+BE:** DISC-001 — Vista /discover~~ ✅ Completado · Sprint 4. FE mock: búsqueda debounce + chips categoría + tarjeta destacada + grid 3 tabs (Recientes/Mejor valorados/Especiales Evento) + estado vacío. 7 componentes.
+- ~~**FE:** CREAR-001 — Tutorial crear receta activado por datos reales~~ ✅ Completado · Sprint 4. `useMisRecetas()` hook; tutorial activo cuando `misRecetas.length === 0`.
+- ~~**FE:** DET-006-FE — Botón "Añadir a mi despensa" funcional~~ ✅ Completado · Sprint 4. `useDespensaStore` + `getEmojiIngrediente` + deduplicación case-insensitive.
 - ~~**FE:** INGR-001 — Autocompletado ingredientes con fuente real~~ ✅ Completado.
 - ~~**FE:** ALERG-002 — Alérgenos desde la nueva fuente~~ ✅ Completado.
 - ~~**FE+BE:** DEBT-009~~ ✅ Aprobado: `useCrearReceta` hook extraído en `features/recetas/hooks/useCrearReceta.ts`.

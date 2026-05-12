@@ -2,6 +2,12 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -29,6 +35,7 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
   const router = useRouter()
   const [texto, setTexto] = useState('')
   const [listaLocal, setListaLocal] = useState<Comentario[]>(comentarios)
+  const [sheetAbierto, setSheetAbierto] = useState(false)
   const { mutate: enviar } = useAgregarComentario(recetaId)
 
   const preview = listaLocal.slice(0, 3)
@@ -63,8 +70,11 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
           Comentarios <span className="text-muted-foreground font-normal text-base">({listaLocal.length})</span>
         </h2>
         {listaLocal.length > 3 && (
-          <button className="text-sm font-bold text-brand hover:opacity-80 transition-opacity">
-            Ver todos
+          <button
+            className="text-sm font-bold text-brand hover:opacity-80 transition-opacity"
+            onClick={() => setSheetAbierto(true)}
+          >
+            Ver todos ({listaLocal.length})
           </button>
         )}
       </div>
@@ -122,6 +132,36 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
           ))}
         </ul>
       )}
+      <Sheet open={sheetAbierto} onOpenChange={setSheetAbierto}>
+        <SheetContent side="bottom" className="h-[80vh] flex flex-col rounded-t-2xl px-0">
+          <SheetHeader className="px-5 pb-3 border-b border-border/40">
+            <SheetTitle className="text-lg font-extrabold">
+              Comentarios <span className="text-muted-foreground font-normal text-base">({listaLocal.length})</span>
+            </SheetTitle>
+          </SheetHeader>
+          <ul className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+            {listaLocal.map((c, i) => (
+              <li key={i} className="flex gap-3">
+                <Avatar className="h-8 w-8 shrink-0 mt-0.5">
+                  <AvatarImage src={c.avatarUrl ?? undefined} alt={c.autorNombre} />
+                  <AvatarFallback className="text-xs bg-[var(--warm-bg)] text-foreground">
+                    {c.autorNombre.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 bg-[var(--warm-bg)] rounded-2xl rounded-tl-sm px-3.5 py-3">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-xs font-bold text-foreground">{c.autorNombre}</span>
+                    <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
+                      {tiempoRelativo(c.fecha)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/80 leading-relaxed">{c.texto}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </SheetContent>
+      </Sheet>
     </section>
   )
 }

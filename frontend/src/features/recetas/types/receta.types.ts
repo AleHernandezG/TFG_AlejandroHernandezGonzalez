@@ -7,10 +7,18 @@ export type Autor = {
   avatarUrl: string
 }
 
+export type FotoCredito = {
+  fotografo: string
+  urlFoto: string
+  urlPerfil: string
+}
+
 export type DatosReceta = {
   titulo: string
   descripcion: string
   imagenUrl: string
+  fotoFuente?: 'usuario' | 'pexels'
+  fotoCredito?: FotoCredito | null
   tiempo: string
   dificultad: DificultadReceta
   alergenos?: string[] // ids de ALERGENOS_OPCIONES en opcionesUsuario.ts

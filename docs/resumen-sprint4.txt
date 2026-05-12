@@ -1,0 +1,71 @@
+RESUMEN SPRINT 4 — Cookr TFG
+Generado: 2026-05-12
+============================================================
+
+BACKEND — NUEVOS ENDPOINTS
+- COL-001   BE GET /api/recetas/guardadas — devuelve recetas guardadas del usuario autenticado
+- COL-002   BE GET /api/recetas/mis-recetas — devuelve recetas creadas por el usuario autenticado
+- COL-007   BE DELETE /api/recetas/:id — elimina receta propia verificando que el autor coincide (403 si no)
+- API-013   BE POST /api/recetas — crea receta completa en MongoDB con foto base64, alérgenos y mapeo de dificultad
+- SOC-001   BE POST /api/usuarios/:id/seguir — toggle seguir/dejar de seguir con arrays seguidos/seguidores en Usuario
+- FOTO-001  BE imagenService.ts — si el usuario no sube foto, busca imagen automática en Pexels API y guarda URL + créditos
+- FIX-001   BE express.json limit subido a 10 mb para aceptar fotos en base64 sin error 413
+
+BACKEND — MEJORAS
+- FEED-001  BE filtro excluirPropio en GET /api/recetas — no muestra recetas propias en el feed de home
+- LIKE-001  BE toggle like único por usuario (array likes en Receta, un like por userId)
+- COM-001   BE POST /api/recetas/:id/comentarios — guarda comentario en listaComentarios del documento Receta
+- FIX-003   BE GET /recetas/foto-preview?query=xxx — endpoint ligero sin auth para preview de foto Pexels antes de publicar
+
+FRONTEND — NUEVOS HOOKS Y SERVICIOS
+- DEBT-009  FE useCrearReceta.ts — hook que orquesta detección de alérgenos, llamada al BE, limpieza del store y redirección
+- COL-004   FE useRecetasGuardadas.ts + useMisRecetas.ts — TanStack Query conectados a los endpoints de colección
+- COL-006   FE useEliminarReceta.ts — mutation TanStack Query que invalida caché tras eliminar
+- FOTO-002  FE useFotoPexelsPreview.ts — hook que llama a /recetas/foto-preview para mostrar foto en la preview antes de publicar
+-           FE recetasService.obtenerFotoPreview() — método HTTP para el endpoint de preview de Pexels
+
+FRONTEND — VISTAS COMPLETAS (mock, integración BE en Fase 5)
+- DESP-001  Vista /despensa — header editorial, lista de ingredientes con emojis, sheet añadir, dialog editar, autocompletado, detección de duplicados, Zustand store
+- PERF-001  Vista /perfil — avatar, grupos de ajustes, dialog cambiar contraseña, dialog preferencias dietas/alérgenos, toggles de permisos, Zustand store
+- CHAT-001  Vista /chat — burbujas usuario/IA, indicador pensando animado, chips sugerencias, barra input sticky, chatStore Zustand con mock 1.4s
+- DISC-001  Vista /discover — header editorial, tarjeta destacada evento semanal, grid 2 columnas, chips categoría, búsqueda con debounce, estado vacío
+
+FRONTEND — COLECCIÓN CONECTADA AL BACKEND
+- COL-004   contenidoColeccion.tsx reemplaza mocks por hooks reales con skeleton animate-pulse durante carga
+- COL-004   Tab inicial leído de ?tab=mis-recetas en la URL con useSearchParams (Suspense boundary añadido)
+- COL-005   Bookmark funcional en pestaña Guardadas con actualización optimista y rollback en error
+- COL-006   Botón ··· en pestaña Mis Recetas abre Sheet → Dialog confirmación → elimina receta real
+
+FRONTEND — CREAR RECETA CONECTADO AL BACKEND
+- CREAR-002 previsualizacionReceta.tsx usa useCrearReceta.publicar() en lugar de setTimeout mock
+- CREAR-001 Tutorial activado por datos reales (useMisRecetas) en lugar de constante MOCK_ES_PRIMER_USUARIO
+- FOTO-001  Si no se sube foto, la preview muestra la foto de Pexels con atribución superpuesta ("Buscando foto…" mientras carga)
+
+FRONTEND — INGREDIENTES
+- INGR-001  Autocompletado reemplaza 30 ingredientes mock por src/config/ingredientes.ts con 200+ ingredientes, aliases y alérgenos EU
+- INGR-002  ingredientesService.ts (stub Edamam) + ingredientesCustomStore.ts (Zustand persist para ingredientes nuevos)
+- INGR-003  useAutocompletadoIngredientes.ts — prioriza local (239 ingredientes) > custom store > fallback Edamam con debounce 300ms
+- ALERG-002 detectarAlergenos.ts reescrito usando la misma fuente que el autocompletado (matching exacto por nombre y aliases)
+
+FRONTEND — FUNCIONALIDAD SOCIAL
+- DET-003   Botón Compartir funcional — Web Share API en móvil, fallback clipboard en escritorio, feedback visual 2s
+- COM-001   Añadir comentario con actualización optimista local + router.refresh() en onSuccess
+- DET-005   Estado vacío "Sé el primero en comentar" cuando no hay comentarios
+- DET-006   Botón "Añadir a mi despensa" en tabsReceta filtra duplicados y añade al despensaStore con feedback 3s
+- SOC-001   Botón Seguir/Siguiendo en detalle receta, oculto en recetas propias, estado inicial desde SSR
+- UI-AF-002 Botón Eliminar en detalle receta visible solo para el autor de la receta
+
+FRONTEND — MEJORAS UI
+- UI-029    Tarjeta fantasma "+ Nueva receta" en grid de Mis Recetas con borde punteado brand → /crear-receta
+- UI-AF-001 Botón ··· en tarjetaColeccion con círculo bg-white/20 backdrop-blur para mayor affordance
+- UI-AF-003 seccionIngredientes rediseñada: card por ingrediente con dos filas (nombre / cantidad + unidad), 20 unidades disponibles
+- UI-AF-004 seccionPasos con textarea auto-resize (crece con el contenido, sin scroll interno)
+
+FIXES
+- FIX-002   Suspense boundary en coleccion/page.tsx para que useSearchParams funcione correctamente en Next.js 14
+- FIX-004   Dropdown de ingredientes movido fuera del div overflow-hidden para que no se corte visualmente
+- FIX-005   next.config.mjs: images.pexels.com añadido a remotePatterns para permitir imágenes de Pexels
+- FIX-006   Race condition en redirect tras publicar: router.push antes de limpiar() + useRef para guardia de montaje en preview
+
+INFRAESTRUCTURA / CONFIG
+- FOTO-002  heroReceta.tsx muestra atribución Pexels (fotógrafo + enlace) cuando fotoFuente === 'pexels' (obligatorio por licencia)

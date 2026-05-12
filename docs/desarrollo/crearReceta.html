@@ -160,14 +160,14 @@
           <span class="step-num">6</span>
           <div class="step-txt">
             Vista <code>/crear-receta/revisar</code> — Preview de la receta
-            <small>Banner "Vista previa — así verán tu receta" · Estructura clonada de detalleReceta · Sin comentarios ni similares</small>
+            <small>Si el usuario subió foto → se muestra directamente. Si no → <code>useFotoPexelsPreview(titulo)</code> llama a <code>GET /recetas/foto-preview?query=titulo</code> y muestra la foto de Pexels con atribución superpuesta. Mientras carga → "Buscando foto…"</small>
           </div>
         </div>
         <div class="flow-step">
           <span class="step-num">7</span>
           <div class="step-txt">
-            Pulsa "Publicar receta" → mock setTimeout 1s → limpiar store → <code>router.push('/home')</code>
-            <small>TODO Fase 5: recetasService.crear(datos) · Botón "← Seguir editando" vuelve con datos preservados</small>
+            Pulsa "Publicar receta" → <code>useCrearReceta.publicar()</code> → <code>recetasService.crear(datos)</code> → BE guarda en MongoDB
+            <small><code>router.push('/coleccion?tab=mis-recetas')</code> se llama ANTES de <code>limpiar()</code> para evitar que el useEffect de la preview detecte <code>datos === null</code> y redirija a <code>/crear-receta</code></small>
           </div>
         </div>
       </div>
@@ -214,7 +214,7 @@
           </tr>
           <tr>
             <td class="path">previsualizacionReceta.tsx</td>
-            <td>Lee datos desde useCrearRecetaStore. Banner bg-brand/10. Estructura clonada de detalleReceta (sin comentarios ni similares). Botones fixed: "← Seguir editando" + "Publicar receta".</td>
+            <td>Lee datos desde useCrearRecetaStore. Si <code>fotoPreview</code> existe la muestra; si no, llama a <code>useFotoPexelsPreview(titulo)</code> para obtener foto automática de Pexels con atribución superpuesta. Botones fijos al final: "← Seguir editando" + "Publicar receta" (vía <code>useCrearReceta</code>). Redirige a <code>/coleccion?tab=mis-recetas</code> tras publicar.</td>
           </tr>
         </tbody>
       </table>
@@ -411,7 +411,23 @@ detectarAlergenos.ts  ← función pura, 0 dependencias externas</pre>
         <code>docs/desarrollo/estadoTareas.html · FOTO-001</code>.
       </p>
 
-      <h3 id="foto-auto-flujo">Flujo BE (Fase 5)</h3>
+      <h3>Preview en /crear-receta/revisar (implementado)</h3>
+      <p>
+        Además del flujo BE al publicar, se añadió un endpoint ligero para mostrar la foto en la
+        vista de previsualización <strong>antes</strong> de publicar, sin guardar nada todavía.
+      </p>
+      <table>
+        <thead><tr><th>Capa</th><th>Fichero</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>BE route</td><td class="path">GET /recetas/foto-preview?query=xxx</td><td>Sin auth. Declarada antes de <code>/:id</code> en el router.</td></tr>
+          <tr><td>BE service</td><td class="path">recetasService.obtenerFotoPreview(query)</td><td>Delega a <code>buscarFotoPexels(query)</code> de imagenService.</td></tr>
+          <tr><td>BE controller</td><td class="path">recetasController.obtenerFotoPreview</td><td>Lee <code>req.query.query</code>, devuelve <code>ResultadoFotoPexels | null</code>.</td></tr>
+          <tr><td>FE service</td><td class="path">recetasService.obtenerFotoPreview(query)</td><td>GET a <code>/recetas/foto-preview</code>, sin token.</td></tr>
+          <tr><td>FE hook</td><td class="path">useFotoPexelsPreview(titulo)</td><td>TanStack Query, <code>enabled: !!titulo.trim()</code>, staleTime 5 min.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="foto-auto-flujo">Flujo BE al publicar (Fase 5)</h3>
       <div class="flow">
         <div class="flow-step">
           <span class="step-num">1</span>
@@ -510,20 +526,20 @@ fotoCredito?: {
       <table>
         <thead><tr><th>ID</th><th>Dónde</th><th>Qué hacer</th></tr></thead>
         <tbody>
-          <tr>
+          <tr style="opacity:0.45">
             <td class="id">TODO-CR-01</td>
             <td class="path">formularioCrearReceta.tsx · onSubmitValido()</td>
-            <td>Llamar <code>recetasService.crear(datos)</code> en vez de solo guardar en store</td>
+            <td><span class="tag done">✅ Sprint 4</span> useCrearReceta guarda en store y la publicación real ocurre en previsualizacionReceta vía useCrearReceta.publicar()</td>
           </tr>
-          <tr>
+          <tr style="opacity:0.45">
             <td class="id">TODO-CR-02</td>
             <td class="path">previsualizacionReceta.tsx · handlePublicar()</td>
-            <td>Sustituir <code>setTimeout</code> mock por <code>await recetasService.crear(datos)</code></td>
+            <td><span class="tag done">✅ Sprint 4</span> setTimeout mock eliminado. Se usa <code>useCrearReceta</code> con llamada real a <code>recetasService.crear()</code>. Redirige a <code>/coleccion?tab=mis-recetas</code>.</td>
           </tr>
-          <tr>
+          <tr style="opacity:0.45">
             <td class="id">TODO-CR-03</td>
             <td class="path">crearReceta.schema.ts · campo foto</td>
-            <td>Mantener <code>z.instanceof(File).optional()</code> — la foto es opcional porque si no se sube se asigna una de Pexels automáticamente (FOTO-001)</td>
+            <td><span class="tag done">✅ Completado</span> La foto es <code>z.instanceof(File).optional()</code>. Si no se sube, el BE asigna una de Pexels automáticamente.</td>
           </tr>
           <tr>
             <td class="id">TODO-CR-04</td>

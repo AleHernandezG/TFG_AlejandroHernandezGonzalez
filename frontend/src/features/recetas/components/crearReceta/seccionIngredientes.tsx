@@ -57,19 +57,6 @@ export function SeccionIngredientes() {
                       autoComplete="off"
                       className="w-full h-12 bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
                     />
-                    {sugerencias.length > 0 && inputActivo?.idx === i && (
-                      <ul className="absolute top-full left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 overflow-hidden">
-                        {sugerencias.map((s) => (
-                          <li
-                            key={s.nombre}
-                            onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s.nombre) }}
-                            className="px-4 py-3 text-sm text-foreground hover:bg-muted cursor-pointer"
-                          >
-                            {s.nombre}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
                   {fields.length > 1 && (
                     <button
@@ -124,6 +111,21 @@ export function SeccionIngredientes() {
                   </div>
                 </div>
               </div>
+
+              {/* Dropdown fuera del overflow-hidden para que no se corte */}
+              {sugerencias.length > 0 && inputActivo?.idx === i && (
+                <ul className="absolute top-12 left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-lg mt-1 overflow-hidden">
+                  {sugerencias.map((s) => (
+                    <li
+                      key={s.nombre}
+                      onPointerDown={(e) => { e.preventDefault(); seleccionarSugerencia(i, s.nombre) }}
+                      className="px-4 py-3 text-sm text-foreground hover:bg-muted cursor-pointer"
+                    >
+                      {s.nombre}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               {/* Error inline */}
               {(errors.ingredientes?.[i]?.nombre ||
