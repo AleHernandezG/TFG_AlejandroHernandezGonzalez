@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-12 · Sprint 4 activo · Fase 4 de 7 · /discover completado</div>
+    <div class="meta">Actualizado: 2026-05-12 · Sprint 5 activo · Fase 5 de 7 · /despensa integración BE+FE completada</div>
   </div>
 </header>
 
@@ -96,7 +96,7 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter review"><div class="num">7</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">13</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">9</div><div class="label">Urgencia baja</div></div>
@@ -1067,6 +1067,78 @@
             <span class="source">📄 features/despensa/ · stores/despensaStore.ts · app/(main)/despensa/page.tsx · docs/stitch/despensa/</span>
           </td>
           <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Despensa BE+FE ── -->
+        <tr>
+          <td class="id">DESP-BE-001</td>
+          <td class="desc">
+            <strong>BE: Schema MongoDB despensa — IItemDespensa + subdocumento en Usuario</strong>
+            <small>Creado backend/src/types/despensa.ts con IItemDespensa (_id?, nombre, cantidad, unidad, emoji, fechaAnadido). Extendido IUsuario con despensa?: IItemDespensa[]. Añadido itemDespensaSchema (subdocumento embebido) en usuarioMongo.ts con campo despensa: [itemDespensaSchema] default [].</small>
+            <span class="source">📄 backend/src/types/despensa.ts · backend/src/types/usuario.ts · backend/src/models/usuarioMongo.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-002</td>
+          <td class="desc">
+            <strong>BE: despensaRepository — obtener / añadir / editar / eliminar</strong>
+            <small>Creado backend/src/repositories/despensaRepository.ts. obtener(): findById().select('despensa'). añadir(): $push. editar(): $set posicional con 'despensa.$.campo'. eliminar(): $pull por _id. Todos devuelven el array despensa actualizado. Valida ObjectId en editar y eliminar (400 si inválido).</small>
+            <span class="source">📄 backend/src/repositories/despensaRepository.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-003</td>
+          <td class="desc">
+            <strong>BE: despensaService + despensaController</strong>
+            <small>despensaService.ts: capa de negocio ligera, delega en el repositorio. despensaController.ts: obtener (GET), añadir (POST, valida 4 campos obligatorios), editar (PUT /:id, construye $set dinámico), eliminar (DELETE /:id). manejarError() centralizado igual que recetasController.</small>
+            <span class="source">📄 backend/src/services/despensaService.ts · backend/src/controllers/despensaController.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-004</td>
+          <td class="desc">
+            <strong>BE: despensa.routes.ts + registro en app.ts</strong>
+            <small>GET / · POST / · PUT /:id · DELETE /:id, todas con requerirAuth. Registrado en app.ts como app.use('/api/despensa', despensaRoutes) junto a los demás routers.</small>
+            <span class="source">📄 backend/src/routes/despensa.routes.ts · backend/src/app.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-001</td>
+          <td class="desc">
+            <strong>FE: despensaService.ts — 4 métodos HTTP con normalización _id→id</strong>
+            <small>Creado frontend/src/services/despensaService.ts con obtener(), añadir(), editar(), eliminar(). Todos envían Authorization: Bearer {token}. normalizar() mapea _id de MongoDB a id para compatibilidad con ItemDespensa del frontend.</small>
+            <span class="source">📄 frontend/src/services/despensaService.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-002</td>
+          <td class="desc">
+            <strong>FE: hooks TanStack Query — useMiDespensa + useAñadirItem + useEditarItem + useEliminarItem</strong>
+            <small>Creado frontend/src/features/despensa/hooks/useMiDespensa.ts. useMiDespensa: useQuery con staleTime:0. Las 3 mutations usan optimistic update (onMutate) + rollback completo (onError) + sync desde BE (onSuccess). Mismo patrón que useToggleLike y useToggleGuardado.</small>
+            <span class="source">📄 frontend/src/features/despensa/hooks/useMiDespensa.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-003</td>
+          <td class="desc">
+            <strong>FE: contenidoDespensa + sheetAnadirIngrediente conectados a hooks reales — despensaStore eliminado</strong>
+            <small>contenidoDespensa.tsx: usa useMiDespensa/useAñadirItem/useEditarItem/useEliminarItem en lugar de useDespensaStore. Spinner de carga mientras isLoading. sheetAnadirIngrediente.tsx: recibe ingredientesExistentes como prop en lugar de leer el store (para detección de duplicados). despensaStore.ts vaciado (store Zustand eliminado, no hay estado mock).</small>
+            <span class="source">📄 frontend/src/features/despensa/components/contenidoDespensa.tsx · sheetAnadirIngrediente.tsx · stores/despensaStore.ts</span>
+          </td>
+          <td><span class="status review">⏳ Pendiente revisión</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 

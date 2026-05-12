@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import type { Ingrediente, MacrosReceta } from '../../types/receta.types'
-import { useDespensaStore } from '@/stores/despensaStore'
+import { useMiDespensa, useAñadirItem } from '@/features/despensa/hooks/useMiDespensa'
 import { getEmojiIngrediente } from '@/features/despensa/data/datosDespensa'
 
 type Props = {
@@ -24,15 +24,13 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
   const [añadido, setAñadido] = useState(false)
   const factor = porciones / porcionesBase
 
-  const storeIngredientes = useDespensaStore((s) => s.ingredientes)
-  const añadir = useDespensaStore((s) => s.añadir)
+  const { data: despensa = [] } = useMiDespensa()
+  const { mutate: añadir } = useAñadirItem()
 
   function handleAnadirDespensa() {
-    const nombresEnStore = new Set(
-      storeIngredientes.map((i) => i.nombre.toLowerCase())
-    )
+    const nombresEnDespensa = new Set(despensa.map((i) => i.nombre.toLowerCase()))
     ingredientes.forEach((ing) => {
-      if (!nombresEnStore.has(ing.nombre.toLowerCase())) {
+      if (!nombresEnDespensa.has(ing.nombre.toLowerCase())) {
         añadir({
           nombre: ing.nombre,
           cantidad: ing.cantidad,

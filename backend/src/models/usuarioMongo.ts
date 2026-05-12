@@ -3,6 +3,17 @@ import { IUsuario } from "../types/usuario";
 
 export interface IUsuarioDoc extends IUsuario, Document {}
 
+const itemDespensaSchema = new Schema(
+  {
+    nombre:       { type: String, required: true, trim: true },
+    cantidad:     { type: Number, required: true, min: 0 },
+    unidad:       { type: String, required: true, trim: true },
+    emoji:        { type: String, required: true },
+    fechaAnadido: { type: Date, default: Date.now },
+  },
+  { _id: true },
+);
+
 const usuarioSchema = new Schema<IUsuarioDoc>({
   nombre: {
     type: String,
@@ -72,6 +83,10 @@ const usuarioSchema = new Schema<IUsuarioDoc>({
   fechaRegistro: {
     type: Date,
     default: Date.now,
+  },
+  despensa: {
+    type: [itemDespensaSchema],
+    default: [],
   },
 });
 

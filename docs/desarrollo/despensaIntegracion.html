@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Despensa — Integración BE+FE · Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.5rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.25rem; }
+    li { font-size: 0.83rem; color: #d4d4d4; margin-bottom: 0.3rem; }
+    strong { color: #fff; }
+    code { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 0.78rem; background: #252525; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.75rem 1rem; background: #141414; border-radius: 8px; }
+    .flow-node { font-size: 0.78rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 6px; white-space: nowrap; }
+    .flow-arrow { color: #525252; font-size: 0.9rem; }
+    .node-fe { background: #1e3a5f; color: #60a5fa; border: 1px solid #1e40af44; }
+    .node-hook { background: #3b1e5f; color: #c084fc; border: 1px solid #7c3aed44; }
+    .node-svc { background: #1e3a2f; color: #34d399; border: 1px solid #05966944; }
+    .node-be { background: #3b2e1e; color: #fb923c; border: 1px solid #f9731644; }
+    .node-db { background: #1e1e3a; color: #818cf8; border: 1px solid #4f46e544; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.5rem 0.9rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.6rem 0.9rem; border-bottom: 1px solid #1f1f1f; font-size: 0.8rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .method { font-family: monospace; font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 4px; }
+    .get { background: #1e3a2f; color: #34d399; }
+    .post { background: #1e3a5f; color: #60a5fa; }
+    .put { background: #3b2e1e; color: #fb923c; }
+    .del { background: #3b1e1e; color: #f87171; }
+
+    .file-path { font-family: monospace; font-size: 0.72rem; color: #818cf8; }
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; }
+    .badge-be { background: #f9731622; color: #fb923c; border: 1px solid #f9731633; }
+    .badge-fe { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge-both { background: #eab30822; color: #fbbf24; border: 1px solid #eab30833; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Despensa — Integración BE+FE</h1>
+  <div class="meta">Sprint 5 · 2026-05-12 · Cookr TFG · Estado: pendiente revisión</div>
+</header>
+
+<nav>
+  <a href="#que-es">¿Qué es?</a>
+  <a href="#flujo">Flujo de datos</a>
+  <a href="#api">API endpoints</a>
+  <a href="#backend">Backend</a>
+  <a href="#frontend">Frontend</a>
+  <a href="#cambios">Cambios frente al mock</a>
+</nav>
+
+<main>
+
+  <!-- QUÉ ES -->
+  <section id="que-es">
+    <div class="section-header"><h2>¿Qué es la despensa?</h2></div>
+    <div class="section-body">
+      <p>La despensa es la lista personal de ingredientes que el usuario tiene en casa. Cada usuario puede añadir, editar y eliminar ingredientes. Los ingredientes se guardan directamente dentro del documento del usuario en MongoDB (subdocumento embebido).</p>
+      <h3>¿Para qué sirve?</h3>
+      <ul>
+        <li>Ver qué ingredientes tienes disponibles en casa.</li>
+        <li>Añadir ingredientes manualmente (con nombre, cantidad, unidad y emoji).</li>
+        <li>Importar los ingredientes de una receta directamente a tu despensa.</li>
+        <li>Editar o eliminar cualquier ingrediente.</li>
+      </ul>
+      <h3>Decisión de diseño: subdocumento embebido</h3>
+      <p>Los ítems de la despensa se guardan como un array <code>despensa: IItemDespensa[]</code> dentro del documento <code>Usuario</code> en MongoDB. No hay una colección separada. Esta decisión simplifica las consultas (un solo <code>findById</code> trae todo) y es adecuada para listas personales de tamaño moderado.</p>
+    </div>
+  </section>
+
+  <!-- FLUJO DE DATOS -->
+  <section id="flujo">
+    <div class="section-header"><h2>Flujo de datos</h2></div>
+    <div class="section-body">
+      <h3>Leer la despensa (GET)</h3>
+      <div class="flow">
+        <span class="flow-node node-fe">ContenidoDespensa</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-hook">useMiDespensa (useQuery)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-svc">despensaService.obtener()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-be">GET /api/despensa</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-db">Usuario.findById().select('despensa')</span>
+      </div>
+
+      <h3>Añadir ingrediente (POST)</h3>
+      <div class="flow">
+        <span class="flow-node node-fe">SheetAnadirIngrediente</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-hook">useAñadirItem (optimistic)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-svc">despensaService.añadir()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-be">POST /api/despensa</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-db">$push despensa</span>
+      </div>
+
+      <h3>Editar ingrediente (PUT)</h3>
+      <div class="flow">
+        <span class="flow-node node-fe">DialogEditarIngrediente</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-hook">useEditarItem (optimistic)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-svc">despensaService.editar()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-be">PUT /api/despensa/:id</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-db">$set despensa.$.campo</span>
+      </div>
+
+      <h3>Eliminar ingrediente (DELETE)</h3>
+      <div class="flow">
+        <span class="flow-node node-fe">TarjetaIngrediente</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-hook">useEliminarItem (optimistic)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-svc">despensaService.eliminar()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-be">DELETE /api/despensa/:id</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node node-db">$pull despensa { _id }</span>
+      </div>
+
+      <h3>Optimistic updates</h3>
+      <p>Las tres mutations (añadir, editar, eliminar) usan el patrón <strong>optimistic update + rollback</strong>:</p>
+      <ul>
+        <li><strong>onMutate</strong>: cancela queries en vuelo, guarda el estado anterior, actualiza el cache TanStack Query inmediatamente.</li>
+        <li><strong>onError</strong>: restaura el estado anterior si el backend falla.</li>
+        <li><strong>onSuccess</strong>: sincroniza el cache con el array real devuelto por el backend.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- API ENDPOINTS -->
+  <section id="api">
+    <div class="section-header"><h2>API endpoints — <code>/api/despensa</code></h2></div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr><th>Método</th><th>Ruta</th><th>Auth</th><th>Body</th><th>Respuesta</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method get">GET</span></td>
+            <td><code>/api/despensa</code></td>
+            <td>JWT</td>
+            <td>—</td>
+            <td><code>IItemDespensa[]</code></td>
+          </tr>
+          <tr>
+            <td><span class="method post">POST</span></td>
+            <td><code>/api/despensa</code></td>
+            <td>JWT</td>
+            <td><code>{ nombre, cantidad, unidad, emoji }</code></td>
+            <td><code>IItemDespensa[]</code> (array completo actualizado)</td>
+          </tr>
+          <tr>
+            <td><span class="method put">PUT</span></td>
+            <td><code>/api/despensa/:id</code></td>
+            <td>JWT</td>
+            <td><code>{ nombre?, cantidad?, unidad?, emoji? }</code></td>
+            <td><code>IItemDespensa[]</code> (array completo actualizado)</td>
+          </tr>
+          <tr>
+            <td><span class="method del">DELETE</span></td>
+            <td><code>/api/despensa/:id</code></td>
+            <td>JWT</td>
+            <td>—</td>
+            <td><code>IItemDespensa[]</code> (array completo actualizado)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Todos los endpoints requieren el header <code>Authorization: Bearer &lt;JWT&gt;</code>. El <code>:id</code> es el <code>_id</code> MongoDB del subdocumento.</p>
+    </div>
+  </section>
+
+  <!-- BACKEND -->
+  <section id="backend">
+    <div class="section-header"><h2>Backend — archivos creados/modificados</h2></div>
+    <div class="section-body">
+      <h3>Nuevos</h3>
+      <table>
+        <thead><tr><th>Archivo</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file-path">backend/src/types/despensa.ts</span></td>
+            <td>Interface <code>IItemDespensa</code> con los campos del subdocumento.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/repositories/despensaRepository.ts</span></td>
+            <td>Acceso a MongoDB: <code>obtener</code>, <code>añadir</code>, <code>editar</code>, <code>eliminar</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/services/despensaService.ts</span></td>
+            <td>Capa de negocio (actualmente delega directamente en el repositorio).</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/controllers/despensaController.ts</span></td>
+            <td>Parsea la request, valida campos, llama al service, devuelve respuesta HTTP.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/routes/despensa.routes.ts</span></td>
+            <td>Define las 4 rutas con <code>requerirAuth</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Modificados</h3>
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file-path">backend/src/types/usuario.ts</span></td>
+            <td>Añadido <code>despensa?: IItemDespensa[]</code> a <code>IUsuario</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/models/usuarioMongo.ts</span></td>
+            <td>Añadido <code>itemDespensaSchema</code> (subdocumento) y campo <code>despensa</code> en el schema de Usuario.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">backend/src/app.ts</span></td>
+            <td>Registrado <code>app.use('/api/despensa', despensaRoutes)</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section id="frontend">
+    <div class="section-header"><h2>Frontend — archivos creados/modificados</h2></div>
+    <div class="section-body">
+      <h3>Nuevos</h3>
+      <table>
+        <thead><tr><th>Archivo</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file-path">frontend/src/services/despensaService.ts</span></td>
+            <td>4 métodos HTTP hacia <code>/api/despensa</code>. <code>normalizar()</code> convierte <code>_id</code> (MongoDB) en <code>id</code> (FE).</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">frontend/src/features/despensa/hooks/useMiDespensa.ts</span></td>
+            <td><code>useMiDespensa</code> (useQuery) + <code>useAñadirItem</code> + <code>useEditarItem</code> + <code>useEliminarItem</code> (useMutation con optimistic update). Query key: <code>['despensa']</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Modificados</h3>
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file-path">frontend/src/features/despensa/components/contenidoDespensa.tsx</span></td>
+            <td>Usa <code>useMiDespensa</code> + <code>useAñadirItem</code> + <code>useEditarItem</code> + <code>useEliminarItem</code> en lugar de <code>useDespensaStore</code>. Spinner de carga mientras <code>isLoading</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">frontend/src/features/despensa/components/sheetAnadirIngrediente.tsx</span></td>
+            <td>Recibe <code>ingredientesExistentes: ItemDespensa[]</code> como prop en lugar de leer del store (para detección de duplicados).</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">frontend/src/features/recetas/components/detalleReceta/tabsReceta.tsx</span></td>
+            <td>Migrado de <code>useDespensaStore</code> a <code>useMiDespensa</code> + <code>useAñadirItem</code> para el botón "Añadir a mi despensa".</td>
+          </tr>
+          <tr>
+            <td><span class="file-path">frontend/src/stores/despensaStore.ts</span></td>
+            <td>Vaciado. El store Zustand ya no es necesario — la despensa se gestiona con TanStack Query.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CAMBIOS FRENTE AL MOCK -->
+  <section id="cambios">
+    <div class="section-header"><h2>Cambios frente a la versión mock (Sprint 4)</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Sprint 4 — Mock</th><th>Sprint 5 — Real</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Datos en memoria (Zustand + <code>DATOS_DESPENSA_MOCK</code>)</td>
+            <td>Datos en MongoDB Atlas (subdocumento en Usuario)</td>
+          </tr>
+          <tr>
+            <td>Se pierden los datos al recargar la página</td>
+            <td>Los datos persisten en base de datos</td>
+          </tr>
+          <tr>
+            <td>No hay llamadas HTTP</td>
+            <td>4 endpoints REST autenticados con JWT</td>
+          </tr>
+          <tr>
+            <td>IDs generados en el cliente (<code>Date.now()</code>)</td>
+            <td>IDs generados por MongoDB (<code>ObjectId</code>)</td>
+          </tr>
+          <tr>
+            <td>Sin sincronización entre pestañas ni dispositivos</td>
+            <td>TanStack Query sincroniza en cada mount (<code>staleTime: 0</code>)</td>
+          </tr>
+          <tr>
+            <td>"Añadir a mi despensa" en receta: solo local</td>
+            <td>"Añadir a mi despensa" en receta: persiste en BD vía <code>useAñadirItem</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
