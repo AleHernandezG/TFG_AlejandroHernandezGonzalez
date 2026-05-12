@@ -9,6 +9,7 @@ router.get("/", optionalAuth, recetasController.obtenerFeed);
 // Rutas fijas ANTES de /:id para que Express no las capture como parámetro
 router.get("/guardadas", requerirAuth, recetasController.obtenerGuardadas);
 router.get("/mis-recetas", requerirAuth, recetasController.obtenerMisRecetas);
+router.get("/foto-preview", recetasController.obtenerFotoPreview);
 
 router.post("/", requerirAuth, recetasController.crear);
 

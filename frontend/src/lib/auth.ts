@@ -78,6 +78,8 @@ export const opcionesAuth: NextAuthOptions = {
       // Credentials: primer login — user contiene los datos del authorize()
       if (user && account?.provider === "credentials") {
         token.sub = user.id;
+        token.name = user.name;
+        token.picture = user.image ?? null;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.backendToken = (user as any).backendToken;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,9 +112,11 @@ export const opcionesAuth: NextAuthOptions = {
         }
       }
 
-      // update() desde el cliente → actualizar perfilCompleto en el token
-      if (trigger === "update" && session?.perfilCompleto !== undefined) {
-        token.perfilCompleto = session.perfilCompleto;
+      // update() desde el cliente → actualizar campos en el token
+      if (trigger === "update") {
+        if (session?.perfilCompleto !== undefined) token.perfilCompleto = session.perfilCompleto;
+        if (session?.name !== undefined) token.name = session.name;
+        if (session?.image !== undefined) token.picture = session.image;
       }
 
       return token;
@@ -121,6 +125,8 @@ export const opcionesAuth: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub;
+        session.user.name = token.name as string | undefined;
+        session.user.image = token.picture as string | null | undefined;
         session.user.backendToken = token.backendToken as string | undefined;
         session.user.rol = token.rol as string | undefined;
         session.user.perfilCompleto = token.perfilCompleto as boolean | undefined;

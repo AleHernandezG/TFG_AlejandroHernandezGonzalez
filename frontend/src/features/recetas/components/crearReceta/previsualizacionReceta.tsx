@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowLeft, Headphones, Heart, MessageCircle, Share2 } from 'lucide-react'
@@ -13,15 +13,19 @@ import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
 import { ETIQUETAS_DIFICULTAD } from '../../types/crearReceta.schema'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 import { useCrearReceta } from '@/features/recetas/hooks/useCrearReceta'
+import { useFotoPexelsPreview } from '@/features/recetas/hooks/useFotoPexelsPreview'
 
 export function PrevisualizacionReceta() {
   const router = useRouter()
   const { datos, fotoPreview } = useCrearRecetaStore()
   const { publicar, publicando, error } = useCrearReceta()
+  const { data: fotoPexels, isLoading: buscandoFoto } = useFotoPexelsPreview(datos?.titulo ?? '')
 
+  // Captura el valor en el montaje para no re-disparar cuando limpiar() pone datos a null
+  const datosAlMontar = useRef(datos)
   useEffect(() => {
-    if (!datos) router.replace('/crear-receta')
-  }, [datos, router])
+    if (!datosAlMontar.current) router.replace('/crear-receta')
+  }, [router])
 
   if (!datos) return null
 
@@ -38,12 +42,32 @@ export function PrevisualizacionReceta() {
 
       {/* ── Hero ── */}
       <div className="relative h-[400px] w-full overflow-hidden">
-        {fotoPreview ? (
-          <Image src={fotoPreview} alt={datos.titulo} fill priority className="object-cover" />
+        {fotoPreview || fotoPexels?.url ? (
+          <Image
+            src={fotoPreview ?? fotoPexels!.url}
+            alt={datos.titulo}
+            fill
+            priority
+            className="object-cover"
+          />
         ) : (
           <div className="h-full w-full bg-muted flex items-center justify-center">
-            <span className="text-sm text-muted-foreground">Sin foto</span>
+            <span className="text-sm text-muted-foreground">
+              {buscandoFoto ? 'Buscando foto…' : 'Sin foto'}
+            </span>
           </div>
+        )}
+        {!fotoPreview && fotoPexels && (
+          <p className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-white/70 px-4 z-10">
+            Foto de{' '}
+            <a href={fotoPexels.urlPerfil} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+              {fotoPexels.fotografo}
+            </a>
+            {' '}en{' '}
+            <a href={fotoPexels.urlFoto} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+              Pexels
+            </a>
+          </p>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/25" />
 

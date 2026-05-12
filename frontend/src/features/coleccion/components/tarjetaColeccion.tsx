@@ -63,7 +63,7 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
       <Link href={`/recetas/${receta.id}`} className="block">
         <article className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer bg-muted shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
           <Image
-            src={receta.imagenUrl || '/images/placeholder-receta.jpg'}
+            src={receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={receta.titulo}
             fill
             className="object-cover"

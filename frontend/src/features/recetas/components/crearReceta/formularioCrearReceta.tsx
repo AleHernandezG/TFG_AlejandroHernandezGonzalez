@@ -25,8 +25,7 @@ import { SeccionAlergenos } from './seccionAlergenos'
 import { PopUpTutorial } from './popUpTutorial'
 import { TutorialCrearReceta } from './tutorialCrearReceta'
 import { PopUpError } from './popUpError'
-
-const MOCK_ES_PRIMER_USUARIO = false
+import { useMisRecetas } from '@/features/coleccion/hooks/useMisRecetas'
 
 const DIFICULTADES: DificultadInterna[] = ['facil', 'media', 'dificil']
 
@@ -61,6 +60,7 @@ function extraerMensajesError(errors: ReturnType<typeof useForm>['formState']['e
 export function FormularioCrearReceta() {
   const router = useRouter()
   const { setDatos, setFoto } = useCrearRecetaStore()
+  const { data: misRecetas, isLoading: cargandoRecetas } = useMisRecetas()
 
   const [mostrarTutorial, setMostrarTutorial] = useState(false)
   const [mostrarStepper, setMostrarStepper] = useState(false)
@@ -70,8 +70,10 @@ export function FormularioCrearReceta() {
   const inputFotoRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (MOCK_ES_PRIMER_USUARIO) setMostrarTutorial(true)
-  }, [])
+    if (!cargandoRecetas && (misRecetas?.length ?? 1) === 0) {
+      setMostrarTutorial(true)
+    }
+  }, [cargandoRecetas, misRecetas])
 
   const methods = useForm<DatosCrearReceta>({
     resolver: zodResolver(esquemaCrearReceta),

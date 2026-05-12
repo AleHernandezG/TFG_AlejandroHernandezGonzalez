@@ -37,6 +37,8 @@ export function DetalleRecetaCliente({ receta }: Props) {
           titulo={receta.receta.titulo}
           guardado={guardado}
           onToggleGuardado={toggleGuardado}
+          fotoFuente={receta.receta.fotoFuente}
+          fotoCredito={receta.receta.fotoCredito}
         />
         {/* Tarjeta de contenido que sube sobre el hero con esquinas redondeadas */}
         <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem]">
@@ -61,6 +63,8 @@ export function DetalleRecetaCliente({ receta }: Props) {
             titulo={receta.receta.titulo}
             guardado={guardado}
             onToggleGuardado={toggleGuardado}
+            fotoFuente={receta.receta.fotoFuente}
+            fotoCredito={receta.receta.fotoCredito}
           />
           <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem]">
             <CabeceraReceta receta={receta} />

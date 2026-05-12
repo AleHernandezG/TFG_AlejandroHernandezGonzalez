@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-11 · Sprint 4 activo · Fase 4 de 7 · Despensa + Perfil + Chat aprobados · /discover pendiente</div>
+    <div class="meta">Actualizado: 2026-05-12 · Sprint 4 activo · Fase 4 de 7 · /discover completado</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">0</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">12</div><div class="label">Urgencia alta</div></div>
+    <div class="counter review"><div class="num">1</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">13</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">11</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">92</div><div class="label">Completadas</div></div>
+    <div class="counter baja"><div class="num">9</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">94</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -930,10 +930,10 @@
           <td class="id">STRUCT-002</td>
           <td class="desc">
             <strong>Scaffolding vistas /despensa, /discover y /perfil</strong>
-            <small>Las rutas existen pero no tienen contenido funcional. /despensa: gestión de ingredientes en casa. /discover: feed global sin filtro de seguidos (explorar). /perfil: datos del usuario + mis recetas + recetas guardadas. Cada una necesita su layout, skeleton de carga y conexión mínima con el backend.</small>
-            <span class="source">📄 frontend/src/app/(app)/despensa · /discover · /perfil</span>
+            <small>Completado: las tres vistas están implementadas con contenido funcional completo. /despensa (DESP-001) · /discover (DISC-001) · /perfil (PERF-001). Todas aprobadas por el autor en Sprint 4.</small>
+            <span class="source">📄 frontend/src/app/(main)/despensa · /discover · /perfil</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -1094,15 +1094,27 @@
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
+        <!-- ── Vista /discover ── -->
+        <tr>
+          <td class="id">DISC-001</td>
+          <td class="desc">
+            <strong>Vista /discover — FE completa con mock (Sprint 4)</strong>
+            <small>Feed de descubrimiento global. Header editorial "Descubre lo que está trending?" con barra de búsqueda pill. Chips de categoría (Todos · Desayuno · Pasta · Vegano · Postres) con single-select. TarjetaDestacada — hero card evento semanal con fondo degradado y etiqueta Sparkles. Grid 2 columnas de TarjetaDiscover (aspect-[3/4] con foto, overlay gradiente, autor + likes + tiempo). Tabs "Más nuevo / Reciente" en sección Inspiración. Búsqueda con debounce 300ms (useDebounce reutilizado) filtra por título y autor. Estado vacío con query resaltada en brand, CTA "Limpiar búsqueda" y 4 chips de sugerencias populares. AnimatePresence entre vista principal y estado vacío. 7 componentes + 1 data file + 2 tipos. Diseño: The Digital Gourmet Editorial (Stitch). Integración BE en Fase 5.</small>
+            <span class="source">📄 features/discover/ · app/(main)/discover/page.tsx · docs/desarrollo/discover.html · docs/stitch/discover/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
         <!-- ── Crear receta ── -->
         <tr>
           <td class="id">CREAR-001</td>
           <td class="desc">
             <strong>Tutorial crear receta activado por datos reales del usuario</strong>
-            <small>Actualmente MOCK_ES_PRIMER_USUARIO = false hardcodeado en formularioCrearReceta.tsx, por lo que el PopUpTutorial y el TutorialCrearReceta (stepper) nunca se muestran. La lógica real: consultar desde la BD si el usuario actualmente logueado tiene numRecetasCreadas === 0 (o campo equivalente). Si es 0, mostrar el popup al entrar en /crear-receta. Requiere: exponer el conteo de recetas propias del usuario en la sesión NextAuth (o hacer una llamada al BE al montar el componente). No requiere nuevo endpoint si se añade el dato al callback de sesión.</small>
-            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · lib/auth.ts · backend/src/types/usuario.ts</span>
+            <small>MOCK_ES_PRIMER_USUARIO eliminado. Se llama al hook useMisRecetas() (reutiliza GET /api/recetas/mis-recetas, COL-002 activo en BE). useEffect reactivo a cargandoRecetas + misRecetas: cuando la query termina y el array está vacío, muestra PopUpTutorial → TutorialCrearReceta (stepper animado). Condición misRecetas?.length ?? 1 evita activar el tutorial mientras la query está cargando.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · features/coleccion/hooks/useMisRecetas.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1236,11 +1248,11 @@
         <tr>
           <td class="id">DET-006</td>
           <td class="desc">
-            <strong>Añadir ingredientes de una receta a la despensa</strong>
-            <small>El link "Añadir a mi despensa" existe en la tab de ingredientes pero no hace nada. Requiere el feature Despensa (Sprint 6).</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <strong>Añadir ingredientes de una receta a la despensa (FE mock)</strong>
+            <small>Botón "Añadir a mi despensa" en tabsReceta.tsx conectado a useDespensaStore. handleAnadirDespensa itera los ingredientes de la receta, filtra duplicados case-insensitive comparando con el store, y llama a añadir() con emoji via getEmojiIngrediente(). Feedback visual 3 s: "✓ Añadidos" + disabled. FE mock Sprint 4 — integración real con BE en Fase 5 (despensaRepository).</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/tabsReceta.tsx · stores/despensaStore.ts · features/despensa/data/datosDespensa.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 6</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1297,10 +1309,10 @@
           <td class="id">API-014</td>
           <td class="desc">
             <strong>BE: GET /api/recetas + GET /api/recetas/:id — feed y detalle reales</strong>
-            <small>GET /api/recetas: feed paginado con filtros (dieta, dificultad, alergenos, q búsqueda). GET /api/recetas/:id: receta completa con autor populado. Sustituyen los datos mock de datosFeed.ts y datosDetalle.ts. Requiere DOM-003. Desbloquea DET-008, DET-001 (guardadas reales), DET-002 (likes reales), DET-009 (similares reales).</small>
-            <span class="source">📄 backend/src/routes/ · features/recetas/data/datosFeed.ts · datosDetalle.ts · DET-008</span>
+            <small>Implementado: GET /api/recetas con optionalAuth, filtros (q, dificultad, alergenos, excluirPropio) y paginación. GET /api/recetas/:id con autor populado. FE: recetasService.obtenerFeed() + useRecetasFeed hook (TanStack Query, staleTime:0). Detalle: recetasService.obtenerPorId() llamado en SSR (force-dynamic). Feed home y vista detalle muestran datos reales de MongoDB.</small>
+            <span class="source">📄 backend/src/routes/recetas.routes.ts · backend/src/controllers/recetasController.ts · frontend/src/services/recetasService.ts · features/recetas/hooks/useRecetasFeed.ts · app/(main)/recetas/[id]/page.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -1310,17 +1322,17 @@
             <small>Si el campo foto queda vacío, llamar a Pexels API (GET /v1/search?query={titulo}&per_page=1) desde imagenService.ts y guardar la URL devuelta en MongoDB. Requiere: PEXELS_API_KEY en Render + campo fotoFuente ('usuario'|'pexels') + fotoCredito ({fotografo, urlFoto, urlPerfil}) en el modelo Receta (DOM-003). Depende de API-013. Ver docs/desarrollo/crearReceta.html §foto-auto.</small>
             <span class="source">📄 backend/src/services/imagenService.ts · TODO-CR-03 · DOM-003 · docs/desarrollo/crearReceta.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">FOTO-002</td>
           <td class="desc">
             <strong>Mostrar créditos Pexels en la vista de detalle de receta</strong>
-            <small>Licencia Pexels obliga a mostrar atribución cuando fotoFuente === 'pexels'. En heroReceta.tsx, si fotoFuente === 'pexels' mostrar bajo la imagen: "📷 Foto de {fotografo} en Pexels" con enlace a urlFoto y urlPerfil. Texto text-xs text-muted-foreground con los dos enlaces activos. Ver docs/desarrollo/crearReceta.html §pexels-creditos para el markup exacto. Depende de FOTO-001.</small>
-            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · docs/desarrollo/crearReceta.html · FOTO-001</span>
+            <small>Implementado en heroReceta.tsx: cuando fotoFuente === 'pexels' && fotoCredito, se renderiza atribución bajo la imagen con enlaces al fotógrafo y a Pexels (obligatorio por licencia). Props fotoFuente y fotoCredito pasadas desde detalleRecetaCliente.tsx. Ver docs/desarrollo/fotoAutoReceta.html.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · docs/desarrollo/fotoAutoReceta.html · FOTO-001</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
       </tbody>

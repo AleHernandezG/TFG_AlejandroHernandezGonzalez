@@ -1,5 +1,6 @@
 import { recetaRepository } from "../repositories/recetaRepository";
 import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
+import { buscarFotoPexels } from "./imagenService";
 
 export const recetasService = {
   async obtenerFeed(filtros: FiltrosFeed, usuarioId?: string) {
@@ -55,5 +56,9 @@ export const recetasService = {
       const e = err as Error & { status?: number };
       throw Object.assign(new Error(e.message), { status: e.status ?? 500 });
     }
+  },
+
+  async obtenerFotoPreview(query: string) {
+    return buscarFotoPexels(query);
   },
 };

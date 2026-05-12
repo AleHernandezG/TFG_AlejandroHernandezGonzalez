@@ -675,3 +675,26 @@ Cambiar el botón Publicar:
   `features/recetas/hooks/`. Importar directamente — está en el mismo dominio.
 
 - **Pencil icon**: Importar de `lucide-react` junto al resto de iconos.
+
+---
+
+## Fixes aplicados post-sprint (2026-05-12) ✅
+
+### FIX-01 — Dropdown ingredientes cortado
+
+- **Problema**: el `<ul>` de autocompletado estaba dentro del `div` con `overflow-hidden` del card y se recortaba.
+- **Fix**: mover el `<ul>` fuera del card, como hermano del contenedor `relative`, con `top-12`.
+- **Archivo**: `seccionIngredientes.tsx`
+
+### FIX-02 — Foto Pexels en vista previa
+
+- **Problema**: la preview mostraba "Sin foto" cuando el usuario no subía imagen.
+- **Fix**: nuevo endpoint `GET /recetas/foto-preview?query=xxx` (sin auth) + hook `useFotoPexelsPreview(titulo)` + atribución superpuesta.
+- **Archivos nuevos**: `useFotoPexelsPreview.ts`
+- **Archivos modificados**: `recetasService.ts` (BE+FE), `recetasController.ts`, `recetas.routes.ts`, `previsualizacionReceta.tsx`, `next.config.mjs` (+images.pexels.com)
+
+### FIX-03 — Redirect a /crear-receta tras publicar
+
+- **Problema**: `router.push()` es asíncrono en Next.js App Router. Al llamar `limpiar()` (incluso después del push), React re-renderiza síncronamente antes de que la navegación complete. El `useEffect([datos, router])` detectaba `datos === null` y disparaba `router.replace('/crear-receta')` ganando la carrera.
+- **Fix**: capturar el valor inicial de `datos` con `useRef` y que el efecto de guardia use ese ref en lugar de la dep `datos`. Así el efecto sólo se ejecuta en el montaje y nunca cuando `limpiar()` vacía el store.
+- **Archivo**: `previsualizacionReceta.tsx` (`useRef(datos)` + `useEffect` sin `datos` en deps)

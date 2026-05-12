@@ -93,6 +93,15 @@ export const recetasService = {
     );
     return data;
   },
+
+  async obtenerFotoPreview(query: string): Promise<{ url: string; fotografo: string; urlFoto: string; urlPerfil: string } | null> {
+    try {
+      const { data } = await apiClient.get('/recetas/foto-preview', { params: { query } });
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  },
 };
 
 export type { FiltrosAvanzados };

@@ -35,11 +35,22 @@ const comentarioSchema = new Schema<IComentarioReceta>({
   fecha: { type: Date, default: Date.now },
 });
 
+const fotoCreditoSchema = new Schema(
+  {
+    fotografo: { type: String, required: true },
+    urlFoto: { type: String, required: true },
+    urlPerfil: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const recetaSchema = new Schema<IRecetaDoc>({
   autorId: { type: Schema.Types.ObjectId, ref: "Usuario", required: true },
   titulo: { type: String, required: true, trim: true, maxlength: 120 },
   descripcion: { type: String, required: true, trim: true, maxlength: 1200 },
   imagenUrl: { type: String, default: '' },
+  fotoFuente: { type: String, enum: ["usuario", "pexels"], default: "usuario" },
+  fotoCredito: { type: fotoCreditoSchema, default: null },
   tiempo: { type: String, required: true },
   dificultad: {
     type: String,

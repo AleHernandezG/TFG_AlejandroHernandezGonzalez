@@ -5,10 +5,12 @@ import {
   DatosCrearRecetaBody,
   FiltrosFeed,
   IComentarioReceta,
+  IFotoCredito,
   PostFeedRespuesta,
   RecetaColeccion,
   RecetaDetalleRespuesta,
 } from "../types/receta";
+import { buscarFotoPexels } from "../services/imagenService";
 
 const MAPA_DIFICULTAD: Record<string, "Fácil" | "Media" | "Difícil"> = {
   facil: "Fácil",
@@ -59,6 +61,8 @@ function docAPostFeed(
       titulo: doc.titulo as string,
       descripcion: doc.descripcion as string,
       imagenUrl: doc.imagenUrl as string,
+      fotoFuente: (doc.fotoFuente as "usuario" | "pexels" | undefined) ?? "usuario",
+      fotoCredito: (doc.fotoCredito as IFotoCredito | null | undefined) ?? null,
       tiempo: doc.tiempo as string,
       dificultad: doc.dificultad as string,
       alergenos: (doc.alergenos as string[]) ?? [],
@@ -399,11 +403,30 @@ export const recetaRepository = {
     const tiempoStr = `${datos.tiempo} ${datos.unidadTiempo}`;
     const dificultad = MAPA_DIFICULTAD[datos.dificultad];
 
+    let imagenUrl = datos.imagenBase64 ?? "";
+    let fotoFuente: "usuario" | "pexels" = "usuario";
+    let fotoCredito: IFotoCredito | null = null;
+
+    if (!datos.imagenBase64) {
+      const fotoPexels = await buscarFotoPexels(datos.titulo);
+      if (fotoPexels) {
+        imagenUrl = fotoPexels.url;
+        fotoFuente = "pexels";
+        fotoCredito = {
+          fotografo: fotoPexels.fotografo,
+          urlFoto: fotoPexels.urlFoto,
+          urlPerfil: fotoPexels.urlPerfil,
+        };
+      }
+    }
+
     const doc = await Receta.create({
       autorId: new Types.ObjectId(autorId),
       titulo: datos.titulo,
       descripcion: datos.descripcion,
-      imagenUrl: datos.imagenBase64 ?? "",
+      imagenUrl,
+      fotoFuente,
+      fotoCredito,
       tiempo: tiempoStr,
       dificultad,
       porciones: datos.porciones,
