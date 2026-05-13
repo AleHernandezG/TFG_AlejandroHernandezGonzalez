@@ -31,7 +31,7 @@ const USUARIOS_SEED = [
     cuentaVerificada: true,
     perfilCompleto: true,
     alergias: [] as string[],
-    preferencias: ["mediterránea", "vegetariano"],
+    preferencias: ["mediterranea", "vegetariano"],
   },
   {
     nombre: "Carlos Ruiz",
@@ -54,7 +54,7 @@ const USUARIOS_SEED = [
     proveedor: "local" as const,
     cuentaVerificada: true,
     perfilCompleto: true,
-    alergias: ["gluten", "huevo"] as string[],
+    alergias: ["cereales", "huevo"] as string[],
     preferencias: ["vegano", "bajoEnCalorias"],
   },
   {
@@ -67,7 +67,7 @@ const USUARIOS_SEED = [
     cuentaVerificada: true,
     perfilCompleto: true,
     alergias: [] as string[],
-    preferencias: ["asiática", "altoEnProteinas"],
+    preferencias: ["altoEnProteinas"],
   },
   {
     nombre: "Sara Molina",
@@ -79,7 +79,7 @@ const USUARIOS_SEED = [
     cuentaVerificada: true,
     perfilCompleto: true,
     alergias: ["frutosSecos"] as string[],
-    preferencias: ["postres", "vegetariano"],
+    preferencias: ["vegetariano"],
   },
 ];
 

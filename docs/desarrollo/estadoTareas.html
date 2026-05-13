@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-12 · Sprint 5 activo · Fase 5 de 7 · /despensa integración BE+FE completada</div>
+    <div class="meta">Actualizado: 2026-05-13 · Sprint 5 activo · Fase 5 de 7 · /perfil integración BE+FE pendiente revisión</div>
   </div>
 </header>
 
@@ -96,11 +96,11 @@
 
   <!-- CONTADORES -->
   <div class="counters">
-    <div class="counter review"><div class="num">7</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter review"><div class="num">6</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">13</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">9</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">94</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">101</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -1078,7 +1078,7 @@
             <small>Creado backend/src/types/despensa.ts con IItemDespensa (_id?, nombre, cantidad, unidad, emoji, fechaAnadido). Extendido IUsuario con despensa?: IItemDespensa[]. Añadido itemDespensaSchema (subdocumento embebido) en usuarioMongo.ts con campo despensa: [itemDespensaSchema] default [].</small>
             <span class="source">📄 backend/src/types/despensa.ts · backend/src/types/usuario.ts · backend/src/models/usuarioMongo.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1088,7 +1088,7 @@
             <small>Creado backend/src/repositories/despensaRepository.ts. obtener(): findById().select('despensa'). añadir(): $push. editar(): $set posicional con 'despensa.$.campo'. eliminar(): $pull por _id. Todos devuelven el array despensa actualizado. Valida ObjectId en editar y eliminar (400 si inválido).</small>
             <span class="source">📄 backend/src/repositories/despensaRepository.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1098,7 +1098,7 @@
             <small>despensaService.ts: capa de negocio ligera, delega en el repositorio. despensaController.ts: obtener (GET), añadir (POST, valida 4 campos obligatorios), editar (PUT /:id, construye $set dinámico), eliminar (DELETE /:id). manejarError() centralizado igual que recetasController.</small>
             <span class="source">📄 backend/src/services/despensaService.ts · backend/src/controllers/despensaController.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1108,7 +1108,7 @@
             <small>GET / · POST / · PUT /:id · DELETE /:id, todas con requerirAuth. Registrado en app.ts como app.use('/api/despensa', despensaRoutes) junto a los demás routers.</small>
             <span class="source">📄 backend/src/routes/despensa.routes.ts · backend/src/app.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1118,7 +1118,7 @@
             <small>Creado frontend/src/services/despensaService.ts con obtener(), añadir(), editar(), eliminar(). Todos envían Authorization: Bearer {token}. normalizar() mapea _id de MongoDB a id para compatibilidad con ItemDespensa del frontend.</small>
             <span class="source">📄 frontend/src/services/despensaService.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1128,7 +1128,7 @@
             <small>Creado frontend/src/features/despensa/hooks/useMiDespensa.ts. useMiDespensa: useQuery con staleTime:0. Las 3 mutations usan optimistic update (onMutate) + rollback completo (onError) + sync desde BE (onSuccess). Mismo patrón que useToggleLike y useToggleGuardado.</small>
             <span class="source">📄 frontend/src/features/despensa/hooks/useMiDespensa.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
         <tr>
@@ -1138,7 +1138,7 @@
             <small>contenidoDespensa.tsx: usa useMiDespensa/useAñadirItem/useEditarItem/useEliminarItem en lugar de useDespensaStore. Spinner de carga mientras isLoading. sheetAnadirIngrediente.tsx: recibe ingredientesExistentes como prop en lugar de leer el store (para detección de duplicados). despensaStore.ts vaciado (store Zustand eliminado, no hay estado mock).</small>
             <span class="source">📄 frontend/src/features/despensa/components/contenidoDespensa.tsx · sheetAnadirIngrediente.tsx · stores/despensaStore.ts</span>
           </td>
-          <td><span class="status review">⏳ Pendiente revisión</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
@@ -1151,6 +1151,68 @@
             <span class="source">📄 features/perfil/ · stores/perfilStore.ts · app/(main)/perfil/page.tsx · docs/stitch/perfil/</span>
           </td>
           <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Perfil BE+FE ── -->
+        <tr>
+          <td class="id">PERF-BE-001</td>
+          <td class="desc">
+            <strong>BE: GET /api/usuarios/me — perfil del usuario autenticado</strong>
+            <small>Nuevo endpoint requerirAuth. usuarioRepository.buscarPerfilPorId() con .select('nombre correo foto alergias preferencias proveedor'). usuariosService.obtenerPerfil() + usuariosController.obtenerPerfil(). Devuelve: { nombre, correo, foto, alergias, preferencias, proveedor }.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts · backend/src/routes/usuarios.routes.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-BE-002</td>
+          <td class="desc">
+            <strong>BE: PUT /api/usuarios/me/contrasena — cambiar contraseña (solo proveedor local)</strong>
+            <small>requerirAuth. Valida contrasenaActual + contrasenaNueva (mín. 8 chars). bcrypt.compare(actual, hash) → 400 si no coincide. bcrypt.hash(nueva, 10) → usuarioRepository.actualizarContrasena(). 400 si proveedor !== 'local'. Devuelve 200 { mensaje }.</small>
+            <span class="source">📄 backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts · backend/src/routes/usuarios.routes.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-BE-003</td>
+          <td class="desc">
+            <strong>BE: PUT /api/usuarios/me/preferencias — guardar dietas y alérgenos en BD</strong>
+            <small>requerirAuth. Body: { dietas: string[], alergenos: string[] }. Mapea dietas→preferencias, alergenos→alergias en el documento Usuario. usuarioRepository.actualizarPreferencias(). Devuelve el perfil actualizado.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-001</td>
+          <td class="desc">
+            <strong>FE: perfilService.ts — 3 métodos HTTP con Authorization Bearer</strong>
+            <small>Creado frontend/src/services/perfilService.ts. getMiPerfil(token): GET /usuarios/me. cambiarContrasena(token, actual, nueva): PUT /usuarios/me/contrasena. actualizarPreferencias(token, dietas, alergenos): PUT /usuarios/me/preferencias. Exporta PerfilRespuesta con los campos del BE.</small>
+            <span class="source">📄 frontend/src/services/perfilService.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-002</td>
+          <td class="desc">
+            <strong>FE: hooks TanStack Query — useMiPerfil + useCambiarContrasena + useActualizarPreferencias</strong>
+            <small>Creado features/perfil/hooks/usePerfil.ts. useMiPerfil: useQuery staleTime 5min. useCambiarContrasena: useMutation. useActualizarPreferencias: useMutation con optimistic update (alergias + preferencias) y rollback en onError. extraerMensajeError() helper para errores Axios.</small>
+            <span class="source">📄 frontend/src/features/perfil/hooks/usePerfil.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-003</td>
+          <td class="desc">
+            <strong>FE: contenidoPerfil + dialogCambiarContrasena + perfilStore conectados al BE real</strong>
+            <small>contenidoPerfil.tsx: nombre/email/foto de useSession(), dietas/alergenos de useMiPerfil(), "Cambiar contraseña" oculto si proveedor==='google'. perfilStore.ts simplificado a solo permisos (ubication/camara/notif). dialogCambiarContrasena.tsx: onSubmit llama a useCambiarContrasena() con error visible si contraseña actual incorrecta (400). dialogPreferenciasAlergenos: onGuardar llama a useActualizarPreferencias() mutation.</small>
+            <span class="source">📄 features/perfil/components/contenidoPerfil.tsx · dialogCambiarContrasena.tsx · stores/perfilStore.ts</span>
+          </td>
+          <td><span class="status review">👁️ Pendiente revisión</span></td>
           <td><span class="urg alta">Alta</span></td>
         </tr>
 
