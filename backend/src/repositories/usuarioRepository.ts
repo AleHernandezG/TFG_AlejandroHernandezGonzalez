@@ -17,6 +17,11 @@ interface DatosCompletarPerfil {
   preferencias: string[];
 }
 
+interface DatosActualizarPreferencias {
+  alergias: string[];
+  preferencias: string[];
+}
+
 export const usuarioRepository = {
   crear: (datos: DatosCrearUsuario): Promise<IUsuarioDoc> =>
     Usuario.create(datos),
@@ -61,6 +66,22 @@ export const usuarioRepository = {
       { alergias: datos.alergias, preferencias: datos.preferencias, perfilCompleto: true },
       { new: true },
     ),
+
+  buscarPerfilPorId: (id: string): Promise<IUsuarioDoc | null> =>
+    Usuario.findById(id).select("nombre correo foto alergias preferencias proveedor"),
+
+  actualizarPreferencias: (
+    id: string,
+    datos: DatosActualizarPreferencias,
+  ): Promise<IUsuarioDoc | null> =>
+    Usuario.findByIdAndUpdate(
+      id,
+      { alergias: datos.alergias, preferencias: datos.preferencias },
+      { new: true },
+    ).select("nombre correo foto alergias preferencias proveedor"),
+
+  buscarPorIdConContrasena: (id: string): Promise<IUsuarioDoc | null> =>
+    Usuario.findById(id).select("+contrasena"),
 
   async toggleSeguir(
     seguidorId: string,

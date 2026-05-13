@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useCambiarContrasena, extraerMensajeError } from '@/features/perfil/hooks/usePerfil'
 
 const esquema = z
   .object({
@@ -36,6 +37,9 @@ export function DialogCambiarContrasena({ abierto, onCerrar }: Props) {
   const [mostrarActual, setMostrarActual] = useState(false)
   const [mostrarNueva, setMostrarNueva] = useState(false)
   const [exito, setExito] = useState(false)
+  const [errorServidor, setErrorServidor] = useState<string | null>(null)
+
+  const { mutateAsync: cambiarContrasena } = useCambiarContrasena()
 
   const {
     register,
@@ -50,12 +54,21 @@ export function DialogCambiarContrasena({ abierto, onCerrar }: Props) {
   function handleCerrar() {
     reset()
     setExito(false)
+    setErrorServidor(null)
     onCerrar()
   }
 
-  async function onSubmit() {
-    await new Promise((r) => setTimeout(r, 600))
-    setExito(true)
+  async function onSubmit(datos: Datos) {
+    setErrorServidor(null)
+    try {
+      await cambiarContrasena({
+        contrasenaActual: datos.contrasenaActual,
+        contrasenaNueva: datos.contrasenaNueva,
+      })
+      setExito(true)
+    } catch (err) {
+      setErrorServidor(extraerMensajeError(err))
+    }
   }
 
   return (
@@ -146,6 +159,12 @@ export function DialogCambiarContrasena({ abierto, onCerrar }: Props) {
                 <p className="text-xs text-destructive">{errors.confirmar.message}</p>
               )}
             </div>
+
+            {errorServidor && (
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                {errorServidor}
+              </p>
+            )}
 
             <Button
               type="submit"

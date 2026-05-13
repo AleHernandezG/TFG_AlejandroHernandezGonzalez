@@ -61,6 +61,17 @@ FRONTEND — MEJORAS UI
 - UI-AF-003 seccionIngredientes rediseñada: card por ingrediente con dos filas (nombre / cantidad + unidad), 20 unidades disponibles
 - UI-AF-004 seccionPasos con textarea auto-resize (crece con el contenido, sin scroll interno)
 
+BACKEND — DESPENSA (Sprint 5)
+- DESP-BE-001  BE Schema despensa — backend/src/types/despensa.ts (IItemDespensa), IUsuario extendido con despensa?: IItemDespensa[], itemDespensaSchema embebido en usuarioMongo.ts con campo despensa default []
+- DESP-BE-002  BE despensaRepository.ts — obtener ($select), añadir ($push), editar ($set posicional despensa.$.campo), eliminar ($pull por _id). Devuelve array completo en cada operación
+- DESP-BE-003  BE despensaService.ts + despensaController.ts — capa de negocio + validación de campos obligatorios + manejarError centralizado
+- DESP-BE-004  BE despensa.routes.ts (GET / · POST / · PUT /:id · DELETE /:id, todas requerirAuth) registrado en app.ts como /api/despensa
+
+FRONTEND — DESPENSA (Sprint 5)
+- DESP-FE-001  FE despensaService.ts — 4 métodos HTTP con Authorization: Bearer, normalizar() convierte _id (MongoDB) a id (FE)
+- DESP-FE-002  FE useMiDespensa.ts — useMiDespensa (useQuery, staleTime:0) + useAñadirItem + useEditarItem + useEliminarItem (useMutation con optimistic update + rollback completo)
+- DESP-FE-003  FE contenidoDespensa.tsx usa hooks reales (isLoading spinner), sheetAnadirIngrediente.tsx recibe ingredientesExistentes como prop, despensaStore.ts vaciado, tabsReceta.tsx migrado a useMiDespensa + useAñadirItem
+
 FIXES
 - FIX-002   Suspense boundary en coleccion/page.tsx para que useSearchParams funcione correctamente en Next.js 14
 - FIX-004   Dropdown de ingredientes movido fuera del div overflow-hidden para que no se corte visualmente

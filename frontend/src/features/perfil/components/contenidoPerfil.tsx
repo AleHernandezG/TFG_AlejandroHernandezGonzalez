@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { Lock, UtensilsCrossed, MapPin, Camera, Bell, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePerfilStore } from '@/stores/perfilStore'
+import { useMiPerfil, useActualizarPreferencias } from '@/features/perfil/hooks/usePerfil'
 import { TarjetaAvatarPerfil } from './tarjetaAvatarPerfil'
 import { GrupoAjustes } from './grupoAjustes'
 import { FilaAjuste } from './filaAjuste'
@@ -14,21 +15,20 @@ import { DialogCambiarContrasena } from './dialogCambiarContrasena'
 import { DialogPreferenciasAlergenos } from './dialogPreferenciasAlergenos'
 
 export function ContenidoPerfil() {
-  const router = useRouter()
-  const {
-    nombre,
-    email,
-    avatar,
-    dietas,
-    alergenos,
-    permisos,
-    actualizarDietas,
-    actualizarAlergenos,
-    togglePermiso,
-  } = usePerfilStore()
+  const { data: session } = useSession()
+  const { permisos, togglePermiso } = usePerfilStore()
+  const { data: perfil } = useMiPerfil()
+  const { mutate: actualizarPreferencias } = useActualizarPreferencias()
 
   const [dialogContrasena, setDialogContrasena] = useState(false)
   const [dialogPreferencias, setDialogPreferencias] = useState(false)
+
+  const nombre = session?.user?.name ?? ''
+  const email = session?.user?.email ?? ''
+  const avatar = session?.user?.image ?? null
+  const dietas = perfil?.preferencias ?? []
+  const alergenos = perfil?.alergias ?? []
+  const esLocal = perfil?.proveedor === 'local'
 
   async function handleCerrarSesion() {
     await signOut({ callbackUrl: '/login' })
@@ -49,11 +49,13 @@ export function ContenidoPerfil() {
 
         {/* Grupo: Cuenta */}
         <GrupoAjustes titulo="Cuenta">
-          <FilaAjuste
-            icono={Lock}
-            label="Cambiar contraseña"
-            onClick={() => setDialogContrasena(true)}
-          />
+          {esLocal && (
+            <FilaAjuste
+              icono={Lock}
+              label="Cambiar contraseña"
+              onClick={() => setDialogContrasena(true)}
+            />
+          )}
           <FilaAjuste
             icono={UtensilsCrossed}
             label="Cambiar preferencias y alérgenos"
@@ -99,7 +101,7 @@ export function ContenidoPerfil() {
         {/* Botón guardar */}
         <div className="border-border/20 border-t pt-4">
           <Button
-            onClick={() => router.back()}
+            onClick={() => window.history.back()}
             className="h-12 w-full rounded-full bg-brand font-bold text-brand-foreground"
           >
             Guardar cambios
@@ -123,10 +125,7 @@ export function ContenidoPerfil() {
         onCerrar={() => setDialogPreferencias(false)}
         dietasActivas={dietas}
         alergenosActivos={alergenos}
-        onGuardar={(d, a) => {
-          actualizarDietas(d)
-          actualizarAlergenos(a)
-        }}
+        onGuardar={(d, a) => actualizarPreferencias({ dietas: d, alergenos: a })}
       />
     </div>
   )

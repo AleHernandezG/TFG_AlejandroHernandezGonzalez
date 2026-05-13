@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from '@/config/opcionesUsuario'
@@ -24,6 +24,13 @@ export function DialogPreferenciasAlergenos({
   const [dietasDraft, setDietasDraft] = useState<string[]>(dietasActivas)
   const [alergenosDraft, setAlergenosDraft] = useState<string[]>(alergenosActivos)
 
+  useEffect(() => {
+    if (abierto) {
+      setDietasDraft(dietasActivas)
+      setAlergenosDraft(alergenosActivos)
+    }
+  }, [abierto, dietasActivas, alergenosActivos])
+
   function toggleDieta(id: string) {
     setDietasDraft((prev) =>
       prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
@@ -36,11 +43,6 @@ export function DialogPreferenciasAlergenos({
     )
   }
 
-  function handleAbrir() {
-    setDietasDraft(dietasActivas)
-    setAlergenosDraft(alergenosActivos)
-  }
-
   function handleGuardar() {
     onGuardar(dietasDraft, alergenosDraft)
     onCerrar()
@@ -49,10 +51,7 @@ export function DialogPreferenciasAlergenos({
   return (
     <Dialog
       open={abierto}
-      onOpenChange={(open) => {
-        if (open) handleAbrir()
-        else onCerrar()
-      }}
+      onOpenChange={(open) => { if (!open) onCerrar() }}
     >
       <DialogContent className="max-w-sm rounded-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
