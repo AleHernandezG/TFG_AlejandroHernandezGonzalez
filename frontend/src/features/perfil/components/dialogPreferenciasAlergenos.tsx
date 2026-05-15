@@ -4,32 +4,28 @@ import { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from '@/config/opcionesUsuario'
+import { useActualizarPreferencias, useMiPerfil, extraerMensajeError } from '@/features/perfil/hooks/usePerfil'
 import Image from 'next/image'
 
 interface Props {
   abierto: boolean
   onCerrar: () => void
-  dietasActivas: string[]
-  alergenosActivos: string[]
-  onGuardar: (dietas: string[], alergenos: string[]) => void
 }
 
-export function DialogPreferenciasAlergenos({
-  abierto,
-  onCerrar,
-  dietasActivas,
-  alergenosActivos,
-  onGuardar,
-}: Props) {
-  const [dietasDraft, setDietasDraft] = useState<string[]>(dietasActivas)
-  const [alergenosDraft, setAlergenosDraft] = useState<string[]>(alergenosActivos)
+export function DialogPreferenciasAlergenos({ abierto, onCerrar }: Props) {
+  const { data: perfil } = useMiPerfil()
+  const { mutate: guardar, isPending } = useActualizarPreferencias()
+  const [dietasDraft, setDietasDraft] = useState<string[]>([])
+  const [alergenosDraft, setAlergenosDraft] = useState<string[]>([])
+  const [errorServidor, setErrorServidor] = useState<string | null>(null)
 
   useEffect(() => {
     if (abierto) {
-      setDietasDraft(dietasActivas)
-      setAlergenosDraft(alergenosActivos)
+      setDietasDraft(perfil?.preferencias ?? [])
+      setAlergenosDraft(perfil?.alergias ?? [])
+      setErrorServidor(null)
     }
-  }, [abierto, dietasActivas, alergenosActivos])
+  }, [abierto, perfil])
 
   function toggleDieta(id: string) {
     setDietasDraft((prev) =>
@@ -44,8 +40,14 @@ export function DialogPreferenciasAlergenos({
   }
 
   function handleGuardar() {
-    onGuardar(dietasDraft, alergenosDraft)
-    onCerrar()
+    setErrorServidor(null)
+    guardar(
+      { dietas: dietasDraft, alergenos: alergenosDraft },
+      {
+        onSuccess: () => onCerrar(),
+        onError: (err) => setErrorServidor(extraerMensajeError(err)),
+      },
+    )
   }
 
   return (
@@ -118,11 +120,18 @@ export function DialogPreferenciasAlergenos({
             </div>
           </div>
 
+          {errorServidor && (
+            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              {errorServidor}
+            </p>
+          )}
+
           <Button
             onClick={handleGuardar}
+            disabled={isPending}
             className="w-full h-11 rounded-xl bg-brand text-brand-foreground font-bold"
           >
-            Guardar preferencias
+            {isPending ? 'Guardando…' : 'Guardar preferencias'}
           </Button>
         </div>
       </DialogContent>

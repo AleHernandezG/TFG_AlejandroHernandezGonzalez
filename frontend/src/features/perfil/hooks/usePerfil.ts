@@ -65,6 +65,10 @@ export function useActualizarPreferencias() {
     onSuccess: (data) => {
       qc.setQueryData(QUERY_KEY, data)
     },
+
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEY })
+    },
   })
 }
 
