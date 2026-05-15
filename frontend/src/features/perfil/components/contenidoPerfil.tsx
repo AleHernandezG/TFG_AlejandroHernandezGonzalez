@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { Lock, UtensilsCrossed, MapPin, Camera, Bell, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePerfilStore } from '@/stores/perfilStore'
-import { useMiPerfil, useActualizarPreferencias } from '@/features/perfil/hooks/usePerfil'
+import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 import { TarjetaAvatarPerfil } from './tarjetaAvatarPerfil'
 import { GrupoAjustes } from './grupoAjustes'
 import { FilaAjuste } from './filaAjuste'
@@ -18,7 +18,6 @@ export function ContenidoPerfil() {
   const { data: session } = useSession()
   const { permisos, togglePermiso } = usePerfilStore()
   const { data: perfil } = useMiPerfil()
-  const { mutate: actualizarPreferencias } = useActualizarPreferencias()
 
   const [dialogContrasena, setDialogContrasena] = useState(false)
   const [dialogPreferencias, setDialogPreferencias] = useState(false)
@@ -26,8 +25,6 @@ export function ContenidoPerfil() {
   const nombre = session?.user?.name ?? ''
   const email = session?.user?.email ?? ''
   const avatar = session?.user?.image ?? null
-  const dietas = perfil?.preferencias ?? []
-  const alergenos = perfil?.alergias ?? []
   const esLocal = perfil?.proveedor === 'local'
 
   async function handleCerrarSesion() {
@@ -123,9 +120,6 @@ export function ContenidoPerfil() {
       <DialogPreferenciasAlergenos
         abierto={dialogPreferencias}
         onCerrar={() => setDialogPreferencias(false)}
-        dietasActivas={dietas}
-        alergenosActivos={alergenos}
-        onGuardar={(d, a) => actualizarPreferencias({ dietas: d, alergenos: a })}
       />
     </div>
   )

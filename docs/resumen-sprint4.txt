@@ -1,5 +1,5 @@
 RESUMEN SPRINT 4 — Cookr TFG
-Generado: 2026-05-12
+Generado: 2026-05-12 · Última actualización: 2026-05-15 (PERF Sprint 5 completado)
 ============================================================
 
 BACKEND — NUEVOS ENDPOINTS
@@ -71,6 +71,17 @@ FRONTEND — DESPENSA (Sprint 5)
 - DESP-FE-001  FE despensaService.ts — 4 métodos HTTP con Authorization: Bearer, normalizar() convierte _id (MongoDB) a id (FE)
 - DESP-FE-002  FE useMiDespensa.ts — useMiDespensa (useQuery, staleTime:0) + useAñadirItem + useEditarItem + useEliminarItem (useMutation con optimistic update + rollback completo)
 - DESP-FE-003  FE contenidoDespensa.tsx usa hooks reales (isLoading spinner), sheetAnadirIngrediente.tsx recibe ingredientesExistentes como prop, despensaStore.ts vaciado, tabsReceta.tsx migrado a useMiDespensa + useAñadirItem
+
+BACKEND — PERFIL (Sprint 5)
+- PERF-BE-001  BE GET /api/usuarios/me — usuarioRepository.buscarPerfilPorId() con .select('nombre correo foto alergias preferencias proveedor'). usuariosService.obtenerPerfil() + controller + route (requerirAuth). Declarado antes de /:id para evitar que Express interprete "me" como id MongoDB
+- PERF-BE-002  BE PUT /api/usuarios/me/contrasena — bcrypt.compare(actual) + bcrypt.hash(nueva, 10) + actualizarContrasena(). 400 si proveedor!=='local' o contraseña incorrecta. 404 si usuario no encontrado
+- PERF-BE-003  BE PUT /api/usuarios/me/preferencias — body { dietas: string[], alergenos: string[] }, mapea dietas→preferencias y alergenos→alergias en MongoDB. Devuelve perfil actualizado (mismo shape que GET)
+
+FRONTEND — PERFIL (Sprint 5)
+- PERF-FE-001  FE perfilService.ts — 3 métodos HTTP: getMiPerfil, cambiarContrasena, actualizarPreferencias con Authorization: Bearer. PerfilRespuesta interface espejo del BE. Fix: import { apiClient } corregido (era default import, error TS)
+- PERF-FE-002  FE usePerfil.ts — useMiPerfil (useQuery, staleTime 5min), useCambiarContrasena (useMutation), useActualizarPreferencias (useMutation con optimistic update completo: cancelQueries + setQueryData + rollback en onError + sync en onSuccess). extraerMensajeError() helper Axios
+- PERF-FE-003  FE Connect — contenidoPerfil.tsx: nombre/email/foto de useSession(), dietas/alergenos/proveedor de useMiPerfil(), fila "Cambiar contraseña" oculta si proveedor==='google'. dialogCambiarContrasena.tsx: mutación real con errorServidor visible. dialogPreferenciasAlergenos: llama useMiPerfil() directamente (cache hit), draft sincronizado con [abierto, perfil]. perfilStore simplificado a solo permisos locales (ubicacion/camara/notificaciones)
+- PERF-FIX-001 FE Fix dialog preferencias — chips activos no se mostraban al abrir el dialog. Causa: refetchOnMount:always + invalidateQueries en mount → perfil=undefined durante refetch → props vacías. Fix: staleTime 5min, eliminado useEffect invalidateQueries, dialog usa useMiPerfil() directo. tsc --noEmit: 0 errores
 
 FIXES
 - FIX-002   Suspense boundary en coleccion/page.tsx para que useSearchParams funcione correctamente en Next.js 14

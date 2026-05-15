@@ -70,12 +70,13 @@
 - ✅ [DESP-FE-001] FE Service — `despensaService.ts`: 4 métodos HTTP con `Authorization: Bearer`, `normalizar()` mapea `_id` → `id`. Pendiente revisión.
 - ✅ [DESP-FE-002] FE Hooks — `useMiDespensa.ts`: `useMiDespensa` (useQuery) + `useAñadirItem` / `useEditarItem` / `useEliminarItem` (useMutation con optimistic update + rollback). Pendiente revisión.
 - ✅ [DESP-FE-003] FE Connect — `contenidoDespensa.tsx` usa hooks reales (isLoading spinner), `sheetAnadirIngrediente.tsx` recibe `ingredientesExistentes` como prop, `despensaStore.ts` vaciado, `tabsReceta.tsx` migrado a `useMiDespensa` + `useAñadirItem`. Pendiente revisión.
-- 👁️ [PERF-BE-001] BE `GET /api/usuarios/me` — `usuarioRepository.buscarPerfilPorId()` devuelve nombre, correo, foto, alergias, preferencias, proveedor. Pendiente revisión.
-- 👁️ [PERF-BE-002] BE `PUT /api/usuarios/me/contrasena` — bcrypt.compare + hash + update. 400 si contraseña incorrecta o proveedor=google. Pendiente revisión.
-- 👁️ [PERF-BE-003] BE `PUT /api/usuarios/me/preferencias` — guarda dietas→preferencias y alergenos→alergias en MongoDB. Pendiente revisión.
-- 👁️ [PERF-FE-001] FE `perfilService.ts` — 3 métodos HTTP: getMiPerfil, cambiarContrasena, actualizarPreferencias. Pendiente revisión.
-- 👁️ [PERF-FE-002] FE `features/perfil/hooks/usePerfil.ts` — useMiPerfil (useQuery, staleTime 5min) + useCambiarContrasena + useActualizarPreferencias (optimistic update). Pendiente revisión.
-- 👁️ [PERF-FE-003] FE Connect — `contenidoPerfil.tsx` usa useSession (nombre/email/foto) + useMiPerfil (dietas/alergenos/proveedor). `dialogCambiarContrasena.tsx` llama al BE real con manejo de error 400. `perfilStore.ts` simplificado a solo permisos. Pendiente revisión.
+- ✅ [PERF-BE-001] BE `GET /api/usuarios/me` — `usuarioRepository.buscarPerfilPorId()` devuelve nombre, correo, foto, alergias, preferencias, proveedor.
+- ✅ [PERF-BE-002] BE `PUT /api/usuarios/me/contrasena` — bcrypt.compare + hash + update. 400 si contraseña incorrecta o proveedor=google.
+- ✅ [PERF-BE-003] BE `PUT /api/usuarios/me/preferencias` — guarda dietas→preferencias y alergenos→alergias en MongoDB.
+- ✅ [PERF-FE-001] FE `perfilService.ts` — 3 métodos HTTP: getMiPerfil, cambiarContrasena, actualizarPreferencias. Fix: `import { apiClient }` (era default import).
+- ✅ [PERF-FE-002] FE `features/perfil/hooks/usePerfil.ts` — useMiPerfil (useQuery, staleTime 5min, sin refetchOnMount) + useCambiarContrasena + useActualizarPreferencias (optimistic update).
+- ✅ [PERF-FE-003] FE Connect — `contenidoPerfil.tsx` usa useSession (nombre/email/foto) + useMiPerfil (dietas/alergenos/proveedor). `dialogCambiarContrasena.tsx` llama al BE real con manejo de error 400. `perfilStore.ts` simplificado a solo permisos.
+- ✅ [PERF-FIX-001] FE Fix — `dialogPreferenciasAlergenos.tsx` no mostraba chips activos. Causa: refetchOnMount+invalidateQueries hacían perfil=undefined durante refetch. Fix: dialog llama `useMiPerfil()` directo (cache hit), deps `[abierto, perfil]` en lugar de props individuales. 0 errores tsc.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 
