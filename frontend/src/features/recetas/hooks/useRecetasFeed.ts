@@ -10,22 +10,27 @@ interface UseRecetasFeedParams {
   filtrosAvanzados?: FiltrosAvanzados;
   pagina?: number;
   excluirPropio?: boolean;
+  soloSiguiendo?: boolean;
+  sort?: 'reciente' | 'likes';
 }
 
-export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio = false }: UseRecetasFeedParams = {}) {
+export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio = false, soloSiguiendo = false, sort }: UseRecetasFeedParams = {}) {
   const { data: session } = useSession();
   const token = session?.user?.backendToken;
 
   const filtros: FiltrosFeed = {
     q: q || undefined,
+    dietas: filtrosAvanzados?.dietas?.length ? filtrosAvanzados.dietas : undefined,
     dificultad: filtrosAvanzados?.dificultad?.length ? filtrosAvanzados.dificultad : undefined,
     alergenos: filtrosAvanzados?.alergenos?.length ? filtrosAvanzados.alergenos : undefined,
     pagina,
     excluirPropio: excluirPropio && !!token,
+    soloSiguiendo: soloSiguiendo && !!token,
+    sort,
   };
 
   return useQuery({
-    queryKey: ["recetas", "feed", q ?? "", filtrosAvanzados, pagina, excluirPropio, !!token],
+    queryKey: ["recetas", "feed", q ?? "", filtrosAvanzados, pagina, excluirPropio, soloSiguiendo, sort, !!token],
     queryFn: () => recetasService.obtenerFeed(filtros, token),
     staleTime: 0,
     placeholderData: (prev) => prev,

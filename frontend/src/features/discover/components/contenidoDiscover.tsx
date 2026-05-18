@@ -1,20 +1,19 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useDebounce } from '@/hooks/useDebounce'
 import { HeaderDiscover } from './headerDiscover'
-import { ChipsCategoria } from './chipsCategoria'
 import { TarjetaDestacada } from './tarjetaDestacada'
 import { TarjetaDiscover } from './tarjetaDiscover'
 import { EstadoVacioDiscover } from './estadoVacioDiscover'
 import {
-  CATEGORIAS_DISCOVER,
   EVENTO_DESTACADO_MOCK,
-  RECETAS_DISCOVER_MOCK,
   SUGERENCIAS_POPULARES,
 } from '@/features/discover/data/datosDiscover'
-import type { CategoriaDiscover, TabDiscover } from '@/features/discover/types/discover.types'
+import type { TabDiscover } from '@/features/discover/types/discover.types'
+import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
+import { useDiscover } from '@/features/discover/hooks/useDiscover'
 
 const variantesGrid: Variants = {
   oculto: { opacity: 0 },
@@ -29,42 +28,32 @@ const varianteTarjeta: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.22 } },
 }
 
+function SkeletonTarjeta() {
+  return (
+    <div className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
+  )
+}
+
 export function ContenidoDiscover() {
   const [query, setQuery] = useState('')
-  const [categoriaActiva, setCategoriaActiva] = useState<CategoriaDiscover>('Todos')
   const [tabActiva, setTabActiva] = useState<TabDiscover>('recientes')
+  const [filtrosAvanzados, setFiltrosAvanzados] = useState<FiltrosAvanzados>({
+    dietas: [],
+    alergenos: [],
+    dificultad: [],
+  })
 
   const queryDebounced = useDebounce(query, 300)
   const buscando = queryDebounced.length > 0
 
-  const recetasFiltradas = useMemo(() => {
-    let lista = RECETAS_DISCOVER_MOCK
-
-    if (categoriaActiva !== 'Todos') {
-      lista = lista.filter((r) => r.categoria === categoriaActiva)
-    }
-
-    if (queryDebounced) {
-      const q = queryDebounced.toLowerCase()
-      lista = lista.filter(
-        (r) =>
-          r.titulo.toLowerCase().includes(q) ||
-          r.autorNombre.toLowerCase().includes(q)
-      )
-    }
-
-    if (tabActiva === 'valorados') {
-      lista = [...lista].sort((a, b) => b.likes - a.likes)
-    } else if (tabActiva === 'evento') {
-      lista = lista.filter((r) => r.esEvento === true)
-    }
-
-    return lista
-  }, [queryDebounced, categoriaActiva, tabActiva])
+  const { data: recetas = [], isLoading } = useDiscover({
+    q: queryDebounced || undefined,
+    tab: tabActiva,
+    filtrosAvanzados,
+  })
 
   function handleLimpiar() {
     setQuery('')
-    setCategoriaActiva('Todos')
   }
 
   function handleSugerencia(s: string) {
@@ -73,24 +62,21 @@ export function ContenidoDiscover() {
 
   return (
     <div className="min-h-screen bg-[var(--warm-bg)]">
-      <HeaderDiscover query={query} onChange={setQuery} />
+      <HeaderDiscover
+        query={query}
+        onChange={setQuery}
+        filtrosAvanzados={filtrosAvanzados}
+        onFiltrosChange={setFiltrosAvanzados}
+      />
 
       {!buscando && (
-        <>
-          <ChipsCategoria
-            categorias={CATEGORIAS_DISCOVER}
-            activa={categoriaActiva}
-            onChange={setCategoriaActiva}
-          />
-
-          <div className="mt-5">
-            <TarjetaDestacada evento={EVENTO_DESTACADO_MOCK} />
-          </div>
-        </>
+        <div className="mt-5">
+          <TarjetaDestacada evento={EVENTO_DESTACADO_MOCK} />
+        </div>
       )}
 
       <AnimatePresence mode="wait">
-        {buscando && recetasFiltradas.length === 0 ? (
+        {!isLoading && buscando && recetas.length === 0 ? (
           <motion.div
             key="vacio"
             initial={{ opacity: 0 }}
@@ -106,12 +92,18 @@ export function ContenidoDiscover() {
             />
           </motion.div>
         ) : (
-          <motion.div key="resultados" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+          <motion.div
+            key="resultados"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          >
             {/* Cabecera / toggle de tabs */}
             <div className="mt-7 mb-4 px-5">
               {buscando ? (
                 <h2 className="text-lg font-extrabold text-foreground">
-                  {recetasFiltradas.length} resultado{recetasFiltradas.length !== 1 ? 's' : ''}
+                  {recetas.length} resultado{recetas.length !== 1 ? 's' : ''}
                 </h2>
               ) : (
                 <div className="flex justify-center">
@@ -140,18 +132,26 @@ export function ContenidoDiscover() {
             </div>
 
             {/* Grid */}
-            <motion.div
-              variants={variantesGrid}
-              initial="oculto"
-              animate="visible"
-              className="grid grid-cols-2 gap-3 px-5 pb-28"
-            >
-              {recetasFiltradas.map((receta) => (
-                <motion.div key={receta.id} variants={varianteTarjeta}>
-                  <TarjetaDiscover receta={receta} />
-                </motion.div>
-              ))}
-            </motion.div>
+            {isLoading ? (
+              <div className="grid grid-cols-2 gap-3 px-5 pb-28">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <SkeletonTarjeta key={i} />
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                variants={variantesGrid}
+                initial="oculto"
+                animate="visible"
+                className="grid grid-cols-2 gap-3 px-5 pb-28"
+              >
+                {recetas.map((receta) => (
+                  <motion.div key={receta.id} variants={varianteTarjeta}>
+                    <TarjetaDiscover receta={receta} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

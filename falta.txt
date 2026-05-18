@@ -1,0 +1,18 @@
+Tareas pendientes por categoría
+Sprint actual — conectar FE a BE
+ID	Descripción	Estado
+PERF-FE-003	Conectar /completar-perfil a useActualizarPreferencias	Pendiente
+UX pendiente (sin BE necesario)
+ID	Descripción	Prioridad
+DET-004	Sheet/Drawer "ver todos los comentarios" con paginación	Alta
+HANDS-001	Modo manos libres — botón TTS sin onClick	Sprint 5
+ALEG-001	Verificar rutas de iconos de alérgenos en todos los componentes	Media
+Refactors pendientes (baja prioridad)
+ID	Descripción
+API-012	Crear useAuth.ts y extraer lógica de formularios de auth
+AUTH-004	Enriquecer sesión NextAuth con avatar/rol del backend
+UI-008–013	Refactorizar formularios de login/registro/recuperación
+Intencionalmente diferidas a Sprint 6
+NUTR-001 — Información nutricional via Edamam API
+/chat — Integración con Gemini AI
+DOCS-003 — Subir HTMLs de docs a OneDrive

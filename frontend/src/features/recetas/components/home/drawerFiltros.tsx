@@ -79,9 +79,10 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
         <div className="overflow-y-auto px-4 pb-2 flex flex-col gap-6">
           {/* Dietas */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Dieta
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Tipo de dieta
             </p>
+            <p className="mb-3 text-[11px] text-muted-foreground/70">Muestra recetas que incluyan esta dieta</p>
             <div className="flex flex-wrap gap-2">
               {DIETAS_OPCIONES.map((d) => {
                 const activo = local.dietas.includes(d.id)
@@ -106,9 +107,10 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
 
           {/* Dificultad */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Dificultad
             </p>
+            <p className="mb-3 text-[11px] text-muted-foreground/70">Muestra recetas de este nivel de dificultad</p>
             <div className="flex flex-wrap gap-2">
               {DIFICULTADES.map((d) => {
                 const activo = local.dificultad.includes(d)
@@ -133,9 +135,10 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
 
           {/* Excluir alérgenos */}
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Excluir alérgenos
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Alérgenos
             </p>
+            <p className="mb-3 text-[11px] text-muted-foreground/70">Oculta recetas que contengan estos alérgenos</p>
             <div className="flex flex-wrap gap-2">
               {ALERGENOS_OPCIONES.map((a) => {
                 const activo = local.alergenos.includes(a.id)

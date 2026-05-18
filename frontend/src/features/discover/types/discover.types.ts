@@ -9,7 +9,7 @@ export type RecetaDiscover = {
   imagenUrl: string | null
   tiempoMin: number
   likes: number
-  categoria: Exclude<CategoriaDiscover, 'Todos'>
+  categoria?: Exclude<CategoriaDiscover, 'Todos'>
   esEvento?: boolean
 }
 

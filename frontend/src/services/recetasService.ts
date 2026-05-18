@@ -4,11 +4,16 @@ import type { DatosRecetaNueva } from "@/features/recetas/types/crearReceta.sche
 
 export interface FiltrosFeed {
   q?: string;
+  dietas?: string[];
   dificultad?: string[];
   alergenos?: string[];
   pagina?: number;
   limite?: number;
   excluirPropio?: boolean;
+  soloSiguiendo?: boolean;
+  sort?: 'reciente' | 'likes';
+  soloEvento?: boolean;
+  categoria?: string;
 }
 
 export interface RespuestaFeed {
@@ -19,11 +24,16 @@ export interface RespuestaFeed {
 function serializarFiltros(filtros: FiltrosFeed): Record<string, string> {
   const params: Record<string, string> = {};
   if (filtros.q) params.q = filtros.q;
+  if (filtros.dietas?.length) params.dietas = filtros.dietas.join(",");
   if (filtros.dificultad?.length) params.dificultad = filtros.dificultad.join(",");
   if (filtros.alergenos?.length) params.alergenos = filtros.alergenos.join(",");
   if (filtros.pagina) params.pagina = String(filtros.pagina);
   if (filtros.limite) params.limite = String(filtros.limite);
   if (filtros.excluirPropio) params.excluirPropio = "true";
+  if (filtros.soloSiguiendo) params.soloSiguiendo = "true";
+  if (filtros.sort) params.sort = filtros.sort;
+  if (filtros.soloEvento) params.soloEvento = "true";
+  if (filtros.categoria) params.categoria = filtros.categoria;
   return params;
 }
 

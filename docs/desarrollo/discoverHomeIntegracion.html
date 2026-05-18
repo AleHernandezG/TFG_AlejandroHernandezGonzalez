@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integración Discover + Home — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.fix { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+    .badge.seed { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf633; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+
+    .callout { border-left: 3px solid #f97316; background: #1f1a14; padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; font-size: 0.82rem; color: #d4d4d4; }
+    .callout.info { border-color: #3b82f6; background: #111827; }
+    .callout.success { border-color: #22c55e; background: #0d1f14; }
+    .callout.warning { border-color: #eab308; background: #1a1900; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Integración Discover + Home — BE + FE</h1>
+  <p>Sprint 5 · 2026-05-18 · Tareas DISC-BE-001 / FILT-001 / UI-030 / MIDDLEWARE-001 — Completado y verificado · tsc --noEmit: 0 errores</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#schema">Schema BE</a>
+  <a href="#repositorio">Repositorio</a>
+  <a href="#controlador">Controlador</a>
+  <a href="#servicio-fe">Servicio FE</a>
+  <a href="#hooks">Hooks</a>
+  <a href="#discover-ui">Discover UI</a>
+  <a href="#drawer">Drawer filtros</a>
+  <a href="#seed">Seed</a>
+  <a href="#middleware">Middleware</a>
+  <a href="#flujo">Flujo completo</a>
+  <a href="#verificacion">Verificación</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen de cambios</h2>
+    </div>
+    <div class="section-body">
+      <p>Esta integración conecta <code>/discover</code> al backend real y cambia el comportamiento del feed <code>/home</code> para mostrar solo recetas de cuentas seguidas. Se añaden filtros nuevos al endpoint <code>GET /api/recetas</code> sin romper compatibilidad hacia atrás.</p>
+
+      <table>
+        <thead><tr><th>Área</th><th>Cambio</th><th>ID</th></tr></thead>
+        <tbody>
+          <tr><td>BE — tipos</td><td><code>esEvento</code> en IReceta, nuevos campos en FiltrosFeed (<code>soloSiguiendo</code>, <code>sort</code>, <code>soloEvento</code>, <code>categoria</code>, <code>dietas</code>)</td><td>DISC-BE-001</td></tr>
+          <tr><td>BE — modelo</td><td>Campo <code>esEvento: Boolean</code> en recetaMongo.ts</td><td>DISC-BE-001</td></tr>
+          <tr><td>BE — repositorio</td><td><code>findAll()</code> maneja 5 filtros nuevos + sort in-memory por likes</td><td>DISC-BE-001</td></tr>
+          <tr><td>BE — controlador</td><td>Parse de 5 nuevos query params en <code>obtenerFeed()</code></td><td>DISC-BE-001</td></tr>
+          <tr><td>FE — servicio</td><td><code>FiltrosFeed</code> extendido + <code>serializarFiltros()</code> actualizado</td><td>DISC-BE-001</td></tr>
+          <tr><td>FE — hooks</td><td><code>useRecetasFeed</code>: soloSiguiendo + sort + dietas. <code>useDiscover</code>: nuevo hook completo</td><td>DISC-BE-001</td></tr>
+          <tr><td>FE — /home</td><td><code>feedHome.tsx</code> + <code>feedHomePc.tsx</code>: soloSiguiendo: true, migrado de mock</td><td>DISC-BE-001</td></tr>
+          <tr><td>FE — /discover</td><td><code>useDiscover</code>, chips eliminados, DrawerFiltros añadido, tarjeta mobile-first</td><td>FILT-001 / UI-030</td></tr>
+          <tr><td>FE — drawer</td><td>Semántica explícita: "incluye" (dieta/dificultad) vs "oculta" (alérgenos)</td><td>FILT-002</td></tr>
+          <tr><td>FE — middleware</td><td>Rutas protegidas restauradas con <code>withAuth</code></td><td>MIDDLEWARE-001</td></tr>
+          <tr><td>Seed</td><td>esEvento en Paella Valenciana + seguimientos entre usuarios de prueba</td><td>SEED-001</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout success">
+        <strong>TypeScript verificado:</strong> <code>tsc --noEmit</code> en frontend y backend — 0 errores tras todos los cambios.
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEMA BE -->
+  <section id="schema">
+    <div class="section-header">
+      <span class="section-icon">🗄️</span>
+      <h2>Backend — Schema y tipos <span class="badge be">BE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>backend/src/types/receta.ts — IReceta</h3>
+      <p>Campo nuevo opcional para marcar recetas como eventos especiales:</p>
+      <pre>export interface IReceta {
+  // ... campos existentes ...
+  esEvento?: boolean;
+}</pre>
+
+      <h3>backend/src/types/receta.ts — FiltrosFeed</h3>
+      <p>Cinco nuevos parámetros de filtrado para el feed:</p>
+      <pre>export interface FiltrosFeed {
+  q?: string;
+  dietas?: string[];          // filtra categorias $in (incluyente)
+  dificultad?: string[];      // filtra dificultad $in (incluyente)
+  alergenos?: string[];       // filtra alergenos $nin (excluyente)
+  pagina?: number;
+  limite?: number;
+  excluirPropio?: boolean;
+  soloSiguiendo?: boolean;    // solo recetas de cuentas seguidas
+  sort?: 'reciente' | 'likes'; // orden del feed
+  soloEvento?: boolean;       // solo recetas marcadas como evento
+  categoria?: string;         // filtro de categoría única (chip)
+}</pre>
+
+      <h3>backend/src/models/recetaMongo.ts</h3>
+      <p>Campo <code>esEvento</code> añadido antes de <code>fechaPublicacion</code>:</p>
+      <pre>esEvento: { type: Boolean, default: false },
+fechaPublicacion: { type: Date, default: Date.now },</pre>
+
+      <div class="callout info">
+        El campo <code>esEvento</code> tiene <code>default: false</code> para que las recetas existentes en MongoDB sean compatibles sin necesitar migración.
+      </div>
+    </div>
+  </section>
+
+  <!-- REPOSITORIO -->
+  <section id="repositorio">
+    <div class="section-header">
+      <span class="section-icon">🔍</span>
+      <h2>Backend — Repositorio findAll() <span class="badge be">BE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>Destructuración de nuevos parámetros</h3>
+      <pre>const {
+  q, dietas, dificultad, alergenos, pagina = 1, limite = 20,
+  excluirPropio, soloSiguiendo, sort, soloEvento, categoria,
+} = filtros;</pre>
+
+      <h3>Bloques de filtro (orden de aplicación)</h3>
+      <pre>// 1. Texto libre
+if (q) {
+  query["$or"] = [
+    { titulo: { $regex: q, $options: "i" } },
+    { descripcion: { $regex: q, $options: "i" } },
+  ];
+}
+
+// 2. Dietas — incluyente ($in sobre campo categorias)
+if (dietas && dietas.length > 0) {
+  query["categorias"] = { $in: dietas };
+}
+
+// 3. Dificultad — incluyente ($in)
+if (dificultad && dificultad.length > 0) {
+  query["dificultad"] = { $in: dificultad };
+}
+
+// 4. Alérgenos — excluyente ($nin)
+if (alergenos && alergenos.length > 0) {
+  query["alergenos"] = { $nin: alergenos };
+}
+
+// 5. Excluir receta propia
+if (excluirPropio && usuarioId) {
+  query["autorId"] = { $ne: new Types.ObjectId(usuarioId) };
+}
+
+// 6. Solo recetas de evento
+if (soloEvento) {
+  query["esEvento"] = true;
+}
+
+// 7. Categoría única (chip)
+if (categoria) {
+  query["categorias"] = { $in: [categoria] };
+}
+
+// 8. Solo siguiendo — requiere cargar seguidosSet
+if (soloSiguiendo && usuarioId) {
+  const seguidosArr = [...(await obtenerSeguidosSet(usuarioId))].map(
+    (id) => new Types.ObjectId(id),
+  );
+  query["autorId"] = { $in: seguidosArr };
+}</pre>
+
+      <h3>Sort in-memory por likes</h3>
+      <p>Para TFG (dataset pequeño) el orden por likes se hace en memoria JS. Para datasets grandes requeriría un campo <code>likesCount</code> desnormalizado:</p>
+      <pre>const usarSortLikes = sort === 'likes';
+
+let docs: unknown[];
+let total: number;
+
+if (usarSortLikes) {
+  // Obtener todos sin paginación, ordenar en memoria, paginar manualmente
+  const todos = await Receta.find(query)
+    .populate('autorId', 'nombre foto')
+    .sort({ fechaPublicacion: -1 })
+    .lean().exec();
+
+  todos.sort((a, b) =>
+    ((b as Record&lt;string, unknown&gt;).likes as unknown[]).length -
+    ((a as Record&lt;string, unknown&gt;).likes as unknown[]).length,
+  );
+
+  total = todos.length;
+  docs = todos.slice(skip, skip + limite);
+} else {
+  [docs, total] = await Promise.all([
+    Receta.find(query)
+      .populate('autorId', 'nombre foto')
+      .sort({ fechaPublicacion: -1 })
+      .skip(skip).limit(limite).lean().exec(),
+    Receta.countDocuments(query),
+  ]);
+}</pre>
+
+      <div class="callout warning">
+        <strong>Nota de arquitectura:</strong> <code>dietas</code> y <code>categoria</code> ambos filtran el campo <code>categorias</code> de la receta. Si se usan simultáneamente, el segundo sobreescribirá la query del primero. En esta versión son mutuamente excluyentes (el chip de categoría no coexiste con el drawer en /discover).
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLADOR -->
+  <section id="controlador">
+    <div class="section-header">
+      <span class="section-icon">🎛️</span>
+      <h2>Backend — Controlador <span class="badge be">BE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>backend/src/controllers/recetasController.ts — obtenerFeed()</h3>
+      <pre>const {
+  q, dietas, dificultad, alergenos, pagina, limite, excluirPropio,
+  soloSiguiendo, sort, soloEvento, categoria,
+} = req.query;
+
+const filtros = {
+  q: typeof q === "string" ? q : undefined,
+  dietas:
+    typeof dietas === "string" && dietas
+      ? dietas.split(",")
+      : undefined,
+  dificultad:
+    typeof dificultad === "string" && dificultad
+      ? dificultad.split(",")
+      : undefined,
+  alergenos:
+    typeof alergenos === "string" && alergenos
+      ? alergenos.split(",")
+      : undefined,
+  pagina: pagina ? Math.max(1, Number(pagina)) : 1,
+  limite: limite ? Math.min(50, Number(limite)) : 20,
+  excluirPropio: excluirPropio === "true",
+  soloSiguiendo: soloSiguiendo === "true",
+  sort: (sort === "likes" || sort === "reciente")
+    ? (sort as 'likes' | 'reciente')
+    : undefined,
+  soloEvento: soloEvento === "true",
+  categoria: typeof categoria === "string" && categoria ? categoria : undefined,
+};</pre>
+
+      <p>Los arrays (<code>dietas</code>, <code>dificultad</code>, <code>alergenos</code>) llegan como string CSV separado por comas (<code>vegano,keto</code>) y se dividen con <code>.split(",")</code>. Los booleanos se comparan con el string literal <code>"true"</code>.</p>
+    </div>
+  </section>
+
+  <!-- SERVICIO FE -->
+  <section id="servicio-fe">
+    <div class="section-header">
+      <span class="section-icon">🔌</span>
+      <h2>Frontend — Servicio recetas <span class="badge fe">FE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>frontend/src/services/recetasService.ts — FiltrosFeed</h3>
+      <pre>export interface FiltrosFeed {
+  q?: string;
+  dietas?: string[];
+  dificultad?: string[];
+  alergenos?: string[];
+  pagina?: number;
+  limite?: number;
+  excluirPropio?: boolean;
+  soloSiguiendo?: boolean;
+  sort?: 'reciente' | 'likes';
+  soloEvento?: boolean;
+  categoria?: string;
+}</pre>
+
+      <h3>serializarFiltros() — campos nuevos</h3>
+      <pre>function serializarFiltros(filtros: FiltrosFeed): Record&lt;string, string&gt; {
+  const params: Record&lt;string, string&gt; = {};
+  if (filtros.q) params.q = filtros.q;
+  if (filtros.dietas?.length) params.dietas = filtros.dietas.join(",");
+  if (filtros.dificultad?.length) params.dificultad = filtros.dificultad.join(",");
+  if (filtros.alergenos?.length) params.alergenos = filtros.alergenos.join(",");
+  if (filtros.pagina) params.pagina = String(filtros.pagina);
+  if (filtros.limite) params.limite = String(filtros.limite);
+  if (filtros.excluirPropio) params.excluirPropio = "true";
+  if (filtros.soloSiguiendo) params.soloSiguiendo = "true";
+  if (filtros.sort) params.sort = filtros.sort;
+  if (filtros.soloEvento) params.soloEvento = "true";
+  if (filtros.categoria) params.categoria = filtros.categoria;
+  return params;
+}</pre>
+    </div>
+  </section>
+
+  <!-- HOOKS -->
+  <section id="hooks">
+    <div class="section-header">
+      <span class="section-icon">🪝</span>
+      <h2>Frontend — Hooks <span class="badge fe">FE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>useRecetasFeed.ts — nuevos parámetros</h3>
+      <p>El hook del feed de /home se amplía con <code>soloSiguiendo</code>, <code>sort</code> y <code>dietas</code> (del drawer):</p>
+      <pre>interface UseRecetasFeedParams {
+  q?: string;
+  filtrosAvanzados?: FiltrosAvanzados;
+  pagina?: number;
+  excluirPropio?: boolean;
+  soloSiguiendo?: boolean;
+  sort?: 'reciente' | 'likes';
+}
+
+// En el objeto filtros:
+const filtros: FiltrosFeed = {
+  q: q || undefined,
+  dietas: filtrosAvanzados?.dietas?.length ? filtrosAvanzados.dietas : undefined,
+  dificultad: filtrosAvanzados?.dificultad?.length ? filtrosAvanzados.dificultad : undefined,
+  alergenos: filtrosAvanzados?.alergenos?.length ? filtrosAvanzados.alergenos : undefined,
+  pagina,
+  excluirPropio: excluirPropio && !!token,
+  soloSiguiendo: soloSiguiendo && !!token, // solo si hay sesión
+  sort,
+};</pre>
+
+      <h3>feedHome.tsx + feedHomePc.tsx — solo siguiendo</h3>
+      <pre>// feedHome.tsx
+const { data, isLoading, isError } = useRecetasFeed({
+  q: busquedaDebounciada,
+  filtrosAvanzados,
+  excluirPropio: true,
+  soloSiguiendo: true,   // ← feed de personas seguidas
+})
+
+// feedHomePc.tsx — migrado de POSTS_MOCK a hook real
+const { data, isLoading } = useRecetasFeed({
+  q: busqueda,
+  filtrosAvanzados,
+  excluirPropio: true,
+  soloSiguiendo: true,
+})</pre>
+
+      <h3>useDiscover.ts — hook nuevo</h3>
+      <p>Nuevo hook en <code>features/discover/hooks/useDiscover.ts</code>. Traduce las 3 tabs a parámetros del endpoint y aplica los filtros avanzados del drawer:</p>
+      <pre>'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { useSession } from 'next-auth/react'
+import { recetasService } from '@/services/recetasService'
+import type { CategoriaDiscover, TabDiscover } from '../types/discover.types'
+import type { FiltrosAvanzados, PostFeed } from '@/features/recetas/types/receta.types'
+
+interface UseDiscoverParams {
+  q?: string
+  categoria?: CategoriaDiscover
+  tab?: TabDiscover
+  filtrosAvanzados?: FiltrosAvanzados
+}
+
+function parseTiempoMin(tiempo: string): number {
+  if (tiempo.includes('h')) return Math.round(parseFloat(tiempo) * 60)
+  return parseInt(tiempo) || 0
+}
+
+export function postFeedARecetaDiscover(post: PostFeed) {
+  return {
+    id: post.id,
+    titulo: post.receta.titulo,
+    autorNombre: post.autor.nombre,
+    imagenUrl: post.receta.imagenUrl,
+    tiempoMin: parseTiempoMin(post.receta.tiempo),
+    likes: post.likes,
+  }
+}
+
+export function useDiscover({
+  q, categoria, tab = 'recientes', filtrosAvanzados,
+}: UseDiscoverParams = {}) {
+  const { data: session } = useSession()
+  const token = session?.user?.backendToken
+
+  const sort = tab === 'valorados' ? 'likes' : 'reciente'
+  const soloEvento = tab === 'evento'
+  // lowercase para coincidir con valores en MongoDB ('vegano', 'pasta'…)
+  const categoriaParam = categoria && categoria !== 'Todos'
+    ? categoria.toLowerCase()
+    : undefined
+
+  return useQuery({
+    queryKey: ['discover', q ?? '', categoria, tab, filtrosAvanzados, !!token],
+    queryFn: async () => {
+      const resp = await recetasService.obtenerFeed(
+        {
+          q: q || undefined,
+          sort,
+          soloEvento,
+          categoria: categoriaParam,
+          limite: 30,
+          dietas: filtrosAvanzados?.dietas?.length ? filtrosAvanzados.dietas : undefined,
+          dificultad: filtrosAvanzados?.dificultad?.length ? filtrosAvanzados.dificultad : undefined,
+          alergenos: filtrosAvanzados?.alergenos?.length ? filtrosAvanzados.alergenos : undefined,
+        },
+        token,
+      )
+      return resp.recetas.map(postFeedARecetaDiscover)
+    },
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+  })
+}</pre>
+
+      <div class="callout info">
+        <strong>Fix case sensitivity (FILT-001):</strong> Los chips de categoría enviaban valores capitalizados (<code>'Vegano'</code>, <code>'Pasta'</code>) pero MongoDB almacena los valores en minúsculas (<code>'vegano'</code>, <code>'pasta'</code>) según los datos del seed. La corrección aplica <code>.toLowerCase()</code> antes de enviar el parámetro <code>categoria</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCOVER UI -->
+  <section id="discover-ui">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <h2>Frontend — Discover UI <span class="badge fe">FE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>contenidoDiscover.tsx — cambios</h3>
+      <ul>
+        <li>Eliminado <code>categoriaActiva</code> (estado + import de <code>CategoriaDiscover</code>)</li>
+        <li>Eliminado import de <code>ChipsCategoria</code> y <code>CATEGORIAS_DISCOVER</code></li>
+        <li>Eliminado el bloque JSX de los chips</li>
+        <li>Añadido estado <code>filtrosAvanzados</code> para el drawer (<code>dietas</code>, <code>alergenos</code>, <code>dificultad</code>)</li>
+        <li><code>filtrosAvanzados</code> se pasa a <code>HeaderDiscover</code> (que renderiza el drawer) y a <code>useDiscover</code></li>
+      </ul>
+
+      <h3>Tabs de /discover — mapeo a parámetros</h3>
+      <table>
+        <thead><tr><th>Tab</th><th>sort</th><th>soloEvento</th></tr></thead>
+        <tbody>
+          <tr><td><code>'recientes'</code></td><td><code>'reciente'</code></td><td><code>false</code></td></tr>
+          <tr><td><code>'valorados'</code></td><td><code>'likes'</code></td><td><code>false</code></td></tr>
+          <tr><td><code>'evento'</code></td><td><code>'reciente'</code></td><td><code>true</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>tarjetaDiscover.tsx — rediseño mobile-first <span class="badge fe">UI-030</span></h3>
+      <p>Mejoras aplicadas para una vista más editorial y adaptada a móvil:</p>
+      <ul>
+        <li><strong>Imagen</strong>: <code>group</code> + <code>group-hover:scale-105</code> con <code>transition-transform duration-500</code></li>
+        <li><strong>Gradiente</strong>: <code>from-black/90 via-black/25 to-transparent</code> (más agresivo para legibilidad)</li>
+        <li><strong>Badge likes</strong>: esquina superior derecha, fondo <code>bg-black/40 backdrop-blur-sm</code>, icono <code>Heart</code> relleno en <code>rose-400</code></li>
+        <li><strong>Tiempo</strong>: función <code>formatTiempo(min)</code> con guard <code>tiempoMin &gt; 0</code> — formatea <code>90</code> como <code>1h 30m</code></li>
+        <li><strong>Autor</strong>: avatar placeholder circular <code>h-5 w-5</code> con <code>bg-brand/70</code></li>
+      </ul>
+
+      <pre>function formatTiempo(min: number): string {
+  if (min &lt;= 0) return ''
+  if (min &lt; 60) return `${min}m`
+  const h = Math.floor(min / 60)
+  const rest = min % 60
+  return rest > 0 ? `${h}h ${rest}m` : `${h}h`
+}</pre>
+
+      <h3>discover.types.ts — cambios en RecetaDiscover</h3>
+      <pre>export type RecetaDiscover = {
+  id: string
+  titulo: string
+  autorNombre: string
+  imagenUrl: string | null
+  tiempoMin: number
+  likes: number
+  categoria?: Exclude&lt;CategoriaDiscover, 'Todos'&gt;  // ahora opcional
+  esEvento?: boolean                                // nuevo campo
+}</pre>
+    </div>
+  </section>
+
+  <!-- DRAWER FILTROS -->
+  <section id="drawer">
+    <div class="section-header">
+      <span class="section-icon">🎚️</span>
+      <h2>Frontend — Drawer de filtros <span class="badge fe">FE</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>headerDiscover.tsx — integración DrawerFiltros</h3>
+      <p>El header de /discover reutiliza el componente <code>DrawerFiltros</code> del feature recetas. Recibe <code>filtrosAvanzados</code> y <code>onFiltrosChange</code> como props desde <code>contenidoDiscover</code>:</p>
+      <pre>interface Props {
+  query: string
+  onChange: (q: string) => void
+  filtrosAvanzados: FiltrosAvanzados
+  onFiltrosChange: (f: FiltrosAvanzados) => void
+}
+
+// Botón del drawer con badge de filtros activos
+const totalActivos =
+  filtrosAvanzados.dietas.length +
+  filtrosAvanzados.dificultad.length +
+  filtrosAvanzados.alergenos.length</pre>
+
+      <h3>Semántica de filtros en drawerFiltros.tsx <span class="badge fix">FILT-002</span></h3>
+      <p>Cada sección del drawer tiene ahora un subtítulo que explica el comportamiento del filtro para el usuario:</p>
+
+      <table>
+        <thead><tr><th>Sección</th><th>Subtítulo</th><th>Operador MongoDB</th><th>Comportamiento</th></tr></thead>
+        <tbody>
+          <tr><td>Tipo de dieta</td><td>"Muestra recetas que incluyan esta dieta"</td><td><code>$in</code> sobre <code>categorias</code></td><td>Incluyente</td></tr>
+          <tr><td>Dificultad</td><td>"Muestra recetas de este nivel de dificultad"</td><td><code>$in</code> sobre <code>dificultad</code></td><td>Incluyente</td></tr>
+          <tr><td>Alérgenos</td><td>"Oculta recetas que contengan estos alérgenos"</td><td><code>$nin</code> sobre <code>alergenos</code></td><td>Excluyente</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        El drawer es el mismo componente para <code>/home</code> y <code>/discover</code>. La semántica es idéntica en ambas vistas. El DrawerFiltros en /discover también transmite las <code>dietas</code> al hook <code>useDiscover</code>, que las envía al backend con el nuevo parámetro.
+      </div>
+    </div>
+  </section>
+
+  <!-- SEED -->
+  <section id="seed">
+    <div class="section-header">
+      <span class="section-icon">🌱</span>
+      <h2>Seed de prueba <span class="badge seed">SEED</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>backend/src/scripts/seedCompleto.ts — cambios</h3>
+
+      <h3>1. esEvento en Paella Valenciana</h3>
+      <pre>// Receta "Paella Valenciana" — marcada como evento
+{
+  titulo: "Paella Valenciana",
+  // ... resto de campos ...
+  esEvento: true,   // ← nuevo
+}</pre>
+
+      <h3>2. Relaciones de seguimiento</h3>
+      <p>Tras crear los 4 usuarios de prueba (María, Carlos, Lucía, Andrés) se añaden seguimientos con <code>$addToSet</code> para poder probar el feed <code>soloSiguiendo</code>:</p>
+      <pre>// María sigue a Carlos y Lucía
+await Usuario.findByIdAndUpdate(maria._id, {
+  $addToSet: { seguidos: { $each: [carlos._id, lucia._id] } }
+});
+// Carlos sigue a María y Andrés
+await Usuario.findByIdAndUpdate(carlos._id, {
+  $addToSet: {
+    seguidores: { $each: [maria._id] },
+    seguidos: { $each: [maria._id, andres._id] },
+  }
+});
+// Lucía: registrar que María la sigue
+await Usuario.findByIdAndUpdate(lucia._id, {
+  $addToSet: { seguidores: { $each: [maria._id] } }
+});
+// Andrés: registrar que Carlos lo sigue
+await Usuario.findByIdAndUpdate(andres._id, {
+  $addToSet: { seguidores: { $each: [carlos._id] } }
+});</pre>
+
+      <h3>Cómo ejecutar el seed</h3>
+      <pre>cd backend
+npx ts-node src/scripts/seedCompleto.ts</pre>
+
+      <div class="callout warning">
+        El seed borra y vuelve a crear todos los datos. Ejecutar solo en entorno de desarrollo. Usar las credenciales del usuario María (o cualquier otro) para probar la app tras el seed.
+      </div>
+    </div>
+  </section>
+
+  <!-- MIDDLEWARE -->
+  <section id="middleware">
+    <div class="section-header">
+      <span class="section-icon">🔐</span>
+      <h2>Middleware — Rutas protegidas restauradas <span class="badge fe">MIDDLEWARE-001</span></h2>
+    </div>
+    <div class="section-body">
+
+      <h3>frontend/src/middleware.ts</h3>
+      <p>El middleware estaba desactivado (stub vacío) durante el desarrollo. Se restaura con <code>withAuth</code> de NextAuth:</p>
+      <pre>export { default } from "next-auth/middleware";
+
+export const config = {
+  matcher: [
+    '/home',
+    '/discover',
+    '/despensa',
+    '/perfil',
+    '/chat',
+    '/coleccion',
+    '/crear-receta',
+    '/crear-receta/revisar',
+    '/recetas/:path*',
+  ],
+};</pre>
+
+      <p>Sin sesión activa, NextAuth redirige automáticamente a <code>/api/auth/signin</code>, que en este proyecto apunta a <code>/login</code> mediante el parámetro <code>pages.signIn</code> configurado en <code>lib/auth.ts</code>.</p>
+
+      <div class="callout success">
+        La restauración del middleware no requiere cambios en los componentes ni en el backend. Es solo configuración del layer de Next.js.
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJO COMPLETO -->
+  <section id="flujo">
+    <div class="section-header">
+      <span class="section-icon">↔️</span>
+      <h2>Flujo de datos completo</h2>
+    </div>
+    <div class="section-body">
+
+      <h3>Feed /home — solo siguiendo</h3>
+      <div class="flow">
+        <div class="flow-node">feedHome.tsx<br><small>soloSiguiendo:true</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">useRecetasFeed<br><small>soloSiguiendo&&!!token</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">recetasService<br><small>params.soloSiguiendo='true'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">GET /api/recetas<br><small>?soloSiguiendo=true</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">findAll()<br><small>autorId:{$in:seguidosArr}</small></div>
+      </div>
+
+      <h3>Feed /discover — tab Mejor Valorados</h3>
+      <div class="flow">
+        <div class="flow-node">contenidoDiscover<br><small>tab:'valorados'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">useDiscover<br><small>sort:'likes'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">recetasService<br><small>params.sort='likes'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">GET /api/recetas<br><small>?sort=likes&limite=30</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">findAll()<br><small>sort in-memory</small></div>
+      </div>
+
+      <h3>Feed /discover — tab Especiales Evento</h3>
+      <div class="flow">
+        <div class="flow-node">contenidoDiscover<br><small>tab:'evento'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">useDiscover<br><small>soloEvento:true</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">recetasService<br><small>params.soloEvento='true'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">GET /api/recetas<br><small>?soloEvento=true</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">findAll()<br><small>esEvento:true</small></div>
+      </div>
+
+      <h3>DrawerFiltros — dieta vegana</h3>
+      <div class="flow">
+        <div class="flow-node">DrawerFiltros<br><small>dietas:['vegano']</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">useDiscover<br><small>filtrosAvanzados.dietas</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">recetasService<br><small>params.dietas='vegano'</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">GET /api/recetas<br><small>?dietas=vegano</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-node">findAll()<br><small>categorias:{$in:['vegano']}</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFICACIÓN -->
+  <section id="verificacion">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Guía de verificación manual</h2>
+    </div>
+    <div class="section-body">
+
+      <h3>Antes de probar — seed</h3>
+      <pre>cd backend && npx ts-node src/scripts/seedCompleto.ts</pre>
+
+      <h3>Prueba A — Feed /home solo siguiendo</h3>
+      <ol>
+        <li>Login con María (la cuenta del seed que sigue a Carlos y Lucía)</li>
+        <li>Ir a <code>/home</code></li>
+        <li>Comprobar que SOLO aparecen recetas de Carlos y Lucía (no de Andrés, no propias)</li>
+        <li>Comprobar en Network: petición con <code>soloSiguiendo=true&excluirPropio=true</code></li>
+      </ol>
+
+      <h3>Prueba B — Tabs de /discover</h3>
+      <ol>
+        <li>Ir a <code>/discover</code></li>
+        <li><strong>Tab Recientes</strong>: recetas reales del backend (no datos mock), ordenadas por fecha</li>
+        <li><strong>Tab Mejor valorados</strong>: mismas recetas, ordenadas de más a menos likes</li>
+        <li><strong>Tab Especiales Evento</strong>: solo Paella Valenciana (esEvento:true en seed)</li>
+      </ol>
+
+      <h3>Prueba C — Búsqueda en /discover</h3>
+      <ol>
+        <li>Escribir "pollo" en la barra de búsqueda</li>
+        <li>Esperar 300ms de debounce</li>
+        <li>Comprobar resultados reales del backend</li>
+        <li>Verificar el contador "N resultados" en la cabecera</li>
+      </ol>
+
+      <h3>Prueba D — DrawerFiltros en /discover</h3>
+      <ol>
+        <li>Pulsar el botón de filtros (icono sliders)</li>
+        <li>Seleccionar "Vegano" en Tipo de dieta → confirmar subtítulo "Muestra recetas que incluyan esta dieta"</li>
+        <li>Pulsar Aplicar</li>
+        <li>Verificar que el badge del botón muestra "1" y el feed filtra por recetas veganas</li>
+        <li>Abrir drawer de nuevo, seleccionar un alérgeno → confirmar subtítulo "Oculta recetas que contengan estos alérgenos"</li>
+      </ol>
+
+      <h3>Prueba E — Rutas protegidas</h3>
+      <ol>
+        <li>Cerrar sesión</li>
+        <li>Intentar navegar a <code>/home</code>, <code>/discover</code>, <code>/despensa</code>, <code>/perfil</code></li>
+        <li>Comprobar que todas redirigen a <code>/login</code></li>
+      </ol>
+
+      <h3>TypeScript</h3>
+      <pre>cd frontend && npx tsc --noEmit  # debe dar 0 errores
+cd backend  && npx tsc --noEmit  # debe dar 0 errores</pre>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
