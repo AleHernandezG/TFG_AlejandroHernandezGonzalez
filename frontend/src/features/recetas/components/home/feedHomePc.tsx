@@ -3,9 +3,9 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDebounce } from '@/hooks/useDebounce'
 import { SearchX } from 'lucide-react'
-import { POSTS_MOCK } from '../../data/datosFeed'
 import type { FiltrosAvanzados } from '../../types/receta.types'
 import { TarjetaPostPc, type VarianteTarjeta } from './tarjetaPostPc'
+import { useRecetasFeed } from '@/features/recetas/hooks/useRecetasFeed'
 
 // Bento grid layout pattern for first 7 posts:
 // [HERO col-span-2 row-span-2][SMALL]
@@ -37,42 +37,26 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
   const busquedaDebounciada = useDebounce(busqueda, 300)
   const cargando = busqueda !== busquedaDebounciada
 
-  const postsFiltrados = POSTS_MOCK.filter((post) => {
-    if (busquedaDebounciada !== '') {
-      const q = busquedaDebounciada.toLowerCase()
-      if (
-        !post.receta.titulo.toLowerCase().includes(q) &&
-        !post.receta.descripcion.toLowerCase().includes(q) &&
-        !post.autor.nombre.toLowerCase().includes(q)
-      )
-        return false
-    }
-
-    if (
-      filtrosAvanzados.dificultad.length > 0 &&
-      !filtrosAvanzados.dificultad.includes(post.receta.dificultad)
-    )
-      return false
-
-    if (filtrosAvanzados.alergenos.length > 0) {
-      const postAlergenos = post.receta.alergenos ?? []
-      if (filtrosAvanzados.alergenos.some((a) => postAlergenos.includes(a))) return false
-    }
-
-    return true
+  const { data, isLoading } = useRecetasFeed({
+    q: busquedaDebounciada,
+    filtrosAvanzados,
+    excluirPropio: true,
+    soloSiguiendo: true,
   })
+
+  const posts = data?.recetas ?? []
 
   return (
     <div>
-      {cargando ? (
+      {cargando || isLoading ? (
         <div className="grid grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <TarjetaPostSkeletonPc key={i} />
           ))}
         </div>
-      ) : postsFiltrados.length > 0 ? (
+      ) : posts.length > 0 ? (
         <div className="grid grid-cols-3 gap-6">
-          {postsFiltrados.map((post, i) => (
+          {posts.map((post, i) => (
             <TarjetaPostPc
               key={post.id}
               post={post}

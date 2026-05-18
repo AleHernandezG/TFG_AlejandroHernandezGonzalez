@@ -38,6 +38,7 @@ export function FeedHome() {
     q: busquedaDebounciada,
     filtrosAvanzados,
     excluirPropio: true,
+    soloSiguiendo: true,
   })
 
   const recetas = data?.recetas ?? []

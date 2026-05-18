@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-15 · Sprint 5 activo · Fase 5 de 7 · /perfil integración BE+FE ✅ completado y verificado</div>
+    <div class="meta">Actualizado: 2026-05-18 · Sprint 5 activo · Fase 5 de 7 · /discover + /home integración BE+FE ✅ completado y verificado</div>
   </div>
 </header>
 
@@ -97,10 +97,10 @@
   <!-- CONTADORES -->
   <div class="counters">
     <div class="counter review"><div class="num">0</div><div class="label">Pendiente revisión</div></div>
-    <div class="counter alta"><div class="num">7</div><div class="label">Urgencia alta</div></div>
-    <div class="counter media"><div class="num">15</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">9</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">108</div><div class="label">Completadas</div></div>
+    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">10</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">120</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -1333,6 +1333,93 @@
           <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
+
+        <!-- ── /discover + /home integración BE ── -->
+        <tr>
+          <td class="id">DISC-BE-001</td>
+          <td class="desc">
+            <strong>BE: Conectar /discover al backend + /home solo-siguiendo</strong>
+            <small>
+              BE — 4 ficheros modificados:<br>
+              · <code>types/receta.ts</code>: campo <code>esEvento?</code> en IReceta; campos <code>soloSiguiendo</code>, <code>sort</code>, <code>soloEvento</code>, <code>categoria</code>, <code>dietas</code> en FiltrosFeed.<br>
+              · <code>models/recetaMongo.ts</code>: campo <code>esEvento: Boolean, default:false</code>.<br>
+              · <code>repositories/recetaRepository.ts</code>: findAll() maneja 5 filtros nuevos; sort in-memory por likes (todos.sort comparando longitud de array likes).<br>
+              · <code>controllers/recetasController.ts</code>: parsea los 5 nuevos query params, split por coma para arrays, comparación con "true" para booleanos.<br>
+              FE — 6 ficheros modificados:<br>
+              · <code>services/recetasService.ts</code>: FiltrosFeed + serializarFiltros extendido.<br>
+              · <code>hooks/useRecetasFeed.ts</code>: soloSiguiendo (solo si !!token), sort, dietas.<br>
+              · <code>feedHome.tsx</code>: soloSiguiendo:true, excluirPropio:true.<br>
+              · <code>feedHomePc.tsx</code>: migrado de POSTS_MOCK a useRecetasFeed real con mismos parámetros.<br>
+              · <code>features/discover/hooks/useDiscover.ts</code>: hook nuevo — tab→sort/soloEvento, filtrosAvanzados, limite:30.<br>
+              · <code>features/discover/types/discover.types.ts</code>: categoria opcional, esEvento opcional.
+            </small>
+            <span class="source">📄 docs/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FILT-001</td>
+          <td class="desc">
+            <strong>FE: Fix case sensitivity en chips de categoría de /discover</strong>
+            <small>Los chips enviaban valores capitalizados (<code>'Vegano'</code>, <code>'Pasta'</code>) pero MongoDB almacena los valores de categorías en minúsculas (<code>'vegano'</code>, <code>'pasta'</code>) según el seed. Fix: <code>categoria.toLowerCase()</code> en useDiscover.ts antes de pasar el parámetro al servicio. Sin cambios en BE.</small>
+            <span class="source">📄 features/discover/hooks/useDiscover.ts · docs/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FILT-002</td>
+          <td class="desc">
+            <strong>FE: DrawerFiltros en /discover + semántica incluir/excluir + filtro dietas real</strong>
+            <small>
+              headerDiscover.tsx reescrito para incluir DrawerFiltros (reutilizando el componente de /home). Estado filtrosAvanzados vive en contenidoDiscover.tsx y fluye hacia el hook.<br>
+              Nuevo parámetro <code>dietas</code> en FiltrosFeed y serializarFiltros — los ids de DIETAS_OPCIONES ('vegano', 'vegetariano'…) ya son lowercase y coinciden con MongoDB.<br>
+              BE: recetaRepository.findAll() aplica <code>categorias:{$in:dietas}</code>.<br>
+              Etiquetas en drawerFiltros.tsx actualizadas:<br>
+              · "Tipo de dieta" + subtítulo "Muestra recetas que incluyan esta dieta" ($in — incluyente)<br>
+              · "Dificultad" + subtítulo "Muestra recetas de este nivel de dificultad" ($in — incluyente)<br>
+              · "Alérgenos" + subtítulo "Oculta recetas que contengan estos alérgenos" ($nin — excluyente)<br>
+              Chips de categoría eliminados de contenidoDiscover.tsx (reemplazados por el drawer).
+            </small>
+            <span class="source">📄 features/discover/components/headerDiscover.tsx · contenidoDiscover.tsx · features/recetas/components/home/drawerFiltros.tsx · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-030</td>
+          <td class="desc">
+            <strong>FE: TarjetaDiscover rediseñada — mobile-first editorial</strong>
+            <small>Mejoras: group+group-hover:scale-105 en imagen (zoom suave). Gradiente from-black/90 via-black/25 to-transparent (más agresivo para legibilidad). Badge likes esquina top-right con Heart relleno rose-400 + bg-black/40 backdrop-blur-sm. Avatar autor circular bg-brand/70. Función formatTiempo() que formatea 90min como "1h 30m" con guard tiempoMin>0 (no muestra el campo si es 0).</small>
+            <span class="source">📄 features/discover/components/tarjetaDiscover.tsx · docs/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEED-001</td>
+          <td class="desc">
+            <strong>Seed: esEvento + relaciones de seguimiento entre usuarios de prueba</strong>
+            <small>
+              · Paella Valenciana marcada con <code>esEvento:true</code> → permite probar la tab "Especiales Evento".<br>
+              · Seguimientos creados con $addToSet tras insertar los 4 usuarios: María→Carlos, María→Lucía, Carlos→María, Carlos→Andrés. Los seguidores recíprocos también se actualizan. Permite probar el feed soloSiguiendo con el usuario María.
+            </small>
+            <span class="source">📄 backend/src/scripts/seedCompleto.ts · docs/desarrollo/discoverHomeIntegracion.html#seed</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">MIDDLEWARE-001</td>
+          <td class="desc">
+            <strong>FE: Restaurar rutas protegidas en middleware.ts</strong>
+            <small>El middleware estaba desactivado (stub vacío + matcher:[]) durante el desarrollo. Se restaura usando <code>export { default } from "next-auth/middleware"</code> con matcher para: /home, /discover, /despensa, /perfil, /chat, /coleccion, /crear-receta, /crear-receta/revisar, /recetas/:path*. Sin sesión → redirige a /login (configurado en lib/auth.ts como pages.signIn).</small>
+            <span class="source">📄 frontend/src/middleware.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -1566,6 +1653,16 @@
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
+          <td class="id">TEND-001</td>
+          <td class="desc">
+            <strong>SidebarTendencias — conectar "Recetas Populares" al BE y crear endpoint "Chefs Destacados"</strong>
+            <small>sidebarTendencias.tsx (solo visible en lg+) usa CHEFS_DESTACADOS y RECETAS_POPULARES de datosTendencias.ts (mock). "Recetas Populares" se puede conectar con GET /api/recetas?sort=likes&limite=5 (endpoint ya existe). "Chefs Destacados" requiere nuevo endpoint BE. El botón "Seguir" tampoco tiene onClick. No es prioritario porque el sidebar es decorativo y solo aparece en escritorio.</small>
+            <span class="source">📄 frontend/src/features/recetas/components/home/sidebarTendencias.tsx · frontend/src/features/recetas/data/datosTendencias.ts</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 6 o posterior</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
           <td class="id">DEBT-007</td>
           <td class="desc">
             <strong>Flujo post-registro no pasa por /completar-perfil</strong>
@@ -1717,6 +1814,7 @@
         <tr><td class="id">SETUP-006</td><td class="desc">Deploy completo — FE live en Vercel (https://tfg-alejandro-hernandez-gonzalez.vercel.app) · BE live en Render (https://tfg-alejandrohernandezgonzalez.onrender.com) · MongoDB Atlas conectado · Gmail SMTP operativo · CI/CD verificado.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">SETUP-007 / API-003</td><td class="desc">OAuth Google producción — URI de redireccionamiento y origen Vercel añadidos en Google Cloud Console. NEXTAUTH_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app en Vercel. Google OAuth funcional en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">API-002</td><td class="desc">CORS producción — FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app configurada en Render. El backend acepta requests solo desde la URL de Vercel en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">COMP-001</td><td class="desc">FormularioCompletarPerfil conectado al BE — formularioCompletarPerfil.tsx llama a authService.completarPerfil({ alergias, preferencias }, token) que hace POST /auth/completar-perfil. Tras éxito: update({ perfilCompleto: true }) en NextAuth y router.push("/home"). No era una tarea pendiente: ya estaba implementado desde el Sprint 3 como parte del flujo Google OAuth.</td><td><span class="status done">✅ Verificado · Sprint 5 (ya implementado en Sprint 3)</span></td></tr>
         <tr><td class="id">DEV-002</td><td class="desc">Script keep-alive — scripts/keep-alive.sh operativo. URL real: https://tfg-alejandrohernandezgonzalez.onrender.com. Ping cada 4 min, máx 2h, auto-stop, Ctrl+C limpio.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
         <tr><td class="id">SETUP-008</td><td class="desc">CI/CD GitHub Actions — .github/workflows/ci-cd.yml creado. CI: lint + tsc --noEmit en FE y BE en cada push a develop y PR a main. CD: deploy automático a Vercel (npx vercel --cwd frontend --prod) + Render Deploy Hook en cada push a main, condicionado a que el CI pase. Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, RENDER_DEPLOY_HOOK_URL, RENDER_APP_URL añadidos en GitHub. Branch protection activada en main (PR obligatoria + status checks). Vercel y Render ya conectados al repo.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
       </tbody>

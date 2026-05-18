@@ -1,12 +1,15 @@
-// TODO: Volver a activar protección de rutas cuando termine el desarrollo
-// import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-export default function middleware(_req: NextRequest) {
-  return NextResponse.next();
-}
+export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: [],
+  matcher: [
+    '/home',
+    '/discover',
+    '/despensa',
+    '/perfil',
+    '/chat',
+    '/coleccion',
+    '/crear-receta',
+    '/crear-receta/revisar',
+    '/recetas/:path*',
+  ],
 };

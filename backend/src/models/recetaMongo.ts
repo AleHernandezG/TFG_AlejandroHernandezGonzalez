@@ -65,6 +65,7 @@ const recetaSchema = new Schema<IRecetaDoc>({
   macros: { type: macrosSchema, required: true },
   likes: { type: [Schema.Types.ObjectId], ref: "Usuario", default: [] },
   listaComentarios: { type: [comentarioSchema], default: [] },
+  esEvento: { type: Boolean, default: false },
   fechaPublicacion: { type: Date, default: Date.now },
 });
 

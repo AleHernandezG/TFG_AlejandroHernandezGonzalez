@@ -99,7 +99,10 @@ export const recetaRepository = {
     filtros: FiltrosFeed = {},
     usuarioId?: string,
   ): Promise<{ recetas: PostFeedRespuesta[]; total: number }> {
-    const { q, dificultad, alergenos, pagina = 1, limite = 20, excluirPropio } = filtros;
+    const {
+      q, dietas, dificultad, alergenos, pagina = 1, limite = 20,
+      excluirPropio, soloSiguiendo, sort, soloEvento, categoria,
+    } = filtros;
 
     const query: Record<string, unknown> = {};
 
@@ -108,6 +111,9 @@ export const recetaRepository = {
         { titulo: { $regex: q, $options: "i" } },
         { descripcion: { $regex: q, $options: "i" } },
       ];
+    }
+    if (dietas && dietas.length > 0) {
+      query["categorias"] = { $in: dietas };
     }
     if (dificultad && dificultad.length > 0) {
       query["dificultad"] = { $in: dificultad };
@@ -118,23 +124,53 @@ export const recetaRepository = {
     if (excluirPropio && usuarioId) {
       query["autorId"] = { $ne: new Types.ObjectId(usuarioId) };
     }
+    if (soloEvento) {
+      query["esEvento"] = true;
+    }
+    if (categoria) {
+      query["categorias"] = { $in: [categoria] };
+    }
+    if (soloSiguiendo && usuarioId) {
+      const seguidosArr = [...(await obtenerSeguidosSet(usuarioId))].map(
+        (id) => new Types.ObjectId(id),
+      );
+      query["autorId"] = { $in: seguidosArr };
+    }
 
     const skip = (pagina - 1) * limite;
-
-    const [docs, total] = await Promise.all([
-      Receta.find(query)
-        .populate("autorId", "nombre foto")
-        .sort({ fechaPublicacion: -1 })
-        .skip(skip)
-        .limit(limite)
-        .lean()
-        .exec(),
-      Receta.countDocuments(query),
-    ]);
 
     const [guardadasSet, seguidosSet] = usuarioId
       ? await Promise.all([obtenerGuardadasSet(usuarioId), obtenerSeguidosSet(usuarioId)])
       : [undefined, undefined];
+
+    let docs: unknown[];
+    let total: number;
+
+    if (sort === 'likes') {
+      const todos = await Receta.find(query)
+        .populate("autorId", "nombre foto")
+        .sort({ fechaPublicacion: -1 })
+        .lean()
+        .exec();
+      todos.sort(
+        (a, b) =>
+          ((b as Record<string, unknown>).likes as unknown[]).length -
+          ((a as Record<string, unknown>).likes as unknown[]).length,
+      );
+      total = todos.length;
+      docs = todos.slice(skip, skip + limite);
+    } else {
+      [docs, total] = await Promise.all([
+        Receta.find(query)
+          .populate("autorId", "nombre foto")
+          .sort({ fechaPublicacion: -1 })
+          .skip(skip)
+          .limit(limite)
+          .lean()
+          .exec(),
+        Receta.countDocuments(query),
+      ]);
+    }
 
     return {
       recetas: docs.map((doc) =>

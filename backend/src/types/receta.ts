@@ -47,17 +47,23 @@ export interface IReceta {
   likes: Types.ObjectId[];
   listaComentarios: IComentarioReceta[];
   fechaPublicacion: Date;
+  esEvento?: boolean;
 }
 
 // ── Tipos de respuesta API (contrato con el frontend) ─────────────────────────
 
 export interface FiltrosFeed {
   q?: string;
+  dietas?: string[];
   dificultad?: string[];
   alergenos?: string[];
   pagina?: number;
   limite?: number;
   excluirPropio?: boolean;
+  soloSiguiendo?: boolean;
+  sort?: 'reciente' | 'likes';
+  soloEvento?: boolean;
+  categoria?: string;
 }
 
 interface AutorRespuesta {

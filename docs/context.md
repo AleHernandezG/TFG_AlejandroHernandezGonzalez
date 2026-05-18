@@ -1,9 +1,9 @@
 # Contexto de Sesión — TFG
 
-**Fecha:** 2026-05-12
+**Fecha:** 2026-05-18
 **Sprint Actual:** Sprint 5 — activo
 **Modelo:** FE vistas reales conectadas a BE + BD MongoDB real
-**Fase:** Fase 5 de 7 — Integración BE /despensa completada
+**Fase:** Fase 5 de 7 — Integración BE /discover + /home completada
 
 > Reglas de desarrollo, arquitectura, colores, nomenclatura y diseño → `docs/rules.md`
 
@@ -77,6 +77,14 @@
 - ✅ [PERF-FE-002] FE `features/perfil/hooks/usePerfil.ts` — useMiPerfil (useQuery, staleTime 5min, sin refetchOnMount) + useCambiarContrasena + useActualizarPreferencias (optimistic update).
 - ✅ [PERF-FE-003] FE Connect — `contenidoPerfil.tsx` usa useSession (nombre/email/foto) + useMiPerfil (dietas/alergenos/proveedor). `dialogCambiarContrasena.tsx` llama al BE real con manejo de error 400. `perfilStore.ts` simplificado a solo permisos.
 - ✅ [PERF-FIX-001] FE Fix — `dialogPreferenciasAlergenos.tsx` no mostraba chips activos. Causa: refetchOnMount+invalidateQueries hacían perfil=undefined durante refetch. Fix: dialog llama `useMiPerfil()` directo (cache hit), deps `[abierto, perfil]` en lugar de props individuales. 0 errores tsc.
+- ✅ [DISC-BE-001] BE+FE — Conectar /discover al backend + /home solo-siguiendo. BE: `esEvento` en IReceta y recetaMongo; `FiltrosFeed` extendido con `soloSiguiendo`, `sort`, `soloEvento`, `categoria`, `dietas`; `findAll()` maneja 5 filtros nuevos + sort in-memory por likes; controller parsea nuevos query params. FE: `recetasService` + `useRecetasFeed` + `feedHome` + `feedHomePc` (migrado de mock) + nuevo `useDiscover.ts`. tsc --noEmit: 0 errores.
+- ✅ [COMP-001] Verificado — `formularioCompletarPerfil.tsx` ya llama a `authService.completarPerfil()` → `POST /auth/completar-perfil` con token. Actualiza sesión NextAuth (`update({ perfilCompleto: true })`) y redirige a `/home`. No era una tarea pendiente: implementado desde Sprint 3.
+- ⏳ [TEND-001] Pendiente (baja) — `sidebarTendencias.tsx` usa mock (`CHEFS_DESTACADOS`, `RECETAS_POPULARES`). "Recetas Populares" conectable con endpoint existente (`sort=likes`). "Chefs Destacados" requiere nuevo BE. Solo visible en `lg+` — no prioritario. BE: `esEvento` en IReceta y recetaMongo; `FiltrosFeed` extendido con `soloSiguiendo`, `sort`, `soloEvento`, `categoria`, `dietas`; `findAll()` maneja 5 filtros nuevos + sort in-memory por likes; controller parsea nuevos query params. FE: `recetasService` + `useRecetasFeed` + `feedHome` + `feedHomePc` (migrado de mock) + nuevo `useDiscover.ts`. tsc --noEmit: 0 errores.
+- ✅ [FILT-001] FE Fix — Chips de categoría en /discover no devolvían resultados. Causa: chips enviaban valores capitalizados ('Vegano') pero MongoDB almacena en minúsculas ('vegano'). Fix: `.toLowerCase()` en `useDiscover.ts`.
+- ✅ [FILT-002] FE — DrawerFiltros añadido a /discover. Reutiliza el componente de /home. Estado `filtrosAvanzados` vive en `contenidoDiscover`. Chips de categoría eliminados. Semántica explícita: dieta/dificultad "incluye" ($in), alérgenos "excluye" ($nin). Subtítulos añadidos en cada sección del drawer. Filtro `dietas` completo BE+FE (antes solo existía en el drawer visualmente).
+- ✅ [UI-030] FE — TarjetaDiscover rediseñada mobile-first: zoom hover en imagen, gradiente más fuerte, badge likes top-right con Heart relleno, función formatTiempo() con guard tiempoMin>0.
+- ✅ [SEED-001] Seed actualizado: Paella Valenciana con `esEvento:true`; seguimientos entre los 4 usuarios de prueba (María→Carlos/Lucía, Carlos→María/Andrés) con `$addToSet`.
+- ✅ [MIDDLEWARE-001] FE — Rutas protegidas restauradas en `middleware.ts` usando `withAuth` de NextAuth. Protege: /home, /discover, /despensa, /perfil, /chat, /coleccion, /crear-receta, /crear-receta/revisar, /recetas/:path*.
 
 ## Avance de la sesión actual (tipografía hero — SeccionHero)
 

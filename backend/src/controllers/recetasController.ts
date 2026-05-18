@@ -14,10 +14,17 @@ function manejarError(res: Response, error: unknown): void {
 export const recetasController = {
   async obtenerFeed(req: Request, res: Response): Promise<void> {
     try {
-      const { q, dificultad, alergenos, pagina, limite, excluirPropio } = req.query;
+      const {
+        q, dietas, dificultad, alergenos, pagina, limite, excluirPropio,
+        soloSiguiendo, sort, soloEvento, categoria,
+      } = req.query;
 
       const filtros = {
         q: typeof q === "string" ? q : undefined,
+        dietas:
+          typeof dietas === "string" && dietas
+            ? dietas.split(",")
+            : undefined,
         dificultad:
           typeof dificultad === "string" && dificultad
             ? dificultad.split(",")
@@ -29,6 +36,10 @@ export const recetasController = {
         pagina: pagina ? Math.max(1, Number(pagina)) : 1,
         limite: limite ? Math.min(50, Number(limite)) : 20,
         excluirPropio: excluirPropio === "true",
+        soloSiguiendo: soloSiguiendo === "true",
+        sort: (sort === "likes" || sort === "reciente") ? (sort as 'likes' | 'reciente') : undefined,
+        soloEvento: soloEvento === "true",
+        categoria: typeof categoria === "string" && categoria ? categoria : undefined,
       };
 
       const resultado = await recetasService.obtenerFeed(

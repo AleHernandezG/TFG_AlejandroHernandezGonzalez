@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\6003766\\\\Documents\\\\TFG\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\features\\\\discover\" -Recurse | Select-Object FullName, @{Name='Type';Expression={if\\($_.PSIsContainer\\){'DIR'}else{'FILE'}}} | Format-Table -AutoSize)"
+    ]
+  }
+}

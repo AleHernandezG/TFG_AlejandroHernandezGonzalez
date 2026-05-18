@@ -475,6 +475,7 @@ const RECETAS_SEED = [
     porciones: 6,
     categorias: ["mediterránea", "española"],
     alergenos: [],
+    esEvento: true,
     macros: { calorias: 540, proteinas: 35, carbos: 62, grasas: 16 },
     ingredientes: [
       { nombre: "Arroz bomba", cantidad: 500, unidad: "g" },
@@ -741,6 +742,27 @@ async function seed(): Promise<void> {
   const recetasCreadas = await Receta.insertMany(recetasParaInsertar);
   console.log(`   ✅ ${recetasCreadas.length} recetas insertadas`);
   recetasCreadas.forEach((r) => console.log(`      · ${r.titulo}`));
+
+  // ── Relaciones de seguimiento ─────────────────────────────────────────────
+  // María (0) sigue a Carlos (1) y Lucía (2)
+  // Carlos (1) sigue a María (0) y Andrés (3)
+  console.log("\n👥 Creando relaciones de seguimiento...");
+  const [maria, carlos, lucia, andres] = usuariosCreados;
+  await Promise.all([
+    Usuario.findByIdAndUpdate(maria._id, {
+      $addToSet: { seguidos: { $each: [carlos._id, lucia._id] } },
+    }),
+    Usuario.findByIdAndUpdate(carlos._id, {
+      $addToSet: { seguidores: { $each: [maria._id] }, seguidos: { $each: [maria._id, andres._id] } },
+    }),
+    Usuario.findByIdAndUpdate(lucia._id, {
+      $addToSet: { seguidores: { $each: [maria._id] } },
+    }),
+    Usuario.findByIdAndUpdate(andres._id, {
+      $addToSet: { seguidores: { $each: [carlos._id] } },
+    }),
+  ]);
+  console.log("   ✅ María sigue a Carlos y Lucía · Carlos sigue a María y Andrés");
 
   console.log("\n🎉 Seed completado:");
   console.log(`   Usuarios : ${usuariosCreados.length}`);
