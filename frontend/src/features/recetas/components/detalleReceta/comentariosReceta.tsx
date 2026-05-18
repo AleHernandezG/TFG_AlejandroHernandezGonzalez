@@ -30,7 +30,7 @@ type Props = {
   total: number
 }
 
-export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
+export function ComentariosReceta({ recetaId, comentarios }: Props) {
   const { data: session } = useSession()
   const router = useRouter()
   const [texto, setTexto] = useState('')
