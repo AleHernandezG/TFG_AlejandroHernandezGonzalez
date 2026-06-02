@@ -33,7 +33,7 @@ export const usuarioRepository = {
     Usuario.findOne({ googleId }),
 
   buscarPorCorreoConContrasena: (correo: string): Promise<IUsuarioDoc | null> =>
-    Usuario.findOne({ correo }).select("+contrasena"),
+    Usuario.findOne({ correo }).select("+contrasena nombre correo foto rol perfilCompleto cuentaVerificada"),
 
   buscarPorId: (id: string): Promise<IUsuarioDoc | null> =>
     Usuario.findById(id),
@@ -82,6 +82,35 @@ export const usuarioRepository = {
 
   buscarPorIdConContrasena: (id: string): Promise<IUsuarioDoc | null> =>
     Usuario.findById(id).select("+contrasena"),
+
+  actualizarFoto: (id: string, foto: string): Promise<IUsuarioDoc | null> =>
+    Usuario.findByIdAndUpdate(id, { foto }, { new: true }).select("foto"),
+
+  async findDestacados(
+    limite: number,
+    usuarioId?: string,
+  ): Promise<{ id: string; nombre: string; foto: string | null; seguidores: number; siguiendo: boolean }[]> {
+    const usuarios = await Usuario.find({ perfilCompleto: true })
+      .select("nombre foto seguidores")
+      .lean()
+      .exec();
+
+    return usuarios
+      .map((u) => ({
+        id: (u._id as Types.ObjectId).toString(),
+        nombre: u.nombre,
+        foto: (u.foto as string | undefined) ?? null,
+        seguidores: ((u.seguidores as Types.ObjectId[] | undefined) ?? []).length,
+        siguiendo: usuarioId
+          ? ((u.seguidores as Types.ObjectId[] | undefined) ?? []).some(
+              (id) => id.toString() === usuarioId,
+            )
+          : false,
+      }))
+      .filter((u) => u.id !== usuarioId)
+      .sort((a, b) => b.seguidores - a.seguidores)
+      .slice(0, limite);
+  },
 
   async toggleSeguir(
     seguidorId: string,

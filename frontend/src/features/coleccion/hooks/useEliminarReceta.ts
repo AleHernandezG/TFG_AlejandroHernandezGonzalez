@@ -12,6 +12,7 @@ export function useEliminarReceta() {
     mutationFn: (recetaId: string) => coleccionService.eliminarReceta(recetaId, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['coleccion', 'mis-recetas'] })
+      queryClient.invalidateQueries({ queryKey: ['recetas', 'feed'] })
     },
   })
 }

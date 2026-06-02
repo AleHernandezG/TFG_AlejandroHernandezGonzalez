@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.routes";
 import recetasRoutes from "./routes/recetas.routes";
 import usuariosRoutes from "./routes/usuarios.routes";
 import despensaRoutes from "./routes/despensa.routes";
+import ingredientesRoutes from "./routes/ingredientes.routes";
+import chatRoutes from "./routes/chat.routes";
 import { manejadorErrores } from "./middlewares/errores";
 
 
@@ -27,6 +29,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/recetas", recetasRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/despensa", despensaRoutes);
+app.use("/api/ingredientes", ingredientesRoutes);
+app.use("/api/chat", chatRoutes);
 
 // GET /api/health — health check público (sin auth).
 // Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.

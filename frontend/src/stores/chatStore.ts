@@ -1,6 +1,7 @@
 import { create } from 'zustand'
+import { getSession } from 'next-auth/react'
 import type { Mensaje } from '@/features/chat/types/chat.types'
-import { getMockRespuesta } from '@/features/chat/data/datosChat'
+import { chatService } from '@/services/chatService'
 
 interface ChatStore {
   mensajes: Mensaje[]
@@ -9,11 +10,11 @@ interface ChatStore {
   limpiarChat: () => void
 }
 
-export const useChatStore = create<ChatStore>((set) => ({
+export const useChatStore = create<ChatStore>((set, get) => ({
   mensajes: [],
   cargando: false,
 
-  enviarMensaje: (texto: string) => {
+  enviarMensaje: async (texto: string) => {
     const mensajeUsuario: Mensaje = {
       id: `${Date.now()}-u`,
       rol: 'usuario',
@@ -26,11 +27,16 @@ export const useChatStore = create<ChatStore>((set) => ({
       cargando: true,
     }))
 
-    setTimeout(() => {
+    try {
+      const session = await getSession()
+      const token = session?.user?.backendToken ?? ''
+      const todosLosMensajes = get().mensajes
+      const respuestaTexto = await chatService.enviarMensaje(todosLosMensajes, token)
+
       const respuesta: Mensaje = {
         id: `${Date.now()}-ia`,
         rol: 'ia',
-        contenido: getMockRespuesta(texto),
+        contenido: respuestaTexto,
         timestamp: new Date(),
       }
 
@@ -38,7 +44,18 @@ export const useChatStore = create<ChatStore>((set) => ({
         mensajes: [...state.mensajes, respuesta],
         cargando: false,
       }))
-    }, 1400)
+    } catch {
+      const errorMsg: Mensaje = {
+        id: `${Date.now()}-err`,
+        rol: 'ia',
+        contenido: 'No pude conectar con el asistente. Inténtalo de nuevo.',
+        timestamp: new Date(),
+      }
+      set((state) => ({
+        mensajes: [...state.mensajes, errorMsg],
+        cargando: false,
+      }))
+    }
   },
 
   limpiarChat: () => set({ mensajes: [], cargando: false }),

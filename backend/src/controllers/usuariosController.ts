@@ -9,6 +9,16 @@ function manejarError(res: Response, error: unknown): void {
 }
 
 export const usuariosController = {
+  async obtenerDestacados(req: Request, res: Response): Promise<void> {
+    try {
+      const limite = req.query.limite ? Math.min(10, Number(req.query.limite)) : 5;
+      const resultado = await usuariosService.obtenerDestacados(limite, req.usuario?.id);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
   async toggleSeguir(req: Request, res: Response): Promise<void> {
     try {
       const resultado = await usuariosService.toggleSeguir(
@@ -50,6 +60,20 @@ export const usuariosController = {
         contrasenaNueva,
       );
       res.status(200).json({ mensaje: "Contraseña actualizada correctamente" });
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async actualizarFoto(req: Request, res: Response): Promise<void> {
+    try {
+      const { fotoBase64 } = req.body as { fotoBase64?: string };
+      if (!fotoBase64 || typeof fotoBase64 !== "string") {
+        res.status(400).json({ error: "fotoBase64 es obligatorio" });
+        return;
+      }
+      const resultado = await usuariosService.actualizarFoto(req.usuario!.id, fotoBase64);
+      res.status(200).json(resultado);
     } catch (error) {
       manejarError(res, error);
     }

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Bookmark, MoreHorizontal, Trash2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export function TarjetaColeccion({ receta, pestana }: Props) {
+  const router = useRouter()
   const [guardado, setGuardado] = useState(true)
   const [sheetAbierto, setSheetAbierto] = useState(false)
   const [confirmando, setConfirmando] = useState(false)
@@ -131,11 +133,11 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
           </button>
 
           <button
-            disabled
-            className="flex items-center gap-3 w-full px-1 py-3 text-sm font-medium text-muted-foreground cursor-not-allowed opacity-40"
+            onClick={() => { setSheetAbierto(false); router.push(`/editar-receta/${receta.id}`) }}
+            className="flex items-center gap-3 w-full px-1 py-3 text-sm font-medium text-foreground hover:opacity-80 transition-opacity"
           >
             <Pencil size={18} />
-            Editar receta (próximamente)
+            Editar receta
           </button>
         </SheetContent>
       </Sheet>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import { Eye, EyeOff, Loader2, ChefHat, AlertCircle } from "lucide-react";
 
@@ -19,13 +18,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { signIn, getSession } from "next-auth/react";
 import { BotonGoogle } from "./botonGoogle";
 import { DivisorOAuth } from "./divisorOAuth";
+import { useAuth } from "@/features/auth/hooks";
 import {
   esquemaLogin,
   type DatosLogin,
-  type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
@@ -54,10 +52,8 @@ const variantesCampo: Variants = {
 // ─── Componente ──────────────────────────────────────────────────────────────
 
 export function FormularioLogin() {
-  const router = useRouter();
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
-  const [estadoEnvio, setEstadoEnvio] = useState<EstadoFormulario>("idle");
-  const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const { iniciarSesion, cargando, error } = useAuth();
 
   const {
     register,
@@ -65,40 +61,11 @@ export function FormularioLogin() {
     formState: { errors },
   } = useForm<DatosLogin>({
     resolver: zodResolver(esquemaLogin),
-    defaultValues: {
-      correo: "",
-      contrasena: "",
-    },
+    defaultValues: { correo: "", contrasena: "" },
   });
 
-  const alEnviar = async (datos: DatosLogin) => {
-    setEstadoEnvio("cargando");
-    setMensajeError(null);
-
-    const resultado = await signIn("credentials", {
-      correo: datos.correo,
-      contrasena: datos.contrasena,
-      redirect: false,
-    });
-
-    if (resultado?.ok) {
-      const session = await getSession();
-      router.push(session?.user?.perfilCompleto ? "/home" : "/completar-perfil");
-      return;
-    }
-
-    // resultado.error contiene el mensaje lanzado en authorize()
-    if (resultado?.error === "Debes verificar tu correo antes de iniciar sesión") {
-      setMensajeError(
-        "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada."
-      );
-    } else {
-      setMensajeError(
-        "Correo o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo."
-      );
-    }
-    setEstadoEnvio("error");
-  };
+  const alEnviar = (datos: DatosLogin) =>
+    iniciarSesion(datos.correo, datos.contrasena);
 
   // ── Formulario ──────────────────────────────────────────────────────────────
   return (
@@ -135,7 +102,7 @@ export function FormularioLogin() {
           <DivisorOAuth />
 
           {/* Error global */}
-          {estadoEnvio === "error" && mensajeError && (
+          {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -143,7 +110,7 @@ export function FormularioLogin() {
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              {mensajeError}
+              {error}
             </motion.div>
           )}
 
@@ -222,9 +189,9 @@ export function FormularioLogin() {
               <Button
                 type="submit"
                 className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
-                disabled={estadoEnvio === "cargando"}
+                disabled={cargando}
               >
-                {estadoEnvio === "cargando" ? (
+                {cargando ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
                     Iniciando sesión…

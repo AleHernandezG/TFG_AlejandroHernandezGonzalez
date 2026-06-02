@@ -1,0 +1,3080 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Especificación de Casos de Uso — Cookr — TFG</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt; color: #1a1a1a; line-height: 1.5;
+      background: white; max-width: 210mm; margin: 0 auto;
+      padding: 20px 40px;
+    }
+
+    /* ── Portada ─────────────────────────────────────── */
+    .portada {
+      min-height: 90vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 60px; page-break-after: always;
+      border: 2px solid #1c3d5a;
+    }
+    .portada .linea-brand {
+      width: 70%; height: 3px; background: #b45309; margin: 20px auto;
+    }
+    .portada .titulo-doc {
+      font-size: 18pt; font-weight: bold;
+      text-transform: uppercase; letter-spacing: 2px; color: #1c3d5a;
+    }
+    .portada .nombre-app { font-size: 26pt; font-weight: bold; color: #b45309; }
+    .portada .subtitulo { font-size: 13pt; color: #444; margin: 8px 0; }
+    .portada .datos { font-size: 11pt; color: #333; margin-top: 24px; line-height: 2; }
+
+    /* ── Índice ──────────────────────────────────────── */
+    .indice { page-break-after: always; padding: 20px 0; }
+    .indice h2 {
+      font-size: 13pt; text-transform: uppercase;
+      border-bottom: 2px solid #1c3d5a;
+      padding-bottom: 6px; margin-bottom: 20px; color: #1c3d5a;
+    }
+    .indice-entrada {
+      display: flex; justify-content: space-between;
+      border-bottom: 1px dotted #aaa; padding: 3px 0; font-size: 10pt;
+    }
+    .indice-modulo { font-weight: bold; margin-top: 10px; color: #1c3d5a; }
+    .indice-cu { padding-left: 20px; }
+
+    /* ── Actores ─────────────────────────────────────── */
+    .actores { page-break-after: always; margin-bottom: 32px; }
+    .actores h2 {
+      font-size: 13pt; text-transform: uppercase;
+      border-bottom: 2px solid #1c3d5a;
+      padding-bottom: 6px; margin-bottom: 16px; color: #1c3d5a;
+    }
+
+    /* ── Sección módulo ──────────────────────────────── */
+    .seccion-titulo {
+      background: #1c3d5a; color: white; font-size: 12pt;
+      font-weight: bold; text-transform: uppercase;
+      padding: 10px 14px; margin: 0 0 20px 0;
+      letter-spacing: 1px; page-break-before: always;
+    }
+
+    /* ── Caso de uso ─────────────────────────────────── */
+    .caso-de-uso { margin-bottom: 36px; page-break-inside: avoid; }
+    .cu-banda {
+      background: #1c3d5a; color: white; padding: 7px 12px;
+      font-weight: bold; font-size: 11pt; font-family: Arial, sans-serif;
+    }
+
+    /* ── Tabla cabecera ──────────────────────────────── */
+    .tabla-cabecera {
+      width: 100%; border-collapse: collapse; font-size: 10.5pt;
+    }
+    .tabla-cabecera td {
+      border: 1px solid #ccc; padding: 5px 9px; vertical-align: top;
+    }
+    .tabla-cabecera .campo {
+      background: #f0f4f8; font-weight: bold;
+      width: 25%; color: #1c3d5a;
+    }
+
+    /* ── Tabla flujos ────────────────────────────────── */
+    .tabla-flujos {
+      width: 100%; border-collapse: collapse; font-size: 10.5pt;
+    }
+    .tabla-flujos td {
+      border: 1px solid #ccc; padding: 5px 9px; vertical-align: top;
+    }
+    .fh-principal {
+      background: #1c3d5a; color: white; font-weight: bold;
+      padding: 5px 9px; font-family: Arial, sans-serif; font-size: 10pt;
+    }
+    .fh-alternativo {
+      background: #2d5a8e; color: white; font-weight: bold;
+      padding: 5px 9px; font-family: Arial, sans-serif; font-size: 10pt;
+    }
+    .fh-excepcion {
+      background: #7f1d1d; color: white; font-weight: bold;
+      padding: 5px 9px; font-family: Arial, sans-serif; font-size: 10pt;
+    }
+    .col-num { width: 5%; text-align: center; font-weight: bold; }
+    .col-actor { width: 20%; font-style: italic; color: #374151; }
+    .fila-par { background: #f9fafb; }
+
+    /* ── Tabla resumen ───────────────────────────────── */
+    .tabla-resumen { width: 100%; border-collapse: collapse; font-size: 10pt; }
+    .tabla-resumen th {
+      background: #1c3d5a; color: white; padding: 7px 9px;
+      font-family: Arial, sans-serif; text-align: left;
+    }
+    .tabla-resumen td { padding: 5px 9px; border: 1px solid #ccc; }
+    .tabla-resumen tr:nth-child(even) td { background: #f9fafb; }
+
+    /* ── Instrucciones PDF ───────────────────────────── */
+    .instrucciones-pdf {
+      background: #f0f4f8; border: 2px solid #1c3d5a;
+      padding: 16px; margin: 32px 0; border-radius: 6px;
+      font-family: Arial, sans-serif; font-size: 10pt;
+    }
+
+    /* ── Elementos inline ────────────────────────────── */
+    code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 9.5pt; background: #f0f4f8;
+      padding: 1px 3px; border: 1px solid #ddd;
+    }
+
+    /* ── Print ───────────────────────────────────────── */
+    @media print {
+      @page { size: A4; margin: 2.5cm 2cm 2.5cm 2.5cm; }
+      body { padding: 0; max-width: 100%; font-size: 10.5pt; }
+      .portada { page-break-after: always; border: 2px solid #1c3d5a; }
+      .indice  { page-break-after: always; }
+      .actores { page-break-after: always; }
+      .seccion-titulo { page-break-before: always; }
+      .caso-de-uso { page-break-inside: avoid; }
+      .instrucciones-pdf { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  PORTADA                                         ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="portada">
+  <div style="font-size:10pt;color:#666;text-transform:uppercase;letter-spacing:2px;">Trabajo de Fin de Grado</div>
+  <div style="font-size:11pt;color:#444;margin:4px 0;">Grado en Ingeniería Informática</div>
+  <div class="linea-brand"></div>
+  <div class="titulo-doc">Especificación de Casos de Uso</div>
+  <div style="margin:16px 0;">
+    <div class="nombre-app">Cookr</div>
+    <div class="subtitulo">Red Social Gastronómica con Inteligencia Artificial</div>
+  </div>
+  <div class="linea-brand"></div>
+  <div class="datos">
+    <strong>Autor:</strong> Alejandro Hernández González<br>
+    <strong>Versión:</strong> 1.0<br>
+    <strong>Fecha:</strong> 21 de mayo de 2026
+  </div>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  ÍNDICE DE CONTENIDOS                            ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="indice">
+  <h2>Índice de Contenidos</h2>
+
+  <div class="indice-entrada indice-modulo">
+    <span>1. Actores del Sistema</span><span>3</span>
+  </div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>2. Módulo Autenticación y Registro</span><span>4</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>2.1&nbsp; CU-01 &mdash; Registro con correo y contraseña</span><span>4</span></div>
+  <div class="indice-entrada indice-cu"><span>2.2&nbsp; CU-02 &mdash; Verificación de cuenta por email</span><span>5</span></div>
+  <div class="indice-entrada indice-cu"><span>2.3&nbsp; CU-03 &mdash; Inicio de sesión con correo y contraseña</span><span>6</span></div>
+  <div class="indice-entrada indice-cu"><span>2.4&nbsp; CU-04 &mdash; Inicio de sesión con Google OAuth</span><span>7</span></div>
+  <div class="indice-entrada indice-cu"><span>2.5&nbsp; CU-05 &mdash; Recuperación de contraseña por email</span><span>8</span></div>
+  <div class="indice-entrada indice-cu"><span>2.6&nbsp; CU-06 &mdash; Completar perfil tras registro</span><span>9</span></div>
+  <div class="indice-entrada indice-cu"><span>2.7&nbsp; CU-07 &mdash; Cerrar sesión</span><span>10</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>3. Módulo Navegación y Feed</span><span>11</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>3.1&nbsp; CU-08 &mdash; Ver feed de recetas</span><span>11</span></div>
+  <div class="indice-entrada indice-cu"><span>3.2&nbsp; CU-09 &mdash; Navegar entre secciones de la aplicación</span><span>12</span></div>
+  <div class="indice-entrada indice-cu"><span>3.3&nbsp; CU-10 &mdash; Buscar recetas por nombre o etiqueta</span><span>13</span></div>
+  <div class="indice-entrada indice-cu"><span>3.4&nbsp; CU-11 &mdash; Cambiar tema de interfaz (claro / oscuro)</span><span>14</span></div>
+  <div class="indice-entrada indice-cu"><span>3.5&nbsp; CU-12 &mdash; Activar modo manos libres al cocinar</span><span>15</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>4. Módulo Gestión de Recetas</span><span>16</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>4.1&nbsp; CU-13 &mdash; Crear receta con formulario multi-paso</span><span>16</span></div>
+  <div class="indice-entrada indice-cu"><span>4.2&nbsp; CU-14 &mdash; Ver tutorial de creación de receta</span><span>18</span></div>
+  <div class="indice-entrada indice-cu"><span>4.3&nbsp; CU-15 &mdash; Ver detalle de una receta</span><span>19</span></div>
+  <div class="indice-entrada indice-cu"><span>4.4&nbsp; CU-16 &mdash; Dar me gusta a una receta</span><span>20</span></div>
+  <div class="indice-entrada indice-cu"><span>4.5&nbsp; CU-17 &mdash; Guardar receta en la colección personal</span><span>21</span></div>
+  <div class="indice-entrada indice-cu"><span>4.6&nbsp; CU-18 &mdash; Comentar en una receta</span><span>22</span></div>
+  <div class="indice-entrada indice-cu"><span>4.7&nbsp; CU-19 &mdash; Editar receta propia</span><span>23</span></div>
+  <div class="indice-entrada indice-cu"><span>4.8&nbsp; CU-20 &mdash; Eliminar receta propia</span><span>24</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>5. Módulo Gestión de Despensa</span><span>25</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>5.1&nbsp; CU-21 &mdash; Ver despensa personal de ingredientes</span><span>25</span></div>
+  <div class="indice-entrada indice-cu"><span>5.2&nbsp; CU-22 &mdash; Añadir ingrediente a la despensa</span><span>26</span></div>
+  <div class="indice-entrada indice-cu"><span>5.3&nbsp; CU-23 &mdash; Eliminar ingrediente de la despensa</span><span>27</span></div>
+  <div class="indice-entrada indice-cu"><span>5.4&nbsp; CU-24 &mdash; Modificar cantidad de un ingrediente</span><span>28</span></div>
+  <div class="indice-entrada indice-cu"><span>5.5&nbsp; CU-25 &mdash; Ver recetas posibles con la despensa actual</span><span>29</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>6. Módulo Chat con Asistente IA</span><span>30</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>6.1&nbsp; CU-26 &mdash; Iniciar conversación con el asistente culinario</span><span>30</span></div>
+  <div class="indice-entrada indice-cu"><span>6.2&nbsp; CU-27 &mdash; Enviar mensaje y recibir respuesta de la IA</span><span>31</span></div>
+  <div class="indice-entrada indice-cu"><span>6.3&nbsp; CU-28 &mdash; Ver historial de conversaciones anteriores</span><span>33</span></div>
+  <div class="indice-entrada indice-cu"><span>6.4&nbsp; CU-29 &mdash; Obtener sugerencias de recetas personalizadas</span><span>34</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>7. Módulo Colección y Perfil de Usuario</span><span>35</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>7.1&nbsp; CU-30 &mdash; Ver colección de recetas guardadas</span><span>35</span></div>
+  <div class="indice-entrada indice-cu"><span>7.2&nbsp; CU-31 &mdash; Eliminar receta de la colección personal</span><span>36</span></div>
+  <div class="indice-entrada indice-cu"><span>7.3&nbsp; CU-32 &mdash; Ver perfil propio con estadísticas</span><span>37</span></div>
+  <div class="indice-entrada indice-cu"><span>7.4&nbsp; CU-33 &mdash; Editar información del perfil</span><span>38</span></div>
+  <div class="indice-entrada indice-cu"><span>7.5&nbsp; CU-34 &mdash; Ver perfil público de otro usuario</span><span>39</span></div>
+  <div class="indice-entrada indice-cu"><span>7.6&nbsp; CU-35 &mdash; Gestionar permisos y privacidad de la cuenta</span><span>40</span></div>
+  <div class="indice-entrada indice-cu"><span>7.7&nbsp; CU-36 &mdash; Cerrar sesión desde el perfil</span><span>41</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>8. Módulo Servicios Externos e Integraciones</span><span>42</span>
+  </div>
+  <div class="indice-entrada indice-cu"><span>8.1&nbsp; CU-37 &mdash; Detección automática de alérgenos en receta</span><span>42</span></div>
+  <div class="indice-entrada indice-cu"><span>8.2&nbsp; CU-38 &mdash; Consulta de información nutricional (Edamam)</span><span>43</span></div>
+  <div class="indice-entrada indice-cu"><span>8.3&nbsp; CU-39 &mdash; Envío de email transaccional (Gmail SMTP)</span><span>44</span></div>
+
+  <div class="indice-entrada indice-modulo">
+    <span>9. Tabla Resumen de Casos de Uso</span><span>45</span>
+  </div>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  1. ACTORES DEL SISTEMA                          ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="actores">
+  <h2>1. Actores del Sistema</h2>
+  <p style="font-size:10.5pt;color:#555;margin-bottom:14px;">
+    Entidades externas que interactúan con el sistema Cookr. Cada caso de uso referencia uno o más de estos actores.
+  </p>
+  <table style="width:100%;border-collapse:collapse;font-size:10.5pt;">
+    <thead>
+      <tr>
+        <th style="background:#1c3d5a;color:white;padding:7px 9px;text-align:left;font-family:Arial,sans-serif;width:20%;">Actor</th>
+        <th style="background:#1c3d5a;color:white;padding:7px 9px;text-align:left;font-family:Arial,sans-serif;width:15%;">Tipo</th>
+        <th style="background:#1c3d5a;color:white;padding:7px 9px;text-align:left;font-family:Arial,sans-serif;">Descripción</th>
+        <th style="background:#1c3d5a;color:white;padding:7px 9px;text-align:left;font-family:Arial,sans-serif;width:12%;">Autenticado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border:1px solid #ccc;padding:6px 9px;"><strong>Usuario Anónimo</strong><br><span style="font-size:9.5pt;color:#555;">ACT-01</span></td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Externo</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Visitante que accede a la aplicación sin cuenta o sin sesión iniciada. Solo puede ver contenido público y acceder a los flujos de registro e inicio de sesión.</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;text-align:center;">No</td>
+      </tr>
+      <tr style="background:#f9fafb;">
+        <td style="border:1px solid #ccc;padding:6px 9px;"><strong>Usuario Registrado</strong><br><span style="font-size:9.5pt;color:#555;">ACT-02</span></td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Externo</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Usuario con cuenta verificada y sesión activa. Puede interactuar con todas las funcionalidades de la plataforma: crear recetas, gestionar su despensa, usar el chat IA y administrar su perfil.</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;text-align:center;">Sí</td>
+      </tr>
+      <tr>
+        <td style="border:1px solid #ccc;padding:6px 9px;"><strong>Asistente IA (Cookr IA)</strong><br><span style="font-size:9.5pt;color:#555;">ACT-03</span></td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Sistema interno</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Módulo interno basado en Gemini (Google AI). Procesa mensajes del usuario, genera respuestas gastronómicas y sugiere recetas personalizadas. Actúa como interlocutor en el chat.</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;text-align:center;">N/A</td>
+      </tr>
+      <tr style="background:#f9fafb;">
+        <td style="border:1px solid #ccc;padding:6px 9px;"><strong>Sistema / Servicios Externos</strong><br><span style="font-size:9.5pt;color:#555;">ACT-04</span></td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Sistema externo</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;">Agrupa el backend de Cookr y los servicios de terceros integrados: Pexels (fotografías), Gmail SMTP (email transaccional) y Edamam (información nutricional). Ejecuta lógica de negocio de forma autónoma.</td>
+        <td style="border:1px solid #ccc;padding:6px 9px;text-align:center;">N/A</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  2. MÓDULO AUTENTICACIÓN Y REGISTRO              ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="seccion-titulo">2. Módulo Autenticación y Registro</div>
+
+<!-- CU-01 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-01 &mdash; Registro con correo y contraseña</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-01</td></tr>
+    <tr><td class="campo">Nombre</td><td>Registro con correo y contraseña</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-01 &mdash; Usuario Anónimo</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite a un visitante crear una cuenta nueva introduciendo nombre, email y contraseña. El sistema valida los datos, persiste el usuario y dispara el flujo de verificación por email antes de permitir el acceso.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario no tiene cuenta en Cookr o no tiene sesión activa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Cuenta creada en MongoDB con contraseña hasheada (bcrypt). Email de verificación enviado via Gmail SMTP. Usuario redirigido a pantalla de verificación pendiente.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta &mdash; funcionalidad de entrada al sistema</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Una vez por usuario</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario accede a <code>/registro</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el formulario de registro (nombre, email, contraseña, confirmación).</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario rellena todos los campos y pulsa <em>Crear cuenta</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida el formulario con Zod (formato email, longitud contraseña ≥ 8 caracteres, coincidencia).</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Comprueba que el email no esté ya registrado en MongoDB.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Genera hash bcrypt de la contraseña y persiste el documento de usuario con <code>cuentaVerificada: false</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>Genera un token de verificación (cadena hexadecimal de 64 caracteres) con TTL de 24 h y lo guarda en la colección <code>tokens</code> con <code>type: 'verificacion'</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía el email de verificación con el enlace firmado via Gmail SMTP (Nodemailer).</td>
+      </tr>
+      <tr>
+        <td class="col-num">7</td>
+        <td class="col-actor">Sistema</td>
+        <td>Redirige al usuario a la pantalla <em>«Verifica tu correo»</em>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El email ya existe en la base de datos. &rarr; Devuelve error <em>«Este correo ya está registrado»</em>. El formulario permanece visible con el campo email marcado.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La contraseña no cumple los requisitos de Zod. &rarr; Muestra mensaje de validación inline sin enviar la petición al servidor.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Fallo en el envío del email. &rarr; La cuenta queda creada pero se muestra aviso <em>«No pudimos enviarte el correo»</em> con opción de reenvío manual.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-02 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-02 &mdash; Verificación de cuenta por email</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-02</td></tr>
+    <tr><td class="campo">Nombre</td><td>Verificación de cuenta por email</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-01 &mdash; Usuario Anónimo (con token de verificación)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Confirma la titularidad del email mediante un enlace de un solo uso. Sin este paso el usuario no puede acceder a las funcionalidades autenticadas.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario ha completado CU-01 y ha recibido el email con el enlace de verificación. La cuenta tiene <code>cuentaVerificada: false</code>.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El campo <code>cuentaVerificada</code> pasa a <code>true</code> en MongoDB. El token de verificación queda invalidado. El usuario puede iniciar sesión.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Una vez por cuenta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario abre el enlace del email (<code>/verificar-email?token=&lt;hex64&gt;</code>).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Extrae el token de la URL y busca el documento correspondiente en la colección <code>tokens</code> con <code>type: 'verificacion'</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Comprueba que el token existe y no ha expirado (TTL 24 h).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el usuario: <code>cuentaVerificada: true</code>. Elimina el token de la colección.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra pantalla de confirmación <em>«¡Cuenta verificada!»</em> con botón hacia <code>/login</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El token no existe o ya fue usado. &rarr; Muestra error <em>«Enlace de verificación inválido»</em> con opción de solicitar uno nuevo.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El token ha expirado (más de 24 h). &rarr; Muestra error <em>«Enlace caducado»</em> y ofrece reenviar el email de verificación.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-03 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-03 &mdash; Inicio de sesión con correo y contraseña</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-03</td></tr>
+    <tr><td class="campo">Nombre</td><td>Inicio de sesión con correo y contraseña</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-01 &mdash; Usuario Anónimo</td></tr>
+    <tr><td class="campo">Descripción</td><td>Autentica al usuario mediante email y contraseña usando NextAuth CredentialsProvider. El backend valida las credenciales comparando el hash bcrypt almacenado.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene cuenta en Cookr con <code>cuentaVerificada: true</code>.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Sesión NextAuth activa (JWT almacenado en cookie HttpOnly). Usuario redirigido al home (<code>/home</code>). Si el perfil está incompleto, redirige a <code>/completar-perfil</code>.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta &mdash; cada inicio de sesión</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario accede a <code>/login</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el formulario con campos email y contraseña.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario introduce sus credenciales y pulsa <em>Iniciar sesión</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>NextAuth CredentialsProvider envía las credenciales al endpoint <code>/api/auth/callback/credentials</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend busca el usuario por email en MongoDB y compara la contraseña con <code>bcrypt.compare()</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>NextAuth genera el JWT de sesión y lo almacena en una cookie <code>HttpOnly; Secure; SameSite=Lax</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>El callback <code>session</code> inyecta <code>id</code>, <code>username</code> y <code>perfilCompleto</code> en el objeto de sesión.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Si <code>perfilCompleto: true</code> &rarr; redirect a <code>/home</code>. Si <code>false</code> &rarr; redirect a <code>/completar-perfil</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>La contraseña no coincide con el hash. &rarr; NextAuth lanza error de autorización. Se muestra <em>«Credenciales incorrectas»</em> sin especificar qué campo falla.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La cuenta existe pero <code>cuentaVerificada: false</code>. &rarr; Se muestra <em>«Debes verificar tu correo antes de iniciar sesión»</em> con opción de reenvío.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no existe en MongoDB. &rarr; Error genérico igual que FA-01 para evitar enumeración de usuarios.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-04 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-04 &mdash; Inicio de sesión con Google OAuth</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-04</td></tr>
+    <tr><td class="campo">Nombre</td><td>Inicio de sesión con Google OAuth</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-01 &mdash; Usuario Anónimo</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite autenticarse usando la cuenta de Google mediante el flujo OAuth 2.0 gestionado por NextAuth GoogleProvider. Elimina la necesidad de contraseña y verificación manual de email.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene cuenta Google activa. La aplicación tiene las credenciales OAuth configuradas en Google Cloud Console.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Sesión NextAuth activa. Si es el primer acceso, se crea el usuario en MongoDB y se redirige a completar perfil. Si ya existe, se redirige al feed.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario pulsa <em>Continuar con Google</em> en <code>/login</code> o <code>/registro</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>NextAuth redirige al endpoint de autorización de Google con <code>response_type=code</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario selecciona su cuenta Google y autoriza el acceso.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Google devuelve un código de autorización al callback <code>/api/auth/callback/google</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>NextAuth intercambia el código por los tokens de acceso y obtiene el perfil del usuario (email, nombre, avatar).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>El callback <code>signIn</code> verifica si el email ya existe en MongoDB. Si no existe, crea el documento de usuario con <code>cuentaVerificada: true</code> y <code>perfilCompleto: false</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>Si es nuevo usuario &rarr; redirect a <code>/completar-perfil</code>. Si ya existe &rarr; redirect a <code>/home</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario cancela el popup OAuth de Google. &rarr; NextAuth redirige de vuelta a <code>/login</code> sin crear sesión ni mostrar error.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El email de Google ya está registrado con contraseña. &rarr; NextAuth vincula ambos métodos de acceso al mismo documento de usuario existente.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-05 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-05 &mdash; Recuperación de contraseña por email</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-05</td></tr>
+    <tr><td class="campo">Nombre</td><td>Recuperación de contraseña por email</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-01 &mdash; Usuario Anónimo</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite recuperar el acceso a la cuenta a través de un enlace de un solo uso enviado al email registrado. El token de reset expira en 1 hora.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene cuenta registrada con email y contraseña (no OAuth exclusivo). Tiene acceso al buzón de correo asociado a la cuenta.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Contraseña actualizada con nuevo hash bcrypt en MongoDB. Token de reset eliminado. Usuario redirigido a <code>/login</code>.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media-alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario accede a <code>/forgot-password</code> y escribe su email.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida el formato del email.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario pulsa <em>Enviar enlace</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Busca el email en MongoDB. Si existe, genera un token hexadecimal de 64 caracteres con TTL de 1 h y lo guarda en la colección <code>tokens</code> con <code>type: 'reset'</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía el email con el enlace <code>/reset-password?token=&lt;hex64&gt;</code> via Gmail SMTP. Muestra mensaje genérico de confirmación independientemente de si el email existe.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario abre el enlace del email.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida el token (existe y no expirado). Muestra formulario de nueva contraseña.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Usuario Anónimo</td>
+        <td>El usuario introduce y confirma la nueva contraseña y pulsa <em>Restablecer</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida la contraseña con Zod. Genera nuevo hash bcrypt. Actualiza el documento de usuario. Elimina el token.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Redirige a <code>/login</code> con mensaje de éxito.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El email no está registrado. &rarr; El sistema no revela si el email existe; muestra el mismo mensaje de éxito genérico (protección contra enumeración).</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El token ha expirado (más de 1 h). &rarr; Muestra <em>«Enlace expirado»</em> y ofrece solicitar uno nuevo.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Sistema</td>
+        <td>La nueva contraseña no supera la validación Zod. &rarr; Muestra errores inline sin consumir el token.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-06 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-06 &mdash; Completar perfil tras registro</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-06</td></tr>
+    <tr><td class="campo">Nombre</td><td>Completar perfil tras registro</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado (recién creado)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Onboarding obligatorio que recoge los datos de perfil necesarios para la experiencia personalizada. El middleware de Next.js redirige automáticamente a esta pantalla si el perfil está incompleto.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y <code>perfilCompleto: false</code> en su documento de MongoDB (primer acceso tras registro o primer OAuth).</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Perfil completo: username único, avatar, preferencias dietéticas y alérgenos guardados. <code>perfilCompleto: true</code>. Usuario redirigido al home.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Una vez por usuario</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Sistema</td>
+        <td>El middleware detecta <code>perfilCompleto: false</code> en el token de sesión. Redirige a <code>/completar-perfil</code> y bloquea el acceso al resto de rutas protegidas.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario introduce un nombre de usuario (<em>username</em>).</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida disponibilidad en tiempo real mediante debounce con <code>GET /api/auth/check-username</code>. Muestra indicador de disponibilidad.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario selecciona su dieta (omnívoro, vegetariano, vegano…) y sus alérgenos.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Registra las selecciones en el estado local del formulario.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario sube o recorta una foto de avatar (opcional).</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Procesa la imagen con el recortador integrado.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Empezar</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>POST /api/auth/completar-perfil</code> con todos los datos. Actualiza <code>perfilCompleto: true</code> en MongoDB.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el token JWT de NextAuth con el nuevo estado. Redirige a <code>/home</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El username elegido ya está en uso. &rarr; Muestra <em>«Este nombre de usuario no está disponible»</em>. El botón de envío permanece deshabilitado.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no sube foto de avatar. &rarr; El sistema asigna un avatar generado con las iniciales del nombre sobre fondo de color derivado del username.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario intenta navegar a otra ruta. &rarr; El middleware intercepta la navegación y redirige de vuelta a <code>/completar-perfil</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-07 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-07 &mdash; Cerrar sesión</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-07</td></tr>
+    <tr><td class="campo">Nombre</td><td>Cerrar sesión</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Destruye la sesión activa del usuario de forma segura llamando a <code>signOut()</code> de NextAuth, que elimina la cookie de sesión y limpia el estado del cliente.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa en la aplicación.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Cookie de sesión eliminada. Token JWT invalidado. Usuario redirigido a <code>/login</code> sin acceso a rutas protegidas.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Cerrar sesión</em> en la sección de perfil.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra diálogo de confirmación.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario confirma la acción.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Invoca <code>signOut({ callbackUrl: '/login' })</code> de NextAuth.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>NextAuth elimina la cookie <code>next-auth.session-token</code> del navegador.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Limpia el estado global del cliente (TanStack Query cache, Zustand stores). Redirige a <code>/login</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario cancela el diálogo de confirmación. &rarr; No se realiza ninguna acción. El usuario permanece en la pantalla de perfil con la sesión activa.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  3. MÓDULO NAVEGACIÓN Y FEED                     ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="seccion-titulo">3. Módulo Navegación y Feed</div>
+
+<!-- CU-08 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-08 &mdash; Ver feed de recetas</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-08</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver feed de recetas</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista principal de la aplicación. Muestra un flujo de recetas publicadas por la comunidad con scroll infinito. Cada tarjeta incluye foto, título, autor, tiempo de preparación, contador de likes y estado de guardado personal.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa. Existe al menos una receta publicada en la plataforma.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra la lista paginada de recetas ordenadas por fecha de publicación (más recientes primero). El estado de «guardado» y «me gusta» de cada receta refleja los datos del usuario en sesión.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Muy alta &mdash; acceso habitual en cada sesión</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario navega a <code>/feed</code> (ruta inicial tras login).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>TanStack Query lanza <code>GET /api/recetas/feed?page=1&amp;limit=10</code> con el token de sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend devuelve el primer bloque de recetas con metadatos de paginación (<code>hasNextPage</code>, <code>nextCursor</code>).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza las tarjetas con animación de entrada (Framer Motion). Muestra skeleton loaders durante la carga inicial.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario hace scroll hasta el final de la lista.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>El observer de intersección detecta el elemento centinela y dispara la carga de la página siguiente.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>Añade las nuevas recetas a la lista existente sin reemplazar las anteriores (infinite query).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>No hay recetas publicadas todavía. &rarr; Muestra estado vacío con ilustración y mensaje <em>«Sé el primero en publicar una receta»</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>No hay más páginas disponibles. &rarr; Oculta el indicador de carga inferior y muestra <em>«Has visto todas las recetas»</em>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al backend. &rarr; TanStack Query reintenta la petición (3 intentos con backoff). Si persiste, muestra banner de error con botón de reintento manual.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-09 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-09 &mdash; Navegar entre secciones de la aplicación</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-09</td></tr>
+    <tr><td class="campo">Nombre</td><td>Navegar entre secciones de la aplicación</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>La navbar inferior fija (mobile-first) proporciona acceso a las cinco secciones principales de la aplicación: Feed, Descubrir, Crear receta, Despensa y Perfil. El icono activo se resalta con el color de marca y una animación de escala.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa. La barra de navegación inferior está visible.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El usuario se encuentra en la sección seleccionada. El icono activo de la navbar refleja la ruta actual.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Muy alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa uno de los cinco iconos de la barra de navegación inferior.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Next.js router ejecuta una navegación client-side hacia la ruta correspondiente.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Las rutas y sus destinos son:<br>
+          <code>Home</code> &rarr; <code>/feed</code> &nbsp;·&nbsp;
+          <code>Discover</code> &rarr; <code>/discover</code> &nbsp;·&nbsp;
+          <code>Crear</code> &rarr; <code>/recetas/nueva</code> &nbsp;·&nbsp;
+          <code>Despensa</code> &rarr; <code>/despensa</code> &nbsp;·&nbsp;
+          <code>Perfil</code> &rarr; <code>/perfil</code>
+        </td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Aplica la animación de transición entre vistas (Framer Motion). El icono de la sección activa adopta el color de marca (<code>text-brand</code>) y escala a 1.1x.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario pulsa el icono <em>Crear</em> sin tener perfil completo. &rarr; El middleware redirige a <code>/completar-perfil</code> en lugar de la vista de creación.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario ya se encuentra en la sección seleccionada. &rarr; No se ejecuta navegación. El estado visual de la navbar no cambia.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-10 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-10 &mdash; Buscar recetas por nombre o etiqueta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-10</td></tr>
+    <tr><td class="campo">Nombre</td><td>Buscar recetas por nombre o etiqueta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite localizar recetas mediante búsqueda de texto libre (título, ingredientes, descripción) o filtrando por etiquetas de categoría (desayuno, vegano, postres…). La búsqueda es reactiva con debounce de 300 ms.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la sección <em>Descubrir</em> (<code>/discover</code>) con sesión activa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestran las recetas que coinciden con el término de búsqueda o la etiqueta seleccionada. El resultado es una lista filtrada y ordenada por relevancia.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario accede a <code>/discover</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el campo de búsqueda y las tarjetas de etiquetas de categoría disponibles.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario escribe un término en el buscador.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Aplica debounce de 300 ms. Transcurrido el tiempo, lanza <code>GET /api/recetas/search?q=&lt;término&gt;</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend realiza búsqueda por índice de texto en MongoDB (título, descripción, ingredientes). Devuelve resultados ordenados por relevancia.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza las tarjetas de resultado reemplazando el contenido anterior. Muestra el número de coincidencias encontradas.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa una etiqueta de categoría.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Añade el filtro de categoría a la query activa y vuelve a lanzar la búsqueda con <code>&amp;categoria=&lt;slug&gt;</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>La búsqueda no devuelve resultados. &rarr; Muestra estado vacío con el mensaje <em>«Sin resultados para "&lt;término&gt;"»</em> y sugerencia de ampliar la búsqueda.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario borra el término de búsqueda. &rarr; Cancela cualquier petición pendiente y restaura la vista inicial de descubrimiento (recetas destacadas o populares).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-11 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-11 &mdash; Cambiar tema de interfaz (claro / oscuro)</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-11</td></tr>
+    <tr><td class="campo">Nombre</td><td>Cambiar tema de interfaz (claro / oscuro)</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite alternar entre el tema claro y el oscuro. El sistema respeta el tema del sistema operativo del usuario como valor inicial (<code>prefers-color-scheme</code>). El cambio se aplica sin recarga de página mediante variables CSS en <code>:root</code>.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y acceso a la configuración de perfil o al control de tema.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El tema seleccionado se aplica globalmente a la interfaz. La preferencia persiste en <code>localStorage</code> y se restaura en la próxima sesión.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja &mdash; normalmente se configura una sola vez</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa el toggle de tema (luna / sol) en la sección de perfil o ajustes.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Lee el tema actual del store de Zustand (<code>useThemeStore</code>).</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Alterna el valor entre <code>'light'</code> y <code>'dark'</code> en el store.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Aplica o elimina la clase <code>dark</code> en el elemento <code>&lt;html&gt;</code>. Tailwind recalcula los colores basándose en las variables CSS del tema activo.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Persiste la preferencia en <code>localStorage</code> con la clave <code>cookr-theme</code>. La interfaz se actualiza de forma inmediata sin parpadeo.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Primera carga de la aplicación sin preferencia guardada. &rarr; El sistema lee <code>prefers-color-scheme</code> del navegador y establece el tema correspondiente como valor inicial.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario tiene <code>localStorage</code> deshabilitado. &rarr; El tema funciona durante la sesión activa pero no persiste entre recargas; se aplica siempre el tema del sistema.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-12 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-12 &mdash; Activar modo manos libres al cocinar</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-12</td></tr>
+    <tr><td class="campo">Nombre</td><td>Activar modo manos libres al cocinar</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Modo de accesibilidad que permite seguir una receta con las manos ocupadas. Usa la API Web Speech para reconocer comandos como «siguiente», «anterior» y «repetir». Planificado para Sprint 8.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está visualizando el detalle de una receta (<code>/recetas/[id]</code>) con los pasos de elaboración desplegados. El dispositivo tiene micrófono disponible y el usuario ha concedido permiso de acceso.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>La interfaz entra en modo de pantalla completa con el paso actual ampliado. El usuario puede avanzar y retroceder pasos mediante comandos de voz sin tocar la pantalla.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media &mdash; diferenciador de producto</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media &mdash; durante el proceso de cocinado</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Modo manos libres</em> en el detalle de receta.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Solicita permiso de micrófono al navegador (<code>MediaDevices.getUserMedia</code>).</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario concede el permiso.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Entra en pantalla completa. Muestra el paso 1 en formato ampliado con el nombre del ingrediente/acción destacado. Activa el reconocedor de voz (Web Speech API).</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario dice <em>«siguiente»</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Avanza al paso siguiente con animación de deslizamiento. Anuncia el número de paso en voz alta (síntesis de voz).</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario dice <em>«anterior»</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Retrocede al paso anterior.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario dice <em>«repetir»</em> o <em>«¿qué?»</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Vuelve a leer en voz alta el paso actual.</td>
+      </tr>
+      <tr>
+        <td class="col-num">6</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario dice <em>«salir»</em> o pulsa el botón de cierre.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Sale del modo manos libres, desactiva el micrófono y restaura la vista normal de la receta.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario deniega el permiso de micrófono. &rarr; Muestra aviso informativo y ofrece continuar en modo visual (con botones en pantalla en lugar de voz).</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El navegador no soporta Web Speech API. &rarr; El botón de modo manos libres no aparece en la interfaz. La funcionalidad queda silenciada sin mensaje de error.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Sistema</td>
+        <td>El reconocedor no entiende el comando (baja confianza). &rarr; No ejecuta ninguna acción. Muestra brevemente el texto detectado para que el usuario corrija su pronunciación.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║  4. MÓDULO GESTIÓN DE RECETAS                    ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="seccion-titulo">4. Módulo Gestión de Recetas</div>
+
+<!-- CU-13 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-13 &mdash; Crear receta con formulario multi-paso</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-13</td></tr>
+    <tr><td class="campo">Nombre</td><td>Crear receta con formulario multi-paso</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-04 &mdash; Sistema (Pexels API para foto automática, <code>detectarAlergenos</code> para alérgenos)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Flujo guiado de cuatro pasos para publicar una receta. El formulario usa React Hook Form + Zod para validación. La foto de portada se obtiene automáticamente de la API de Pexels usando el título como query, eliminando la necesidad de que el usuario suba imágenes.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y perfil completo (<code>perfilCompleto: true</code>).</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Receta persistida en MongoDB con foto obtenida de Pexels, alérgenos detectados automáticamente y publicada en el feed. El usuario es redirigido al detalle de la receta creada.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta &mdash; funcionalidad central de la plataforma</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario accede a <code>/recetas/nueva</code> desde la navbar.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Si es el primer acceso, redirige al tutorial (CU-14). Si ya lo ha visto, muestra el formulario en el paso 1.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td><strong>Paso 1 &mdash; Datos básicos:</strong> El usuario rellena título, descripción, categoría, tiempo de preparación y número de porciones.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida los campos con Zod en tiempo real. Habilita el botón «Siguiente» al cumplir los requisitos mínimos.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td><strong>Paso 2 &mdash; Ingredientes:</strong> El usuario añade ingredientes indicando nombre, cantidad y unidad. Puede reordenarlos y eliminarlos.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida que haya al menos un ingrediente. Permite añadir tantos como se necesiten mediante el botón «Añadir ingrediente».</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td><strong>Paso 3 &mdash; Elaboración:</strong> El usuario escribe los pasos de preparación en orden, uno por cada campo.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida que haya al menos un paso. Permite reordenar los pasos con drag-and-drop.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td><strong>Paso 4 &mdash; Revisión:</strong> El usuario revisa el resumen completo de la receta y pulsa <em>Publicar</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Ejecuta la validación global del formulario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Llama a la API de Pexels (<code>GET /search?query=&lt;título&gt;</code>) para obtener la foto de portada más relevante. Selecciona la primera imagen y guarda la URL.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">7</td>
+        <td class="col-actor">Sistema</td>
+        <td>Ejecuta <code>detectarAlergenos(ingredientes)</code> para identificar automáticamente los alérgenos presentes en la receta.</td>
+      </tr>
+      <tr>
+        <td class="col-num">8</td>
+        <td class="col-actor">Sistema</td>
+        <td>Persiste el documento de receta completo en MongoDB con <code>POST /api/recetas</code>. Redirige al usuario a <code>/recetas/[id]</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Pexels no devuelve resultados para el título de la receta. &rarr; La receta se publica con una imagen de portada por defecto (placeholder de Cookr).</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario abandona el formulario a mitad de camino. &rarr; El estado del formulario se conserva en memoria durante la sesión. Al volver a <code>/recetas/nueva</code>, el borrador está disponible.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error de red al publicar. &rarr; Muestra toast de error. El formulario permanece con todos los datos para que el usuario reintente sin perder información.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-14 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-14 &mdash; Ver tutorial de creación de receta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-14</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver tutorial de creación de receta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Tutorial de incorporación que explica los cuatro pasos del formulario de creación mediante pantallas ilustradas. Solo se muestra automáticamente la primera vez; las siguientes se puede acceder voluntariamente.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario accede a <code>/recetas/nueva</code> por primera vez, o pulsa el botón de ayuda dentro del formulario.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El usuario ha visto los pasos del tutorial. Se marca como «visto» en <code>localStorage</code>. Al finalizar, se inicia el formulario de creación.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja &mdash; una vez por usuario como flujo automático</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario accede a <code>/recetas/nueva</code> por primera vez.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Comprueba <code>localStorage</code>: clave <code>cookr-tutorial-visto</code> ausente. Muestra la pantalla de tutorial antes del formulario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario navega entre las pantallas del tutorial («Siguiente»).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Avanza por las diapositivas: (1) datos básicos, (2) ingredientes, (3) pasos, (4) foto automática y publicación.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario llega a la última diapositiva y pulsa <em>Empezar a crear</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Guarda <code>cookr-tutorial-visto: true</code> en <code>localStorage</code>. Carga el formulario multi-paso en el paso 1.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Saltar tutorial</em>. &rarr; Guarda la clave en <code>localStorage</code> igualmente y carga el formulario directamente.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario ya tiene el tutorial marcado como visto. &rarr; Se omite el tutorial y se muestra directamente el formulario en el paso 1.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-15 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-15 &mdash; Ver detalle de una receta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-15</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver detalle de una receta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista de detalle completa de una receta: foto de portada, datos básicos (tiempo, porciones, autor), lista de ingredientes, pasos de elaboración, alérgenos detectados, sección de comentarios e indicadores sociales (likes, guardados).</td></tr>
+    <tr><td class="campo">Precondición</td><td>Existe una receta publicada con el <code>id</code> especificado en la URL.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra toda la información de la receta. El estado de «me gusta» y «guardado» refleja los datos del usuario en sesión.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Muy alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa una tarjeta de receta en el feed o en resultados de búsqueda.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega a <code>/recetas/[id]</code>. Next.js ejecuta <code>getServerSideProps</code> (o la Server Component equivalente) para obtener los datos.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Lanza en paralelo: <code>GET /api/recetas/[id]</code> (datos completos) y comprueba si el usuario tiene la receta en me gusta y en colección.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza los componentes: <code>HeroReceta</code> (foto + datos básicos), <code>IngredientesReceta</code>, <code>PasosReceta</code>, <code>AlérgenosReceta</code>, <code>AccionesReceta</code> (like/guardar), <code>ComentariosReceta</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario hace scroll para leer ingredientes y pasos.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Los pasos se muestran numerados. Los ingredientes con sus cantidades y unidades.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El <code>id</code> de la receta no existe en MongoDB. &rarr; Next.js devuelve la página 404 de la aplicación.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario es el autor de la receta. &rarr; Se muestran los controles de propietario: botón <em>Editar</em> (CU-19) y botón <em>Eliminar</em> (CU-20).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-16 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-16 &mdash; Dar me gusta a una receta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-16</td></tr>
+    <tr><td class="campo">Nombre</td><td>Dar me gusta a una receta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Acción social de doble estado (like / unlike) con actualización optimista en cliente. El resultado se sincroniza con el servidor de forma asíncrona.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está viendo el detalle de una receta o una tarjeta en el feed.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El like queda registrado o eliminado en MongoDB. El contador de likes de la receta se actualiza. El icono refleja el estado actual del usuario.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa el icono de corazón en la receta.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el estado local de forma optimista: invierte el booleano <code>liked</code> e incrementa o decrementa el contador de likes en la UI sin esperar la respuesta del servidor.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>POST /api/recetas/[id]/like</code> (si era unlike &rarr; like) o <code>DELETE /api/recetas/[id]/like</code> (si era like &rarr; unlike).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>El servidor actualiza el documento de receta y el array de likes del usuario en MongoDB. Devuelve el nuevo contador.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>TanStack Query invalida y refresca la query de la receta para sincronizar el contador definitivo.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor. &rarr; Revierte el estado optimista al valor previo. Muestra un toast de error discreto.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-17 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-17 &mdash; Guardar receta en la colección personal</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-17</td></tr>
+    <tr><td class="campo">Nombre</td><td>Guardar receta en la colección personal</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite guardar recetas de otros usuarios en la colección personal para acceder a ellas fácilmente desde la sección Colección. Funciona como toggle con actualización optimista, igual que el me gusta.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está viendo el detalle de una receta o una tarjeta en el feed.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>La receta queda añadida o eliminada de la colección personal del usuario en MongoDB. El icono de marcador refleja el estado actual.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa el icono de marcador (bookmark) en la receta.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el estado local de forma optimista: invierte el booleano <code>guardada</code> en la UI.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>POST /api/recetas/[id]/guardar</code> o <code>DELETE /api/recetas/[id]/guardar</code> según el estado previo.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>El servidor actualiza la colección del usuario en MongoDB. Invalida las queries de colección para que la sección Colección esté actualizada.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario intenta guardar su propia receta. &rarr; La acción está permitida; el autor puede guardar sus propias recetas en la colección.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor. &rarr; Revierte el estado optimista. Muestra toast de error.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-18 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-18 &mdash; Comentar en una receta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-18</td></tr>
+    <tr><td class="campo">Nombre</td><td>Comentar en una receta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite publicar un comentario de texto libre (máximo 500 caracteres) en el detalle de una receta. La publicación es optimista: el comentario aparece en la UI de forma inmediata antes de confirmar el servidor.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está viendo el detalle de una receta y tiene sesión activa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El comentario queda guardado en MongoDB asociado a la receta y al autor. Aparece al inicio de la lista de comentarios.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media-alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario escribe su comentario en el textarea de la sección <em>Comentarios</em> (máx. 500 caracteres).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el contador de caracteres restantes en tiempo real.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Publicar</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Inserta un comentario optimista al inicio de la lista local con el nombre y avatar del usuario en sesión y la fecha actual.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Limpia el textarea. Envía <code>POST /api/recetas/[id]/comentarios</code> con el texto del comentario.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>El servidor persiste el comentario en MongoDB. Llama a <code>router.refresh()</code> para sincronizar los datos del servidor.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El comentario está vacío o solo tiene espacios. &rarr; El botón <em>Publicar</em> permanece deshabilitado. No se envía ninguna petición.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>Hay más de 3 comentarios. &rarr; Se muestran solo los 3 primeros con un botón <em>Ver todos (N)</em> que abre un sheet deslizable con la lista completa.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor. &rarr; Elimina el comentario optimista de la lista local. Restaura el texto en el textarea para que el usuario pueda reintentar.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-19 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-19 &mdash; Editar receta propia</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-19</td></tr>
+    <tr><td class="campo">Nombre</td><td>Editar receta propia</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado (autor de la receta)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite al autor de una receta modificar cualquier campo: título, descripción, ingredientes, pasos y categoría. Reutiliza el formulario multi-paso de CU-13 precargado con los datos actuales. La detección de alérgenos y la foto de Pexels se regeneran si cambia el título.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y es el autor de la receta que desea modificar.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Los cambios quedan guardados en MongoDB. La receta actualizada es visible en el feed y en el detalle con los nuevos datos.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Editar</em> en el detalle de una receta propia.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega a <code>/recetas/[id]/editar</code>. Carga los datos actuales de la receta y los inyecta como valores por defecto en el formulario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario modifica los campos deseados y pulsa <em>Guardar cambios</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Ejecuta la validación global de Zod sobre los datos actualizados.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Si el título ha cambiado, vuelve a consultar Pexels para actualizar la foto de portada y regenera los alérgenos detectados.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>PATCH /api/recetas/[id]</code> con los campos modificados. Redirige al detalle de la receta con los datos actualizados.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario intenta editar una receta de la que no es autor. &rarr; El servidor devuelve 403 Forbidden. El botón de edición no se renderiza en el cliente si el <code>autorId</code> no coincide con el <code>id</code> de sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario cancela la edición sin guardar. &rarr; Redirige al detalle de la receta sin modificar ningún dato.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-20 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-20 &mdash; Eliminar receta propia</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-20</td></tr>
+    <tr><td class="campo">Nombre</td><td>Eliminar receta propia</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 &mdash; Usuario Registrado (autor de la receta)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite al autor eliminar permanentemente una receta propia. La acción requiere confirmación explícita para evitar eliminaciones accidentales. Es una operación irreversible.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y es el autor de la receta. La receta existe en MongoDB.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El documento de receta es eliminado de MongoDB. La receta desaparece del feed, de los resultados de búsqueda y de las colecciones de otros usuarios que la habían guardado.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario pulsa <em>Eliminar</em> en el detalle de una receta propia.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra un diálogo de confirmación: <em>«¿Seguro que quieres eliminar esta receta? Esta acción no se puede deshacer.»</em></td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario confirma la eliminación.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>DELETE /api/recetas/[id]</code> con el token de sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>El servidor verifica que el <code>autorId</code> de la receta coincide con el usuario en sesión. Elimina el documento de receta de MongoDB.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Invalida las queries de feed, colecciones y perfil del usuario. Redirige a <code>/perfil</code> con toast de confirmación <em>«Receta eliminada»</em>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Usuario Registrado</td>
+        <td>El usuario cancela el diálogo de confirmación. &rarr; Cierra el diálogo. La receta no se modifica.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no es el autor de la receta (manipulación de petición). &rarr; El servidor devuelve 403 Forbidden. El botón de eliminar nunca se renderiza en el cliente para recetas ajenas.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error de red durante la eliminación. &rarr; Muestra toast de error. La receta permanece publicada. El usuario puede reintentar.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MÓDULO 5 — GESTIÓN DE DESPENSA                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="seccion-titulo">5. Gestión de Despensa</div>
+
+<!-- CU-21 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-21 — Ver despensa personal de ingredientes</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-21</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver despensa personal de ingredientes</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista principal de la despensa personal. Permite al usuario consultar en todo momento qué ingredientes tiene disponibles, con opción de filtrar por categoría. Es el punto de entrada para las operaciones CU-22, CU-23, CU-24 y CU-25.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede a la sección Despensa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra la lista completa de ingredientes registrados por el usuario, agrupados por categoría y con sus cantidades y unidades.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media-alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario navega a <code>/despensa</code> desde la navbar inferior.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>TanStack Query lanza <code>GET /api/despensa</code> con el token de sesión del usuario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend devuelve el array de ingredientes del usuario, cada uno con: <code>nombre</code>, <code>cantidad</code>, <code>unidad</code>, <code>categoria</code> e <code>_id</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra skeleton loaders durante la carga. Al resolverse, renderiza la lista agrupada por categoría (frutas, verduras, lácteos, carnes, otros…).</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa una categoría del filtro horizontal.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Filtra la lista en cliente para mostrar solo los ingredientes de esa categoría sin nueva petición al servidor.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>La despensa está vacía → Muestra estado vacío con ilustración y mensaje <em>«Tu despensa está vacía»</em> junto al botón de acceso directo a CU-22.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error al obtener los datos del servidor → TanStack Query reintenta automáticamente. Si persiste, muestra mensaje de error con botón de reintento.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-22 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-22 — Añadir ingrediente a la despensa</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-22</td></tr>
+    <tr><td class="campo">Nombre</td><td>Añadir ingrediente a la despensa</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite añadir un nuevo ingrediente a la despensa personal indicando nombre, cantidad y unidad de medida. El campo de nombre dispone de autocompletado con debounce para facilitar la entrada.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la vista de despensa (<code>/despensa</code>).</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El ingrediente queda registrado en la despensa del usuario en MongoDB y aparece en la lista.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media-alta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa el botón <em>Añadir ingrediente</em> (<code>+</code>) en la vista de despensa.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Abre el sheet o modal de añadir ingrediente con el campo de nombre enfocado automáticamente.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario escribe el nombre del ingrediente.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Aplica debounce de 300 ms y lanza una búsqueda de autocompletado. Muestra sugerencias de ingredientes conocidos.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario selecciona una sugerencia o escribe el nombre manualmente.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Rellena el campo de nombre. Detecta la categoría del ingrediente automáticamente si es conocido.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario introduce la cantidad y selecciona la unidad (g, kg, ml, l, ud…).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida que la cantidad sea un número positivo.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Añadir</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>POST /api/despensa</code> con los datos. Invalida la query de despensa. Cierra el sheet y muestra el nuevo ingrediente en la lista.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El ingrediente ya existe en la despensa del usuario → El servidor detecta el duplicado y devuelve error. Se muestra <em>«Este ingrediente ya está en tu despensa»</em> con opción de ir directamente a editar la cantidad (CU-24).</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cancela el sheet sin guardar → Cierra el panel sin realizar ninguna modificación.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-23 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-23 — Eliminar ingrediente de la despensa</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-23</td></tr>
+    <tr><td class="campo">Nombre</td><td>Eliminar ingrediente de la despensa</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite eliminar un ingrediente de la despensa mediante un gesto de deslizamiento (swipe) o el botón de borrado. La eliminación es optimista.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la vista de despensa y tiene al menos un ingrediente registrado.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El ingrediente queda eliminado de la despensa del usuario en MongoDB y desaparece de la lista.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario desliza el elemento hacia la izquierda (swipe) o pulsa el icono de papelera del ingrediente.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el botón de confirmación de borrado con color de advertencia.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario confirma la eliminación.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Elimina el ingrediente de la lista local de forma optimista con animación de salida.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>DELETE /api/despensa/:id</code>. Si el servidor confirma, la operación concluye. Si hay error, revierte el cambio optimista.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor → Revierte la eliminación optimista: el ingrediente reaparece en la lista. Muestra toast de error.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-24 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-24 — Modificar cantidad de un ingrediente</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-24</td></tr>
+    <tr><td class="campo">Nombre</td><td>Modificar cantidad de un ingrediente</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite actualizar la cantidad y unidad de un ingrediente ya registrado en la despensa, por ejemplo tras hacer la compra o al consumir parte del stock.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la vista de despensa y tiene al menos un ingrediente registrado.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>La cantidad y/o la unidad del ingrediente quedan actualizadas en MongoDB.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa el ingrediente que desea editar.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Abre el sheet de edición precargado con los valores actuales del ingrediente (nombre, cantidad, unidad).</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario modifica la cantidad y/o la unidad.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida que la cantidad sea un número positivo mayor que cero.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Guardar</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>PUT /api/despensa/:id</code> con los campos modificados. Invalida la query de despensa. Cierra el sheet y actualiza el valor en la lista.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario introduce una cantidad no válida (texto, cero o negativa) → Muestra error de validación inline. El botón <em>Guardar</em> permanece deshabilitado.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cierra el sheet sin guardar → Descarta los cambios. El ingrediente conserva sus valores anteriores.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor → Muestra toast de error. Los datos en pantalla se revierten a los valores previos.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-25 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-25 — Ver recetas posibles con la despensa actual</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-25</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver recetas posibles con la despensa actual</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-04 — Sistema (motor de matching de ingredientes)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Funcionalidad de matching inteligente que cruza los ingredientes de la despensa del usuario con los ingredientes requeridos por las recetas de la plataforma. Devuelve recetas ordenadas por mayor porcentaje de ingredientes disponibles. Las recetas con el 100 % de ingredientes se marcan como «listas para cocinar».</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y al menos un ingrediente registrado en su despensa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra una lista de recetas publicadas en Cookr que el usuario puede preparar total o parcialmente con los ingredientes disponibles en su despensa, ordenadas por porcentaje de coincidencia.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media — diferenciador de producto</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>¿Qué puedo cocinar?</em> en la vista de despensa.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra un indicador de carga. Lanza <code>GET /api/despensa/recetas-posibles</code> con el token de sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend recupera los ingredientes de la despensa del usuario y ejecuta el motor de matching contra la colección de recetas: para cada receta calcula el porcentaje de ingredientes presentes en la despensa.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Devuelve la lista de recetas ordenada descendientemente por porcentaje de coincidencia. Cada ítem incluye: receta, porcentaje, ingredientes faltantes.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza las tarjetas de recetas agrupadas: <em>«Listas para cocinar»</em> (100 %) y <em>«Solo te faltan N ingredientes»</em> (parciales).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa una receta del resultado.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega al detalle de la receta (CU-15), con los ingredientes faltantes destacados visualmente.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Ninguna receta de la plataforma coincide con los ingredientes de la despensa → Muestra estado vacío con el mensaje <em>«No hemos encontrado recetas con tus ingredientes actuales»</em> y sugiere añadir más ingredientes o explorar el feed.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La despensa está vacía al acceder a esta función → Muestra aviso <em>«Añade ingredientes a tu despensa para ver qué puedes cocinar»</em> con enlace directo a CU-22.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MÓDULO 6 — CHAT CON ASISTENTE IA                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="seccion-titulo">6. Chat con Asistente IA</div>
+
+<!-- CU-26 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-26 — Iniciar conversación con el asistente culinario</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-26</td></tr>
+    <tr><td class="campo">Nombre</td><td>Iniciar conversación con el asistente culinario</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-03 — Asistente IA (Cookr IA / Gemini)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Punto de entrada al módulo de chat. Al acceder a <code>/chat</code> se inicializa una nueva conversación con el asistente culinario Cookr IA. La cabecera muestra el nombre del asistente, su rol (<em>Asistente Culinario</em>) y el acceso al historial de chats anteriores.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa. La interfaz de chat está disponible en <code>/chat</code>.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Una nueva sesión de conversación queda inicializada. El área de mensajes está lista para recibir la primera entrada del usuario. La conversación se gestiona en el store cliente (Zustand); la persistencia en servidor está planificada para la fase de integración real con Gemini.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media-alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario accede a <code>/chat</code> desde la navegación.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza el <code>HeaderChat</code> con el nombre <em>Cookr IA</em>, la etiqueta <em>Asistente Culinario</em> y el botón <em>Ver historial de chats</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Inicializa el estado local de la conversación: array de mensajes vacío, <code>conversacionId</code> pendiente de asignación hasta el primer envío.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el área de mensajes con un mensaje de bienvenida del asistente: <em>«¡Hola! Soy Cookr IA. ¿En qué puedo ayudarte hoy?»</em></td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Posiciona el foco en el campo de texto de entrada para que el usuario pueda escribir de inmediato.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario tiene conversaciones previas guardadas → La vista de nueva conversación permanece en blanco. El acceso al historial se realiza mediante el botón dedicado (CU-28), sin interferir con el flujo de nueva conversación.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-27 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-27 — Enviar mensaje y recibir respuesta de la IA</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-27</td></tr>
+    <tr><td class="campo">Nombre</td><td>Enviar mensaje y recibir respuesta de la IA</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-03 — Asistente IA (Cookr IA / Gemini)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Ciclo básico de pregunta-respuesta en el chat. El usuario envía un mensaje de texto y el asistente procesa la consulta con contexto culinario para generar una respuesta relevante. El historial del hilo se pasa al modelo en cada turno para mantener coherencia conversacional.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la vista de chat con una conversación inicializada (CU-26). El campo de texto no está vacío.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El mensaje del usuario y la respuesta del asistente quedan registrados en el hilo de la conversación. Si la integración con Gemini está activa, la respuesta es generada por el modelo; en caso contrario, se devuelve una respuesta simulada.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta — funcionalidad central del módulo</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Alta durante el uso del chat</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario escribe su mensaje en el campo de texto y pulsa <em>Enviar</em> (o tecla <kbd>Enter</kbd>).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Añade el mensaje del usuario al array de mensajes local con <code>rol: 'user'</code> y <code>timestamp</code> actual. Limpia el campo de texto.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el indicador de escritura del asistente (<em>Cookr IA está escribiendo…</em>) con animación de puntos pulsantes.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>En la implementación mock actual, el store Zustand genera una respuesta simulada tras un delay de 1,4 s. En la fase de integración real: enviará la petición al backend con el historial, que construirá el prompt y lo pasará a la API de Gemini.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Recibe la respuesta (simulada o real). Oculta el indicador de escritura y añade el mensaje del asistente al hilo con <code>rol: 'assistant'</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el estado del store cliente. Hace scroll automático al último mensaje.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El campo de texto está vacío o solo contiene espacios → El botón de envío permanece deshabilitado. No se procesa ninguna acción.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La API de Gemini no está configurada (<code>GEMINI_API_KEY</code> ausente) → El backend devuelve una respuesta mock predefinida con temática culinaria. El flujo de UI es idéntico al normal.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario envía varios mensajes rápidamente → Se encolan las peticiones para evitar respuestas desordenadas. El campo de texto se deshabilita mientras el asistente está generando una respuesta.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la llamada a Gemini o timeout → Oculta el indicador de escritura. Muestra mensaje de error del asistente: <em>«Lo siento, no pude procesar tu consulta. Inténtalo de nuevo.»</em></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-28 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-28 — Ver historial de conversaciones anteriores</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-28</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver historial de conversaciones anteriores</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite al usuario acceder a sus conversaciones pasadas con el asistente IA. Se accede mediante el botón <em>Ver historial de chats</em> del <code>HeaderChat</code>, que abre un panel lateral o sheet con la lista de conversaciones previas.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa, está en la vista de chat y tiene al menos una conversación previa guardada en MongoDB.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra la lista de conversaciones anteriores ordenadas por fecha. El usuario puede recuperar y continuar cualquier conversación previa.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja-media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Ver historial de chats</em> en el <code>HeaderChat</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Abre el panel lateral de historial. Lanza <code>GET /api/chat/conversaciones</code> para obtener la lista de conversaciones del usuario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza la lista de conversaciones con: fecha, primer mensaje del usuario como título resumido y número de mensajes del hilo.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario selecciona una conversación de la lista.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Cierra el panel y carga el hilo completo de la conversación seleccionada. El área de mensajes muestra todos los turnos anteriores.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario puede continuar la conversación enviando un nuevo mensaje.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Los mensajes nuevos se añaden al hilo existente manteniendo el contexto de la conversación anterior.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no tiene conversaciones previas → El panel muestra estado vacío: <em>«Aún no tienes conversaciones guardadas»</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cierra el panel sin seleccionar ninguna conversación → La vista de chat regresa al estado previo (conversación activa o nueva conversación en blanco).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-29 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-29 — Obtener sugerencias de recetas personalizadas</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-29</td></tr>
+    <tr><td class="campo">Nombre</td><td>Obtener sugerencias de recetas personalizadas</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-03 — Asistente IA (Cookr IA / Gemini) · ACT-04 — Sistema (despensa del usuario)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Capacidad avanzada del asistente que inyecta el contexto del usuario (despensa actual, preferencias dietéticas, alérgenos) en el prompt de Gemini para generar sugerencias de recetas personalizadas. Si la sugerencia coincide con una receta publicada en Cookr, la respuesta incluye una tarjeta con enlace directo al detalle.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en el chat y tiene ingredientes registrados en su despensa. La integración con Gemini está activa.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El asistente devuelve sugerencias de recetas coherentes con la despensa del usuario, sus preferencias dietéticas y el contexto de la conversación. Si las recetas existen en Cookr, se incluyen como tarjetas enlazables.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media — diferenciador de valor de la plataforma</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario escribe una consulta de tipo <em>«¿Qué puedo hacer con lo que tengo?»</em> o <em>«Sugiéreme una cena fácil»</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Detecta la intención de sugerencia de recetas en el mensaje del usuario.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Recupera el contexto del usuario: ingredientes de la despensa (<code>GET /api/despensa</code>), preferencias dietéticas y alérgenos del perfil.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Construye el prompt para Gemini inyectando el contexto: <em>«El usuario tiene [ingredientes]. Su dieta es [dieta]. Sus alérgenos son [alérgenos]. Sugiere recetas que pueda preparar.»</em></td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Gemini genera entre 3 y 5 sugerencias con nombre, descripción breve e ingredientes principales.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend busca en MongoDB si alguna de las sugerencias coincide con recetas publicadas en Cookr (por nombre o etiquetas). Las coincidencias se enriquecen con el <code>_id</code> de la receta real.</td>
+      </tr>
+      <tr>
+        <td class="col-num">6</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza la respuesta del asistente con texto descriptivo y, para las coincidencias encontradas, tarjetas clicables que llevan al detalle de la receta (CU-15).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>La despensa del usuario está vacía → Gemini genera sugerencias genéricas sin contexto de ingredientes. La respuesta indica al usuario que puede añadir ingredientes a su despensa para obtener sugerencias más precisas.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>Ninguna sugerencia de Gemini coincide con recetas de Cookr → La respuesta muestra solo el texto generado por la IA sin tarjetas de receta. El usuario puede explorar el feed para encontrar recetas similares.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-03</td>
+        <td class="col-actor">Sistema</td>
+        <td>La consulta del usuario no está relacionada con gastronomía → El system prompt limita a Gemini al dominio culinario. El asistente responde educadamente que solo puede ayudar con temas de cocina y alimentación.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MÓDULO 7 — COLECCIÓN Y PERFIL DE USUARIO              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="seccion-titulo">7. Colección y Perfil de Usuario</div>
+
+<!-- CU-30 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-30 — Ver colección de recetas guardadas</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-30</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver colección de recetas guardadas</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista que agrupa todas las recetas marcadas como guardadas por el usuario. Funciona como una biblioteca personal de recetas favoritas de otros autores. Desde aquí se puede navegar al detalle de cada receta o eliminarla de la colección.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede a la sección de colección dentro de su perfil.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra la cuadrícula de recetas que el usuario ha guardado previamente mediante CU-17.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario accede a su perfil (<code>/perfil</code>) y selecciona la pestaña <em>Guardadas</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>TanStack Query lanza <code>GET /api/recetas/guardadas</code> con el token de sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend devuelve el array de recetas guardadas con sus datos básicos (foto, título, autor, likes). Renderiza la cuadrícula de tarjetas con skeleton loaders durante la carga.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa una tarjeta de receta.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega al detalle de la receta (CU-15).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no ha guardado ninguna receta todavía → Muestra estado vacío: <em>«Aún no tienes recetas guardadas»</em> con botón que lleva al feed para explorar.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>Una receta guardada fue eliminada por su autor → La referencia huérfana se filtra en el backend. La receta no aparece en la colección.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-31 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-31 — Eliminar receta de la colección personal</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-31</td></tr>
+    <tr><td class="campo">Nombre</td><td>Eliminar receta de la colección personal</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite desmarcar una receta guardada directamente desde la vista de colección. Es el equivalente a ejecutar el toggle de CU-17 en sentido inverso, pero con acceso contextual desde la lista de guardadas.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario está en la vista de colección y tiene al menos una receta guardada.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>La referencia de la receta queda eliminada de la colección del usuario en MongoDB. La receta original no se ve afectada. El estado del icono de guardado (bookmark) de esa receta pasa a inactivo en cualquier vista.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media-alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario mantiene pulsada una tarjeta o pulsa el menú contextual de la receta en la colección.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra la opción <em>Quitar de guardados</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario confirma la acción.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Elimina la tarjeta de la cuadrícula local de forma optimista con animación de salida.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>DELETE /api/recetas/[id]/guardar</code>. Invalida las queries de colección y del detalle de la receta para sincronizar el estado del bookmark.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Error en la petición al servidor → Revierte la eliminación optimista. La tarjeta reaparece en la cuadrícula. Muestra toast de error.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-32 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-32 — Ver perfil propio con estadísticas</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-32</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver perfil propio con estadísticas</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista del perfil personal del usuario autenticado. Muestra avatar, nombre, username, biografía, preferencias dietéticas y un resumen de estadísticas (recetas publicadas, me gustas recibidos totales, recetas guardadas). Incluye pestañas para ver las recetas propias y las guardadas.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede a <code>/perfil</code>.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra la información completa del perfil del usuario: datos personales, estadísticas de actividad y las recetas que ha publicado.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario navega a <code>/perfil</code> desde la navbar.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Lanza en paralelo: <code>GET /api/usuarios/me</code> (datos del perfil) y <code>GET /api/recetas?autor=me</code> (recetas publicadas).</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza el bloque de cabecera: avatar, nombre, username con prefijo <code>@</code>, biografía y badges de dieta.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra el panel de estadísticas: número de recetas publicadas, total de me gustas recibidos y número de recetas guardadas.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Carga la pestaña activa por defecto (<em>Mis recetas</em>) con la cuadrícula de recetas publicadas por el usuario.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">5</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cambia a la pestaña <em>Guardadas</em>.</td>
+      </tr>
+      <tr>
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Carga CU-30 (colección personal).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario no ha publicado ninguna receta → La pestaña <em>Mis recetas</em> muestra estado vacío con acceso directo a CU-13.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-33 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-33 — Editar información del perfil</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-33</td></tr>
+    <tr><td class="campo">Nombre</td><td>Editar información del perfil</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite al usuario modificar los datos de su perfil: nombre visible, username, biografía, foto de avatar, preferencias dietéticas y alérgenos. Reutiliza el recortador de imagen del flujo de onboarding (CU-06).</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede a la pantalla de edición de perfil.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Los cambios quedan guardados en MongoDB. El perfil visible en CU-32 y CU-34 refleja los datos actualizados. El token de sesión de NextAuth se actualiza si cambia el nombre o el avatar.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Editar perfil</em> en la vista de perfil (<code>/perfil/editar</code>).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Carga el formulario precargado con los datos actuales del usuario obtenidos de <code>GET /api/usuarios/me</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario modifica los campos deseados.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Valida en tiempo real: formato de username (alfanumérico, sin espacios), longitud de biografía (máx. 160 caracteres), disponibilidad de username con debounce.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>Opcionalmente, el usuario sube una nueva foto de avatar.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Abre el recortador de imagen. El usuario ajusta el encuadre y confirma.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Guardar cambios</em>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>PUT /api/usuarios/me</code> con los campos modificados. Actualiza el documento del usuario en MongoDB.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>Si cambió el nombre o el avatar, llama a <code>update()</code> de NextAuth para refrescar el token de sesión con los nuevos datos. Muestra toast de confirmación y regresa a <code>/perfil</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El nuevo username ya está en uso por otro usuario → Muestra indicador de no disponible en tiempo real. El botón <em>Guardar</em> permanece deshabilitado.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cancela sin guardar → Redirige a <code>/perfil</code> sin modificar ningún dato.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-34 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-34 — Ver perfil público de otro usuario</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-34</td></tr>
+    <tr><td class="campo">Nombre</td><td>Ver perfil público de otro usuario</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Vista de perfil de solo lectura de otro usuario de la plataforma. Muestra los datos que el autor ha hecho públicos: avatar, nombre, username, biografía, estadísticas públicas y cuadrícula de recetas publicadas.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede al perfil de otro usuario pulsando su nombre o avatar en el detalle de una receta o en un comentario.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Se muestra el perfil público del usuario visitado con sus datos visibles y sus recetas publicadas. No se exponen datos privados (email, alérgenos, colección).</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa el nombre o avatar de otro usuario en el detalle de una receta o comentario.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega a <code>/perfil/[username]</code>. Lanza <code>GET /api/usuarios/[username]/publico</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend devuelve solo los campos públicos: nombre, username, avatar, biografía, número de recetas, total de likes recibidos. Omite email, alérgenos, colección y otros datos privados.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Renderiza el perfil con la cabecera del usuario y la cuadrícula de sus recetas publicadas. No muestra los controles de edición ni el botón de cerrar sesión.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa una receta del perfil visitado.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Navega al detalle de la receta (CU-15).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El username visitado no existe en la plataforma → Devuelve la página 404 de la aplicación.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>El usuario visita su propio perfil mediante la URL directa con su username → Redirige automáticamente a <code>/perfil</code> para mostrar la vista de perfil propio con todos los controles disponibles.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-35 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-35 — Gestionar permisos y privacidad de la cuenta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-35</td></tr>
+    <tr><td class="campo">Nombre</td><td>Gestionar permisos y privacidad de la cuenta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Permite al usuario configurar la visibilidad de su perfil (público o privado), los permisos de notificación y otras preferencias de cuenta. Accesible desde el menú de ajustes dentro de la sección de perfil.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y accede a la sección de ajustes o configuración dentro del perfil.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Las preferencias de privacidad y permisos quedan guardadas en MongoDB y aplicadas de inmediato a la visibilidad del perfil y las notificaciones.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario accede a <em>Ajustes</em> o <em>Configuración</em> desde la vista de perfil.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra la pantalla de ajustes con las opciones agrupadas por categoría: privacidad, notificaciones, cuenta.</td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cambia la visibilidad del perfil (público / privado).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el toggle de forma inmediata en la UI.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario activa o desactiva notificaciones (nuevos comentarios, likes, sugerencias de la IA).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Registra las preferencias en el store local.</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Guardar</em> o los cambios se autoguardan.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía <code>PUT /api/usuarios/me/preferencias</code> con las preferencias actualizadas. Aplica los cambios de visibilidad: si el perfil pasa a privado, su perfil deja de aparecer en búsquedas públicas.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario activa el perfil privado teniendo recetas publicadas → Sus recetas dejan de aparecer en el feed y en los resultados de búsqueda de otros usuarios. El usuario recibe aviso informativo antes de confirmar.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-36 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-36 — Cerrar sesión desde el perfil</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-36</td></tr>
+    <tr><td class="campo">Nombre</td><td>Cerrar sesión desde el perfil</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-02 — Usuario Registrado</td></tr>
+    <tr><td class="campo">Descripción</td><td>Acción de cierre de sesión accesible desde la pantalla de perfil o ajustes. Ejecuta el mismo flujo que CU-07 (signOut de NextAuth) pero con el punto de entrada contextualizado en la gestión de la cuenta personal.</td></tr>
+    <tr><td class="campo">Precondición</td><td>El usuario tiene sesión activa y está en la sección de perfil o ajustes.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>Sesión destruida. Cookie de NextAuth eliminada. Estado global del cliente limpiado. Usuario redirigido a <code>/login</code>. Equivalente funcional a CU-07, con punto de entrada desde el perfil.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Media</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario pulsa <em>Cerrar sesión</em> en la sección de perfil o ajustes.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Muestra diálogo de confirmación: <em>«¿Seguro que quieres cerrar sesión?»</em></td>
+      </tr>
+      <tr>
+        <td class="col-num">2</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario confirma.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>Invoca <code>signOut({ callbackUrl: '/login' })</code> de NextAuth. Elimina la cookie <code>next-auth.session-token</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Limpia el caché de TanStack Query y los stores de Zustand (datos de usuario, despensa, preferencias en memoria). Redirige a <code>/login</code>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario cancela el diálogo → No se realiza ninguna acción. El usuario permanece en la sección de perfil con la sesión activa.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MÓDULO 8 — SERVICIOS EXTERNOS E INTEGRACIONES         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="seccion-titulo">8. Servicios Externos e Integraciones</div>
+
+<!-- CU-37 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-37 — Detección automática de alérgenos en receta</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-37</td></tr>
+    <tr><td class="campo">Nombre</td><td>Detección automática de alérgenos en receta</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-04 — Sistema</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-02 — Usuario Registrado (desencadena el proceso al crear o editar una receta)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Servicio interno que analiza automáticamente los ingredientes de una receta para identificar alérgenos alimentarios conocidos. Se ejecuta de forma síncrona durante la creación o actualización de una receta, sin intervención del usuario. La lógica reside en <code>detectarAlergenos.ts</code>, que cruza los nombres de los ingredientes contra un mapa estático de términos asociados a cada alérgeno.</td></tr>
+    <tr><td class="campo">Precondición</td><td>Se está procesando una receta (CU-13 o CU-19) y el documento contiene una lista de ingredientes con al menos un nombre de ingrediente.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El campo <code>alergenos</code> del documento de receta en MongoDB queda poblado con el array de alérgenos detectados según la nomenclatura de los 14 alérgenos de declaración obligatoria establecidos por el Reglamento UE 1169/2011. Los alérgenos se muestran como badges en el detalle de la receta.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta — requisito de seguridad alimentaria</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Cada vez que se crea o actualiza una receta</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Sistema</td>
+        <td>El backend recibe la petición de creación (<code>POST /api/recetas</code>) o actualización (<code>PATCH /api/recetas/[id]</code>) con la lista de ingredientes. Extrae el array de nombres de ingredientes del cuerpo de la petición.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Invoca <code>detectarAlergenos(ingredientes: string[])</code>. La función normaliza los nombres (minúsculas, sin tildes) y los compara contra el mapa de términos de cada uno de los 14 alérgenos: gluten, crustáceos, huevos, pescado, cacahuetes, soja, leche, frutos de cáscara, apio, mostaza, sésamo, sulfitos, altramuces y moluscos.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Devuelve el array de identificadores de alérgenos detectados (p. ej. <code>['gluten', 'leche', 'huevos']</code>).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>El resultado se incluye en el documento de receta como el campo <code>alergenos</code> antes de persistir en MongoDB.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Sistema</td>
+        <td>El frontend recibe la receta guardada. El componente <code>AlérgenosReceta</code> en el detalle de la receta renderiza los badges de alérgenos detectados con su icono y nombre correspondiente.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Ningún ingrediente coincide con términos del mapa de alérgenos → El campo <code>alergenos</code> se guarda como array vacío. El detalle de la receta no muestra badges de alérgenos.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>Un ingrediente tiene nombre ambiguo o abreviado que no está en el mapa → No se detecta el alérgeno. El sistema muestra un aviso en el detalle de la receta recomendando al autor revisar manualmente los alérgenos.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-38 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-38 — Consulta de información nutricional (Edamam)</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-38</td></tr>
+    <tr><td class="campo">Nombre</td><td>Consulta de información nutricional (Edamam)</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-04 — Sistema (Edamam Nutrition Analysis API)</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-02 — Usuario Registrado (visualiza los datos)</td></tr>
+    <tr><td class="campo">Descripción</td><td>Integración con la Edamam Nutrition Analysis API que calcula automáticamente los valores nutricionales de una receta a partir de sus ingredientes con cantidades. Se ejecuta de forma asíncrona tras la publicación de la receta para no bloquear la respuesta al usuario. Planificado para Fase 6 del proyecto.</td></tr>
+    <tr><td class="campo">Precondición</td><td>La receta ha sido publicada con lista de ingredientes que incluyen nombre, cantidad y unidad. Las variables <code>EDAMAM_APP_ID</code> y <code>EDAMAM_APP_KEY</code> están configuradas en el entorno del backend.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El documento de receta en MongoDB queda enriquecido con el campo <code>nutricion</code> que incluye calorías totales, proteínas, hidratos de carbono y grasas por porción. Los datos se muestran en el detalle de la receta.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Media — funcionalidad de valor añadido</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Una vez por receta al publicar o actualizar ingredientes</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Sistema</td>
+        <td>La receta es publicada correctamente (CU-13) y devuelta al cliente. El backend encola una tarea asíncrona para calcular la información nutricional sin bloquear la respuesta.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Construye el payload para Edamam: lista de ingredientes con formato <code>«cantidad unidad nombre»</code> (p. ej. <em>«200g harina de trigo»</em>). Envía <code>POST https://api.edamam.com/api/nutrition-details</code> con las credenciales <code>app_id</code> y <code>app_key</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Edamam procesa la solicitud y devuelve el análisis nutricional completo. Extrae los valores relevantes: calorías (kcal), proteínas (g), hidratos de carbono (g), grasas (g) y fibra (g) por porción (total dividido entre el número de raciones).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Actualiza el documento de receta en MongoDB con el campo <code>nutricion</code>. El componente de detalle de receta muestra la tabla nutricional al usuario.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-alternativo">FLUJOS ALTERNATIVOS</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FA-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>Edamam no reconoce alguno de los ingredientes → Devuelve el análisis parcial con los ingredientes que sí reconoció. El sistema guarda los datos disponibles e indica en la receta que el cálculo es aproximado.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FA-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La cuota de la API de Edamam se agota → Las nuevas recetas publicadas se encolan para su análisis nutricional cuando la cuota se renueve. Las recetas sin datos nutricionales se muestran con un aviso <em>«Información nutricional no disponible»</em>.</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>La API de Edamam no está configurada o devuelve error → El campo <code>nutricion</code> permanece nulo. El detalle de la receta no muestra la sección nutricional. No se interrumpe la publicación de la receta.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CU-39 -->
+<div class="caso-de-uso">
+  <div class="cu-banda">CU-39 — Envío de email transaccional (Gmail SMTP)</div>
+  <table class="tabla-cabecera">
+    <tr><td class="campo">Identificador</td><td>CU-39</td></tr>
+    <tr><td class="campo">Nombre</td><td>Envío de email transaccional (Gmail SMTP)</td></tr>
+    <tr><td class="campo">Versión</td><td>1.0</td></tr>
+    <tr><td class="campo">Autor</td><td>Alejandro Hernández González</td></tr>
+    <tr><td class="campo">Actor principal</td><td>ACT-04 — Sistema (Gmail SMTP via Nodemailer)</td></tr>
+    <tr><td class="campo">Actores secundarios</td><td>ACT-01 / ACT-02 — Usuario destinatario del email</td></tr>
+    <tr><td class="campo">Descripción</td><td>Servicio transversal de envío de emails del sistema. Utiliza Nodemailer con el proveedor Gmail SMTP autenticado mediante App Password. Se encarga del envío de todos los emails generados por la plataforma: verificación de cuenta, recuperación de contraseña y futuras notificaciones. Cada tipo de email usa una plantilla HTML independiente.</td></tr>
+    <tr><td class="campo">Precondición</td><td>Se ha producido un evento del sistema que requiere notificación por email: registro de cuenta (CU-01), solicitud de recuperación de contraseña (CU-05) o cualquier evento transaccional configurado. Las variables <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code> están presentes en el entorno del backend.</td></tr>
+    <tr><td class="campo">Postcondición</td><td>El email con el contenido correspondiente al evento ha sido enviado al buzón del usuario destinatario. El evento queda registrado en los logs del servidor.</td></tr>
+    <tr><td class="campo">Prioridad</td><td>Alta — bloquea los flujos de registro y recuperación</td></tr>
+    <tr><td class="campo">Frecuencia</td><td>Baja — solo en eventos de cuenta específicos</td></tr>
+  </table>
+  <table class="tabla-flujos">
+    <tbody>
+      <tr><td colspan="3" class="fh-principal">FLUJO PRINCIPAL</td></tr>
+      <tr>
+        <td class="col-num">1</td>
+        <td class="col-actor">Sistema</td>
+        <td>Un evento del sistema dispara la necesidad de enviar un email (p. ej. registro nuevo → verificación de cuenta). El servicio de email selecciona la plantilla HTML correspondiente al tipo de evento.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">2</td>
+        <td class="col-actor">Sistema</td>
+        <td>Construye el objeto de email: destinatario (<code>to</code>), asunto (<code>subject</code>), cuerpo HTML con los datos dinámicos del evento (nombre del usuario, enlace con token firmado, fecha de expiración).</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td class="col-actor">Sistema</td>
+        <td>Nodemailer establece la conexión SMTP con <code>smtp.gmail.com:465</code> usando las credenciales <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code>.</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num">4</td>
+        <td class="col-actor">Sistema</td>
+        <td>Envía el mensaje. Gmail SMTP devuelve confirmación de entrega con el <code>messageId</code>. El sistema registra el evento en los logs del servidor.</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td class="col-actor">Actor</td>
+        <td>El usuario recibe el email en su buzón y actúa sobre él (hace clic en el enlace de verificación o de reset).</td>
+      </tr>
+      <tr class="fila-par">
+        <td class="col-num"></td>
+        <td class="col-actor">Sistema</td>
+        <td>El flujo continúa en el caso de uso que originó el envío (CU-02 para verificación, CU-05 para reset de contraseña).</td>
+      </tr>
+      <tr><td colspan="3" class="fh-excepcion">FLUJOS DE EXCEPCIÓN</td></tr>
+      <tr class="fila-par">
+        <td class="col-num">FE-01</td>
+        <td class="col-actor">Sistema</td>
+        <td>El servidor SMTP rechaza la conexión o las credenciales → Nodemailer lanza excepción. El backend registra el error en los logs y, si el evento lo permite (p. ej. registro), continúa el flujo principal indicando al usuario que el email no pudo enviarse, con opción de reenvío manual.</td>
+      </tr>
+      <tr>
+        <td class="col-num">FE-02</td>
+        <td class="col-actor">Sistema</td>
+        <td>La dirección de destino no existe o el buzón está lleno → Gmail devuelve un error de entrega (bounce). El sistema registra el fallo. En futuros envíos al mismo email puede mostrar un aviso al usuario para que compruebe su dirección.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLA RESUMEN FINAL                                    -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="seccion-titulo" style="page-break-before: always;">Resumen de Casos de Uso</div>
+
+<table class="tabla-cabecera" style="margin-bottom: 36px;">
+  <tr>
+    <td class="campo" style="width:12%;">Módulo</td>
+    <td class="campo" style="width:15%;">CU</td>
+    <td class="campo" style="width:48%;">Nombre</td>
+    <td class="campo" style="width:25%;">Estado</td>
+  </tr>
+  <tr><td class="campo" rowspan="7" style="vertical-align:middle; text-align:center;">2<br>Autenticación</td>
+      <td>CU-01</td><td>Registrarse con email y contraseña</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-02</td><td>Verificar cuenta por email</td><td>Implementado</td></tr>
+  <tr><td>CU-03</td><td>Iniciar sesión con credenciales</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-04</td><td>Iniciar sesión con Google OAuth</td><td>Implementado</td></tr>
+  <tr><td>CU-05</td><td>Recuperar contraseña olvidada</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-06</td><td>Completar perfil de usuario (onboarding)</td><td>Implementado</td></tr>
+  <tr><td>CU-07</td><td>Cerrar sesión</td><td>Implementado</td></tr>
+
+  <tr><td class="campo" rowspan="5" style="vertical-align:middle; text-align:center;">3<br>Navegación<br>y Feed</td>
+      <td>CU-08</td><td>Ver feed de recetas</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-09</td><td>Buscar recetas por nombre o ingrediente</td><td>Implementado</td></tr>
+  <tr><td>CU-10</td><td>Filtrar recetas por categoría, dieta o tiempo</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-11</td><td>Cambiar tema de la interfaz (claro / oscuro)</td><td>Implementado</td></tr>
+  <tr><td>CU-12</td><td>Activar modo manos libres al cocinar</td><td>Pendiente — Sprint 8</td></tr>
+
+  <tr><td class="campo" rowspan="8" style="vertical-align:middle; text-align:center;">4<br>Gestión de<br>Recetas</td>
+      <td>CU-13</td><td>Crear receta con formulario multi-paso</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-14</td><td>Ver tutorial de creación de receta</td><td>Implementado</td></tr>
+  <tr><td>CU-15</td><td>Ver detalle de una receta</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-16</td><td>Dar me gusta a una receta</td><td>Implementado</td></tr>
+  <tr><td>CU-17</td><td>Guardar receta en la colección personal</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-18</td><td>Comentar en una receta</td><td>Implementado</td></tr>
+  <tr><td>CU-19</td><td>Editar receta propia</td><td>Pendiente</td></tr>
+  <tr class="fila-par"><td>CU-20</td><td>Eliminar receta propia</td><td>Implementado</td></tr>
+
+  <tr><td class="campo" rowspan="5" style="vertical-align:middle; text-align:center;">5<br>Gestión de<br>Despensa</td>
+      <td>CU-21</td><td>Ver despensa personal de ingredientes</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-22</td><td>Añadir ingrediente a la despensa</td><td>Implementado</td></tr>
+  <tr><td>CU-23</td><td>Eliminar ingrediente de la despensa</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-24</td><td>Modificar cantidad de un ingrediente</td><td>Implementado</td></tr>
+  <tr><td>CU-25</td><td>Ver recetas posibles con la despensa actual</td><td>Pendiente</td></tr>
+
+  <tr><td class="campo" rowspan="4" style="vertical-align:middle; text-align:center;">6<br>Chat IA</td>
+      <td>CU-26</td><td>Iniciar conversación con el asistente culinario</td><td>Parcial — FE mock</td></tr>
+  <tr class="fila-par"><td>CU-27</td><td>Enviar mensaje y recibir respuesta de la IA</td><td>Parcial — FE mock</td></tr>
+  <tr><td>CU-28</td><td>Ver historial de conversaciones anteriores</td><td>Pendiente</td></tr>
+  <tr class="fila-par"><td>CU-29</td><td>Obtener sugerencias de recetas personalizadas</td><td>Pendiente</td></tr>
+
+  <tr><td class="campo" rowspan="7" style="vertical-align:middle; text-align:center;">7<br>Colección<br>y Perfil</td>
+      <td>CU-30</td><td>Ver colección de recetas guardadas</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-31</td><td>Eliminar receta de la colección personal</td><td>Implementado</td></tr>
+  <tr><td>CU-32</td><td>Ver perfil propio con estadísticas</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-33</td><td>Editar información del perfil</td><td>Implementado</td></tr>
+  <tr><td>CU-34</td><td>Ver perfil público de otro usuario</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-35</td><td>Gestionar permisos y privacidad de la cuenta</td><td>Implementado</td></tr>
+  <tr><td>CU-36</td><td>Cerrar sesión desde el perfil</td><td>Implementado</td></tr>
+
+  <tr><td class="campo" rowspan="3" style="vertical-align:middle; text-align:center;">8<br>Servicios<br>Externos</td>
+      <td>CU-37</td><td>Detección automática de alérgenos en receta</td><td>Implementado</td></tr>
+  <tr class="fila-par"><td>CU-38</td><td>Consulta de información nutricional (Edamam)</td><td>Fase futura</td></tr>
+  <tr><td>CU-39</td><td>Envío de email transaccional (Gmail SMTP)</td><td>Implementado</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- INSTRUCCIONES PDF                                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="instrucciones-pdf" style="margin-top: 48px; padding: 20px; border: 1px solid #d1d5db; background: #f9fafb; font-size: 10pt;">
+  <p style="font-weight: bold; color: #1c3d5a; margin-bottom: 10px;">Instrucciones para generar el PDF</p>
+  <ol style="margin-left: 20px; line-height: 2;">
+    <li>Abrir este archivo en Google Chrome o Microsoft Edge.</li>
+    <li>Pulsar <strong>Ctrl + P</strong> (Windows) o <strong>Cmd + P</strong> (macOS).</li>
+    <li>Seleccionar <em>Guardar como PDF</em> como destino.</li>
+    <li>En <em>Más ajustes</em>: tamaño A4, márgenes predeterminados, activar <em>Gráficos de fondo</em>.</li>
+    <li>Pulsar <em>Guardar</em>.</li>
+  </ol>
+</div>
+
+<!-- Cierre del documento -->
+<div style="text-align: center; margin-top: 48px; padding: 24px 0; border-top: 1px solid #e5e7eb;">
+  <p style="font-size: 10pt; color: #6b7280; margin-bottom: 6px;">
+    Especificación de Casos de Uso — Cookr — Versión 1.0
+  </p>
+  <p style="font-size: 9.5pt; color: #9ca3af;">
+    39 casos de uso &nbsp;·&nbsp; 8 módulos &nbsp;·&nbsp; Alejandro Hernández González &nbsp;·&nbsp; 21 de mayo de 2026
+  </p>
+  <div style="margin-top: 16px; width: 40px; height: 3px; background: #b45309; margin-left: auto; margin-right: auto;"></div>
+</div>
+
+</body>
+</html>
+
+</html>

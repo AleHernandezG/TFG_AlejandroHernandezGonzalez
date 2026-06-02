@@ -1,8 +1,20 @@
+import { apiClient } from './apiClient'
 import type { DatoIngrediente } from '@/config/ingredientes'
 
 export const ingredientesService = {
-  buscarEdamam: async (_query: string): Promise<DatoIngrediente[]> => {
-    // TODO Fase 6: llamada real a Edamam Food Database API
-    return []
+  async buscarEdamam(query: string): Promise<DatoIngrediente[]> {
+    try {
+      const { data } = await apiClient.get<string[]>('/ingredientes/buscar', {
+        params: { q: query },
+      })
+      return (data ?? []).map((nombre) => ({
+        nombre,
+        aliases: [],
+        alergenos: [],
+        categoria: 'otros' as const,
+      }))
+    } catch {
+      return []
+    }
   },
 }

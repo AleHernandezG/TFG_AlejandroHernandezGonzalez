@@ -56,7 +56,7 @@
 
 <header>
   <h1>Funcionalidad Social — Likes, Comentarios, Seguir, Feed</h1>
-  <p>Sprint 4 · 2026-05-03 · Tareas FEED-001 / LIKE-001 / COM-001 / SOC-001 — BE + FE completados</p>
+  <p>Actualizado: 2026-05-31 · Sprint 5 · DET-004 ✅ completado (paginación de comentarios + infinite scroll)</p>
 </header>
 
 <nav>
@@ -410,6 +410,124 @@ async function handleCompartir() {
           </tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- DET-004 — Paginación de comentarios -->
+  <section id="det004">
+    <div class="section-header">
+      <span>💬</span>
+      <h2>DET-004 — Paginación de comentarios con infinite scroll <span class="badge done">✅ Sprint 5</span></h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <h3>Problema original</h3>
+        <p>Todos los comentarios de una receta llegaban por SSR embebidos en <code>RecetaDetalle.listaComentarios[]</code>. El Sheet de "Ver todos" simplemente mostraba ese array completo sin paginación. Para recetas con muchos comentarios esto generaba respuestas SSR grandes innecesariamente.</p>
+      </div>
+
+      <div>
+        <h3>Endpoint nuevo — BE</h3>
+        <pre>GET /api/recetas/:id/comentarios?pagina=1&limite=8
+
+Respuesta:
+{
+  comentarios: [{ autorNombre, avatarUrl, texto, fecha }],
+  total: number,
+  hayMas: boolean
+}
+
+Auth: optionalAuth (comentarios son públicos)
+Orden: más recientes primero (.slice().reverse() del subdocumento)</pre>
+
+        <h3>Capas BE modificadas</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>recetaRepository.ts</td><td>Añadido <code>findComentarios(id, pagina, limite)</code> — slice del array embebido en Mongoose, reversed, paginado en memoria</td></tr>
+            <tr><td>recetasService.ts</td><td>Añadido <code>obtenerComentarios(id, pagina, limite)</code> — delegación directa al repository</td></tr>
+            <tr><td>recetasController.ts</td><td>Añadido <code>obtenerComentarios()</code> — parsea query params con defaults (pagina=1, limite=8, máx 20)</td></tr>
+            <tr><td>recetas.routes.ts</td><td>Añadida ruta <code>GET /:id/comentarios</code> con <code>optionalAuth</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Hook FE — useComentarios.ts</h3>
+        <pre>// frontend/src/features/recetas/hooks/useComentarios.ts
+useInfiniteQuery({
+  queryKey: ['comentarios', recetaId],
+  queryFn: ({ pageParam }) => recetasService.obtenerComentarios(recetaId, pageParam),
+  getNextPageParam: (lastPage, allPages) =>
+    lastPage.hayMas ? allPages.length + 1 : undefined,
+  initialPageParam: 1,
+  staleTime: 0,
+})</pre>
+
+        <p>También exporta <code>useInvalidarComentarios(recetaId)</code> — wrapper de <code>queryClient.invalidateQueries</code> que se llama en <code>onSuccess</code> al añadir un comentario.</p>
+      </div>
+
+      <div>
+        <h3>Componente — comentariosReceta.tsx</h3>
+        <table>
+          <thead><tr><th>Zona</th><th>Datos usados</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td>Preview (fuera del Sheet)</td><td><code>[...nuevos, ...comentariosSSR].slice(0,3)</code></td><td>Renderizado instantáneo desde SSR, sin esperar la query</td></tr>
+            <tr><td>Sheet interior</td><td>Solo <code>data?.pages.flatMap(p => p.comentarios)</code></td><td>Evita duplicados: el array <code>nuevos</code> queda fuera para que al invalidar la query no aparezca dos veces</td></tr>
+            <tr><td>Nuevo comentario</td><td>Prepend a <code>nuevos</code> (optimista) → <code>invalidar()</code> en onSuccess</td><td>Feedback inmediato + refresco de la query para el Sheet</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Infinite scroll — IntersectionObserver</h3>
+        <p>Un <code>div</code> sentinel al final de la lista del Sheet es observado con <code>IntersectionObserver (threshold: 0.1)</code>. Cuando entra en viewport y hay más páginas disponibles, se llama <code>fetchNextPage()</code> automáticamente. Mientras carga aparecen 2 skeletons con la anatomía real del comentario. Cuando no hay más páginas se muestra "Has visto todos los comentarios".</p>
+
+        <div class="flow">
+          <span class="flow-node">usuario scrollea al final</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">sentinel entra en viewport</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">fetchNextPage()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">GET /comentarios?pagina=N</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">skeletons → nuevos items</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>UX / Affordance — Sheet rediseñado</h3>
+        <ul>
+          <li><strong>Handle visual</strong> (pastilla gris) en la parte superior — señal táctil estándar de bottom sheet (iOS/Android)</li>
+          <li><strong>Título centrado</strong> con total de comentarios — patrón Instagram</li>
+          <li><strong>Input de comentario dentro del Sheet</strong> — el usuario no necesita cerrarlo para comentar</li>
+          <li><strong>Skeletons con anatomía real</strong> (círculo avatar + líneas de texto) en lugar de bloques genéricos</li>
+          <li><strong>CTA secundario</strong> bajo la preview: "Ver los N comentarios" (texto gris) — refuerza que hay más sin interrumpir el flujo</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Decisión: paginación en memoria vs query MongoDB</h3>
+        <p>Los comentarios se almacenan como subdocumento embebido en el documento Receta (<code>listaComentarios[]</code>). MongoDB no tiene slice nativo eficiente en subdocumentos con paginación + orden inverso, y el volumen esperado (decenas, raramente centenas) no justifica una colección separada. Se opta por cargar el documento completo y paginar en Node con <code>.slice().reverse()</code>. Si en el futuro los comentarios superan los 500 por receta, se migrará a colección propia con índice de fecha.</p>
+      </div>
+
+      <div>
+        <h3>Archivos modificados</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Capa</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>backend/src/repositories/recetaRepository.ts</td><td><span class="badge be">BE</span></td><td>findComentarios()</td></tr>
+            <tr><td>backend/src/services/recetasService.ts</td><td><span class="badge be">BE</span></td><td>obtenerComentarios()</td></tr>
+            <tr><td>backend/src/controllers/recetasController.ts</td><td><span class="badge be">BE</span></td><td>obtenerComentarios()</td></tr>
+            <tr><td>backend/src/routes/recetas.routes.ts</td><td><span class="badge be">BE</span></td><td>GET /:id/comentarios</td></tr>
+            <tr><td>frontend/src/services/recetasService.ts</td><td><span class="badge fe">FE</span></td><td>obtenerComentarios()</td></tr>
+            <tr><td>frontend/src/features/recetas/hooks/useComentarios.ts</td><td><span class="badge fe">FE</span></td><td>Nuevo — useInfiniteQuery + useInvalidarComentarios</td></tr>
+            <tr><td>frontend/src/features/recetas/components/detalleReceta/comentariosReceta.tsx</td><td><span class="badge fe">FE</span></td><td>Infinite scroll, fix duplicados, Sheet rediseñado</td></tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </section>
 

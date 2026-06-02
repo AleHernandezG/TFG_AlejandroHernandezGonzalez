@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import { Eye, EyeOff, Loader2, ChefHat, AlertCircle } from "lucide-react";
 
@@ -21,13 +20,11 @@ import {
 
 import { BotonGoogle } from "./botonGoogle";
 import { DivisorOAuth } from "./divisorOAuth";
+import { useAuth } from "@/features/auth/hooks";
 import {
   esquemaRegistro,
   type DatosRegistro,
-  type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
-import { authService } from "@/services/authService";
-import axios from "axios";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -55,11 +52,9 @@ const variantesCampo: Variants = {
 // ─── Componente ─────────────────────────────────────────────────────────────
 
 export function FormularioRegistro() {
-  const router = useRouter();
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-  const [estadoEnvio, setEstadoEnvio] = useState<EstadoFormulario>("idle");
-  const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const { registrar, cargando, error } = useAuth();
 
   const {
     register,
@@ -67,40 +62,11 @@ export function FormularioRegistro() {
     formState: { errors },
   } = useForm<DatosRegistro>({
     resolver: zodResolver(esquemaRegistro),
-    defaultValues: {
-      nombre: "",
-      correo: "",
-      contrasena: "",
-      confirmarContrasena: "",
-    },
+    defaultValues: { nombre: "", correo: "", contrasena: "", confirmarContrasena: "" },
   });
 
-  const alEnviar = async (datos: DatosRegistro) => {
-    setEstadoEnvio("cargando");
-    setMensajeError(null);
-
-    try {
-      await authService.registro({
-        nombre: datos.nombre,
-        correo: datos.correo,
-        contrasena: datos.contrasena,
-        // confirmarContrasena no se envía al backend — ya validado por Zod
-      });
-      router.push(`/verificar-email/pendiente?email=${encodeURIComponent(datos.correo)}`);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const msg = error.response?.data?.error;
-        setMensajeError(
-          msg === "Este correo ya está registrado"
-            ? "Este correo ya tiene una cuenta. ¿Quieres iniciar sesión?"
-            : "No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos."
-        );
-      } else {
-        setMensajeError("No se pudo crear la cuenta. Inténtalo de nuevo en unos segundos.");
-      }
-      setEstadoEnvio("error");
-    }
-  };
+  const alEnviar = (datos: DatosRegistro) =>
+    registrar(datos.nombre, datos.correo, datos.contrasena);
 
   // ── Formulario ─────────────────────────────────────────────────────────────
   return (
@@ -137,7 +103,7 @@ export function FormularioRegistro() {
           <DivisorOAuth />
 
           {/* Error global */}
-          {estadoEnvio === "error" && mensajeError && (
+          {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -145,7 +111,7 @@ export function FormularioRegistro() {
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              {mensajeError}
+              {error}
             </motion.div>
           )}
 
@@ -266,9 +232,9 @@ export function FormularioRegistro() {
               <Button
                 type="submit"
                 className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
-                disabled={estadoEnvio === "cargando"}
+                disabled={cargando}
               >
-                {estadoEnvio === "cargando" ? (
+                {cargando ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
                     Creando cuenta…

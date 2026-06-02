@@ -21,10 +21,8 @@ import {
 import {
   esquemaNuevaContrasena,
   type DatosNuevaContrasena,
-  type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
-import { authService } from "@/services/authService";
-import axios from "axios";
+import { useAuth } from "@/features/auth/hooks";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -61,8 +59,8 @@ interface Props {
 export function FormularioNuevaContrasena({ token }: Props) {
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-  const [estadoEnvio, setEstadoEnvio] = useState<EstadoFormulario>("idle");
-  const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const [exito, setExito] = useState(false);
+  const { nuevaContrasena, cargando, error } = useAuth();
 
   const {
     register,
@@ -74,30 +72,11 @@ export function FormularioNuevaContrasena({ token }: Props) {
   });
 
   const alEnviar = async (datos: DatosNuevaContrasena) => {
-    setEstadoEnvio("cargando");
-    setMensajeError(null);
-
-    try {
-      await authService.nuevaContrasena({
-        token, // prop recibida del padre (query string ?token=...)
-        contrasena: datos.contrasena,
-      });
-      setEstadoEnvio("exito");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const msg = error.response?.data?.error;
-        setMensajeError(
-          msg ?? "No se pudo cambiar la contraseña. El enlace puede haber expirado."
-        );
-      } else {
-        setMensajeError("No se pudo cambiar la contraseña. El enlace puede haber expirado.");
-      }
-      setEstadoEnvio("error");
-    }
+    const ok = await nuevaContrasena(token, datos.contrasena)
+    if (ok) setExito(true)
   };
 
-  // ── Estado éxito ────────────────────────────────────────────────────────────
-  if (estadoEnvio === "exito") {
+  if (exito) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -164,7 +143,7 @@ export function FormularioNuevaContrasena({ token }: Props) {
 
         <CardContent className="space-y-5">
           {/* Error global */}
-          {estadoEnvio === "error" && mensajeError && (
+          {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -172,7 +151,7 @@ export function FormularioNuevaContrasena({ token }: Props) {
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              {mensajeError}
+              {error}
             </motion.div>
           )}
 
@@ -255,9 +234,9 @@ export function FormularioNuevaContrasena({ token }: Props) {
               <Button
                 type="submit"
                 className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
-                disabled={estadoEnvio === "cargando"}
+                disabled={cargando}
               >
-                {estadoEnvio === "cargando" ? (
+                {cargando ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
                     Guardando contraseña…

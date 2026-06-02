@@ -447,10 +447,86 @@ useEffect(() => {
 }, [router])   // no depende de datos — nunca re-dispara al limpiar</pre>
 </section>
 
+<!-- ── Sprint 6: Editar receta (A4) ── -->
+<section id="editar-receta">
+  <h2>Sprint 6 · A4 — Editar receta propia</h2>
+  <p>Activa el botón "Editar receta" (antes <code>disabled</code>) en <code>tarjetaColeccion.tsx</code>. El flujo navega a <code>/editar-receta/[id]</code> donde el formulario aparece pre-rellenado con los datos actuales.</p>
+
+  <h3>Backend</h3>
+  <table>
+    <tr><th>Endpoint</th><th>Auth</th><th>Descripción</th></tr>
+    <tr><td><code>PUT /api/recetas/:id</code></td><td>requerirAuth</td><td>Valida autoría (403 si no es el autor). <code>$set</code> parcial de los campos presentes en el body.</td></tr>
+  </table>
+  <p>Archivos BE: <code>recetaRepository.actualizar()</code> · <code>recetasService.actualizar()</code> · <code>recetasController.actualizar()</code> · <code>recetas.routes.ts</code>.</p>
+
+  <h3>Frontend</h3>
+  <ul>
+    <li><code>recetasService.actualizar(id, datos, token)</code> → <code>PUT /recetas/:id</code></li>
+    <li><code>useEditarReceta(recetaId)</code> hook → invalida <code>['coleccion','mis-recetas']</code> y <code>['recetas', recetaId]</code> en onSuccess</li>
+    <li><code>FormularioEditarReceta</code> → reutiliza <code>SeccionIngredientes</code>, <code>SeccionPasos</code>, <code>SeccionAlergenos</code>. Mapea <code>RecetaDetalle</code> a <code>defaultValues</code> del form (pasos:string[] → {texto:string}[], dificultad:"Fácil"→"facil", etc.)</li>
+    <li>Página <code>/editar-receta/[id]/page.tsx</code> → client component, verifica autoría antes de renderizar</li>
+    <li><code>tarjetaColeccion.tsx</code> → botón "Editar receta" con <code>router.push('/editar-receta/'+receta.id)</code></li>
+  </ul>
+</section>
+
+<!-- ── Sprint 6: Crear desde texto (C3) ── -->
+<section id="crear-desde-texto">
+  <h2>Sprint 6 · C3 — Crear receta desde descripción (Gemini)</h2>
+  <p>Botón "Crear desde descripción (IA)" en <code>/crear-receta</code>. Abre un diálogo con textarea. Al pulsar "Generar", Gemini devuelve un JSON que pre-rellena el formulario con <code>methods.reset(datos)</code>.</p>
+
+  <div style="background:#eab30811;border:1px solid #eab30833;border-radius:8px;padding:0.75rem 1rem;margin:0.75rem 0;font-size:0.82rem;color:#fbbf24">⚠️ Requiere <code>GEMINI_API_KEY</code> en <code>backend/.env</code>.</div>
+
+  <h3>Backend</h3>
+  <table>
+    <tr><th>Endpoint</th><th>Auth</th><th>Descripción</th></tr>
+    <tr><td><code>POST /api/recetas/generar-desde-texto</code></td><td>requerirAuth</td><td>Body: <code>{descripcion}</code>. Llama a <code>chatService.generarRecetaDesdeTexto()</code> → Gemini → JSON validado → devuelve objeto receta.</td></tr>
+  </table>
+
+  <h3>Frontend</h3>
+  <ul>
+    <li><code>recetasService.generarDesdeTexto(descripcion, token)</code></li>
+    <li><code>formularioCrearReceta.tsx</code>: botón Sparkles + Dialog con textarea + <code>methods.reset(generado)</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>INGR-002 / INGR-003 — Autocompletado de ingredientes mejorado</h2>
+
+  <h3>Qué había antes</h3>
+  <p>La lista local <code>frontend/src/config/ingredientes.ts</code> tenía 239 ingredientes. El fallback externo (<code>ingredientesService.buscarEdamam</code>) apuntaba a Edamam Food Database, que requería plan de pago y devolvía <code>[]</code> siempre.</p>
+
+  <h3>INGR-002 — Lista local expandida a ~991 ingredientes</h3>
+  <p>Se han añadido 752 ingredientes nuevos organizados en 18 categorías (nueva: <strong>preparados</strong>). La búsqueda local es instantánea y funciona sin ninguna API ni conexión a internet.</p>
+  <table style="width:100%;border-collapse:collapse;margin-top:.75rem">
+    <thead><tr style="border-bottom:2px solid var(--brand)"><th style="text-align:left;padding:.4rem .6rem;font-size:.8rem">Categoría</th><th style="text-align:left;padding:.4rem .6rem;font-size:.8rem">Items</th><th style="text-align:left;padding:.4rem .6rem;font-size:.8rem">Novedades destacadas</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem;border-bottom:1px solid var(--border)">carnes</td><td>80</td><td>Cortes ibéricos (secreto, presa, pluma), caza, casquería, embutidos</td></tr>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem;border-bottom:1px solid var(--border)">verduras</td><td>147</td><td>Setas exóticas, algas, chiles, flores comestibles, verduras asiáticas</td></tr>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem;border-bottom:1px solid var(--border)">frutas</td><td>92</td><td>Tropicales (pitahaya, maracuyá, lichi), variedades de manzana/pera, cítricos raros</td></tr>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem;border-bottom:1px solid var(--border)">especias</td><td>104</td><td>Mezclas del mundo (ras el hanout, garam masala, za'atar, five spice)</td></tr>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem;border-bottom:1px solid var(--border)">salsas</td><td>68</td><td>Salsas internacionales (harissa, gochujang, mojo, romesco, XO)</td></tr>
+      <tr><td style="padding:.4rem .6rem;font-size:.82rem">preparados (nueva)</td><td>45</td><td>Bases de cocina, masas listas, platos semielaborados</td></tr>
+    </tbody>
+  </table>
+
+  <h3>INGR-003 — Open Food Facts como fallback externo</h3>
+  <p>Cuando <code>buscarIngredientes(query)</code> devuelve menos de 3 resultados locales, el hook <code>useAutocompletadoIngredientes</code> llama al endpoint <code>GET /api/ingredientes/buscar?q=</code>, que ahora consulta Open Food Facts en lugar de Edamam. <strong>Sin API key, gratuito ilimitado.</strong></p>
+  <pre style="background:var(--code-bg);padding:.75rem 1rem;border-radius:6px;font-size:.78rem;margin-top:.5rem">// backend/src/services/ingredientesService.ts
+GET https://world.openfoodfacts.org/cgi/suggest.pl
+  ?tagtype=ingredients&term=tomate&lc=es
+→ ["Tomate", "Tomate cherry", "Tomate triturado", ...]</pre>
+
+  <h4>Archivos modificados</h4>
+  <ul>
+    <li><code>frontend/src/config/ingredientes.ts</code> — expandido de 239 a 991 entradas; nuevo tipo de categoría <code>'preparados'</code></li>
+    <li><code>backend/src/services/ingredientesService.ts</code> — endpoint cambiado de Edamam a Open Food Facts</li>
+  </ul>
+</section>
+
 </main>
 
 <footer>
-  Cookr TFG · Sprint 4 · Generado 2026-05-06 · Fixes 2026-05-12
+  Cookr TFG · Sprint 4-6 · Actualizado 2026-06-01
 </footer>
 
 </body>

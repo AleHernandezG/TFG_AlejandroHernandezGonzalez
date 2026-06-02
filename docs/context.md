@@ -79,7 +79,7 @@
 - ✅ [PERF-FIX-001] FE Fix — `dialogPreferenciasAlergenos.tsx` no mostraba chips activos. Causa: refetchOnMount+invalidateQueries hacían perfil=undefined durante refetch. Fix: dialog llama `useMiPerfil()` directo (cache hit), deps `[abierto, perfil]` en lugar de props individuales. 0 errores tsc.
 - ✅ [DISC-BE-001] BE+FE — Conectar /discover al backend + /home solo-siguiendo. BE: `esEvento` en IReceta y recetaMongo; `FiltrosFeed` extendido con `soloSiguiendo`, `sort`, `soloEvento`, `categoria`, `dietas`; `findAll()` maneja 5 filtros nuevos + sort in-memory por likes; controller parsea nuevos query params. FE: `recetasService` + `useRecetasFeed` + `feedHome` + `feedHomePc` (migrado de mock) + nuevo `useDiscover.ts`. tsc --noEmit: 0 errores.
 - ✅ [COMP-001] Verificado — `formularioCompletarPerfil.tsx` ya llama a `authService.completarPerfil()` → `POST /auth/completar-perfil` con token. Actualiza sesión NextAuth (`update({ perfilCompleto: true })`) y redirige a `/home`. No era una tarea pendiente: implementado desde Sprint 3.
-- ⏳ [TEND-001] Pendiente (baja) — `sidebarTendencias.tsx` usa mock (`CHEFS_DESTACADOS`, `RECETAS_POPULARES`). "Recetas Populares" conectable con endpoint existente (`sort=likes`). "Chefs Destacados" requiere nuevo BE. Solo visible en `lg+` — no prioritario. BE: `esEvento` en IReceta y recetaMongo; `FiltrosFeed` extendido con `soloSiguiendo`, `sort`, `soloEvento`, `categoria`, `dietas`; `findAll()` maneja 5 filtros nuevos + sort in-memory por likes; controller parsea nuevos query params. FE: `recetasService` + `useRecetasFeed` + `feedHome` + `feedHomePc` (migrado de mock) + nuevo `useDiscover.ts`. tsc --noEmit: 0 errores.
+- ✅ [TEND-001] Completado — Sidebar tendencias con datos reales. BE: `GET /api/usuarios/destacados` (optionalAuth, findDestacados por nº seguidores). FE: useRecetasPopulares (sort:likes) + useChefsDestacados + BotonSeguir con optimistic update. Skeletons durante carga.
 - ✅ [FILT-001] FE Fix — Chips de categoría en /discover no devolvían resultados. Causa: chips enviaban valores capitalizados ('Vegano') pero MongoDB almacena en minúsculas ('vegano'). Fix: `.toLowerCase()` en `useDiscover.ts`.
 - ✅ [FILT-002] FE — DrawerFiltros añadido a /discover. Reutiliza el componente de /home. Estado `filtrosAvanzados` vive en `contenidoDiscover`. Chips de categoría eliminados. Semántica explícita: dieta/dificultad "incluye" ($in), alérgenos "excluye" ($nin). Subtítulos añadidos en cada sección del drawer. Filtro `dietas` completo BE+FE (antes solo existía en el drawer visualmente).
 - ✅ [UI-030] FE — TarjetaDiscover rediseñada mobile-first: zoom hover en imagen, gradiente más fuerte, badge likes top-right con Heart relleno, función formatTiempo() con guard tiempoMin>0.
@@ -350,5 +350,19 @@ Sprint 4 — pendientes sin comenzar:
 
 Sprint 5+ — pendientes:
 
-- **FE:** HANDS-001 — Modo manos libres: botón visible en preview y detalleReceta sin `onClick`. Feature TTS + avance por voz.
+- ✅ [ALEG-001] Verificado — 14 webp en public/alergenos/ coinciden con chipAlergeno.tsx y opcionesUsuario.ts. Sin cambios.
+- ✅ [DET-010] Completado — generateMetadata en /recetas/[id]/page.tsx con og:image real de cada receta.
+- ✅ [AUTH-004] Verificado — session.user.image ya funcionaba desde Sprint 2. Sin cambios.
+- ✅ [API-012] Completado — useAuth.ts con 6 métodos, barrel en hooks/index.ts.
+- ✅ [UI-008→013] Completado — 6 componentes de auth refactorizados. Comportamiento idéntico, 0 cambios visuales.
+- ✅ [DET-004] Completado — GET /api/recetas/:id/comentarios paginado. Hook useComentarios (useInfiniteQuery). Sheet con infinite scroll (IntersectionObserver). Fix duplicados: Sheet usa solo API, preview usa SSR+optimista. Sheet rediseñado: handle táctil, input inline, skeletons reales.
+- ✅ [SEED-002] Script creado — backend/src/scripts/updateSeedImages.ts. Actualiza imágenes picsum a Pexels con `npx ts-node src/scripts/updateSeedImages.ts`.
+- ✅ [FEED-SMART-001] Completado — feedHome.tsx: doble query (soloSiguiendo + recomendaciones por preferencias/alergias). Si siguiendo vacío → feed recomendado con chip "Recetas para ti". useRecetasFeed acepta enabled. Usa useMiPerfil para obtener preferencias y alergias del usuario.
+- ✅ [DESP-003] Completado — DELETE /api/despensa/vaciar (BE). useVaciarDespensa mutation (FE, optimistic). headerDespensa: pill button muted→destructive en hover, solo visible si hay items. Dialog de confirmación.
+- **FE:** PERF-SSR-001 — Analizar y optimizar carga de vistas (RSC shell + CSR feed, Suspense streaming).
+- **FE:** STATE-001 — Auditoría de coherencia del cache TanStack Query entre hooks y mutations.
+- ✅ [HANDS-001] Completado — useModoManoLibres.ts (TTS es-ES + Wake Lock). Botón activo en pasosReceta y previsualizacionReceta con controles y resaltado de paso.: botón visible en preview y detalleReceta sin `onClick`. Feature TTS + avance por voz.
 - **FE+BE:** NUTR-001 — Información nutricional automática via Edamam API (Fase 6). Placeholder en preview y detalleReceta con "—".
+- **BE+FE:** DESP-TICKET-001 — OCR ticket de compra con Gemini Vision → ingredientes en despensa (Sprint 6, requiere GEMINI_API_KEY).
+- **BE+FE:** CHAT-SMART-001 — Chat IA recomienda recetas con contexto despensa + perfil (Sprint 6, depende de /chat Gemini).
+- **FE:** CREAR-TEXT-001 — Crear receta desde descripción de texto libre vía Gemini (Sprint 6).

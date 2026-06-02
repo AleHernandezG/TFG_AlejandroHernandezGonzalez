@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-05-18 · Sprint 5 activo · Fase 5 de 7 · /discover + /home integración BE+FE ✅ completado y verificado</div>
+    <div class="meta">Actualizado: 2026-06-01 · Sprint 6 completado · A1-A7 ✅ · B1-B2 ✅ · C1-C4 ✅ · INGR-002 ✅ · INGR-003 ✅ · NUTR-002 ✅</div>
   </div>
 </header>
 
@@ -99,8 +99,8 @@
     <div class="counter review"><div class="num">0</div><div class="label">Pendiente revisión</div></div>
     <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
-    <div class="counter baja"><div class="num">10</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">120</div><div class="label">Completadas</div></div>
+    <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">127</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -760,10 +760,10 @@
           <td class="id">API-012</td>
           <td class="desc">
             <strong>Crear useAuth.ts — hook de abstracción de auth</strong>
-            <small>Extrae la lógica de envío de los 6 formularios de auth a un hook reutilizable. Cumple el patrón: Componente → Hook → Service → apiClient.</small>
-            <span class="source">📄 docs/changes/api-changes.md</span>
+            <small>Creado frontend/src/features/auth/hooks/useAuth.ts con 6 métodos: iniciarSesion (signIn credentials + redirect por perfilCompleto), registrar, recuperarContrasena, nuevaContrasena (devuelve boolean para exito in-page), reenviarVerificacion, reenviarRecuperacion. Gestiona cargando:boolean y error:string|null centralizados. Barrel en hooks/index.ts. AUTH-004 verificado: session.user.image ya funcionaba — token.picture mapeado desde user.image en credentials y Google OAuth automático.</small>
+            <span class="source">📄 frontend/src/features/auth/hooks/useAuth.ts · frontend/src/features/auth/hooks/index.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -789,21 +789,21 @@
         <tr>
           <td class="id">AUTH-004</td>
           <td class="desc">
-            <strong>Enriquecer la sesión NextAuth con datos del backend</strong>
-            <small>Ahora la sesión solo tiene el email de Google. Hay que añadir avatar, nombre y rol del usuario para mostrarlos en la app.</small>
-            <span class="source">📄 docs/phase-reports/fase-1-completados.md</span>
+            <strong>Enriquecer la sesión NextAuth con avatar, nombre y rol</strong>
+            <small>Verificado: ya funcionaba. En credentials: token.picture = user.image (de usuarioRepository), token.name, token.sub, token.backendToken, token.rol, token.perfilCompleto. En Google OAuth: foto pasada al BE en POST /auth/google, token enriquecido. Session callback mapea token.picture → session.user.image. Sin cambios necesarios.</small>
+            <span class="source">📄 frontend/src/lib/auth.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Verificado · Sprint 5 (ya implementado)</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
-          <td class="id">UI-008 / UI-009</td>
+          <td class="id">UI-008 → UI-013</td>
           <td class="desc">
-            <strong>Refactor de capas: FormularioRegistro y FormularioLogin</strong>
-            <small>Extraer la lógica de envío inline a los hooks useRegistro() y useLogin() de useAuth.ts. Depende de que existan apiClient + authService primero.</small>
-            <span class="source">📄 docs/changes/ui-changes.md</span>
+            <strong>Refactor de capas: 6 componentes de auth → useAuth</strong>
+            <small>formularioLogin: eliminados estadoEnvio, mensajeError, signIn inline, useRouter — usa iniciarSesion(). formularioRegistro: eliminados estadoEnvio, mensajeError, authService, axios — usa registrar(). formularioRecuperarContrasena: eliminados estadoEnvio, mensajeError, authService, useRouter — usa recuperarContrasena(). formularioNuevaContrasena: eliminados estadoEnvio, mensajeError, authService, axios — usa nuevaContrasena() que devuelve boolean → exito local. tarjetaVerificacionPendiente: eliminado authService — usa reenviarVerificacion(). tarjetaRecuperacionPendiente: eliminado authService — usa reenviarRecuperacion(). Comportamiento idéntico, 0 cambios visuales.</small>
+            <span class="source">📄 frontend/src/features/auth/components/ · frontend/src/features/auth/hooks/useAuth.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -819,11 +819,15 @@
         <tr>
           <td class="id">DET-004</td>
           <td class="desc">
-            <strong>Ver comentarios completos de una receta</strong>
-            <small>Ahora se ven 3 comentarios de muestra. Hay que crear un Sheet/Drawer con paginación infinita y un endpoint GET /api/recetas/:id/comentarios.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <strong>Paginación de comentarios con infinite scroll</strong>
+            <small>
+              BE: GET /api/recetas/:id/comentarios?pagina=1&limite=8 → recetaRepository.findComentarios() (slice+reverse del subdocumento, paginación en memoria) → service → controller → route. optionalAuth.<br>
+              FE: recetasService.obtenerComentarios() · useComentarios.ts (useInfiniteQuery, queryKey ['comentarios', recetaId]) · useInvalidarComentarios().<br>
+              comentariosReceta.tsx: preview usa SSR+nuevos, Sheet usa solo API (sin duplicados). IntersectionObserver sentinel para infinite scroll automático. Sheet rediseñado: handle táctil, título centrado, input inline, skeletons con anatomía real. Fix duplicados: nuevos no se mezclan con datos de API en el Sheet.
+            </small>
+            <span class="source">📄 docs/desarrollo/funcionalidadSocial.html#det004 · backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useComentarios.ts · components/detalleReceta/comentariosReceta.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -909,11 +913,11 @@
         <tr>
           <td class="id">ALEG-001</td>
           <td class="desc">
-            <strong>Revisar rutas de iconos de alérgenos en todos los componentes</strong>
-            <small>Verificar que todos los componentes que muestran alérgenos (tarjeta feed, vista detalle, filtros) usan las rutas correctas de los SVG/PNG en /public. Comprobar que los imports no están rotos y que los iconos se renderizan en dev y en build (next/image vs img).</small>
-            <span class="source">📄 features/recetas/components/ · public/icons/alergenos/</span>
+            <strong>Auditoría de iconos de alérgenos — verificación completa</strong>
+            <small>14 archivos webp verificados en frontend/public/alergenos/: altramuz, apio, cacahuetes, cereales, crustaceo, frutos-secos, huevo, lacteos, moluscos, mostaza, pescado, sesamo, soja, sulfitos. Los 14 IDs de chipAlergeno.tsx coinciden con los de ALERGENOS_OPCIONES en opcionesUsuario.ts. Rutas en icono de opcionesUsuario (/alergenos/crustaceo.webp) y en chipAlergeno ('crustaceo') consistentes. next/image carga rutas locales sin configuración extra. Sin cambios en código.</small>
+            <span class="source">📄 frontend/src/components/common/chipAlergeno.tsx · frontend/src/config/opcionesUsuario.ts · frontend/public/alergenos/</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="status done">✅ Verificado · Sprint 5</span></td>
           <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
@@ -1439,11 +1443,11 @@
         <tr>
           <td class="id">HANDS-001</td>
           <td class="desc">
-            <strong>Modo manos libres en previsualizacionReceta / detalleReceta</strong>
-            <small>El botón "Modo manos libres" existe en previsualizacionReceta.tsx y en pasosReceta.tsx (detalleReceta) pero no tiene onClick — no hace nada. Feature prevista: lectura TTS (Text-to-Speech) de los pasos con la Web Speech API, avance por voz o tap, pantalla always-on. No bloquea ninguna otra tarea. Se puede abordar de forma independiente en Sprint 5.</small>
-            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · features/recetas/components/detalleReceta/pasosReceta.tsx</span>
+            <strong>Modo manos libres — TTS + Wake Lock</strong>
+            <small>Creado useModoManoLibres.ts: Web Speech API (es-ES, rate 0.9), auto-avance en utterance.onend, Navigator Wake Lock para pantalla always-on, cleanup en useEffect. Controles: ← anterior · ⏸/▶ pausar/reanudar · → siguiente · ✕ detener. Paso activo resaltado con ring-brand. Botón oculto en navegadores sin soporte (guard soportado). Integrado en pasosReceta.tsx (pasos: string[]) y previsualizacionReceta.tsx (mapea {texto}[] a string[]).</small>
+            <span class="source">📄 docs/desarrollo/modoManoLibres.html · frontend/src/features/recetas/hooks/useModoManoLibres.ts · pasosReceta.tsx · previsualizacionReceta.tsx</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1510,10 +1514,10 @@
           <td class="id">DET-010</td>
           <td class="desc">
             <strong>Metadatos dinámicos por receta (SEO / Open Graph)</strong>
-            <small>Ahora el título de /recetas/[id] es siempre "Detalle de receta — Cookr". Hay que generar metadatos dinámicos con el título real de cada receta para compartir en redes.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Implementado: export const metadata estático eliminado de app/(main)/recetas/[id]/page.tsx. Reemplazado por export async function generateMetadata que llama a recetasService.obtenerPorId(params.id) sin token (contexto separado del page component). Devuelve title = "{titulo} — Cookr", description con tiempo y dificultad, y openGraph con images si imagenUrl existe. Fallback genérico si la receta no existe.</small>
+            <span class="source">📄 frontend/src/app/(main)/recetas/[id]/page.tsx · docs/desarrollo/integracionRecetas.html</span>
           </td>
-          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1565,6 +1569,158 @@
           </td>
           <td><span class="status done">✅ Completado · Sprint 4</span></td>
           <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── Nuevas tareas 2026-05-31 ── -->
+        <tr>
+          <td class="id">FEED-SMART-001</td>
+          <td class="desc">
+            <strong>Feed inteligente en /home — seguidos + recomendaciones por gustos</strong>
+            <small>feedHome.tsx: doble query con useRecetasFeed. Primera: soloSiguiendo:true. Si está vacía y sin filtros activos → segunda query con dietas:preferencias + alergenos:alergias + sort:likes (recomendadas). useRecetasFeed recibe enabled:boolean. useMiPerfil() provee preferencias y alergias. Cuando el feed es recomendado → chip naranja "Recetas para ti — basadas en tus gustos" encima del feed. Estado vacío sin seguidos muestra mensaje contextual.</small>
+            <span class="source">📄 frontend/src/features/recetas/components/home/feedHome.tsx · hooks/useRecetasFeed.ts · docs/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-003</td>
+          <td class="desc">
+            <strong>Vaciar despensa — eliminar todos los ítems de golpe</strong>
+            <small>BE: DELETE /api/despensa/vaciar (requerirAuth, antes de /:id en router) → despensaRepository.vaciar() → $set:{despensa:[]} → 204. FE: despensaService.vaciar() + useVaciarDespensa mutation (optimistic: setQueryData [] + rollback onError). headerDespensa: pill button rounded-full con border neutro que transiciona a destructive en hover (patrón iOS/Notion/Linear). Visible solo cuando items.length > 0. Dialog de confirmación antes de ejecutar.</small>
+            <span class="source">📄 backend/src/repositories/despensaRepository.ts · backend/src/routes/despensa.routes.ts · frontend/src/features/despensa/hooks/useMiDespensa.ts · frontend/src/features/despensa/components/headerDespensa.tsx · docs/desarrollo/despensaIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-SSR-001</td>
+          <td class="desc">
+            <strong>Loading states — skeletons para /home y /recetas/[id]</strong>
+            <small>Creados loading.tsx en app/(main)/home/ y app/(main)/recetas/[id]/. Next.js los sirve automáticamente como Suspense boundary durante la carga de la ruta. /home/loading.tsx: skeleton con header + chips de filtro + 3 tarjetas. /recetas/[id]/loading.tsx: skeleton del hero + cabecera + lista de ingredientes.</small>
+            <span class="source">📄 frontend/src/app/(main)/home/loading.tsx · app/(main)/recetas/[id]/loading.tsx · docs/desarrollo/optimizacionRendimiento.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">STATE-001</td>
+          <td class="desc">
+            <strong>Auditoría cache TanStack Query — 3 bugs corregidos</strong>
+            <small>Bugs corregidos: (1) useAgregarComentario invalidaba ['recetas','detalle',id] inexistente → ahora invalida ['comentarios',recetaId] correcto. (2) useToggleGuardado no invalidaba ['coleccion','guardadas'] → ahora sí. (3) useEliminarReceta no invalidaba ['recetas','feed'] → ahora sí. Las mutations están 100% sincronizadas con sus queries correspondientes.</small>
+            <span class="source">📄 features/recetas/hooks/useAgregarComentario.ts · useToggleGuardado.ts · features/coleccion/hooks/useEliminarReceta.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-TICKET-001</td>
+          <td class="desc">
+            <strong>OCR de ticket de compra → ingredientes en despensa (Gemini Vision)</strong>
+            <small>BE: POST /api/despensa/escanear-ticket → chatService.escanearTicket(imagenBase64) → Gemini 1.5 Flash multimodal extrae [{nombre,cantidad,unidad}] del ticket. FE: sheetAnadirIngrediente.tsx añade botón "Escanear ticket" + input capture="environment" + FileReader a base64 + lista de confirmación con "Añadir todos". Fallback cuando no hay GEMINI_API_KEY: error 503 manejado. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/despensa.routes.ts · backend/src/services/chatService.ts · frontend/src/features/despensa/components/sheetAnadirIngrediente.tsx · docs/desarrollo/despensaIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-SMART-001</td>
+          <td class="desc">
+            <strong>Chat Gemini real con contexto despensa + perfil (C1 + C2)</strong>
+            <small>BE: POST /api/chat → chatService.responderChat() construye un system prompt con preferencias, alergias y despensa del usuario antes de llamar a Gemini 1.5 Flash. FE: chatStore.ts reemplaza getMockRespuesta por llamada real a chatService.enviarMensaje(). Nuevo frontend/src/services/chatService.ts. Fallback sin clave: respuesta informativa. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/chat.routes.ts · backend/src/services/chatService.ts · frontend/src/stores/chatStore.ts · frontend/src/services/chatService.ts · docs/desarrollo/chat.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEED-002</td>
+          <td class="desc">
+            <strong>Refactorizar imágenes del seed — Pexels API en lugar de picsum</strong>
+            <small>Script backend/src/scripts/updateSeedImages.ts ya disponible. Itera recetas con picsum en imagenUrl, llama a buscarFotoPexels(titulo), actualiza imagenUrl + fotoFuente + fotoCredito. Requiere ejecutar: cd backend && npx ts-node src/scripts/updateSeedImages.ts</small>
+            <span class="source">📄 backend/src/scripts/updateSeedImages.ts · backend/src/services/imagenService.ts</span>
+          </td>
+          <td><span class="status review">⚠️ Pendiente ejecución</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CREAR-TEXT-001</td>
+          <td class="desc">
+            <strong>Crear receta a partir de texto libre (Gemini)</strong>
+            <small>BE: POST /api/recetas/generar-desde-texto → chatService.generarRecetaDesdeTexto(descripcion) → Gemini genera JSON {titulo,descripcion,tiempo,dificultad,ingredientes,pasos} → responde sin markdown. FE: botón "Crear desde descripción (IA)" en formularioCrearReceta.tsx → dialog con textarea → recetasService.generarDesdeTexto() → methods.reset(datos) pre-rellena el form. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/recetas.routes.ts · backend/src/services/chatService.ts · features/recetas/components/crearReceta/formularioCrearReceta.tsx · frontend/src/services/recetasService.ts · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-001</td>
+          <td class="desc">
+            <strong>Macros reales al publicar receta — Edamam Nutrition Analysis</strong>
+            <small>BE: nutritionService.ts → calcularMacros(ingredientes[]) llama a POST https://api.edamam.com/api/nutrition-details. Integrado en recetaRepository.crear() antes de guardar. Fallback cuando falta EDAMAM_APP_ID: macros {0,0,0,0}. Requiere EDAMAM_APP_ID + EDAMAM_APP_KEY.</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/src/repositories/recetaRepository.ts · docs/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-001-EXT</td>
+          <td class="desc">
+            <strong>Búsqueda de ingredientes con Edamam Food Database</strong>
+            <small>Reemplazado por INGR-003 (Open Food Facts) ya que Edamam Food Database requería plan de pago. El endpoint GET /api/ingredientes/buscar ahora llama a Open Food Facts gratuitamente.</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts → ver INGR-003</span>
+          </td>
+          <td><span class="status done">✅ Migrado a INGR-003 · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-002</td>
+          <td class="desc">
+            <strong>Expansión lista local de ingredientes a ~1000</strong>
+            <small>ingredientes.ts pasó de 239 a 991 ingredientes cubriendo 18 categorías (nueva: preparados). Incluye ingredientes ibéricos, asiáticos, europeos, tropicales, especias del mundo, embutidos, mariscos gallegos y platos semielaborados. Fuentes: BEDCA, catálogos Mercadona/Carrefour, Open Food Facts, bases de recetas.</small>
+            <span class="source">📄 frontend/src/config/ingredientes.ts · docs/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-003</td>
+          <td class="desc">
+            <strong>Open Food Facts como fallback de autocompletado</strong>
+            <small>ingredientesService.ts (BE) ahora llama a world.openfoodfacts.org/cgi/suggest.pl en lugar de Edamam Food DB. Sin API key, gratuito ilimitado (15 req/min recomendado). Devuelve nombres en español directamente. Timeout 3s + fallback a [].</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts · docs/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-002</td>
+          <td class="desc">
+            <strong>USDA FoodData Central como fallback de cálculo de macros</strong>
+            <small>nutritionService.calcularMacros() ahora tiene doble fallback: Edamam primero (100/mes) → USDA si falla (1000/hora gratis). USDA busca cada ingrediente, escala por unidad con conversión g/kg/ml/tsp/tbsp/taza/unidad, y suma calorías+proteínas+carbos+grasas (nutrientIds USDA: 1008, 1003, 1005, 1004). Requiere USDA_API_KEY en .env (gratis en api.data.gov).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/.env · docs/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">AVATAR-001</td>
+          <td class="desc">
+            <strong>Avatar upload real en /perfil</strong>
+            <small>BE: PUT /api/usuarios/me/foto → usuarioRepository.actualizarFoto(id, fotoBase64). FE: perfilService.subirFoto() + useSubirFoto mutation (invalida cache perfil + llama a NextAuth update({image})). tarjetaAvatarPerfil.tsx: input file oculto, preview optimista, spinner, rollback en error.</small>
+            <span class="source">📄 backend/src/routes/usuarios.routes.ts · frontend/src/services/perfilService.ts · frontend/src/features/perfil/hooks/usePerfil.ts · features/perfil/components/tarjetaAvatarPerfil.tsx · docs/desarrollo/perfilIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">EDIT-RECETA-001</td>
+          <td class="desc">
+            <strong>Editar receta propia</strong>
+            <small>BE: PUT /api/recetas/:id → recetaRepository.actualizar() verifica autoría (403) + $set parcial. FE: recetasService.actualizar() + useEditarReceta hook + FormularioEditarReceta (re-usa SeccionIngredientes, SeccionPasos, SeccionAlergenos) + page /editar-receta/[id]/. tarjetaColeccion.tsx botón "Editar receta" activado.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/components/editarReceta/ · frontend/src/app/(main)/editar-receta/[id]/page.tsx · docs/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
         </tr>
       </tbody>
     </table>
@@ -1655,11 +1811,11 @@
         <tr>
           <td class="id">TEND-001</td>
           <td class="desc">
-            <strong>SidebarTendencias — conectar "Recetas Populares" al BE y crear endpoint "Chefs Destacados"</strong>
-            <small>sidebarTendencias.tsx (solo visible en lg+) usa CHEFS_DESTACADOS y RECETAS_POPULARES de datosTendencias.ts (mock). "Recetas Populares" se puede conectar con GET /api/recetas?sort=likes&limite=5 (endpoint ya existe). "Chefs Destacados" requiere nuevo endpoint BE. El botón "Seguir" tampoco tiene onClick. No es prioritario porque el sidebar es decorativo y solo aparece en escritorio.</small>
-            <span class="source">📄 frontend/src/features/recetas/components/home/sidebarTendencias.tsx · frontend/src/features/recetas/data/datosTendencias.ts</span>
+            <strong>SidebarTendencias — datos reales (Recetas Populares + Chefs Destacados)</strong>
+            <small>BE: GET /api/usuarios/destacados?limite=5 (optionalAuth) — findDestacados() ordena por nº seguidores, filtra perfilCompleto:true, excluye al propio usuario, devuelve siguiendo:boolean. FE: useRecetasPopulares (sort:likes, staleTime:5min) · useChefsDestacados (staleTime:10min). sidebarTendencias.tsx → 'use client', Link en recetas populares hacia /recetas/:id, BotonSeguir con useMutation + optimistic update. Skeletons de carga con anatomía real. datosTendencias.ts (mock) reemplazado por hooks reales.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/routes/usuarios.routes.ts · frontend/src/features/recetas/hooks/useRecetasPopulares.ts · useChefsDestacados.ts · frontend/src/features/recetas/components/home/sidebarTendencias.tsx · frontend/src/services/usuariosService.ts</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 6 o posterior</span></td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>

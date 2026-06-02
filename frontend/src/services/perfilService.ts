@@ -33,6 +33,15 @@ export const perfilService = {
     )
   },
 
+  async subirFoto(token: string, fotoBase64: string): Promise<{ foto: string | null }> {
+    const { data } = await apiClient.put<{ foto: string | null }>(
+      '/usuarios/me/foto',
+      { fotoBase64 },
+      { headers: headers(token) },
+    )
+    return data
+  },
+
   async actualizarPreferencias(
     token: string,
     dietas: string[],

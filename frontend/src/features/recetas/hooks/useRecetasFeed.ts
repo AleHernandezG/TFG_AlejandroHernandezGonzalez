@@ -12,9 +12,10 @@ interface UseRecetasFeedParams {
   excluirPropio?: boolean;
   soloSiguiendo?: boolean;
   sort?: 'reciente' | 'likes';
+  enabled?: boolean;
 }
 
-export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio = false, soloSiguiendo = false, sort }: UseRecetasFeedParams = {}) {
+export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio = false, soloSiguiendo = false, sort, enabled = true }: UseRecetasFeedParams = {}) {
   const { data: session } = useSession();
   const token = session?.user?.backendToken;
 
@@ -34,5 +35,6 @@ export function useRecetasFeed({ q, filtrosAvanzados, pagina = 1, excluirPropio 
     queryFn: () => recetasService.obtenerFeed(filtros, token),
     staleTime: 0,
     placeholderData: (prev) => prev,
+    enabled,
   });
 }

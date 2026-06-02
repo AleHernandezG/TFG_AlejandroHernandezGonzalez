@@ -14,7 +14,9 @@
     "seed:completo:force": "ts-node --transpile-only src/scripts/seedCompleto.ts -- --force"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/nodemailer": "^8.0.0",
+    "axios": "^1.16.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

@@ -100,6 +100,17 @@ export const recetasController = {
     }
   },
 
+  async obtenerComentarios(req: Request, res: Response): Promise<void> {
+    try {
+      const pagina = req.query.pagina ? Math.max(1, Number(req.query.pagina)) : 1;
+      const limite = req.query.limite ? Math.min(20, Number(req.query.limite)) : 8;
+      const resultado = await recetasService.obtenerComentarios(req.params.id, pagina, limite);
+      res.status(200).json(resultado);
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
   async agregarComentario(req: Request, res: Response): Promise<void> {
     try {
       const { texto } = req.body as { texto?: string };
@@ -145,6 +156,20 @@ export const recetasController = {
       }
       const { id } = await recetasService.crear(resultado.data, req.usuario!.id);
       res.status(201).json({ id });
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async actualizar(req: Request, res: Response): Promise<void> {
+    try {
+      const resultado = esquemaCrearRecetaBody.partial().safeParse(req.body);
+      if (!resultado.success) {
+        res.status(400).json({ error: "Datos inválidos", detalle: resultado.error.flatten() });
+        return;
+      }
+      await recetasService.actualizar(req.params.id, req.usuario!.id, resultado.data);
+      res.status(204).send();
     } catch (error) {
       manejarError(res, error);
     }

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integración Recetas — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.seo { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf633; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    .status-done { color: #22c55e; font-weight: 600; }
+    .status-ok { color: #22c55e; font-size: 0.75rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+
+    .callout { background: #111; border-left: 3px solid #f97316; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; font-size: 0.82rem; color: #d4d4d4; }
+    .callout.info { border-color: #3b82f6; }
+    .callout.success { border-color: #22c55e; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Integración Recetas — Cookr TFG</h1>
+  <p>Actualizado: 2026-05-31 · Sprint 5 · ALEG-001 ✅ verificado · DET-010 ✅ completado</p>
+</header>
+
+<nav>
+  <a href="#aleg001">ALEG-001 — Alérgenos</a>
+  <a href="#det010">DET-010 — Metadatos dinámicos</a>
+  <a href="#arquitectura">Arquitectura detalle receta</a>
+  <a href="#endpoints">Endpoints relacionados</a>
+</nav>
+
+<main>
+
+  <!-- ALEG-001 -->
+  <section id="aleg001">
+    <div class="section-header">
+      <span class="section-icon">🧪</span>
+      <h2>ALEG-001 — Auditoría de iconos de alérgenos <span class="badge done">✅ Verificado</span></h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <h3>Resultado</h3>
+        <p>Auditoría completada sin cambios. Los 14 iconos de alérgenos están correctamente configurados en todos los puntos de la aplicación.</p>
+      </div>
+
+      <div>
+        <h3>Archivos verificados</h3>
+        <table>
+          <thead>
+            <tr><th>Archivo</th><th>Rol</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>frontend/public/alergenos/</td><td>14 archivos .webp</td><td class="status-done">✅ 14/14 presentes</td></tr>
+            <tr><td>components/common/chipAlergeno.tsx</td><td>Mapa ID → nombre de imagen</td><td class="status-done">✅ 14 entradas correctas</td></tr>
+            <tr><td>config/opcionesUsuario.ts</td><td>ALERGENOS_OPCIONES con rutas absolutas</td><td class="status-done">✅ 14 rutas correctas</td></tr>
+            <tr><td>features/perfil/components/dialogPreferenciasAlergenos.tsx</td><td>Usa alergeno.icono</td><td class="status-done">✅ Rutas absolutas /alergenos/…</td></tr>
+            <tr><td>features/recetas/components/detalleReceta/cabeceraReceta.tsx</td><td>Usa ChipAlergeno</td><td class="status-done">✅ Pasa alergenoId correcto</td></tr>
+            <tr><td>features/recetas/components/crearReceta/seccionAlergenos.tsx</td><td>Usa ChipAlergeno</td><td class="status-done">✅ Pasa alergenoId correcto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Tabla de correspondencias</h3>
+        <table>
+          <thead>
+            <tr><th>ID (clave)</th><th>Label chipAlergeno</th><th>Imagen chipAlergeno</th><th>Ruta opcionesUsuario</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>cereales</td><td>Cereales</td><td>cereales</td><td>/alergenos/cereales.webp</td></tr>
+            <tr><td>crustaceos</td><td>Crustáceos</td><td>crustaceo</td><td>/alergenos/crustaceo.webp</td></tr>
+            <tr><td>huevo</td><td>Huevo</td><td>huevo</td><td>/alergenos/huevo.webp</td></tr>
+            <tr><td>pescado</td><td>Pescado</td><td>pescado</td><td>/alergenos/pescado.webp</td></tr>
+            <tr><td>cacahuetes</td><td>Cacahuetes</td><td>cacahuetes</td><td>/alergenos/cacahuetes.webp</td></tr>
+            <tr><td>soja</td><td>Soja</td><td>soja</td><td>/alergenos/soja.webp</td></tr>
+            <tr><td>lacteos</td><td>Lácteos</td><td>lacteos</td><td>/alergenos/lacteos.webp</td></tr>
+            <tr><td>frutosSecos</td><td>Frutos secos</td><td>frutos-secos</td><td>/alergenos/frutos-secos.webp</td></tr>
+            <tr><td>apio</td><td>Apio</td><td>apio</td><td>/alergenos/apio.webp</td></tr>
+            <tr><td>mostaza</td><td>Mostaza</td><td>mostaza</td><td>/alergenos/mostaza.webp</td></tr>
+            <tr><td>sesamo</td><td>Sésamo</td><td>sesamo</td><td>/alergenos/sesamo.webp</td></tr>
+            <tr><td>sulfitos</td><td>Sulfitos</td><td>sulfitos</td><td>/alergenos/sulfitos.webp</td></tr>
+            <tr><td>moluscos</td><td>Moluscos</td><td>moluscos</td><td>/alergenos/moluscos.webp</td></tr>
+            <tr><td>altramuz</td><td>Altramuz</td><td>altramuz</td><td>/alergenos/altramuz.webp</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <strong>Nota sobre crustaceos:</strong> el ID es <code>crustaceos</code> (con s) pero el nombre del archivo es <code>crustaceo.webp</code> (sin s). Esta asimetría es intencional y consistente entre chipAlergeno.tsx y opcionesUsuario.ts — no es un bug.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DET-010 -->
+  <section id="det010">
+    <div class="section-header">
+      <span class="section-icon">🔍</span>
+      <h2>DET-010 — Metadatos dinámicos en /recetas/[id] <span class="badge done">✅ Completado</span></h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <h3>Problema original</h3>
+        <p>La página <code>app/(main)/recetas/[id]/page.tsx</code> tenía metadatos estáticos:</p>
+        <pre>export const metadata = {
+  title: 'Detalle de receta — Cookr',
+  description: 'Ingredientes, pasos y nutrición de la receta.',
+}</pre>
+        <p>Al compartir un enlace de receta en WhatsApp, Telegram o Twitter, la tarjeta de previsualización mostraba siempre el mismo título genérico en lugar del nombre real de la receta.</p>
+      </div>
+
+      <div>
+        <h3>Solución implementada</h3>
+        <p><span class="badge fe">FE</span> Archivo: <code>frontend/src/app/(main)/recetas/[id]/page.tsx</code></p>
+        <pre>import type { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise&lt;Metadata&gt; {
+  const detalle = await recetasService.obtenerPorId(params.id)
+  if (!detalle) return { title: 'Receta — Cookr' }
+  const { receta } = detalle
+  return {
+    title: `${receta.titulo} — Cookr`,
+    description: `${receta.descripcion} · ${receta.tiempo} · ${receta.dificultad}`,
+    openGraph: {
+      title: receta.titulo,
+      description: receta.descripcion,
+      images: receta.imagenUrl ? [{ url: receta.imagenUrl }] : [],
+      type: 'article',
+    },
+  }
+}</pre>
+      </div>
+
+      <div>
+        <h3>Decisiones de diseño</h3>
+        <ul>
+          <li><strong>Sin token en generateMetadata</strong>: <code>getServerSession</code> no está disponible en el contexto de <code>generateMetadata</code> (se ejecuta en un contexto separado del page component). La llamada se hace sin autenticación — los metadatos son públicos.</li>
+          <li><strong>Fallback genérico</strong>: si <code>obtenerPorId</code> devuelve <code>null</code> (ID inválido o receta eliminada), se retorna <code>{ title: 'Receta — Cookr' }</code> sin lanzar error.</li>
+          <li><strong>Segunda llamada al BE</strong>: Next.js deduplica automáticamente las llamadas fetch con la misma URL en el mismo ciclo de renderizado. Sin embargo, <code>recetasService</code> usa Axios, no fetch nativo — por tanto sí hay una segunda petición. El impacto es mínimo (llamada rápida sin autenticación) y es el trade-off aceptable para tener og:image real.</li>
+          <li><strong>og:image condicional</strong>: solo se incluye si <code>receta.imagenUrl</code> existe — algunas recetas antiguas pueden no tenerla.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Estructura del tipo RecetaDetalle</h3>
+        <p>La propiedad <code>receta</code> dentro de <code>RecetaDetalle</code> es de tipo <code>DatosReceta</code>:</p>
+        <pre>type DatosReceta = {
+  titulo: string        // ← og:title
+  descripcion: string   // ← og:description
+  imagenUrl: string     // ← og:image
+  tiempo: string        // "45 min"
+  dificultad: DificultadReceta  // 'Fácil' | 'Media' | 'Difícil'
+}</pre>
+      </div>
+
+      <div>
+        <h3>Flujo completo</h3>
+        <div class="flow">
+          <span class="flow-node">Bot compartir (WhatsApp/Telegram)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">GET /recetas/[id]</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">generateMetadata()</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">recetasService.obtenerPorId(id)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">Metadata con og:title, og:image</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">Tarjeta con imagen real ✅</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Verificación</h3>
+        <pre>cd frontend && npx tsc --noEmit   # 0 errores
+cd frontend && npx next lint       # 0 warnings</pre>
+        <p>Prueba manual: abrir <code>/recetas/[id-real]</code> → ver <code>&lt;title&gt;</code> en DevTools → debe mostrar el nombre real de la receta. Compartir enlace en Telegram → debe mostrar tarjeta con imagen.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA DETALLE RECETA -->
+  <section id="arquitectura">
+    <div class="section-header">
+      <span class="section-icon">🏗️</span>
+      <h2>Arquitectura — Vista detalle de receta</h2>
+    </div>
+    <div class="section-body">
+
+      <div>
+        <h3>Flujo de datos en /recetas/[id]</h3>
+        <div class="flow">
+          <span class="flow-node">page.tsx (RSC)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">getServerSession (NextAuth)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">recetasService.obtenerPorId(id, token)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">DetalleRecetaCliente (Client)</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Componentes cliente</h3>
+        <table>
+          <thead>
+            <tr><th>Componente</th><th>Responsabilidad</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>DetalleRecetaCliente</td><td>Orquestador — recibe RecetaDetalle del RSC</td></tr>
+            <tr><td>HeroReceta</td><td>Imagen hero + créditos Pexels</td></tr>
+            <tr><td>CabeceraReceta</td><td>Título, autor, like/guardar/compartir/eliminar</td></tr>
+            <tr><td>TabsReceta</td><td>Ingredientes · Pasos · Nutrición</td></tr>
+            <tr><td>ComentariosReceta</td><td>Preview 3 comentarios + Sheet "Ver todos"</td></tr>
+            <tr><td>CarruselSimilares</td><td>6 recetas relacionadas</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Hooks activos en detalle de receta</h3>
+        <table>
+          <thead>
+            <tr><th>Hook</th><th>Qué hace</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>useToggleLike</td><td>Like/unlike con optimistic update</td></tr>
+            <tr><td>useToggleGuardado</td><td>Guardar/desguardar con optimistic update</td></tr>
+            <tr><td>useToggleSeguir</td><td>Seguir/dejar de seguir al autor</td></tr>
+            <tr><td>useAgregarComentario</td><td>Añadir comentario con optimistic update</td></tr>
+            <tr><td>useEliminarReceta</td><td>Eliminar receta (solo autor)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ENDPOINTS -->
+  <section id="endpoints">
+    <div class="section-header">
+      <span class="section-icon">🔌</span>
+      <h2>Endpoints relacionados con recetas</h2>
+    </div>
+    <div class="section-body">
+
+      <table>
+        <thead>
+          <tr><th>Método + Ruta</th><th>Auth</th><th>Descripción</th><th>Sprint</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>GET /api/recetas</td><td>optionalAuth</td><td>Feed paginado con filtros q, dificultad, alergenos, soloSiguiendo, sort, dietas, soloEvento, categoria</td><td>Sprint 3</td></tr>
+          <tr><td>GET /api/recetas/:id</td><td>optionalAuth</td><td>Detalle completo con ingredientes, pasos, similares, sigueAlAutor, liked, guardado</td><td>Sprint 3</td></tr>
+          <tr><td>GET /api/recetas/guardadas</td><td>requerirAuth</td><td>Recetas guardadas del usuario autenticado</td><td>Sprint 4</td></tr>
+          <tr><td>GET /api/recetas/mis-recetas</td><td>requerirAuth</td><td>Recetas creadas por el usuario autenticado</td><td>Sprint 4</td></tr>
+          <tr><td>POST /api/recetas</td><td>requerirAuth</td><td>Crear nueva receta (imagen base64, foto Pexels si no hay imagen)</td><td>Sprint 4</td></tr>
+          <tr><td>DELETE /api/recetas/:id</td><td>requerirAuth</td><td>Eliminar receta (solo el autor, 403 si no es autor)</td><td>Sprint 4</td></tr>
+          <tr><td>POST /api/recetas/:id/like</td><td>requerirAuth</td><td>Toggle like — añade/elimina userId del array likes[]</td><td>Sprint 4</td></tr>
+          <tr><td>POST /api/recetas/:id/guardar</td><td>requerirAuth</td><td>Toggle guardar — añade/elimina recetaId en Usuario.recetasGuardadas[]</td><td>Sprint 4</td></tr>
+          <tr><td>POST /api/recetas/:id/comentarios</td><td>requerirAuth</td><td>Añadir comentario (subdocumento en listaComentarios[])</td><td>Sprint 4</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

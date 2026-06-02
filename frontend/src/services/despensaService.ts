@@ -42,4 +42,10 @@ export const despensaService = {
     })
     return data.map(normalizar)
   },
+
+  async vaciar(token: string): Promise<void> {
+    await apiClient.delete('/despensa/vaciar', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+  },
 }

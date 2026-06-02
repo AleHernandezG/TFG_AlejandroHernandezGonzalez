@@ -1,0 +1,30 @@
+══════════════════════════════════════════
+  VARIABLES DE ENTORNO — PRODUCCIÓN
+══════════════════════════════════════════
+
+────────────────────────────────────────
+  RENDER (backend)
+────────────────────────────────────────
+Añadir en: Render → tu servicio → Environment
+
+GEMINI_API_KEY=AQ.Ab8RN6JehnfOb2BfeF6R27nAHzppUzD92v05v1BH4lPQz1znPw
+EDAMAM_APP_ID=63d7dfad
+EDAMAM_APP_KEY=591c9ec1dfbd757a0c6ac10c513114e3
+USDA_API_KEY=aFxNt4obn7fvVSr4I4MN477WRev7WmNBYTYeG6JI
+
+────────────────────────────────────────
+  VERCEL (frontend)
+────────────────────────────────────────
+Añadir en: Vercel → tu proyecto → Settings → Environment Variables
+
+(ninguna API nueva — las claves de Gemini/Edamam/USDA
+ solo las usa el backend, no el frontend)
+
+══════════════════════════════════════════
+  QUÉ HACE CADA UNA
+══════════════════════════════════════════
+
+GEMINI_API_KEY   → Chat IA, crear receta desde texto, escanear ticket
+EDAMAM_APP_ID    → Cálculo de macros al publicar receta (100 llamadas/mes gratis)
+EDAMAM_APP_KEY   → (par con EDAMAM_APP_ID)
+USDA_API_KEY     → Fallback de macros si Edamam se agota (1000/hora gratis)

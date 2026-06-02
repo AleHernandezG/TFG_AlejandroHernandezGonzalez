@@ -72,6 +72,23 @@ export function useActualizarPreferencias() {
   })
 }
 
+export function useSubirFoto() {
+  const { data: session, update } = useSession()
+  const token = session?.user?.backendToken ?? ''
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: (fotoBase64: string) => perfilService.subirFoto(token, fotoBase64),
+    onSuccess: async (data) => {
+      qc.setQueryData(QUERY_KEY, (old: ReturnType<typeof useMiPerfil>['data']) => {
+        if (!old) return old
+        return { ...old, foto: data.foto }
+      })
+      await update({ image: data.foto })
+    },
+  })
+}
+
 export function extraerMensajeError(error: unknown): string {
   if (axios.isAxiosError(error)) {
     return (error.response?.data as { error?: string })?.error ?? 'Error al procesar la solicitud'
