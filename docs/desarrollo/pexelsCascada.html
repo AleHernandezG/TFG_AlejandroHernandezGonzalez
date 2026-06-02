@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pexels Cascada — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.algo { background: #f9731622; color: #fb923c; border: 1px solid #f9731633; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .cascade { display: flex; flex-direction: column; gap: 0.75rem; }
+    .cascade-step { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.9rem 1.1rem; display: flex; gap: 1rem; align-items: flex-start; }
+    .step-num { background: #f97316; color: #fff; font-weight: 800; font-size: 0.72rem; width: 1.5rem; height: 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
+    .step-body { flex: 1; }
+    .step-title { font-size: 0.83rem; font-weight: 700; color: #fff; margin-bottom: 0.2rem; }
+    .step-desc { font-size: 0.78rem; color: #a3a3a3; }
+    .step-example { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #4ade80; margin-top: 0.4rem; background: #0f0f0f; padding: 0.3rem 0.6rem; border-radius: 4px; display: inline-block; }
+    .step-fallback { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #737373; margin-top: 0.4rem; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Pexels en cascada — Búsqueda inteligente de imágenes</h1>
+  <p>PEXELS-CASCADE-001 · 2026-06-02 · <span class="badge be">BE</span> <span class="badge done">✅ Completado</span></p>
+</header>
+
+<nav>
+  <a href="#problema">Problema</a>
+  <a href="#solucion">Solución</a>
+  <a href="#cascada">Cascada</a>
+  <a href="#mapas">Mapas de traducción</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#ejemplos">Ejemplos</a>
+</nav>
+
+<main>
+
+  <section id="problema">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <h2>Problema original</h2>
+    </div>
+    <div class="section-body">
+      <p>Cuando se publicaba una receta sin foto, se llamaba a Pexels con el título crudo de la receta. El resultado era impredecible: "Sopa de pepino" podía devolver una foto de pepinos enteros en lugar de un plato de sopa. "Pollo con almendras" a veces devolvía árboles de almendro.</p>
+      <p>El título crudo en español no funciona bien como query de imagen. Pexels indexa en inglés y por concepto visual, no por nombre de ingrediente.</p>
+    </div>
+  </section>
+
+  <section id="solucion">
+    <div class="section-header">
+      <span class="section-icon">💡</span>
+      <h2>Solución</h2>
+    </div>
+    <div class="section-body">
+      <p>En lugar de mandar el título, se extrae primero el <strong>tipo de plato</strong> (sopa, guiso, pasta, paella…) que es lo que define visualmente la imagen. El tipo de plato es invariable independientemente de los ingredientes: una sopa de pepino y una sopa de pollo deben mostrar una foto de sopa.</p>
+      <p>Si no hay tipo de plato reconocible, se usa el <strong>ingrediente principal visual</strong> (pollo, salmón, carne…). Como último recurso, se usa la categoría/dieta genérica del usuario.</p>
+      <p>El título crudo nunca llega a Pexels.</p>
+    </div>
+  </section>
+
+  <section id="cascada">
+    <div class="section-header">
+      <span class="section-icon">🔁</span>
+      <h2>Función de cascada</h2>
+    </div>
+    <div class="section-body">
+      <div class="cascade">
+        <div class="cascade-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Tipo de plato detectado en el título</div>
+            <div class="step-desc">Regex sobre el título en minúsculas. Si hay match, busca el concepto visual en inglés.</div>
+            <span class="step-example">"sopa de pepino" → soup food photography</span>
+            <span class="step-example">"guiso de garbanzos" → stew food photography</span>
+            <span class="step-example">"pasta con gambas" → pasta dish food photography</span>
+          </div>
+        </div>
+        <div class="cascade-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Ingrediente principal visual</div>
+            <div class="step-desc">Si no hay tipo de plato (o si el intento 1 falla), se busca el ingrediente más distintivo visualmente. Se combina con el tipo de plato si lo hay.</div>
+            <span class="step-example">"pollo al horno" → chicken food dish</span>
+            <span class="step-example">"salmón con limón" → salmon food dish</span>
+            <span class="step-fallback">Si hay tipo de plato: "gambas + paella" → shrimp paella</span>
+          </div>
+        </div>
+        <div class="cascade-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Categoría/dieta genérica</div>
+            <div class="step-desc">Fallback final usando las dietas del formulario de receta. Si no hay dietas, usa "food photography" como comodín universal.</div>
+            <span class="step-example">dietas: ["vegano"] → vegan food</span>
+            <span class="step-example">dietas: [] → food photography</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Parámetros de la llamada a Pexels</h3>
+      <ul>
+        <li><code>orientation: "landscape"</code> — las cards siempre son horizontales</li>
+        <li><code>per_page: "3"</code> — pide 3 fotos, usa la primera; si el array está vacío, el intento falla y se pasa al siguiente</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="mapas">
+    <div class="section-header">
+      <span class="section-icon">🗺️</span>
+      <h2>Mapas de traducción</h2>
+    </div>
+    <div class="section-body">
+      <h3>Tipos de plato (prioridad 1)</h3>
+      <table>
+        <thead><tr><th>Patrón (regex)</th><th>Query Pexels EN</th></tr></thead>
+        <tbody>
+          <tr><td>/\bsopa\b/</td><td>soup</td></tr>
+          <tr><td>/\bcrema\b/</td><td>cream soup</td></tr>
+          <tr><td>/\bcaldo\b/</td><td>broth soup</td></tr>
+          <tr><td>/\bguiso\b|\bestofado\b/</td><td>stew</td></tr>
+          <tr><td>/\bcurry\b/</td><td>curry</td></tr>
+          <tr><td>/\bpaella\b/</td><td>paella</td></tr>
+          <tr><td>/\barroz\b/</td><td>rice dish</td></tr>
+          <tr><td>/\bpasta\b|\bespagueti\b|\bmacarrones\b|\bfideos\b/</td><td>pasta dish</td></tr>
+          <tr><td>/\bpizza\b/</td><td>pizza</td></tr>
+          <tr><td>/\bhamburguesa\b/</td><td>burger</td></tr>
+          <tr><td>/\btacos?\b|\bburritos?\b/</td><td>tacos</td></tr>
+          <tr><td>/\bensalada\b/</td><td>salad</td></tr>
+          <tr><td>/\bbarbacoa\b|\bbbq\b/</td><td>barbecue food</td></tr>
+          <tr><td>/\bparrilla\b|\ba la brasa\b/</td><td>grilled food</td></tr>
+          <tr><td>/\bsandwich\b|\bbocadillo\b/</td><td>sandwich</td></tr>
+          <tr><td>/\btortilla\b/</td><td>omelette</td></tr>
+          <tr><td>/\bhuev/</td><td>eggs dish</td></tr>
+          <tr><td>/\btarta\b|\bpastel\b|\bbizcocho\b/</td><td>cake</td></tr>
+          <tr><td>/\bgalletas?\b/</td><td>cookies</td></tr>
+          <tr><td>/\bpan\b|\bbaguette\b/</td><td>bread</td></tr>
+          <tr><td>/\bhelado\b/</td><td>ice cream</td></tr>
+          <tr><td>/\bflan\b|\bmousse\b|\bpudding\b/</td><td>dessert</td></tr>
+          <tr><td>/\bcocido\b|\bpuchero\b/</td><td>stew pot</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Ingredientes visuales (prioridad 2)</h3>
+      <table>
+        <thead><tr><th>Patrón</th><th>Query EN</th></tr></thead>
+        <tbody>
+          <tr><td>/\bpollo\b/</td><td>chicken</td></tr>
+          <tr><td>/\bternera\b|\bcarne\b/</td><td>beef</td></tr>
+          <tr><td>/\bcerdo\b|\blomo\b/</td><td>pork</td></tr>
+          <tr><td>/\bcordero\b/</td><td>lamb</td></tr>
+          <tr><td>/\bsalm[oó]n\b/</td><td>salmon</td></tr>
+          <tr><td>/\bat[uú]n\b/</td><td>tuna</td></tr>
+          <tr><td>/\bbacalao\b/</td><td>cod fish</td></tr>
+          <tr><td>/\bgambas\b/</td><td>shrimp</td></tr>
+          <tr><td>/\blentejas\b/</td><td>lentils</td></tr>
+          <tr><td>/\bgarbanzos\b/</td><td>chickpeas</td></tr>
+          <tr><td>/\btomate\b/</td><td>tomato</td></tr>
+          <tr><td>/\bcalabaz/</td><td>pumpkin</td></tr>
+          <tr><td>/\bchampinones\b|\bsetas\b/</td><td>mushrooms</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="archivos">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Archivos modificados</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>backend/src/services/imagenService.ts</td>
+            <td>Nueva función <code>buscarFotoPexelsCascada(titulo, categorias?)</code>. Helper <code>llamarPexels()</code> extraído como función interna reutilizable por los tres intentos. <code>buscarFotoPexels()</code> se mantiene para el script de seed.</td>
+          </tr>
+          <tr>
+            <td>backend/src/repositories/recetaRepository.ts</td>
+            <td>Import cambiado a <code>buscarFotoPexelsCascada</code>. Llamada en <code>crear()</code> pasa <code>datos.dietas</code> como hint de categoría.</td>
+          </tr>
+          <tr>
+            <td>backend/src/services/recetasService.ts</td>
+            <td>Import cambiado a <code>buscarFotoPexelsCascada</code>. <code>obtenerFotoPreview()</code> usa la cascada (el query del usuario ya viene formateado desde el FE).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Interfaz pública</h3>
+      <pre>// Conservada — la usa el script de seed directamente
+export async function buscarFotoPexels(query: string): Promise&lt;ResultadoFotoPexels | null&gt;
+
+// Nueva — para flujos con contexto de título + categorías
+export async function buscarFotoPexelsCascada(
+  titulo: string,
+  categorias?: string[]
+): Promise&lt;ResultadoFotoPexels | null&gt;</pre>
+    </div>
+  </section>
+
+  <section id="ejemplos">
+    <div class="section-header">
+      <span class="section-icon">🧪</span>
+      <h2>Ejemplos reales</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Título receta</th><th>Intento usado</th><th>Query a Pexels</th></tr></thead>
+        <tbody>
+          <tr><td>Sopa de lentejas</td><td>1 — tipo de plato</td><td>soup food photography</td></tr>
+          <tr><td>Sopa de pepino</td><td>1 — tipo de plato</td><td>soup food photography</td></tr>
+          <tr><td>Guiso de garbanzos con chorizo</td><td>1 — tipo de plato</td><td>stew food photography</td></tr>
+          <tr><td>Pasta con salsa de remolacha</td><td>1 — tipo de plato</td><td>pasta dish food photography</td></tr>
+          <tr><td>Pollo al horno con patatas</td><td>2 — ingrediente</td><td>chicken food dish</td></tr>
+          <tr><td>Salmón con limón y eneldo</td><td>2 — ingrediente</td><td>salmon food dish</td></tr>
+          <tr><td>Ensalada de garbanzos</td><td>1 — tipo de plato</td><td>salad food photography</td></tr>
+          <tr><td>Tarta de queso</td><td>1 — tipo de plato</td><td>cake food photography</td></tr>
+          <tr><td>Smoothie de frutas</td><td>3 — categoría</td><td>vegan food (si dietas=[vegano])</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

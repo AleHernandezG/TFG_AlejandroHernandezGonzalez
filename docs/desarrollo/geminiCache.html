@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemini Caché — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    .flow { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-size: 0.8rem; margin-top: 0.5rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-node.hit { border-color: #22c55e44; color: #4ade80; background: #22c55e11; }
+    .flow-node.miss { border-color: #f9731644; color: #fb923c; background: #f9731611; }
+    .flow-arrow { color: #525252; }
+
+    .cache-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; }
+    .cache-card h4 { font-size: 0.8rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .cache-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+    .cache-meta span { font-size: 0.75rem; color: #737373; }
+    .cache-meta strong { color: #a3a3a3; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Caché en memoria para llamadas a Gemini</h1>
+  <p>GEMINI-CACHE-001 · 2026-06-02 · <span class="badge be">BE</span> <span class="badge done">✅ Completado</span></p>
+</header>
+
+<nav>
+  <a href="#problema">Problema</a>
+  <a href="#caches">Cachés implementados</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#codigo">Código clave</a>
+  <a href="#decisiones">Decisiones</a>
+</nav>
+
+<main>
+
+  <section id="problema">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <h2>Problema original</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Problema</th><th>Impacto</th><th>Frecuencia</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>2 queries a MongoDB por mensaje de chat</td>
+            <td><code>buscarPerfilPorId()</code> + <code>Usuario.findById(despensa)</code> en cada mensaje</td>
+            <td>Cada vez que el usuario envía un mensaje al chat IA</td>
+          </tr>
+          <tr>
+            <td><code>new GoogleGenerativeAI(apiKey)</code> en cada request</td>
+            <td>Overhead de inicialización del cliente SDK en cada llamada</td>
+            <td>Cada llamada a responderChat, generarRecetaDesdeTexto, escanearTicket</td>
+          </tr>
+          <tr>
+            <td>Sin protección ante doble-submit en "Crear con IA"</td>
+            <td>Dos llamadas a Gemini con el mismo prompt</td>
+            <td>Doble-click o submit rápido en el formulario</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="caches">
+    <div class="section-header">
+      <span class="section-icon">🗄️</span>
+      <h2>Cachés implementados</h2>
+    </div>
+    <div class="section-body">
+      <div class="cache-card">
+        <h4>1 — Contexto de usuario (mayor impacto)</h4>
+        <div class="cache-meta">
+          <span><strong>Tipo:</strong> Map&lt;usuarioId, {contexto, expira}&gt;</span>
+          <span><strong>TTL:</strong> 5 minutos</span>
+          <span><strong>Máximo:</strong> 100 entradas</span>
+          <span><strong>Limpieza:</strong> automática al superar el límite</span>
+        </div>
+        <p>Evita las 2 queries a MongoDB en cada mensaje del chat. El contexto (preferencias, alergias, despensa) no cambia durante una conversación normal. Si el usuario actualiza su despensa y vuelve al chat, el contexto se refresca automáticamente al expirar el TTL.</p>
+      </div>
+
+      <div class="cache-card">
+        <h4>2 — Singleton del cliente Gemini</h4>
+        <div class="cache-meta">
+          <span><strong>Tipo:</strong> variable de módulo <code>_genAI</code></span>
+          <span><strong>TTL:</strong> sin expiración (vida del proceso)</span>
+        </div>
+        <p>La instancia <code>GoogleGenerativeAI</code> se crea una sola vez y se reutiliza en todas las funciones del módulo. El <code>model</code> con <code>systemInstruction</code> no se puede cachear (varía según el contexto de cada usuario), pero el cliente base sí.</p>
+      </div>
+
+      <div class="cache-card">
+        <h4>3 — Recetas generadas desde texto</h4>
+        <div class="cache-meta">
+          <span><strong>Tipo:</strong> Map&lt;descripcionNormalizada, {resultado, expira}&gt;</span>
+          <span><strong>TTL:</strong> 2 minutos</span>
+        </div>
+        <p>Protege ante doble-submit. La clave es la descripción normalizada (<code>trim().toLowerCase().replace(/\s+/g, ' ')</code>). TTL corto de 2 minutos: suficiente para absorber el tiempo entre el primer click y un posible segundo intento, sin retener resultados obsoletos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="flujos">
+    <div class="section-header">
+      <span class="section-icon">🔁</span>
+      <h2>Flujos con caché</h2>
+    </div>
+    <div class="section-body">
+      <h3>Chat — mensaje del usuario</h3>
+      <div class="flow">
+        <span class="flow-node">responderChat(mensajes, usuarioId)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">cacheContexto.get(usuarioId)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node hit">HIT → contexto en memoria</span>
+        <span class="flow-arrow">/ MISS →</span>
+        <span class="flow-node miss">2 queries MongoDB → set cache</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Gemini API</span>
+      </div>
+
+      <h3>Crear receta con IA</h3>
+      <div class="flow">
+        <span class="flow-node">generarRecetaDesdeTexto(desc)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">cacheRecetaGenerada.get(clave)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node hit">HIT → receta en memoria (doble-submit)</span>
+        <span class="flow-arrow">/ MISS →</span>
+        <span class="flow-node miss">Gemini API → set cache 2 min</span>
+      </div>
+
+      <h3>Escanear ticket (sin caché)</h3>
+      <div class="flow">
+        <span class="flow-node">escanearTicket(imagenBase64)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">obtenerCliente() singleton</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Gemini Vision API</span>
+      </div>
+      <p style="margin-top:0.5rem">Las imágenes de ticket son siempre únicas, no tiene sentido cachearlas.</p>
+    </div>
+  </section>
+
+  <section id="codigo">
+    <div class="section-header">
+      <span class="section-icon">💻</span>
+      <h2>Código clave</h2>
+    </div>
+    <div class="section-body">
+      <h3>Singleton del cliente</h3>
+      <pre>let _genAI: GoogleGenerativeAI | null = null;
+
+function obtenerCliente(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw Object.assign(new Error("GEMINI_API_KEY no configurada"), { status: 503 });
+  if (!_genAI) _genAI = new GoogleGenerativeAI(apiKey);
+  return _genAI;
+}</pre>
+
+      <h3>Caché de contexto con TTL y límite</h3>
+      <pre>const cacheContexto = new Map&lt;string, EntradaContexto&gt;();
+const TTL_CONTEXTO_MS = 5 * 60 * 1000;
+const MAX_ENTRADAS_CONTEXTO = 100;
+
+async function obtenerContextoUsuario(usuarioId: string): Promise&lt;string&gt; {
+  const ahora = Date.now();
+  const entrada = cacheContexto.get(usuarioId);
+
+  if (entrada &amp;&amp; entrada.expira &gt; ahora) return entrada.contexto; // cache hit
+
+  // cache miss → queries a MongoDB
+  const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId);
+  const despensaDoc = usuario
+    ? await Usuario.findById(usuarioId).select("despensa").lean().exec()
+    : null;
+  // ... construir contexto ...
+
+  if (cacheContexto.size &gt;= MAX_ENTRADAS_CONTEXTO) limpiarContextosExpirados();
+  cacheContexto.set(usuarioId, { contexto, expira: ahora + TTL_CONTEXTO_MS });
+  return contexto;
+}</pre>
+
+      <h3>Invalidación manual (para uso futuro)</h3>
+      <pre>// Exportada para que otros módulos puedan forzar refresco
+// (ej: si despensaRepository llama a esto tras una mutación)
+export function invalidarContextoUsuario(usuarioId: string): void {
+  cacheContexto.delete(usuarioId);
+}</pre>
+    </div>
+  </section>
+
+  <section id="decisiones">
+    <div class="section-header">
+      <span class="section-icon">🧠</span>
+      <h2>Decisiones de diseño</h2>
+    </div>
+    <div class="section-body">
+      <h3>Sin Redis, sin infraestructura adicional</h3>
+      <p>El caché vive en la memoria del proceso Node. Para el TFG es suficiente: un solo proceso en Render, el caché se comparte entre todas las requests de ese proceso. Si escalara a múltiples instancias se necesitaría Redis, pero ese escenario está fuera del alcance.</p>
+
+      <h3>TTL 5 min para contexto, 2 min para recetas</h3>
+      <p>5 minutos es suficiente para una conversación de chat fluida sin recargar el contexto entre cada mensaje. Si el usuario actualiza su despensa y vuelve, el contexto se refresca solo al expirar. 2 minutos para recetas generadas es suficiente para absorber doble-submits sin retener resultados obsoletos.</p>
+
+      <h3>Limpieza pasiva por expiración</h3>
+      <p>No hay un intervalo periódico de limpieza. La limpieza ocurre solo cuando se supera <code>MAX_ENTRADAS_CONTEXTO</code>. Para 100 usuarios activos simultáneos (máximo realista en un TFG) el Map nunca crece demasiado.</p>
+
+      <h3>El model con systemInstruction no se cachea</h3>
+      <p>El <code>systemInstruction</code> incluye el contexto personalizado de cada usuario. Como el contexto es diferente por usuario y cambia con el tiempo, crear un modelo cacheado por userId añadiría complejidad sin beneficio claro frente a cachear solo el contexto string.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

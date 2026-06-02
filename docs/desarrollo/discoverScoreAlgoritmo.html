@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discover Score — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .formula-box { background: #111; border: 1px solid #f9731633; border-radius: 10px; padding: 1.25rem; text-align: center; }
+    .formula-main { font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: #fb923c; font-weight: 700; letter-spacing: 0.02em; }
+    .formula-sub { font-size: 0.75rem; color: #737373; margin-top: 0.5rem; }
+
+    .decay-bar { display: flex; align-items: center; gap: 0.75rem; }
+    .decay-label { font-size: 0.75rem; color: #a3a3a3; width: 4rem; flex-shrink: 0; font-family: monospace; }
+    .decay-track { flex: 1; background: #222; border-radius: 4px; height: 8px; overflow: hidden; }
+    .decay-fill { height: 100%; background: linear-gradient(90deg, #f97316, #fb923c88); border-radius: 4px; }
+    .decay-val { font-size: 0.72rem; color: #737373; width: 3rem; text-align: right; font-family: monospace; }
+
+    .flow { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Algoritmo de scoring híbrido — Feed de Discover</h1>
+  <p>DISC-SCORE-001 · 2026-06-02 · <span class="badge be">BE</span> <span class="badge fe">FE</span> <span class="badge done">✅ Completado</span></p>
+</header>
+
+<nav>
+  <a href="#problema">Problema</a>
+  <a href="#formula">Fórmula</a>
+  <a href="#decay">Curva decay</a>
+  <a href="#implementacion">Implementación</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#decisiones">Decisiones</a>
+</nav>
+
+<main>
+
+  <section id="problema">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <h2>Problema original</h2>
+    </div>
+    <div class="section-body">
+      <p>El tab <strong>"Recientes"</strong> en /discover ordenaba por fecha de publicación pura (<code>sort: 'reciente'</code>). Una receta publicada hace 5 minutos con 0 likes aparecía antes que una publicada hace 2 días con 200 likes y 40 comentarios.</p>
+      <p>El tab <strong>"Mejor valorados"</strong> ordenaba por número de likes en bruto, sin decaimiento temporal. Una receta de hace un año con 500 likes bloqueaba permanentemente el top, independientemente de la actividad reciente.</p>
+      <p>El resultado: el feed no premiaba contenido de calidad reciente ni tenía en cuenta la relevancia personal del usuario.</p>
+    </div>
+  </section>
+
+  <section id="formula">
+    <div class="section-header">
+      <span class="section-icon">📐</span>
+      <h2>Fórmula de scoring</h2>
+    </div>
+    <div class="section-body">
+      <div class="formula-box">
+        <div class="formula-main">score = (likes × 2 + comentarios × 3) × decay + followBoost + prefBoost</div>
+        <div class="formula-sub">calculado en memoria para cada documento antes del sort</div>
+      </div>
+
+      <h3>Variables</h3>
+      <table>
+        <thead><tr><th>Variable</th><th>Cálculo</th><th>Razón</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>popularidad</td>
+            <td><code>likes×2 + comentarios×3</code></td>
+            <td>Comentar requiere más intención que un like. Peso mayor en comentarios.</td>
+          </tr>
+          <tr>
+            <td>decay</td>
+            <td><code>1 / (1 + √diasAntiguo)</code></td>
+            <td>Curva suave con raíz cuadrada. Penaliza el tiempo sin colapsar recetas de días anteriores.</td>
+          </tr>
+          <tr>
+            <td>followBoost</td>
+            <td><code>+1.5 si sigues al autor</code></td>
+            <td>Bonus pequeño de cercanía social. No domina el score, pero desempata.</td>
+          </tr>
+          <tr>
+            <td>prefBoost</td>
+            <td><code>+0.5 × categorías coincidentes</code></td>
+            <td>Cada categoría de la receta que coincida con las preferencias del usuario suma 0.5.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="decay">
+    <div class="section-header">
+      <span class="section-icon">📉</span>
+      <h2>Curva de decaimiento temporal</h2>
+    </div>
+    <div class="section-body">
+      <p>La función <code>1 / (1 + √t)</code> produce una curva suave: cae rápido los primeros días (cuando el contenido es más relevante) y se estabiliza en valores bajos para contenido antiguo.</p>
+
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
+        <div class="decay-bar">
+          <span class="decay-label">día 0</span>
+          <div class="decay-track"><div class="decay-fill" style="width:100%"></div></div>
+          <span class="decay-val">1.00</span>
+        </div>
+        <div class="decay-bar">
+          <span class="decay-label">día 1</span>
+          <div class="decay-track"><div class="decay-fill" style="width:50%"></div></div>
+          <span class="decay-val">0.50</span>
+        </div>
+        <div class="decay-bar">
+          <span class="decay-label">día 4</span>
+          <div class="decay-track"><div class="decay-fill" style="width:33%"></div></div>
+          <span class="decay-val">0.33</span>
+        </div>
+        <div class="decay-bar">
+          <span class="decay-label">día 7</span>
+          <div class="decay-track"><div class="decay-fill" style="width:27%"></div></div>
+          <span class="decay-val">0.27</span>
+        </div>
+        <div class="decay-bar">
+          <span class="decay-label">día 30</span>
+          <div class="decay-track"><div class="decay-fill" style="width:15%"></div></div>
+          <span class="decay-val">0.15</span>
+        </div>
+        <div class="decay-bar">
+          <span class="decay-label">día 90</span>
+          <div class="decay-track"><div class="decay-fill" style="width:9%"></div></div>
+          <span class="decay-val">0.09</span>
+        </div>
+      </div>
+
+      <p>Una receta con 100 likes publicada hoy (decay=1.0) tiene score 200. La misma receta publicada hace 30 días tiene score 30. Una receta de hace una semana con 500 likes tiene score 135 — supera a la nueva con 100 likes.</p>
+    </div>
+  </section>
+
+  <section id="implementacion">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <h2>Implementación</h2>
+    </div>
+    <div class="section-body">
+      <h3>Flujo de datos</h3>
+      <div class="flow">
+        <span class="flow-node">GET /api/recetas?sort=score</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasController</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetasService.obtenerFeed()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">recetaRepository.findAll()</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">rama sort==='score'</span>
+      </div>
+
+      <h3>Rama score en findAll()</h3>
+      <pre>if (sort === 'score') {
+  const [todos, preferencias] = await Promise.all([
+    Receta.find(query).populate("autorId", "nombre foto").lean().exec(),
+    usuarioId ? obtenerPreferenciasUsuario(usuarioId) : Promise.resolve([]),
+  ]);
+
+  const ahora = new Date();
+  const segSet = seguidosSet ?? new Set&lt;string&gt;();
+
+  todos.sort((a, b) => {
+    const sa = calcularScoreFeed(a, ahora, segSet, preferencias);
+    const sb = calcularScoreFeed(b, ahora, segSet, preferencias);
+    return sb - sa;
+  });
+
+  total = todos.length;
+  docs = todos.slice(skip, skip + limite);
+}</pre>
+
+      <h3>Función calcularScoreFeed()</h3>
+      <pre>function calcularScoreFeed(
+  doc: Record&lt;string, unknown&gt;,
+  ahora: Date,
+  seguidosSet: Set&lt;string&gt;,
+  preferencias: string[],
+): number {
+  const likes = (doc.likes as unknown[]).length;
+  const comentarios = (doc.listaComentarios as unknown[]).length;
+  const fecha = doc.fechaPublicacion as Date;
+  const diasAntiguo = (ahora.getTime() - fecha.getTime()) / (1000 * 60 * 60 * 24);
+
+  const popularidad = likes * 2 + comentarios * 3;
+  const decay = 1 / (1 + Math.sqrt(Math.max(0, diasAntiguo)));
+
+  const autor = doc.autorId as { _id: { toString(): string } };
+  const followBoost = seguidosSet.has(autor?._id?.toString() ?? "") ? 1.5 : 0;
+
+  const categorias = (doc.categorias as string[]) ?? [];
+  const prefBoost = categorias.filter((c) => preferencias.includes(c)).length * 0.5;
+
+  return popularidad * decay + followBoost + prefBoost;
+}</pre>
+
+      <h3>Helper obtenerPreferenciasUsuario()</h3>
+      <pre>async function obtenerPreferenciasUsuario(usuarioId: string): Promise&lt;string[]&gt; {
+  const usuario = await Usuario.findById(usuarioId)
+    .select("preferencias")
+    .lean()
+    .exec();
+  return (usuario?.preferencias as string[] | undefined) ?? [];
+}</pre>
+
+      <h3>Mapeo en el frontend</h3>
+      <pre>// useDiscover.ts — tab "recientes" usa sort:score
+const sort = tab === 'valorados' ? 'likes' : tab === 'recientes' ? 'score' : 'reciente'</pre>
+    </div>
+  </section>
+
+  <section id="archivos">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Archivos modificados</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>backend/src/types/receta.ts</td>
+            <td>Añadido <code>'score'</code> a <code>FiltrosFeed.sort</code> union type.</td>
+          </tr>
+          <tr>
+            <td>backend/src/repositories/recetaRepository.ts</td>
+            <td>Funciones <code>obtenerPreferenciasUsuario()</code> y <code>calcularScoreFeed()</code> añadidas a nivel de módulo. Nueva rama <code>sort === 'score'</code> en <code>findAll()</code>, antes de la rama <code>likes</code>.</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/discover/hooks/useDiscover.ts</td>
+            <td>Mapeo del tab <code>'recientes'</code> a <code>sort: 'score'</code>.</td>
+          </tr>
+          <tr>
+            <td>frontend/src/services/recetasService.ts</td>
+            <td>Añadido <code>'score'</code> a <code>FiltrosFeed.sort</code> en la interfaz del servicio FE.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="decisiones">
+    <div class="section-header">
+      <span class="section-icon">🧠</span>
+      <h2>Decisiones de diseño</h2>
+    </div>
+    <div class="section-body">
+      <h3>Sin cambios de schema</h3>
+      <p>Las "guardadas" de una receta viven en <code>usuario.recetasGuardadas</code>, no en el documento de receta. Añadir un contador de guardados requeriría una migración de schema. La decisión fue usar solo <code>likes</code> y <code>listaComentarios</code>, ambos ya presentes en el documento.</p>
+
+      <h3>Sort in-memory</h3>
+      <p>El mismo patrón que la rama existente <code>sort === 'likes'</code>. Carga todos los documentos que pasan los filtros, los puntúa y ordena en Node, y luego pagina con <code>slice()</code>. Válido a escala de TFG. Para producción real se optaría por un campo precalculado en MongoDB con índice.</p>
+
+      <h3>Tab "Recientes" → score</h3>
+      <p>El algoritmo ya premia la recencia via decay, así que "Recientes" no pierde su semántica: el contenido de hoy sigue apareciendo arriba si tiene algo de actividad. La diferencia es que una receta con 0 interacciones publicada hace 10 minutos ya no bloquea el top solo por ser nueva.</p>
+
+      <h3>Tab "Mejor valorados" sin cambios</h3>
+      <p>Sigue usando <code>sort: 'likes'</code> puro — ranking histórico de likes sin decaimiento. Tiene sentido mantenerlo como referencia de "lo más popular de siempre".</p>
+
+      <h3>Promise.all() para reducir latencia</h3>
+      <p>La query de recetas y <code>obtenerPreferenciasUsuario()</code> se ejecutan en paralelo. La <code>seguidosSet</code> ya estaba disponible en ese punto del flujo (calculada antes del bloque de sort), sin coste extra.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

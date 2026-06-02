@@ -1,6 +1,6 @@
 import { recetaRepository } from "../repositories/recetaRepository";
 import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
-import { buscarFotoPexels } from "./imagenService";
+import { buscarFotoPexelsCascada } from "./imagenService";
 
 export const recetasService = {
   async obtenerFeed(filtros: FiltrosFeed, usuarioId?: string) {
@@ -72,6 +72,6 @@ export const recetasService = {
   },
 
   async obtenerFotoPreview(query: string) {
-    return buscarFotoPexels(query);
+    return buscarFotoPexelsCascada(query);
   },
 };
