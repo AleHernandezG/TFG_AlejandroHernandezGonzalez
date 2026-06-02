@@ -38,7 +38,7 @@ export function useDiscover({
   const { data: session } = useSession()
   const token = session?.user?.backendToken
 
-  const sort = tab === 'valorados' ? 'likes' : 'reciente'
+  const sort = tab === 'valorados' ? 'likes' : tab === 'recientes' ? 'score' : 'reciente'
   const soloEvento = tab === 'evento'
   // lowercase para que coincida con los valores en MongoDB ('vegano', 'pasta'…)
   const categoriaParam = categoria && categoria !== 'Todos' ? categoria.toLowerCase() : undefined

@@ -11,7 +11,7 @@ export interface FiltrosFeed {
   limite?: number;
   excluirPropio?: boolean;
   soloSiguiendo?: boolean;
-  sort?: 'reciente' | 'likes';
+  sort?: 'reciente' | 'likes' | 'score';
   soloEvento?: boolean;
   categoria?: string;
 }

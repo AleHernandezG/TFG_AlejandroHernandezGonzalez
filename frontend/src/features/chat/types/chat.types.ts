@@ -5,6 +5,14 @@ export interface Mensaje {
   rol: RolMensaje
   contenido: string
   timestamp: Date
+  imagen?: string
+}
+
+export interface ConversacionGuardada {
+  id: string
+  fecha: string
+  primerMensaje: string
+  mensajes: Mensaje[]
 }
 
 export interface ChipSugerido {

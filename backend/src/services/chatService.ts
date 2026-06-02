@@ -7,51 +7,153 @@ interface MensajeChat {
   texto: string;
 }
 
-async function obtenerContextoUsuario(usuarioId: string): Promise<string> {
-  const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId);
-  if (!usuario) return "";
+// ── Singleton del cliente Gemini ─────────────────────────────────────────────
+let _genAI: GoogleGenerativeAI | null = null;
 
-  const despensaUsuario = await Usuario.findById(usuarioId).select("despensa").lean().exec();
-  const despensa = (despensaUsuario?.despensa as Array<{ nombre: string; cantidad: number; unidad: string }> | undefined) ?? [];
+function obtenerCliente(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw Object.assign(new Error("GEMINI_API_KEY no configurada"), { status: 503 });
+  if (!_genAI) _genAI = new GoogleGenerativeAI(apiKey);
+  return _genAI;
+}
+
+// ── Caché de contexto de usuario ─────────────────────────────────────────────
+interface EntradaContexto {
+  contexto: string;
+  expira: number;
+}
+
+const cacheContexto = new Map<string, EntradaContexto>();
+const TTL_CONTEXTO_MS = 5 * 60 * 1000;
+const MAX_ENTRADAS_CONTEXTO = 100;
+
+function limpiarContextosExpirados() {
+  const ahora = Date.now();
+  for (const [key, entrada] of cacheContexto.entries()) {
+    if (entrada.expira < ahora) cacheContexto.delete(key);
+  }
+}
+
+export function invalidarContextoUsuario(usuarioId: string): void {
+  cacheContexto.delete(usuarioId);
+}
+
+async function obtenerContextoUsuario(usuarioId: string): Promise<string> {
+  const ahora = Date.now();
+  const entrada = cacheContexto.get(usuarioId);
+
+  if (entrada && entrada.expira > ahora) {
+    console.log(`[Gemini cache] HIT contexto usuario ${usuarioId.slice(-6)}`);
+    return entrada.contexto;
+  }
+
+  console.log(`[Gemini cache] MISS contexto usuario ${usuarioId.slice(-6)} — consultando MongoDB`);
+  const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId);
+  const despensaDoc = usuario
+    ? await Usuario.findById(usuarioId).select("despensa").lean().exec()
+    : null;
+  const despensa =
+    (despensaDoc?.despensa as Array<{ nombre: string; cantidad: number; unidad: string }> | undefined) ?? [];
 
   const lineas: string[] = [];
-
-  if ((usuario.preferencias ?? []).length > 0) {
-    lineas.push(`- Dietas: ${usuario.preferencias.join(", ")}`);
+  if ((usuario?.preferencias ?? []).length > 0) {
+    lineas.push(`- Dietas: ${usuario!.preferencias.join(", ")}`);
   }
-  if ((usuario.alergias ?? []).length > 0) {
-    lineas.push(`- Alergias: ${usuario.alergias.join(", ")}`);
+  if ((usuario?.alergias ?? []).length > 0) {
+    lineas.push(`- Alergias: ${usuario!.alergias.join(", ")}`);
   }
   if (despensa.length > 0) {
     const lista = despensa.map((d) => `${d.nombre} (${d.cantidad} ${d.unidad})`).join(", ");
     lineas.push(`- En su despensa: ${lista}`);
   }
 
-  return lineas.join("\n");
+  const contexto = lineas.join("\n");
+
+  if (cacheContexto.size >= MAX_ENTRADAS_CONTEXTO) limpiarContextosExpirados();
+  cacheContexto.set(usuarioId, { contexto, expira: ahora + TTL_CONTEXTO_MS });
+
+  return contexto;
 }
 
+// ── Caché de generación desde texto ──────────────────────────────────────────
+interface EntradaRecetaGenerada {
+  resultado: unknown;
+  expira: number;
+}
+
+const cacheRecetaGenerada = new Map<string, EntradaRecetaGenerada>();
+const TTL_RECETA_MS = 2 * 60 * 1000;
+
+function normalizarDescripcion(desc: string): string {
+  return desc.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function sanitizarTextoUsuario(texto: string): string {
+  return texto.replace(/\\/g, " ").replace(/"/g, "'").replace(/`/g, "'");
+}
+
+interface RecetaGeneradaEsperada {
+  titulo: string;
+  descripcion: string;
+  tiempo: number;
+  unidadTiempo: string;
+  porciones: number;
+  dificultad: string;
+  dietas: string[];
+  ingredientes: unknown[];
+  pasos: unknown[];
+}
+
+function validarEsquemaReceta(obj: unknown): obj is RecetaGeneradaEsperada {
+  if (typeof obj !== "object" || obj === null) return false;
+  const r = obj as Record<string, unknown>;
+  return (
+    typeof r.titulo === "string" && r.titulo.length > 0 &&
+    typeof r.descripcion === "string" &&
+    typeof r.tiempo === "number" &&
+    typeof r.unidadTiempo === "string" &&
+    typeof r.porciones === "number" &&
+    typeof r.dificultad === "string" &&
+    Array.isArray(r.dietas) &&
+    Array.isArray(r.ingredientes) && r.ingredientes.length > 0 &&
+    Array.isArray(r.pasos) && r.pasos.length > 0
+  );
+}
+
+function validarEsquemaIngredientes(arr: unknown): boolean {
+  if (!Array.isArray(arr)) return false;
+  return arr.every(
+    (item) =>
+      typeof item === "object" &&
+      item !== null &&
+      typeof (item as Record<string, unknown>).nombre === "string" &&
+      typeof (item as Record<string, unknown>).cantidad === "number"
+  );
+}
+
+// ── System prompt ─────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = (contexto: string) => `Eres el asistente culinario de Cookr, una app de recetas y gastronomía social.
 Responde siempre en español. Sé conciso, útil y con personalidad.
 Si te preguntan qué cocinar, sugiere recetas que usen los ingredientes disponibles y respeten las restricciones del usuario.
-No uses asteriscos para formato. Usa puntos o guiones simples.
+Usa markdown para estructurar las respuestas: **negrita** para títulos de sección, listas con - para ingredientes o pasos, párrafos separados para ideas distintas. Sin bloques de código.
 
 Contexto del usuario:
 ${contexto || "- Sin información de perfil disponible"}`;
 
+// ── Funciones exportadas ──────────────────────────────────────────────────────
 export async function responderChat(
   mensajes: MensajeChat[],
   usuarioId: string,
+  imagenBase64?: string,
 ): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!process.env.GEMINI_API_KEY) {
     return "El asistente no está disponible en este momento. Configura GEMINI_API_KEY para activarlo.";
   }
 
   try {
     const contexto = await obtenerContextoUsuario(usuarioId);
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
+    const model = obtenerCliente().getGenerativeModel({
       model: "gemini-flash-latest",
       systemInstruction: SYSTEM_PROMPT(contexto),
     });
@@ -63,7 +165,19 @@ export async function responderChat(
 
     const ultimo = mensajes[mensajes.length - 1];
     const chat = model.startChat({ history: historial });
-    const result = await chat.sendMessage(ultimo.texto);
+
+    let result;
+    if (imagenBase64) {
+      const partes = imagenBase64.split(",");
+      const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";
+      const data = partes[1] ?? partes[0];
+      result = await chat.sendMessage([
+        { inlineData: { mimeType, data } },
+        { text: ultimo.texto || "¿Qué ves en esta imagen? Ayúdame en el contexto culinario." },
+      ]);
+    } else {
+      result = await chat.sendMessage(ultimo.texto);
+    }
 
     return result.response.text();
   } catch (err) {
@@ -74,16 +188,23 @@ export async function responderChat(
 }
 
 export async function generarRecetaDesdeTexto(descripcion: string): Promise<unknown> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!process.env.GEMINI_API_KEY) {
     throw Object.assign(new Error("Gemini no está configurado"), { status: 503 });
   }
 
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+  const clave = normalizarDescripcion(descripcion);
+  const ahora = Date.now();
+  const entrada = cacheRecetaGenerada.get(clave);
 
-    const prompt = `Dado este texto: "${descripcion}", genera una receta en JSON con exactamente este formato:
+  if (entrada && entrada.expira > ahora) {
+    return entrada.resultado;
+  }
+
+  try {
+    const model = obtenerCliente().getGenerativeModel({ model: "gemini-flash-latest" });
+
+    const descripcionSegura = sanitizarTextoUsuario(descripcion);
+    const prompt = `Genera una receta en JSON con exactamente este formato:
 {
   "titulo": string,
   "descripcion": string,
@@ -95,13 +216,23 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
   "ingredientes": [{"nombre": string, "cantidad": string, "unidad": string}],
   "pasos": [{"texto": string}]
 }
+
+Descripción del usuario: ${descripcionSegura}
+
 Solo responde con el JSON, sin markdown, sin explicaciones.`;
 
     const result = await model.generateContent(prompt);
     const texto = result.response.text().trim();
-
     const limpio = texto.replace(/^```json?\s*/i, "").replace(/```\s*$/i, "").trim();
-    return JSON.parse(limpio);
+    const receta = JSON.parse(limpio);
+
+    if (!validarEsquemaReceta(receta)) {
+      throw new Error("La respuesta de Gemini no tiene el formato esperado");
+    }
+
+    cacheRecetaGenerada.set(clave, { resultado: receta, expira: ahora + TTL_RECETA_MS });
+
+    return receta;
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini generar-receta] Error:", error.message);
@@ -110,14 +241,12 @@ Solo responde con el JSON, sin markdown, sin explicaciones.`;
 }
 
 export async function escanearTicket(imagenBase64: string): Promise<Array<{ nombre: string; cantidad: number; unidad: string }>> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!process.env.GEMINI_API_KEY) {
     throw Object.assign(new Error("Gemini no está configurado"), { status: 503 });
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = obtenerCliente().getGenerativeModel({ model: "gemini-flash-latest" });
 
     const partes = imagenBase64.split(",");
     const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";
@@ -136,7 +265,13 @@ Solo responde con el JSON, sin markdown.`;
 
     const texto = result.response.text().trim();
     const limpio = texto.replace(/^```json?\s*/i, "").replace(/```\s*$/i, "").trim();
-    return JSON.parse(limpio);
+    const ingredientes = JSON.parse(limpio);
+
+    if (!validarEsquemaIngredientes(ingredientes)) {
+      return [];
+    }
+
+    return ingredientes as Array<{ nombre: string; cantidad: number; unidad: string }>;
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini escanear-ticket] Error:", error.message);

@@ -10,7 +10,7 @@ import {
   RecetaColeccion,
   RecetaDetalleRespuesta,
 } from "../types/receta";
-import { buscarFotoPexels } from "../services/imagenService";
+import { buscarFotoPexelsCascada } from "../services/imagenService";
 import { calcularMacros } from "../services/nutritionService";
 
 const MAPA_DIFICULTAD: Record<string, "Fácil" | "Media" | "Difícil"> = {
@@ -95,6 +95,38 @@ async function obtenerSeguidosSet(usuarioId: string): Promise<Set<string>> {
   return new Set(ids.map((id) => id.toString()));
 }
 
+async function obtenerPreferenciasUsuario(usuarioId: string): Promise<string[]> {
+  const usuario = await Usuario.findById(usuarioId)
+    .select("preferencias")
+    .lean()
+    .exec();
+  return (usuario?.preferencias as string[] | undefined) ?? [];
+}
+
+function calcularScoreFeed(
+  doc: Record<string, unknown>,
+  ahora: Date,
+  seguidosSet: Set<string>,
+  preferencias: string[],
+): number {
+  const likes = (doc.likes as unknown[]).length;
+  const comentarios = (doc.listaComentarios as unknown[]).length;
+  const fecha = doc.fechaPublicacion as Date;
+  const diasAntiguo = (ahora.getTime() - fecha.getTime()) / (1000 * 60 * 60 * 24);
+
+  const popularidad = likes * 2 + comentarios * 3;
+  const decay = 1 / (1 + Math.sqrt(Math.max(0, diasAntiguo)));
+
+  const autor = doc.autorId as UsuarioPopulado;
+  const autorIdStr = autor?._id?.toString() ?? "";
+  const followBoost = seguidosSet.has(autorIdStr) ? 1.5 : 0;
+
+  const categorias = (doc.categorias as string[]) ?? [];
+  const prefBoost = categorias.filter((c) => preferencias.includes(c)).length * 0.5;
+
+  return popularidad * decay + followBoost + prefBoost;
+}
+
 export const recetaRepository = {
   async findAll(
     filtros: FiltrosFeed = {},
@@ -147,7 +179,27 @@ export const recetaRepository = {
     let docs: unknown[];
     let total: number;
 
-    if (sort === 'likes') {
+    if (sort === 'score') {
+      const [todos, preferencias] = await Promise.all([
+        Receta.find(query)
+          .populate("autorId", "nombre foto")
+          .lean()
+          .exec(),
+        usuarioId ? obtenerPreferenciasUsuario(usuarioId) : Promise.resolve<string[]>([]),
+      ]);
+
+      const ahora = new Date();
+      const segSet = seguidosSet ?? new Set<string>();
+
+      todos.sort((a, b) => {
+        const sa = calcularScoreFeed(a as Record<string, unknown>, ahora, segSet, preferencias);
+        const sb = calcularScoreFeed(b as Record<string, unknown>, ahora, segSet, preferencias);
+        return sb - sa;
+      });
+
+      total = todos.length;
+      docs = todos.slice(skip, skip + limite);
+    } else if (sort === 'likes') {
       const todos = await Receta.find(query)
         .populate("autorId", "nombre foto")
         .sort({ fechaPublicacion: -1 })
@@ -445,7 +497,7 @@ export const recetaRepository = {
     let fotoCredito: IFotoCredito | null = null;
 
     if (!datos.imagenBase64) {
-      const fotoPexels = await buscarFotoPexels(datos.titulo);
+      const fotoPexels = await buscarFotoPexelsCascada(datos.titulo, datos.dietas);
       if (fotoPexels) {
         imagenUrl = fotoPexels.url;
         fotoFuente = "pexels";

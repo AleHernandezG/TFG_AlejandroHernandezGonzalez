@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-06-01 · Sprint 6 completado · A1-A7 ✅ · B1-B2 ✅ · C1-C4 ✅ · INGR-002 ✅ · INGR-003 ✅ · NUTR-002 ✅</div>
+    <div class="meta">Actualizado: 2026-06-02 · SEC-IA-001 ✅ · DISC-SCORE-001 ✅ · PEXELS-CASCADE-001 ✅ · GEMINI-CACHE-001 ✅</div>
   </div>
 </header>
 
@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">127</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">131</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -1710,6 +1710,46 @@
             <span class="source">📄 backend/src/routes/usuarios.routes.ts · frontend/src/services/perfilService.ts · frontend/src/features/perfil/hooks/usePerfil.ts · features/perfil/components/tarjetaAvatarPerfil.tsx · docs/desarrollo/perfilIntegracion.html</span>
           </td>
           <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DISC-SCORE-001</td>
+          <td class="desc">
+            <strong>Algoritmo de scoring híbrido para el feed de Discover</strong>
+            <small>Tab "Recientes" usa sort:score en lugar de sort:reciente. Fórmula: score = (likes×2 + comentarios×3) × decay + followBoost + prefBoost. Decay: 1/(1+√diasAntiguo). followBoost +1.5 si el usuario sigue al autor. prefBoost +0.5 por categoría coincidente con preferencias del usuario. BE: calcularScoreFeed() + obtenerPreferenciasUsuario() en recetaRepository.ts. Sort in-memory sobre todos los docs (mismo patrón que sort:likes). FE: useDiscover.ts mapea tab recientes → sort:score.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/types/receta.ts · frontend/src/features/discover/hooks/useDiscover.ts · frontend/src/services/recetasService.ts · docs/desarrollo/discoverScoreAlgoritmo.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">PEXELS-CASCADE-001</td>
+          <td class="desc">
+            <strong>Búsqueda Pexels en cascada — tipo de plato como clave visual</strong>
+            <small>buscarFotoPexelsCascada(titulo, categorias) en imagenService.ts. Intento 1: detecta tipo de plato en el título con regex (sopa→soup, guiso→stew, pasta→pasta dish, paella→paella…). Intento 2: ingrediente principal visual si no hay tipo de plato (pollo→chicken, salmón→salmon…). Intento 3: dieta/categoría genérica como fallback. orientation:landscape + per_page:3 en cada intento. Nunca se manda el título crudo a Pexels. Sustituye a buscarFotoPexels() en recetaRepository.crear() y recetasService.obtenerFotoPreview().</small>
+            <span class="source">📄 backend/src/services/imagenService.ts · backend/src/repositories/recetaRepository.ts · backend/src/services/recetasService.ts · docs/desarrollo/plan-pexels-cascade.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEC-IA-001</td>
+          <td class="desc">
+            <strong>Auditoría seguridad endpoints IA — 7 vulnerabilidades corregidas</strong>
+            <small>(1) Prompt injection en generarRecetaDesdeTexto: sanitizarTextoUsuario() + prompt reestructurado. (2) Rate limiting por usuario: middleware limitarPorUsuario() — chat 30/min, generar 5/min, ticket 5/min. (3) Límites chat: max 50 mensajes, 2000 chars/mensaje. (4) Jailbreak por rol: último mensaje debe ser "user". (5) imagenBase64: límite 7M chars + validación data:image/. (6) /foto-preview requiere auth. (7) Schema validation en respuestas Gemini: validarEsquemaReceta() + validarEsquemaIngredientes(). 0 errores tsc.</small>
+            <span class="source">📄 backend/src/middlewares/rateLimitIA.ts · backend/src/services/chatService.ts · backend/src/routes/chat.routes.ts · backend/src/routes/recetas.routes.ts · backend/src/routes/despensa.routes.ts · docs/desarrollo/seguridadIA.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">GEMINI-CACHE-001</td>
+          <td class="desc">
+            <strong>Caché en memoria para llamadas a Gemini — 3 optimizaciones</strong>
+            <small>(1) Contexto de usuario cacheado por userId con TTL 5 min y límite 100 entradas: evita 2 queries a MongoDB en cada mensaje del chat. (2) Singleton GoogleGenerativeAI: instancia creada una sola vez y reutilizada. (3) Caché de receta generada desde texto con TTL 2 min: protege ante doble-submit. invalidarContextoUsuario() exportada para uso futuro. escanearTicket() sin caché (imágenes únicas). 0 cambios de schema, 0 dependencias nuevas.</small>
+            <span class="source">📄 backend/src/services/chatService.ts · docs/desarrollo/geminiCache.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>

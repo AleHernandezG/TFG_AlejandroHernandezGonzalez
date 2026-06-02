@@ -6,10 +6,13 @@ function mapearRol(rol: 'usuario' | 'ia'): 'user' | 'model' {
 }
 
 export const chatService = {
-  async enviarMensaje(mensajes: Mensaje[], token: string): Promise<string> {
+  async enviarMensaje(mensajes: Mensaje[], token: string, imagenBase64?: string): Promise<string> {
     const { data } = await apiClient.post<{ respuesta: string }>(
       '/chat',
-      { mensajes: mensajes.map((m) => ({ rol: mapearRol(m.rol), texto: m.contenido })) },
+      {
+        mensajes: mensajes.map((m) => ({ rol: mapearRol(m.rol), texto: m.contenido })),
+        ...(imagenBase64 ? { imagenBase64 } : {}),
+      },
       { headers: { Authorization: `Bearer ${token}` } },
     )
     return data.respuesta

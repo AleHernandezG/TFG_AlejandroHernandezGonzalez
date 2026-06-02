@@ -16,3 +16,10 @@ DOCS-003 — Subir HTMLs de docs a OneDriv
 TEND-001	sidebarTendencias.tsx usa mock (CHEFS_DESTACADOS, RECETAS_POPULARES). "Recetas Populares" se puede conectar con ?sort=likes (endpoint ya existe). "Chefs Destacados" requiere endpoint nuevo. Solo visible en lg+.	Baja
 DET-010	Metadatos dinámicos por receta (og:title, og:image) para que al compartir el enlace se vea la tarjeta correcta. Ahora siempre sale "Detalle de receta — Cookr".
 
+crea un plan md para llevarlo a cabo para ello siempre desbes serguir las rules de @docs/rules.md , @docs/folderStructure.md y @docs/infraestructura.md 
+
+Luego revisas el typescrpit y lint para ver que todo esta bien
+
+Posteriormente me dices cuando acabes las mofidificaciones como ver si todo esta correcto y como revisarlo  y si te doy el visto bueno continuas documentando todas las tareas en @docs/desarrollo/estadoTareas.html y @docs/context.md 
+
+Finalmente, crear o modificas los debidos html de /docs/desarrollo 
