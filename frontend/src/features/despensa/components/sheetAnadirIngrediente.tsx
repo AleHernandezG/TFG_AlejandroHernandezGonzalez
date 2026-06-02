@@ -1,7 +1,9 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Search, AlertCircle } from 'lucide-react'
+import { Search, AlertCircle, ScanLine, Loader2, CheckCircle2 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { apiClient } from '@/services/apiClient'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -19,15 +21,23 @@ interface Props {
   ingredientesExistentes: ItemDespensa[]
 }
 
+type IngredienteEscaneado = { nombre: string; cantidad: number; unidad: string }
+
 export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredientesExistentes }: Props) {
+  const { data: session } = useSession()
   const [nombre, setNombre] = useState('')
   const [cantidad, setCantidad] = useState('')
   const [unidad, setUnidad] = useState('g')
   const [mostrandoSugerencias, setMostrandoSugerencias] = useState(false)
   const [nombreDuplicado, setNombreDuplicado] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const ticketInputRef = useRef<HTMLInputElement>(null)
   const { sugerencias } = useAutocompletadoIngredientes(nombre)
   const ingredientes = ingredientesExistentes
+
+  const [escaneando, setEscaneando] = useState(false)
+  const [ingredientesEscaneados, setIngredientesEscaneados] = useState<IngredienteEscaneado[] | null>(null)
+  const [errorEscaneo, setErrorEscaneo] = useState<string | null>(null)
 
   const puedeAnadir = nombre.trim().length >= 2 && Number(cantidad) > 0
 
@@ -56,6 +66,48 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
       emoji: getEmojiIngrediente(nombreTrimmed),
     })
     resetear()
+  }
+
+  async function handleTicketChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setEscaneando(true)
+    setErrorEscaneo(null)
+    const reader = new FileReader()
+    reader.onload = async () => {
+      try {
+        const token = session?.user?.backendToken ?? ''
+        const { data } = await apiClient.post<{ ingredientes: IngredienteEscaneado[] }>(
+          '/despensa/escanear-ticket',
+          { imagenBase64: reader.result as string },
+          { headers: { Authorization: `Bearer ${token}` } },
+        )
+        if (!data.ingredientes.length) {
+          setErrorEscaneo('No se detectaron ingredientes en el ticket.')
+        } else {
+          setIngredientesEscaneados(data.ingredientes)
+        }
+      } catch {
+        setErrorEscaneo('No se pudo procesar la imagen. Inténtalo de nuevo.')
+      } finally {
+        setEscaneando(false)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function confirmarEscaneados() {
+    if (!ingredientesEscaneados) return
+    ingredientesEscaneados.forEach((ing) => {
+      const yaExiste = ingredientes.some(
+        (e) => e.nombre.toLowerCase() === ing.nombre.toLowerCase(),
+      )
+      if (!yaExiste) {
+        onAnadir({ nombre: ing.nombre, cantidad: ing.cantidad, unidad: ing.unidad, emoji: getEmojiIngrediente(ing.nombre) })
+      }
+    })
+    setIngredientesEscaneados(null)
+    onCerrar()
   }
 
   function resetear() {
@@ -180,6 +232,57 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
           >
             Cancelar
           </button>
+
+          {/* Escanear ticket */}
+          <div className="mt-4 pt-4 border-t border-border/40">
+            <input
+              ref={ticketInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleTicketChange}
+            />
+            <button
+              type="button"
+              onClick={() => { setErrorEscaneo(null); ticketInputRef.current?.click() }}
+              disabled={escaneando}
+              className="w-full flex items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-medium text-muted-foreground transition-all hover:border-brand/40 hover:text-brand disabled:opacity-50"
+            >
+              {escaneando ? (
+                <><Loader2 size={16} className="animate-spin" />Escaneando ticket…</>
+              ) : (
+                <><ScanLine size={16} />Escanear ticket de compra</>
+              )}
+            </button>
+            {errorEscaneo && <p className="text-xs text-destructive mt-2 text-center">{errorEscaneo}</p>}
+          </div>
+
+          {/* Lista ingredientes escaneados para confirmar */}
+          {ingredientesEscaneados && (
+            <div className="mt-4 pt-4 border-t border-border/40">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                Ingredientes detectados
+              </p>
+              <ul className="flex flex-col gap-1.5 mb-4">
+                {ingredientesEscaneados.map((ing, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 size={14} className="text-brand shrink-0" />
+                    <span className="flex-1">{ing.nombre}</span>
+                    <span className="text-muted-foreground text-xs">{ing.cantidad} {ing.unidad}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setIngredientesEscaneados(null)}>
+                  Cancelar
+                </Button>
+                <Button className="flex-1 bg-brand text-brand-foreground font-bold" onClick={confirmarEscaneados}>
+                  Añadir todos
+                </Button>
+              </div>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 

@@ -82,6 +82,17 @@ export const recetasService = {
     return data;
   },
 
+  async obtenerComentarios(
+    recetaId: string,
+    pagina = 1,
+    limite = 8,
+  ): Promise<{ comentarios: import('@/features/recetas/types/receta.types').Comentario[]; total: number; hayMas: boolean }> {
+    const { data } = await apiClient.get(`/recetas/${recetaId}/comentarios`, {
+      params: { pagina, limite },
+    });
+    return data;
+  },
+
   async agregarComentario(
     recetaId: string,
     texto: string,
@@ -95,6 +106,14 @@ export const recetasService = {
     return data;
   },
 
+  async actualizar(id: string, datos: Partial<DatosRecetaNueva>, token: string): Promise<void> {
+    await apiClient.put(
+      `/recetas/${id}`,
+      datos,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+  },
+
   async crear(datos: DatosRecetaNueva, token: string): Promise<{ id: string }> {
     const { data } = await apiClient.post<{ id: string }>(
       '/recetas',
@@ -102,6 +121,19 @@ export const recetasService = {
       { headers: { Authorization: `Bearer ${token}` } },
     );
     return data;
+  },
+
+  async generarDesdeTexto(descripcion: string, token: string): Promise<import('@/features/recetas/types/crearReceta.schema').DatosCrearReceta | null> {
+    try {
+      const { data } = await apiClient.post(
+        '/recetas/generar-desde-texto',
+        { descripcion },
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      return data as import('@/features/recetas/types/crearReceta.schema').DatosCrearReceta
+    } catch {
+      return null
+    }
   },
 
   async obtenerFotoPreview(query: string): Promise<{ url: string; fotografo: string; urlFoto: string; urlPerfil: string } | null> {

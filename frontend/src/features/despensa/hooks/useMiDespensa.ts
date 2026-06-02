@@ -72,6 +72,25 @@ export function useEditarItem() {
   })
 }
 
+export function useVaciarDespensa() {
+  const { data: session } = useSession()
+  const token = session?.user?.backendToken ?? ''
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => despensaService.vaciar(token),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: QUERY_KEY })
+      const prev = qc.getQueryData<ItemDespensa[]>(QUERY_KEY)
+      qc.setQueryData<ItemDespensa[]>(QUERY_KEY, [])
+      return { prev }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(QUERY_KEY, ctx.prev)
+    },
+  })
+}
+
 export function useEliminarItem() {
   const { data: session } = useSession()
   const token = session?.user?.backendToken ?? ''

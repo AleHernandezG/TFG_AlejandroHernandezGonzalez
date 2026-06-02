@@ -60,7 +60,7 @@
 
 <header>
   <h1>Despensa — Integración BE+FE</h1>
-  <div class="meta">Sprint 5 · 2026-05-12 · Cookr TFG · Estado: pendiente revisión</div>
+  <div class="meta">Sprint 6 · 2026-05-31 · Cookr TFG · DESP-003 ✅ vaciar despensa completado</div>
 </header>
 
 <nav>
@@ -326,6 +326,101 @@
           <tr>
             <td>"Añadir a mi despensa" en receta: solo local</td>
             <td>"Añadir a mi despensa" en receta: persiste en BD vía <code>useAñadirItem</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DESP-003 -->
+  <section id="desp003">
+    <div class="section-header"><span>🗑️</span><h2>DESP-003 — Vaciar despensa <span class="badge-done">✅ Sprint 6</span></h2></div>
+    <div class="section-body">
+
+      <div>
+        <h3>Endpoint BE</h3>
+        <pre>DELETE /api/despensa/vaciar   (requerirAuth)
+→ despensaRepository.vaciar(userId): $set { despensa: [] }
+→ devuelve 204 (sin body)
+
+Posición en el router: ANTES de /:id para evitar colisión de parámetros.</pre>
+      </div>
+
+      <div>
+        <h3>Capas BE modificadas</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>despensaRepository.ts</td><td>Añadido <code>vaciar(userId)</code> — $set {despensa:[]} en el documento Usuario</td></tr>
+            <tr><td>despensaService.ts</td><td>Añadido <code>vaciar(userId)</code> — delegación directa</td></tr>
+            <tr><td>despensaController.ts</td><td>Añadido <code>vaciar()</code> — llama al service, devuelve 204</td></tr>
+            <tr><td>despensa.routes.ts</td><td>Añadida ruta <code>DELETE /vaciar</code> antes de <code>/:id</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>FE — service + hook + UI</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>despensaService.ts</td><td>Añadido <code>vaciar(token)</code> — DELETE /despensa/vaciar</td></tr>
+            <tr><td>useMiDespensa.ts</td><td>Añadido <code>useVaciarDespensa()</code> — useMutation con optimistic update (setQueryData []) y rollback en onError</td></tr>
+            <tr><td>headerDespensa.tsx</td><td>Pill button visible solo cuando items.length > 0. Transición muted→destructive en hover (patrón iOS/Notion/Linear). Dialog de confirmación antes de ejecutar.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Diseño del botón — patrón iOS/Notion/Linear</h3>
+        <p>El botón es un pill <code>rounded-full</code> con <code>border-border</code> y <code>text-muted-foreground</code> en estado neutro. En hover transiciona a <code>border-destructive/40 bg-destructive/5 text-destructive</code>. La naturaleza destructiva solo se revela en la interacción, sin alarmar visualmente al usuario en reposo.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Sprint 6 — DESP-TICKET-001 (C4) -->
+  <section id="escanear-ticket">
+    <div class="section-header" style="padding:1rem 1.25rem;border-bottom:1px solid #252525">
+      <h2 style="font-size:0.92rem;font-weight:700;color:#fff">Sprint 6 · C4 — DESP-TICKET-001: Escanear ticket de compra</h2>
+    </div>
+    <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
+      <p style="font-size:0.85rem;color:#d4d4d4">El usuario fotografía un ticket de supermercado. Gemini Vision extrae los ingredientes alimentarios y muestra una lista de confirmación. Al confirmar, los ingredientes se añaden a la despensa.</p>
+
+      <div style="background:#eab30811;border:1px solid #eab30833;border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:#fbbf24">⚠️ Requiere <code>GEMINI_API_KEY</code> en <code>backend/.env</code>. Sin clave: error 503 manejado con mensaje visible.</div>
+
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+        <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Capa</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Detalle</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">chatService.ts → escanearTicket()</td><td style="padding:0.6rem 1rem">Gemini 1.5 Flash multimodal: imagen base64 → prompt extrae <code>[{nombre,cantidad,unidad}]</code>. Limpia markdown de la respuesta antes de <code>JSON.parse()</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">despensa.routes.ts</td><td style="padding:0.6rem 1rem"><code>POST /api/despensa/escanear-ticket</code> (requerirAuth). Body: <code>{imagenBase64}</code>. Responde: <code>{ingredientes: [{nombre,cantidad,unidad}]}</code>.</td></tr>
+          <tr><td style="padding:0.6rem 1rem">FE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">sheetAnadirIngrediente.tsx</td><td style="padding:0.6rem 1rem">Botón "Escanear ticket" + <code>input capture="environment"</code> → FileReader → POST → lista de confirmación → "Añadir todos" llama a <code>onAnadir</code> por cada ingrediente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header"><h2>INGR-002 / INGR-003 — Autocompletado en despensa mejorado</h2></div>
+    <div class="section-body">
+      <p>El autocompletado de ingredientes en el sheet "Añadir ingrediente" usa el hook <code>useAutocompletadoIngredientes</code>, que primero busca en la lista local y después llama al backend si hay pocos resultados. Ambas fuentes han sido mejoradas.</p>
+
+      <h3>INGR-002 — Lista local ampliada a ~991 ingredientes</h3>
+      <p>La búsqueda local es instantánea. Se han añadido ingredientes frecuentes en despensas españolas: legumbres regionales, pescados en conserva, salsas, condimentos asiáticos, embutidos ibéricos y platos semielaborados. La nueva categoría <code>preparados</code> cubre bases de cocina (sofrito, caldo concentrado, paella precocinada).</p>
+
+      <h3>INGR-003 — Open Food Facts como fallback externo</h3>
+      <p>Cuando la búsqueda local devuelve menos de 3 resultados, el hook llama a <code>GET /api/ingredientes/buscar?q=</code>, que ahora consulta Open Food Facts (3M+ productos, sin API key, gratis). Reemplaza Edamam Food Database que requería plan de pago.</p>
+
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span style="color:#3b82f6;font-family:monospace;font-size:.72rem">frontend/src/config/ingredientes.ts</span></td>
+            <td>239 → 991 ingredientes. Nuevo tipo de categoría <code>preparados</code>.</td>
+          </tr>
+          <tr>
+            <td><span style="color:#3b82f6;font-family:monospace;font-size:.72rem">backend/src/services/ingredientesService.ts</span></td>
+            <td>Endpoint cambiado de Edamam Food DB a Open Food Facts. Sin clave, timeout 3s, fallback a <code>[]</code>.</td>
           </tr>
         </tbody>
       </table>

@@ -2,9 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import { ChefHat, Loader2, AlertCircle } from "lucide-react";
 
@@ -22,9 +20,8 @@ import {
 import {
   esquemaRecuperarContrasena,
   type DatosRecuperarContrasena,
-  type EstadoFormulario,
 } from "@/features/auth/types/autenticacion";
-import { authService } from "@/services/authService";
+import { useAuth } from "@/features/auth/hooks";
 
 // ─── Variantes de animación ──────────────────────────────────────────────────
 
@@ -52,9 +49,7 @@ const variantesCampo: Variants = {
 // ─── Componente ──────────────────────────────────────────────────────────────
 
 export function FormularioRecuperarContrasena() {
-  const router = useRouter();
-  const [estadoEnvio, setEstadoEnvio] = useState<EstadoFormulario>("idle");
-  const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const { recuperarContrasena, cargando, error } = useAuth();
 
   const {
     register,
@@ -65,21 +60,8 @@ export function FormularioRecuperarContrasena() {
     defaultValues: { correo: "" },
   });
 
-  const alEnviar = async (datos: DatosRecuperarContrasena) => {
-    setEstadoEnvio("cargando");
-    setMensajeError(null);
-
-    try {
-      // El backend siempre devuelve 200 (nunca revela si el correo existe)
-      await authService.recuperarContrasena({ correo: datos.correo });
-      router.push(`/recuperar-contrasena/pendiente?email=${encodeURIComponent(datos.correo)}`);
-    } catch {
-      setMensajeError(
-        "No se pudo enviar el correo. Inténtalo de nuevo en unos segundos."
-      );
-      setEstadoEnvio("error");
-    }
-  };
+  const alEnviar = (datos: DatosRecuperarContrasena) =>
+    recuperarContrasena(datos.correo);
 
   return (
     <motion.div
@@ -109,7 +91,7 @@ export function FormularioRecuperarContrasena() {
 
         <CardContent className="space-y-5">
           {/* Error global */}
-          {estadoEnvio === "error" && mensajeError && (
+          {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -117,7 +99,7 @@ export function FormularioRecuperarContrasena() {
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-              {mensajeError}
+              {error}
             </motion.div>
           )}
 
@@ -152,9 +134,9 @@ export function FormularioRecuperarContrasena() {
               <Button
                 type="submit"
                 className="w-full bg-brand text-brand-foreground hover:bg-brand/90"
-                disabled={estadoEnvio === "cargando"}
+                disabled={cargando}
               >
-                {estadoEnvio === "cargando" ? (
+                {cargando ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
                     Enviando enlace…

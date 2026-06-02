@@ -51,8 +51,8 @@ export function useToggleGuardado(recetaId: string) {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["recetas", "feed"] })
-      queryClient.invalidateQueries({ queryKey: ["recetas", "detalle", recetaId] })
+      queryClient.invalidateQueries({ queryKey: ['recetas', 'feed'] })
+      queryClient.invalidateQueries({ queryKey: ['coleccion', 'guardadas'] })
     },
   });
 }

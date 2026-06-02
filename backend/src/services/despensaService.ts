@@ -18,4 +18,7 @@ export const despensaService = {
 
   eliminar: (usuarioId: string, itemId: string) =>
     despensaRepository.eliminar(usuarioId, itemId),
+
+  vaciar: (usuarioId: string) =>
+    despensaRepository.vaciar(usuarioId),
 };

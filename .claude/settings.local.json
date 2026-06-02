@@ -8,7 +8,37 @@
       "Bash(find \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\app\\\\\\(main\\)\" -type f)",
       "Bash(npm install:*)",
       "Bash(npx shadcn@latest add checkbox --yes)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(Remove-Item \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\docs\\\\casos-de-uso.html\")",
+      "Bash(Rename-Item \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\docs\\\\casos-de-uso-v2.html\" \"casos-de-uso.html\")",
+      "PowerShell(cd \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\" ; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"npm notice\" } | Select-Object -Last 15)",
+      "PowerShell(cd \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\" ; npx next lint 2>&1 | Where-Object { $_ -notmatch \"npm notice\" } | Select-Object -Last 10)",
+      "PowerShell(cd \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\backend\" ; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"npm notice\" } | Select-Object -Last 15)",
+      "PowerShell(cd \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\backend\" ; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"npm notice\" } | Select-Object -Last 10)",
+      "PowerShell(cd \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\" ; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"npm notice\" } | Select-Object -Last 10)",
+      "Bash(mkdir \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\app\\\\\\(main\\)\\\\editar-receta\\\\[id]\")",
+      "Bash(dir \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\app\\\\\\(main\\)\\\\recetas\")",
+      "WebFetch(domain:world.openfoodfacts.org)",
+      "WebFetch(domain:fdc.nal.usda.gov)",
+      "WebFetch(domain:www.calorieninjas.com)",
+      "WebFetch(domain:spoonacular.com)",
+      "WebFetch(domain:www.nutritionix.com)",
+      "WebSearch",
+      "WebFetch(domain:openfoodfacts.github.io)",
+      "WebFetch(domain:developer.nutritionix.com)",
+      "WebFetch(domain:calorieninjas.com)",
+      "WebFetch(domain:api-ninjas.com)",
+      "Bash(grep -v \"//\\\\|^\\\\s*//\")",
+      "Bash(Get-Content \"c:\\\\Users\\\\usuario\\\\Desktop\\\\TFG_AlejandroHernandezGonzalez\\\\docs\\\\desarrollo\\\\coleccionYCrearReceta.html\")",
+      "Bash(Measure-Object -Line)",
+      "Bash(Select-Object -ExpandProperty Lines)",
+      "Bash(node -e \"console.log\\(process.env.GEMINI_API_KEY\\)\")",
+      "Bash(curl -s http://localhost:4000/api/health)",
+      "Bash(curl -s -X POST http://localhost:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"maria@cookr.dev\",\"contrasena\":\"Seed1234.\"}')",
+      "Bash(curl -s -X POST http://localhost:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"correo\":\"maria@cookr.dev\",\"contrasena\":\"Seed1234.\"}')"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\usuario\\Desktop\\TFG_AlejandroHernandezGonzalez\\frontend\\src\\app\\(main)\\editar-receta"
     ]
   }
 }

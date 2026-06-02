@@ -27,6 +27,10 @@ export const recetasService = {
     return recetaRepository.toggleGuardado(recetaId, usuarioId);
   },
 
+  async obtenerComentarios(id: string, pagina: number, limite: number) {
+    return recetaRepository.findComentarios(id, pagina, limite);
+  },
+
   async agregarComentario(recetaId: string, usuarioId: string, texto: string) {
     if (!texto || texto.trim().length === 0) {
       throw Object.assign(new Error("El comentario no puede estar vacío"), { status: 400 });
@@ -47,6 +51,15 @@ export const recetasService = {
 
   async crear(datos: DatosCrearRecetaBody, autorId: string) {
     return recetaRepository.crear(datos, autorId);
+  },
+
+  async actualizar(recetaId: string, usuarioId: string, datos: Partial<DatosCrearRecetaBody>) {
+    try {
+      await recetaRepository.actualizar(recetaId, usuarioId, datos);
+    } catch (err) {
+      const e = err as Error & { status?: number };
+      throw Object.assign(new Error(e.message), { status: e.status ?? 500 });
+    }
   },
 
   async eliminar(recetaId: string, usuarioId: string) {

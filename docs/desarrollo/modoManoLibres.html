@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modo Manos Libres — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.limit { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+    .callout { background: #111; border-left: 3px solid #f97316; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; font-size: 0.82rem; color: #d4d4d4; }
+    .callout.warn { border-color: #eab308; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Modo Manos Libres — Cookr TFG</h1>
+  <p>Sprint 5 · 2026-05-31 · HANDS-001 ✅ completado · Web Speech API + Navigator Wake Lock</p>
+</header>
+
+<nav>
+  <a href="#descripcion">Descripción</a>
+  <a href="#hook">Hook</a>
+  <a href="#integracion">Integración</a>
+  <a href="#limitaciones">Limitaciones</a>
+  <a href="#archivos">Archivos</a>
+</nav>
+
+<main>
+
+  <section id="descripcion">
+    <div class="section-header"><span>🎙️</span><h2>Descripción — HANDS-001 <span class="badge done">✅ Sprint 5</span></h2></div>
+    <div class="section-body">
+      <p>El modo manos libres lee en voz alta los pasos de una receta usando la Web Speech API del navegador, avanzando automáticamente al siguiente paso al terminar de leer cada uno. La pantalla permanece encendida mientras está activo gracias a la Navigator Wake Lock API.</p>
+
+      <div>
+        <h3>Flujo de usuario</h3>
+        <div class="flow">
+          <span class="flow-node">Botón "Modo manos libres"</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">Lee paso 1</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">onend → paso 2</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">... auto-avance</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-node">Fin o X detener</span>
+        </div>
+      </div>
+
+      <div>
+        <h3>Controles disponibles</h3>
+        <ul>
+          <li><strong>← Anterior</strong> — salta al paso previo y lo lee desde el inicio</li>
+          <li><strong>⏸ Pausar / ▶ Reanudar</strong> — pausa/reanuda la síntesis de voz</li>
+          <li><strong>→ Siguiente</strong> — salta al siguiente paso sin esperar a que termine</li>
+          <li><strong>✕ Detener</strong> — cancela TTS, libera Wake Lock, resetea estado</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="hook">
+    <div class="section-header"><span>🪝</span><h2>Hook — useModoManoLibres.ts</h2></div>
+    <div class="section-body">
+
+      <div>
+        <h3>Estado</h3>
+        <table>
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td>activo</td><td>boolean</td><td>TTS corriendo o en pausa</td></tr>
+            <tr><td>pasoActual</td><td>number</td><td>Índice del paso que se está leyendo</td></tr>
+            <tr><td>pausado</td><td>boolean</td><td>speechSynthesis en pausa</td></tr>
+            <tr><td>soportado</td><td>boolean</td><td>window.speechSynthesis existe</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Acciones</h3>
+        <table>
+          <thead><tr><th>Método</th><th>Signatura</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td>iniciar</td><td>(pasos: string[]) → Promise&lt;void&gt;</td><td>Arranca TTS + Wake Lock desde el paso 0</td></tr>
+            <tr><td>pausar</td><td>() → void</td><td>speechSynthesis.pause()</td></tr>
+            <tr><td>reanudar</td><td>() → void</td><td>speechSynthesis.resume()</td></tr>
+            <tr><td>siguiente</td><td>() → void</td><td>Cancela utterance actual, lee el siguiente paso</td></tr>
+            <tr><td>anterior</td><td>() → void</td><td>Cancela utterance actual, lee el paso anterior</td></tr>
+            <tr><td>detener</td><td>() → void</td><td>Cancela TTS, libera Wake Lock, resetea estado</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Detalles de implementación</h3>
+        <ul>
+          <li><code>pasosRef</code> y <code>pasoActualRef</code> como <code>useRef</code> — evita stale closure en <code>utterance.onend</code></li>
+          <li><code>utterance.lang = 'es-ES'</code> — voz en español</li>
+          <li><code>utterance.rate = 0.9</code> — velocidad ligeramente reducida para mejor comprensión</li>
+          <li>Auto-avance en <code>utterance.onend</code> — solo si hay más pasos</li>
+          <li>Cleanup en <code>useEffect return</code> — cancela TTS y libera Wake Lock al desmontar</li>
+          <li>Guard de soporte: <code>setSoportado</code> en <code>useEffect</code> para evitar SSR mismatch</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Wake Lock</h3>
+        <pre>if ('wakeLock' in navigator) {
+  wakeLockRef.current = await navigator.wakeLock.request('screen')
+}
+// Se libera en detener() y en cleanup de useEffect</pre>
+        <p>El guard <code>'wakeLock' in navigator</code> evita errores en navegadores que no lo soportan (Firefox). El <code>try/catch</code> absorbe el error si el usuario deniega el permiso.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="integracion">
+    <div class="section-header"><span>🔌</span><h2>Integración en componentes</h2></div>
+    <div class="section-body">
+
+      <table>
+        <thead><tr><th>Componente</th><th>Pasos que recibe</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td>pasosReceta.tsx</td><td>props.pasos: string[]</td><td>Botón activa <code>iniciar(pasos)</code>. Barra de controles visible cuando <code>activo</code>. Paso activo resaltado con ring brand y círculo relleno.</td></tr>
+          <tr><td>previsualizacionReceta.tsx</td><td>datos.pasos: {texto}[]</td><td>Mismo patrón. Mapea a string[] con <code>.map(p => p.texto)</code> antes de pasar al hook.</td></tr>
+        </tbody>
+      </table>
+
+      <div>
+        <h3>UI — estado activo</h3>
+        <ul>
+          <li>El botón "Modo manos libres" se oculta cuando <code>activo === true</code> (solo cuando <code>!activo && soportado</code>)</li>
+          <li>Barra de controles aparece con fondo <code>bg-brand/10 border-brand/20</code></li>
+          <li>Paso activo: <code>bg-brand/5 ring-1 ring-brand/30</code> + círculo numerado cambia a <code>bg-brand text-brand-foreground</code></li>
+          <li>Pasos futuros/pasados: sin cambio visual</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="limitaciones">
+    <div class="section-header"><span>⚠️</span><h2>Limitaciones conocidas</h2></div>
+    <div class="section-body">
+
+      <table>
+        <thead><tr><th>Limitación</th><th>Contexto</th><th>Mitigación</th></tr></thead>
+        <tbody>
+          <tr><td>Safari iOS requiere interacción del usuario</td><td>speechSynthesis.speak() no funciona sin evento táctil previo</td><td>El botón "Modo manos libres" es el evento táctil — funciona correctamente</td></tr>
+          <tr><td>Voces disponibles varían por SO</td><td>Windows usa voces Cortana, macOS voces Apple, Android voces Google TTS</td><td>lang='es-ES' selecciona la mejor voz disponible en cada plataforma</td></tr>
+          <tr><td>Firefox no soporta Wake Lock</td><td>navigator.wakeLock no existe en Firefox</td><td>Guard <code>'wakeLock' in navigator</code> — el TTS sigue funcionando sin Wake Lock</td></tr>
+          <tr><td>speechSynthesis.pause() inconsistente en Chrome Android</td><td>Puede cortar el audio en lugar de pausar</td><td>Comportamiento aceptable para MVP — el usuario puede reanudar con el botón</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+
+  <section id="archivos">
+    <div class="section-header"><span>📁</span><h2>Archivos</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Capa</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td>frontend/src/features/recetas/hooks/useModoManoLibres.ts</td><td><span class="badge fe">FE</span></td><td>Nuevo — hook completo con TTS + Wake Lock</td></tr>
+          <tr><td>frontend/src/features/recetas/components/detalleReceta/pasosReceta.tsx</td><td><span class="badge fe">FE</span></td><td>Botón conectado + barra controles + resaltado paso activo</td></tr>
+          <tr><td>frontend/src/features/recetas/components/crearReceta/previsualizacionReceta.tsx</td><td><span class="badge fe">FE</span></td><td>Mismo patrón — mapea pasos de objeto a string[]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

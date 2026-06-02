@@ -88,7 +88,7 @@
     <h1>Vista /chat — Chat IA Cookr · Documentación Técnica</h1>
   </div>
   <span class="badge">CHAT-001</span>
-  <div class="meta">Sprint 4 · 2026-05-08 · Fase 4 de 7 · FE mock completa</div>
+  <div class="meta">Sprint 4-6 · 2026-06-01 · Chat Gemini real activo (C1+C2)</div>
 </header>
 
 <nav>
@@ -599,6 +599,38 @@ components/common/
           <tr><td class="path">chatStore.ts</td><td>Sustituir <code>enviarMensaje</code> mock por llamada real desde el hook</td></tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- ── Sprint 6: implementación real ── -->
+  <section id="sprint6-real">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Sprint 6 — Integración Gemini real (C1 + C2)</h2>
+    </div>
+    <div class="section-body">
+      <h3>Archivos nuevos/modificados</h3>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;font-size:0.7rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;font-size:0.7rem;color:#525252;text-transform:uppercase">Cambio</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/services/chatService.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>responderChat(mensajes[], usuarioId)</code>: carga preferencias + alergias + despensa del usuario, construye system prompt, llama a Gemini 1.5 Flash con historial. También exporta <code>generarRecetaDesdeTexto()</code> y <code>escanearTicket()</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/routes/chat.routes.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>POST /api/chat</code> (requerirAuth). Valida array <code>mensajes</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/app.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Registrado <code>/api/chat</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">frontend/src/services/chatService.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>chatService.enviarMensaje(mensajes[], token)</code> → POST /api/chat.</td></tr>
+          <tr><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">frontend/src/stores/chatStore.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Reemplazado <code>getMockRespuesta + setTimeout</code> por llamada real a <code>chatService.enviarMensaje()</code>. En error → mensaje de error en la burbuja de IA.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:1.25rem">System prompt con contexto (C2)</h3>
+      <pre style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.76rem;color:#d4d4d4;line-height:1.5">Eres el asistente culinario de Cookr...
+- Dietas: [preferencias del usuario]
+- Alergias: [alergias del usuario]
+- En su despensa: [lista de items]
+
+Responde siempre en español. Sin asteriscos para formato.</pre>
+
+      <h3 style="margin-top:1.25rem">Dependencia</h3>
+      <p style="font-size:0.85rem;color:#fbbf24;background:#eab30811;border:1px solid #eab30833;border-radius:8px;padding:0.75rem 1rem">⚠️ Requiere <code>GEMINI_API_KEY</code> en <code>backend/.env</code>. Sin clave, el asistente responde con un mensaje informativo. Obtener gratis en aistudio.google.com (15 RPM, 1M tokens/día con gemini-1.5-flash).</p>
     </div>
   </section>
 

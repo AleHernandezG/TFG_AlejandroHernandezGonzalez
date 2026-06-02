@@ -11,6 +11,7 @@ import {
   RecetaDetalleRespuesta,
 } from "../types/receta";
 import { buscarFotoPexels } from "../services/imagenService";
+import { calcularMacros } from "../services/nutritionService";
 
 const MAPA_DIFICULTAD: Record<string, "Fácil" | "Media" | "Difícil"> = {
   facil: "Fácil",
@@ -474,13 +475,93 @@ export const recetaRepository = {
       })),
       pasos: datos.pasos.map((p) => p.texto),
       alergenos: datos.alergenos,
-      macros: { calorias: 0, proteinas: 0, carbos: 0, grasas: 0 },
+      macros: await calcularMacros(
+        datos.ingredientes.map((ing) => ({
+          nombre: ing.nombre,
+          cantidad: parseFloat(ing.cantidad) || 0,
+          unidad: ing.unidad,
+        })),
+      ),
       likes: [],
       listaComentarios: [],
       fechaPublicacion: new Date(),
     });
 
     return { id: doc._id.toString() };
+  },
+
+  async findComentarios(
+    id: string,
+    pagina: number,
+    limite: number,
+  ): Promise<{
+    comentarios: { autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }[];
+    total: number;
+    hayMas: boolean;
+  }> {
+    if (!Types.ObjectId.isValid(id)) return { comentarios: [], total: 0, hayMas: false };
+
+    const receta = await Receta.findById(id).select("listaComentarios").lean().exec();
+    if (!receta) return { comentarios: [], total: 0, hayMas: false };
+
+    type ComentarioLean = { autorNombre: string; avatarUrl: string | null; texto: string; fecha: Date };
+    const todos = (receta.listaComentarios as ComentarioLean[]).slice().reverse();
+    const total = todos.length;
+    const skip = (pagina - 1) * limite;
+    const comentarios = todos.slice(skip, skip + limite).map((c) => ({
+      autorNombre: c.autorNombre,
+      avatarUrl: c.avatarUrl,
+      texto: c.texto,
+      fecha: c.fecha.toISOString(),
+    }));
+
+    return { comentarios, total, hayMas: skip + limite < total };
+  },
+
+  async actualizar(
+    recetaId: string,
+    usuarioId: string,
+    datos: Partial<DatosCrearRecetaBody>,
+  ): Promise<void> {
+    if (!Types.ObjectId.isValid(recetaId)) {
+      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    }
+
+    const receta = await Receta.findById(recetaId).select("autorId").lean().exec();
+    if (!receta) {
+      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    }
+
+    if ((receta.autorId as Types.ObjectId).toString() !== usuarioId) {
+      throw Object.assign(new Error("No tienes permiso para editar esta receta"), { status: 403 });
+    }
+
+    const update: Record<string, unknown> = {};
+
+    if (datos.titulo !== undefined) update.titulo = datos.titulo;
+    if (datos.descripcion !== undefined) update.descripcion = datos.descripcion;
+    if (datos.tiempo !== undefined && datos.unidadTiempo !== undefined) {
+      update.tiempo = `${datos.tiempo} ${datos.unidadTiempo}`;
+    }
+    if (datos.dificultad !== undefined) update.dificultad = MAPA_DIFICULTAD[datos.dificultad];
+    if (datos.porciones !== undefined) update.porciones = datos.porciones;
+    if (datos.dietas !== undefined) update.categorias = datos.dietas;
+    if (datos.alergenos !== undefined) update.alergenos = datos.alergenos;
+    if (datos.ingredientes !== undefined) {
+      update.ingredientes = datos.ingredientes.map((ing) => ({
+        nombre: ing.nombre,
+        cantidad: parseFloat(ing.cantidad) || 0,
+        unidad: ing.unidad,
+      }));
+    }
+    if (datos.pasos !== undefined) update.pasos = datos.pasos.map((p) => p.texto);
+    if (datos.imagenBase64 !== undefined) {
+      update.imagenUrl = datos.imagenBase64;
+      update.fotoFuente = "usuario";
+      update.fotoCredito = null;
+    }
+
+    await Receta.findByIdAndUpdate(recetaId, { $set: update });
   },
 
   async eliminar(recetaId: string, usuarioId: string): Promise<void> {

@@ -12,8 +12,8 @@ export function useAgregarComentario(recetaId: string) {
   return useMutation({
     mutationFn: (texto: string) => recetasService.agregarComentario(recetaId, texto, token),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["recetas", "feed"] });
-      queryClient.invalidateQueries({ queryKey: ["recetas", "detalle", recetaId] });
+      queryClient.invalidateQueries({ queryKey: ['comentarios', recetaId] });
+      queryClient.invalidateQueries({ queryKey: ['recetas', 'feed'] });
     },
   });
 }

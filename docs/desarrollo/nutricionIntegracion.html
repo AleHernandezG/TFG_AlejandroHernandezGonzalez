@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nutrición — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.7rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.83rem; }
+    tr:last-child td { border-bottom: none; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: #111; border: 1px solid #2a2a2a; border-radius: 4px; padding: 0.1rem 0.4rem; color: #f97316; }
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #d4d4d4; overflow-x: auto; line-height: 1.5; }
+    .file { color: #3b82f6; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+    p { font-size: 0.88rem; color: #d4d4d4; }
+    .warn { background: #eab30811; border: 1px solid #eab30833; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.82rem; color: #fbbf24; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Nutrición + Ingredientes — NUTR-001 · INGR-001 · INGR-002 · INGR-003 · NUTR-002</h1>
+  <div class="meta">Sprint 6 · 2026-06-01 · Actualizado: 2026-06-01 · Estado: <span style="color:#4ade80">✅ Completado</span></div>
+</header>
+
+<main>
+
+  <section>
+    <div class="section-header"><h2>NUTR-001 — Macros reales al publicar</h2></div>
+    <div class="body">
+      <p>Al publicar una receta, <code>recetaRepository.crear()</code> llama a <code>calcularMacros()</code> antes de guardar el documento. La función llama a la Edamam Nutrition Analysis API con los ingredientes y retorna <code>{ calorias, proteinas, carbos, grasas }</code>. Sin claves configuradas retorna ceros (mismo comportamiento que antes).</p>
+
+      <div class="warn">⚠️ Requiere <code>EDAMAM_APP_ID</code> y <code>EDAMAM_APP_KEY</code> en <code>backend/.env</code>. Obtener en developer.edamam.com → Nutrition Analysis API (tier gratuito: 100 análisis/mes).</div>
+
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file">backend/src/services/nutritionService.ts</span></td>
+            <td>Nuevo. <code>calcularMacros(ingredientes[])</code> → POST a Edamam con array de strings "200g tomate". Fallback a ceros en cualquier error.</td>
+          </tr>
+          <tr>
+            <td><span class="file">backend/src/repositories/recetaRepository.ts</span></td>
+            <td>En <code>crear()</code>: reemplazado <code>macros: {calorias:0,...}</code> por <code>macros: await calcularMacros(datos.ingredientes)</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <pre>// nutritionService.ts — llamada Edamam
+const ingr = ingredientes.map(i => `${i.cantidad}${i.unidad} ${i.nombre}`)
+POST https://api.edamam.com/api/nutrition-details
+  ?app_id=EDAMAM_APP_ID&app_key=EDAMAM_APP_KEY
+Body: { ingr: ["200g pasta", "100ml nata", ...] }
+
+// Respuesta mapeada:
+{
+  calorias:  Math.round(data.calories),
+  proteinas: Math.round(data.totalNutrients.PROCNT?.quantity),
+  carbos:    Math.round(data.totalNutrients.CHOCDF?.quantity),
+  grasas:    Math.round(data.totalNutrients.FAT?.quantity)
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header"><h2>INGR-001 — Búsqueda Edamam Food Database</h2></div>
+    <div class="body">
+      <p>El hook <code>useAutocompletadoIngredientes</code> ya tenía lógica de fallback a Edamam cuando hay menos de 3 resultados locales. El stub <code>ingredientesService.buscarEdamam()</code> devolvía siempre <code>[]</code>. Ahora conecta al endpoint real.</p>
+
+      <div class="warn">⚠️ Usa las mismas claves EDAMAM o las variantes <code>EDAMAM_FOOD_APP_ID</code>/<code>EDAMAM_FOOD_APP_KEY</code> (Food Database API).</div>
+
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file">backend/src/services/ingredientesService.ts</span></td>
+            <td>Nuevo. <code>buscarIngredientesEdamam(query)</code> → GET Edamam auto-complete → devuelve <code>string[]</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="file">backend/src/routes/ingredientes.routes.ts</span></td>
+            <td>Nuevo. <code>GET /api/ingredientes/buscar?q=</code> registrado en <code>app.ts</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="file">frontend/src/services/ingredientesService.ts</span></td>
+            <td>Conectado al endpoint real. Antes: <code>return []</code>. Ahora: <code>apiClient.get('/ingredientes/buscar')</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header"><h2>INGR-002 — Lista de ingredientes ampliada (~991)</h2></div>
+    <div class="body">
+      <p>La lista local <code>frontend/src/config/ingredientes.ts</code> ha pasado de 239 a 991 ingredientes cubriendo 18 categorías (la nueva categoría <code>preparados</code> incluye platos semielaborados, bases y productos listos para usar). Los ingredientes se han obtenido de referencias como BEDCA, catálogos de Mercadona y Carrefour España, Open Food Facts y bases de datos de recetas.</p>
+
+      <table>
+        <thead><tr><th>Categoría</th><th>Items aprox.</th><th>Qué cubre</th></tr></thead>
+        <tbody>
+          <tr><td>harinas</td><td>34</td><td>Harinas alternativas (garbanzo, almendra, teff, tapioca), panes y galletas</td></tr>
+          <tr><td>pasta-arroz</td><td>32</td><td>Pastas asiáticas (soba, udon, ramen, arroz), cereales alternativos</td></tr>
+          <tr><td>lacteos</td><td>57</td><td>Quesos europeos (brie, feta, halloumi, pecorino), kéfir, bebidas vegetales</td></tr>
+          <tr><td>carnes</td><td>80</td><td>Cortes ibéricos, caza, casquería, embutidos regionales</td></tr>
+          <tr><td>pescados</td><td>53</td><td>Especies locales (besugo, corvina, platija), conservas</td></tr>
+          <tr><td>mariscos</td><td>31</td><td>Mariscos gallegos (percebe, nécora, centolla), bivalvos</td></tr>
+          <tr><td>verduras</td><td>147</td><td>Setas exóticas, algas, chiles frescos, flores comestibles, verduras asiáticas</td></tr>
+          <tr><td>frutas</td><td>92</td><td>Frutas tropicales, variedades locales, cítricos raros</td></tr>
+          <tr><td>legumbres</td><td>32</td><td>Variedades regionales, legumbres en conserva</td></tr>
+          <tr><td>frutos-secos</td><td>40</td><td>Pastas y cremas de frutos secos, semillas diversas</td></tr>
+          <tr><td>especias</td><td>104</td><td>Mezclas del mundo (ras el hanout, garam masala, za'atar), especias asiáticas</td></tr>
+          <tr><td>aceites</td><td>22</td><td>Aceites premium, variedades de AOVE</td></tr>
+          <tr><td>salsas</td><td>68</td><td>Salsas del mundo (mojo, harissa, gochujang), fondos y reducciones</td></tr>
+          <tr><td>bebidas</td><td>33</td><td>Caldos especiales, alcoholes para cocinar, dashi, sake, mirin</td></tr>
+          <tr><td>dulces</td><td>58</td><td>Técnicas de pastelería, edulcorantes alternativos, chocolates</td></tr>
+          <tr><td>otros</td><td>43</td><td>Conservas, encurtidos, alimentos japoneses, proteínas vegetales</td></tr>
+          <tr><td>preparados</td><td>45</td><td>Platos semielaborados, bases de cocina, masas y rellenos listos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header"><h2>INGR-003 — Open Food Facts como fallback de autocompletado</h2></div>
+    <div class="body">
+      <p>La Food Database API de Edamam requería plan de pago, por lo que se ha reemplazado con <strong>Open Food Facts</strong>, que es gratuita, sin tarjeta, y tiene más de 3 millones de productos. El endpoint de sugerencias devuelve un array de strings en español directamente.</p>
+      <div class="warn">Sin API key — gratis ilimitado. Límite recomendado: 15 peticiones/minuto por IP.</div>
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file">backend/src/services/ingredientesService.ts</span></td>
+            <td>Reemplazado endpoint Edamam Food DB por <code>world.openfoodfacts.org/cgi/suggest.pl?tagtype=ingredients&amp;term=&lt;query&gt;&amp;lc=es</code>. Timeout 3s, fallback a array vacío.</td>
+          </tr>
+        </tbody>
+      </table>
+      <pre>GET https://world.openfoodfacts.org/cgi/suggest.pl
+  ?tagtype=ingredients&amp;term=tomate&amp;lc=es
+→ ["Tomate", "Tomate cherry", "Tomate triturado", ...]</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-header"><h2>NUTR-002 — USDA FoodData Central como fallback de macros</h2></div>
+    <div class="body">
+      <p>Edamam Nutrition Analysis tiene un límite de 100 llamadas/mes. Cuando falla o no está configurado, <code>nutritionService.calcularMacros()</code> intenta ahora con la <strong>USDA FoodData Central API</strong> (1.000 peticiones/hora con clave gratuita). La función busca cada ingrediente, escala por cantidad/unidad y suma los macros.</p>
+      <div class="warn">⚠️ Requiere <code>USDA_API_KEY</code> en <code>backend/.env</code>. Obtener gratis en <code>api.data.gov</code> sin tarjeta de crédito.</div>
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="file">backend/src/services/nutritionService.ts</span></td>
+            <td>Añadida función <code>calcularMacrosUSDA()</code> con conversión de unidades (g, kg, ml, tsp, tbsp, taza, unidad). <code>calcularMacros()</code> prueba Edamam primero, USDA si falla, ceros si ninguno.</td>
+          </tr>
+          <tr>
+            <td><span class="file">backend/.env</span></td>
+            <td>Añadida variable <code>USDA_API_KEY=</code> (vacía por defecto, funciona sin ella devolviendo ceros).</td>
+          </tr>
+        </tbody>
+      </table>
+      <pre>// Flujo calcularMacros():
+1. Edamam disponible → llama Edamam (100/mes gratis)
+2. Edamam falla/no configurado → llama USDA (1000/hora gratis)
+3. Ambos fallan → devuelve { calorias:0, proteinas:0, carbos:0, grasas:0 }
+
+// USDA nutrientIds:
+// 1008 = Energy (kcal)
+// 1003 = Protein (g)
+// 1005 = Carbohydrates (g)
+// 1004 = Total Fat (g)</pre>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

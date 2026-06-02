@@ -50,6 +50,15 @@ export const despensaRepository = {
     return usuario.despensa ?? [];
   },
 
+  async vaciar(usuarioId: string): Promise<void> {
+    const usuario = await Usuario.findByIdAndUpdate(
+      usuarioId,
+      { $set: { despensa: [] } },
+      { new: true },
+    );
+    if (!usuario) notFound();
+  },
+
   async eliminar(usuarioId: string, itemId: string): Promise<IItemDespensa[]> {
     if (!Types.ObjectId.isValid(itemId)) {
       throw Object.assign(new Error("Item no encontrado"), { status: 404 });

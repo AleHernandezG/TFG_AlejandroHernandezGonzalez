@@ -81,4 +81,13 @@ export const despensaController = {
       manejarError(res, error);
     }
   },
+
+  async vaciar(req: Request, res: Response): Promise<void> {
+    try {
+      await despensaService.vaciar(req.usuario!.id);
+      res.status(204).send();
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
 };

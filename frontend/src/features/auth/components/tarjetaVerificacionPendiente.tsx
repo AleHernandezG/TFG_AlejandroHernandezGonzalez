@@ -7,7 +7,7 @@ import { Mail, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { authService } from '@/services/authService'
+import { useAuth } from '@/features/auth/hooks'
 
 const COOLDOWN_SEGUNDOS = 60
 
@@ -20,6 +20,7 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { reenviarVerificacion } = useAuth()
 
   const iniciarCooldown = useCallback(() => {
     setSegundosRestantes(COOLDOWN_SEGUNDOS)
@@ -35,7 +36,7 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
     setReenviando(true)
     setError(null)
     try {
-      await authService.reenviarVerificacion(email)
+      await reenviarVerificacion(email)
       setReenviado(true)
       iniciarCooldown()
     } catch {

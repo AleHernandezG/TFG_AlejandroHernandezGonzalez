@@ -766,6 +766,57 @@ cd backend  && npx tsc --noEmit  # debe dar 0 errores</pre>
     </div>
   </section>
 
+  <!-- FEED-SMART-001 -->
+  <section id="feed-smart">
+    <div class="section-header"><span class="section-icon">✨</span><h2>FEED-SMART-001 — Feed inteligente en /home <span style="font-size:0.72rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:999px;background:#22c55e22;color:#4ade80;border:1px solid #22c55e33;text-transform:uppercase;letter-spacing:0.05em;margin-left:0.5rem">✅ Sprint 6</span></h2></div>
+    <div class="section-body">
+
+      <div>
+        <p>Cuando el usuario no sigue a nadie (o los seguidos no han publicado recetas), el feed de <code>/home</code> quedaba vacío. Este feature añade un segundo query de fallback que muestra recetas personalizadas basadas en el perfil del usuario.</p>
+      </div>
+
+      <div>
+        <h3>Lógica de fallback</h3>
+        <pre>1. feedSiguiendo = useRecetasFeed({ soloSiguiendo: true, excluirPropio: true })
+2. Si feedSiguiendo.isSuccess && recetas.length === 0 && sin filtros activos:
+   → sinSiguiendo = true
+3. feedRecomendado = useRecetasFeed({
+     filtrosAvanzados: { dietas: perfil.preferencias, alergenos: perfil.alergias },
+     sort: 'likes', excluirPropio: true,
+     enabled: sinSiguiendo        ← segunda query solo se lanza cuando la primera da vacío
+   })
+4. recetas = sinSiguiendo ? feedRecomendado : feedSiguiendo
+5. esRecomendado = sinSiguiendo && recetas.length > 0
+   → muestra chip "Recetas para ti — basadas en tus gustos"</pre>
+      </div>
+
+      <div>
+        <h3>Archivos modificados</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>useRecetasFeed.ts</td><td>Añadido parámetro <code>enabled?: boolean</code> (default true) → pasado a <code>useQuery</code></td></tr>
+            <tr><td>feedHome.tsx</td><td>Importa <code>useMiPerfil</code>. Doble query con lógica sinSiguiendo. Chip Sparkles cuando <code>esRecomendado</code>. Estado vacío con mensaje contextual ("Sigue a otros usuarios…")</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Comportamiento por escenario</h3>
+        <table>
+          <thead><tr><th>Escenario</th><th>Feed mostrado</th><th>Chip visible</th></tr></thead>
+          <tbody>
+            <tr><td>Usuario sigue a alguien con recetas</td><td>Feed de seguidos (comportamiento original)</td><td>No</td></tr>
+            <tr><td>Usuario sin seguidos / seguidos sin recetas</td><td>Top recetas que encajan con sus preferencias/alergias</td><td>Sí — "Recetas para ti"</td></tr>
+            <tr><td>Sin preferencias configuradas</td><td>Top recetas por likes (sin filtros de dieta)</td><td>Sí</td></tr>
+            <tr><td>Usuario aplica búsqueda o filtros</td><td>Resultados del filtro activo (no se activa el fallback)</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
 </main>
 </body>
 </html>

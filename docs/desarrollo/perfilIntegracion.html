@@ -598,6 +598,28 @@ $ cd frontend && npx tsc --noEmit
     </div>
   </section>
 
+  <!-- Sprint 6 — Avatar upload (A5) -->
+  <section id="avatar-upload">
+    <div class="section-header" style="padding:1rem 1.25rem;border-bottom:1px solid #252525">
+      <h2 style="font-size:0.92rem;font-weight:700;color:#fff">Sprint 6 · A5 — Avatar upload real</h2>
+    </div>
+    <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
+      <p style="font-size:0.85rem;color:#d4d4d4">El icono de cámara en <code>TarjetaAvatarPerfil</code> ahora abre un selector de archivos. La imagen se convierte a base64 con <code>FileReader</code>, se sube al backend y se actualiza la sesión de NextAuth.</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+        <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Capa</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Cambio</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Repository</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuarioRepository.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>actualizarFoto(id, foto)</code> → <code>findByIdAndUpdate({ foto })</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Service</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuariosService.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>actualizarFoto()</code> — valida que empiece con <code>data:image/</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Route</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuarios.routes.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>PUT /api/usuarios/me/foto</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE Service</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">perfilService.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>subirFoto(token, fotoBase64)</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE Hook</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usePerfil.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>useSubirFoto()</code> — invalida cache perfil + llama <code>update({image})</code> de NextAuth</td></tr>
+          <tr><td style="padding:0.6rem 1rem">FE UI</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">tarjetaAvatarPerfil.tsx</td><td style="padding:0.6rem 1rem">Input file oculto, preview optimista, spinner <code>Loader2</code>, rollback en error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
 </main>
 </body>
 </html>

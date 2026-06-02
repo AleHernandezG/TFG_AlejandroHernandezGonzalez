@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth Refactor — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.3rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.verified { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+
+    .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .diff-panel { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; }
+    .diff-label { padding: 0.4rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #2a2a2a; }
+    .diff-label.before { color: #f87171; background: #ef444411; }
+    .diff-label.after  { color: #4ade80; background: #22c55e11; }
+    .diff pre { border: none; border-radius: 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Auth Refactor — useAuth hook</h1>
+  <p>Sprint 5 · 2026-05-31 · AUTH-004 ✅ verificado · API-012 ✅ · UI-008→013 ✅ — 6 componentes refactorizados · BUG-AUTH-001 ✅ resuelto 2026-06-02</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#auth004">AUTH-004</a>
+  <a href="#hook">Hook useAuth</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#patron">Patrón antes/después</a>
+  <a href="#decision">Decisión de diseño</a>
+  <a href="#archivos">Archivos</a>
+  <a href="#bug-auth-001">BUG-AUTH-001</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header"><span>📋</span><h2>Resumen</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>ID</th><th>Tarea</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>AUTH-004</td><td>Avatar y datos de usuario en sesión NextAuth — verificado que ya funcionaba</td><td><span class="badge verified">✅ Verificado (ya implementado)</span></td></tr>
+          <tr><td>API-012</td><td>Crear <code>useAuth.ts</code> — hook central de abstracción de auth</td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-008</td><td>Refactor <code>formularioRegistro.tsx</code> → usa <code>registrar()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-009</td><td>Refactor <code>formularioLogin.tsx</code> → usa <code>iniciarSesion()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-010</td><td>Refactor <code>formularioRecuperarContrasena.tsx</code> → usa <code>recuperarContrasena()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-011</td><td>Refactor <code>formularioNuevaContrasena.tsx</code> → usa <code>nuevaContrasena()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-012</td><td>Refactor <code>tarjetaVerificacionPendiente.tsx</code> → usa <code>reenviarVerificacion()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>UI-013</td><td>Refactor <code>tarjetaRecuperacionPendiente.tsx</code> → usa <code>reenviarRecuperacion()</code></td><td><span class="badge done">✅ Completado</span></td></tr>
+        </tbody>
+      </table>
+      <p>Comportamiento idéntico al anterior. 0 cambios visuales. El refactor solo mueve lógica de HTTP + navegación desde los componentes al hook, cumpliendo el patrón <strong>Componente → Hook → Service → apiClient</strong>.</p>
+    </div>
+  </section>
+
+  <!-- AUTH-004 -->
+  <section id="auth004">
+    <div class="section-header"><span>🔐</span><h2>AUTH-004 — Avatar y datos en sesión NextAuth <span class="badge verified">Verificado</span></h2></div>
+    <div class="section-body">
+      <p>Al auditar <code>lib/auth.ts</code> se comprobó que <code>session.user.image</code> ya estaba mapeado correctamente desde el Sprint 2. No se requirieron cambios.</p>
+      <div>
+        <h3>Flujo credentials</h3>
+        <pre>authorize() → { id, name, email, image: usuario.foto, backendToken, rol, perfilCompleto }
+jwt()      → token.picture = user.image  ·  token.name  ·  token.sub  ·  token.backendToken
+session()  → session.user.image = token.picture  ·  session.user.name = token.name</pre>
+      </div>
+      <div>
+        <h3>Flujo Google OAuth</h3>
+        <pre>GoogleProvider → user.image (URL avatar Google)
+jwt() → POST /api/auth/google con { foto: user.image }
+       token enriquecido con datos del BE (id, rol, perfilCompleto)
+       token.picture viene del perfil Google automáticamente via NextAuth</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOOK -->
+  <section id="hook">
+    <div class="section-header"><span>🪝</span><h2>Hook useAuth.ts — API-012 <span class="badge done">✅</span></h2></div>
+    <div class="section-body">
+
+      <div>
+        <h3>Ubicación</h3>
+        <p><code>frontend/src/features/auth/hooks/useAuth.ts</code><br>
+        Barrel: <code>frontend/src/features/auth/hooks/index.ts</code> → <code>export { useAuth } from './useAuth'</code></p>
+      </div>
+
+      <div>
+        <h3>Estado gestionado</h3>
+        <table>
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td>cargando</td><td>boolean</td><td>Petición HTTP en vuelo o signIn en proceso</td></tr>
+            <tr><td>error</td><td>string | null</td><td>Mensaje de error legible para el usuario, null si no hay error</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Métodos</h3>
+        <table>
+          <thead><tr><th>Método</th><th>Signatura</th><th>Qué hace</th></tr></thead>
+          <tbody>
+            <tr><td>iniciarSesion</td><td>(correo, contrasena) → Promise&lt;void&gt;</td><td>signIn("credentials"), getSession, redirect a /home o /completar-perfil según perfilCompleto</td></tr>
+            <tr><td>registrar</td><td>(nombre, correo, contrasena) → Promise&lt;void&gt;</td><td>authService.registro(), redirect a /verificar-email/pendiente. Maneja 409 (correo duplicado)</td></tr>
+            <tr><td>recuperarContrasena</td><td>(correo) → Promise&lt;void&gt;</td><td>authService.recuperarContrasena(), redirect a /recuperar-contrasena/pendiente</td></tr>
+            <tr><td>nuevaContrasena</td><td>(token, contrasena) → Promise&lt;boolean&gt;</td><td>authService.nuevaContrasena(). Devuelve true en éxito para que el componente muestre pantalla in-page</td></tr>
+            <tr><td>reenviarVerificacion</td><td>(correo) → Promise&lt;void&gt;</td><td>authService.reenviarVerificacion(). Sin gestión de estado (lo gestiona el componente con cooldown)</td></tr>
+            <tr><td>reenviarRecuperacion</td><td>(correo) → Promise&lt;void&gt;</td><td>authService.recuperarContrasena(). Ídem</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Helper interno</h3>
+        <pre>function extraerMensaje(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) return error.response?.data?.error ?? fallback
+  return fallback
+}</pre>
+        <p>Extrae el mensaje de error del backend (campo <code>error</code> en el body) o devuelve el fallback genérico. Evita que los componentes importen Axios.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header"><span>🧩</span><h2>Componentes refactorizados</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Componente</th><th>Método del hook</th><th>Eliminado del componente</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>formularioLogin.tsx</td>
+            <td><code>iniciarSesion(correo, contrasena)</code></td>
+            <td>import signIn, getSession, useRouter, useState estadoEnvio, useState mensajeError</td>
+          </tr>
+          <tr>
+            <td>formularioRegistro.tsx</td>
+            <td><code>registrar(nombre, correo, contrasena)</code></td>
+            <td>import authService, axios, useRouter, useState estadoEnvio, useState mensajeError</td>
+          </tr>
+          <tr>
+            <td>formularioRecuperarContrasena.tsx</td>
+            <td><code>recuperarContrasena(correo)</code></td>
+            <td>import authService, useRouter, useState estadoEnvio, useState mensajeError</td>
+          </tr>
+          <tr>
+            <td>formularioNuevaContrasena.tsx</td>
+            <td><code>nuevaContrasena(token, contrasena)</code></td>
+            <td>import authService, axios, useState estadoEnvio (reemplazado por boolean exito), useState mensajeError</td>
+          </tr>
+          <tr>
+            <td>tarjetaVerificacionPendiente.tsx</td>
+            <td><code>reenviarVerificacion(email)</code></td>
+            <td>import authService — cooldown y reenviado siguen en el componente (son UI, no auth)</td>
+          </tr>
+          <tr>
+            <td>tarjetaRecuperacionPendiente.tsx</td>
+            <td><code>reenviarRecuperacion(email)</code></td>
+            <td>import authService — ídem</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PATRÓN ANTES/DESPUÉS -->
+  <section id="patron">
+    <div class="section-header"><span>⚖️</span><h2>Patrón antes / después</h2></div>
+    <div class="section-body">
+
+      <h3>formularioLogin.tsx (ejemplo representativo)</h3>
+      <div class="diff">
+        <div class="diff-panel">
+          <div class="diff-label before">Antes — lógica inline</div>
+          <pre>import { signIn, getSession } from "next-auth/react"
+
+const [estadoEnvio, setEstadoEnvio] = useState("idle")
+const [mensajeError, setMensajeError] = useState(null)
+
+const alEnviar = async (datos) => {
+  setEstadoEnvio("cargando")
+  const res = await signIn("credentials", { ...datos, redirect: false })
+  if (res?.ok) {
+    const session = await getSession()
+    router.push(session?.user?.perfilCompleto ? "/home" : "/completar-perfil")
+    return
+  }
+  setMensajeError("Correo o contraseña incorrectos.")
+  setEstadoEnvio("error")
+}</pre>
+        </div>
+        <div class="diff-panel">
+          <div class="diff-label after">Después — hook</div>
+          <pre>import { useAuth } from "@/features/auth/hooks"
+
+const { iniciarSesion, cargando, error } = useAuth()
+
+const alEnviar = (datos) =>
+  iniciarSesion(datos.correo, datos.contrasena)</pre>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1rem">formularioNuevaContrasena.tsx — caso especial (exito in-page)</h3>
+      <div class="diff">
+        <div class="diff-panel">
+          <div class="diff-label before">Antes</div>
+          <pre>const [estadoEnvio, setEstadoEnvio] =
+  useState&lt;EstadoFormulario&gt;("idle")
+
+// en alEnviar:
+setEstadoEnvio("exito")
+
+// en JSX:
+if (estadoEnvio === "exito") return &lt;PantallaExito /&gt;</pre>
+        </div>
+        <div class="diff-panel">
+          <div class="diff-label after">Después</div>
+          <pre>const [exito, setExito] = useState(false)
+const { nuevaContrasena, cargando, error } = useAuth()
+
+// en alEnviar:
+const ok = await nuevaContrasena(token, datos.contrasena)
+if (ok) setExito(true)
+
+// en JSX:
+if (exito) return &lt;PantallaExito /&gt;</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DECISIÓN DE DISEÑO -->
+  <section id="decision">
+    <div class="section-header"><span>💡</span><h2>Decisión de diseño — por qué un hook y no solo el service</h2></div>
+    <div class="section-body">
+      <ul>
+        <li><strong>El service (authService.ts) solo habla HTTP</strong> — no sabe nada de NextAuth, useRouter ni de los mensajes de error específicos para cada flujo.</li>
+        <li><strong>El hook es la capa de orquestación</strong> — combina authService + signIn (NextAuth) + router + traducción de errores del backend a mensajes en español para el usuario.</li>
+        <li><strong>Los componentes quedan como renderizadores puros</strong> — solo gestionan el estado de UI (mostrar contraseña, exito in-page, cooldown de reenvío) que no tiene sentido en un hook compartido.</li>
+        <li><strong>Sin Zustand</strong> — el estado del hook es local a cada formulario. No tiene sentido compartir entre formularios si nunca coexisten en pantalla.</li>
+        <li><strong>Testabilidad</strong> — el hook puede testearse con mocks de authService y signIn sin necesidad de montar los formularios completos.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ARCHIVOS -->
+  <section id="archivos">
+    <div class="section-header"><span>📁</span><h2>Archivos</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Capa</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td>frontend/src/features/auth/hooks/useAuth.ts</td><td><span class="badge fe">FE</span></td><td>Nuevo — 6 métodos de auth, cargando + error centralizados</td></tr>
+          <tr><td>frontend/src/features/auth/hooks/index.ts</td><td><span class="badge fe">FE</span></td><td>Nuevo — barrel export</td></tr>
+          <tr><td>frontend/src/features/auth/components/formularioLogin.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa iniciarSesion()</td></tr>
+          <tr><td>frontend/src/features/auth/components/formularioRegistro.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa registrar()</td></tr>
+          <tr><td>frontend/src/features/auth/components/formularioRecuperarContrasena.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa recuperarContrasena()</td></tr>
+          <tr><td>frontend/src/features/auth/components/formularioNuevaContrasena.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa nuevaContrasena(), exito como boolean local</td></tr>
+          <tr><td>frontend/src/features/auth/components/tarjetaVerificacionPendiente.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa reenviarVerificacion()</td></tr>
+          <tr><td>frontend/src/features/auth/components/tarjetaRecuperacionPendiente.tsx</td><td><span class="badge fe">FE</span></td><td>Refactor — usa reenviarRecuperacion()</td></tr>
+          <tr><td>frontend/src/lib/auth.ts</td><td><span class="badge fe">FE</span></td><td>Sin cambios — AUTH-004 ya estaba implementado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BUG-AUTH-001 -->
+  <section id="bug-auth-001">
+    <div class="section-header"><span>🐛</span><h2>BUG-AUTH-001 — Login con credenciales silenciosamente roto por cookie overflow <span class="badge done">✅ Resuelto 2026-06-02</span></h2></div>
+    <div class="section-body">
+
+      <div>
+        <h3>Síntoma</h3>
+        <p>Al intentar iniciar sesión con correo y contraseña, todos los endpoints devolvían 200 (backend login OK, NextAuth callback OK) pero la app se quedaba bloqueada en <code>/login</code> con <code>TypeError: Failed to fetch</code> en el overlay de Next.js. El login con Google funcionaba correctamente.</p>
+      </div>
+
+      <div>
+        <h3>Diagnóstico</h3>
+        <p>El log del servidor reveló la causa raíz:</p>
+        <pre>POST /api/auth/login 200 335ms - 2015168 bytes</pre>
+        <p>La respuesta del login del backend era de <strong>2 MB</strong>. Un login debería pesar 1-2 KB.</p>
+
+        <p style="margin-top:0.75rem">La cadena de eventos era:</p>
+        <ol style="padding-left:1.2rem; font-size:0.83rem; color:#d4d4d4; display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem">
+          <li><code>buscarPorCorreoConContrasena</code> ejecutaba <code>Usuario.findOne({ correo }).select("+contrasena")</code> sin restringir campos — devolvía el documento completo del usuario, incluyendo <code>despensa</code>, <code>seguidores</code>, <code>seguidos</code> y el campo <code>foto</code> con la imagen de perfil en <strong>base64</strong> (subida desde la feature de avatar del Sprint 6).</li>
+          <li>El backend incluía <code>usuario.foto</code> (imagen base64 de ~2 MB) en la respuesta de <code>/api/auth/login</code>.</li>
+          <li>La función <code>authorize()</code> de NextAuth en <code>lib/auth.ts</code> metía esa imagen directamente en <code>image: usuario.foto</code>, que NextAuth serializa en el JWT y guarda en una cookie.</li>
+          <li>Las cookies del navegador tienen un límite de <strong>~4 KB</strong>. El navegador descartaba la cookie silenciosamente sin error visible.</li>
+          <li><code>getSession()</code> devolvía <code>null</code> porque no había cookie de sesión. NextAuth lanzaba internamente un <code>TypeError: Failed to fetch</code> que Next.js mostraba como error no capturado.</li>
+          <li>La URL seguía en <code>/login</code> porque <code>router.push()</code> nunca se ejecutaba (dependía del resultado de <code>getSession()</code>).</li>
+        </ol>
+        <p style="margin-top:0.75rem">El login con Google no fallaba porque la foto de Google es una URL corta (< 100 bytes), no base64.</p>
+      </div>
+
+      <div>
+        <h3>Fix — dos cambios</h3>
+        <div class="diff">
+          <div class="diff-panel">
+            <div class="diff-label before">Antes — backend/src/repositories/usuarioRepository.ts</div>
+            <pre>buscarPorCorreoConContrasena: (correo) =>
+  Usuario.findOne({ correo })
+    .select("+contrasena")
+// Devuelve el documento COMPLETO:
+// foto (base64), despensa[], seguidores[],
+// seguidos[], alergias[], preferencias...
+// → 2 MB en respuesta</pre>
+          </div>
+          <div class="diff-panel">
+            <div class="diff-label after">Después</div>
+            <pre>buscarPorCorreoConContrasena: (correo) =>
+  Usuario.findOne({ correo })
+    .select(
+      "+contrasena nombre correo foto " +
+      "rol perfilCompleto cuentaVerificada"
+    )
+// Solo los 7 campos necesarios para el login
+// → respuesta de ~1 KB</pre>
+          </div>
+        </div>
+
+        <div class="diff" style="margin-top:1rem">
+          <div class="diff-panel">
+            <div class="diff-label before">Antes — frontend/src/lib/auth.ts (authorize)</div>
+            <pre>return {
+  id: usuario.id,
+  name: usuario.nombre,
+  email: usuario.correo,
+  image: usuario.foto ?? null, // base64 → overflow
+  backendToken: token,
+  rol: usuario.rol,
+  perfilCompleto,
+}</pre>
+          </div>
+          <div class="diff-panel">
+            <div class="diff-label after">Después</div>
+            <pre>// Si foto es base64 (data:image/...) no la metemos
+// en el JWT — excedería el límite de cookie de 4 KB.
+// URLs de CDN/picsum sí se permiten (cortas).
+const fotoUrl = usuario.foto &&
+  !usuario.foto.startsWith("data:")
+    ? usuario.foto
+    : null
+
+return {
+  id: usuario.id,
+  name: usuario.nombre,
+  email: usuario.correo,
+  image: fotoUrl,
+  backendToken: token,
+  rol: usuario.rol,
+  perfilCompleto,
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Por qué dos fixes y no uno</h3>
+        <p>El fix del repositorio resuelve el problema de raíz (no traer 2 MB del backend) y mejora el rendimiento. El fix de <code>auth.ts</code> es una capa de defensa adicional: si en el futuro el backend volviera a incluir una foto base64 por cualquier motivo, el JWT no rompería la sesión. Las imágenes de perfil en base64 se siguen mostrando correctamente desde <code>GET /api/usuarios/me</code>, que sí devuelve el campo completo.</p>
+      </div>
+
+      <div>
+        <h3>Archivos modificados</h3>
+        <table>
+          <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+          <tbody>
+            <tr><td>backend/src/repositories/usuarioRepository.ts</td><td><code>buscarPorCorreoConContrasena</code> — <code>.select()</code> restringido a los 7 campos necesarios</td></tr>
+            <tr><td>frontend/src/lib/auth.ts</td><td><code>authorize()</code> — filtro <code>!foto.startsWith("data:")</code> antes de asignar <code>image</code> al JWT</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Lección</h3>
+        <p>Un <code>findOne()</code> sin <code>.select()</code> en Mongoose devuelve todos los campos del documento. En colecciones que acumulan campos grandes (imágenes base64, arrays de despensa, listas de seguidores) esto puede disparar el tamaño de respuesta varias órdenes de magnitud. Siempre proyectar solo los campos necesarios en queries de autenticación.</p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

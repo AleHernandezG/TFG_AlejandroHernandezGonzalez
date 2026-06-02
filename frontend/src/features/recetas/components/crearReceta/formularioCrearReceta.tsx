@@ -4,15 +4,17 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, Trash2 } from 'lucide-react'
+import { Camera, Trash2, Sparkles, Loader2 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { recetasService } from '@/services/recetasService'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog'
 import { SelectorChips } from '@/components/common/selectorChips'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
@@ -59,6 +61,7 @@ function extraerMensajesError(errors: ReturnType<typeof useForm>['formState']['e
 
 export function FormularioCrearReceta() {
   const router = useRouter()
+  const { data: session } = useSession()
   const { setDatos, setFoto } = useCrearRecetaStore()
   const { data: misRecetas, isLoading: cargandoRecetas } = useMisRecetas()
 
@@ -68,6 +71,10 @@ export function FormularioCrearReceta() {
   const [mostrarDialogSalir, setMostrarDialogSalir] = useState(false)
   const [fotoUrl, setFotoUrl] = useState<string | null>(null)
   const inputFotoRef = useRef<HTMLInputElement>(null)
+  const [mostrarDialogTexto, setMostrarDialogTexto] = useState(false)
+  const [textoDescripcion, setTextoDescripcion] = useState('')
+  const [generando, setGenerando] = useState(false)
+  const [errorGeneracion, setErrorGeneracion] = useState<string | null>(null)
 
   useEffect(() => {
     if (!cargandoRecetas && (misRecetas?.length ?? 1) === 0) {
@@ -112,6 +119,22 @@ export function FormularioCrearReceta() {
     setValue('foto', file)
   }
 
+  async function handleGenerarDesdeTexto() {
+    if (textoDescripcion.trim().length < 10) return
+    setGenerando(true)
+    setErrorGeneracion(null)
+    const token = session?.user?.backendToken ?? ''
+    const generado = await recetasService.generarDesdeTexto(textoDescripcion.trim(), token)
+    setGenerando(false)
+    if (!generado) {
+      setErrorGeneracion('No se pudo generar la receta. Inténtalo con una descripción más detallada.')
+      return
+    }
+    methods.reset(generado)
+    setMostrarDialogTexto(false)
+    setTextoDescripcion('')
+  }
+
   function onSubmitValido(datos: DatosCrearReceta) {
     setDatos(datos)
     router.push('/crear-receta/revisar')
@@ -152,6 +175,43 @@ export function FormularioCrearReceta() {
         onCorregir={handleCorregir}
       />
 
+      {/* Dialog: generar desde texto */}
+      <Dialog open={mostrarDialogTexto} onOpenChange={setMostrarDialogTexto}>
+        <DialogContent className="max-w-sm rounded-2xl bg-card p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-extrabold flex items-center gap-2">
+              <Sparkles size={18} className="text-brand" />
+              Crear desde descripción
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-1">
+              Describe tu receta con palabras y la IA rellenará el formulario por ti.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={textoDescripcion}
+            onChange={(e) => setTextoDescripcion(e.target.value)}
+            placeholder="Ej: Un risotto cremoso de setas con parmesano, para 4 personas, listo en 40 minutos..."
+            rows={4}
+            className="w-full mt-3 bg-background border border-border rounded-xl px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-brand/40"
+          />
+          {errorGeneracion && (
+            <p className="text-xs text-destructive mt-1">{errorGeneracion}</p>
+          )}
+          <div className="flex gap-3 mt-4">
+            <Button variant="outline" className="flex-1" onClick={() => { setMostrarDialogTexto(false); setErrorGeneracion(null) }} disabled={generando}>
+              Cancelar
+            </Button>
+            <Button
+              className="flex-1 bg-brand text-brand-foreground font-bold"
+              onClick={handleGenerarDesdeTexto}
+              disabled={generando || textoDescripcion.trim().length < 10}
+            >
+              {generando ? <><Loader2 size={14} className="animate-spin mr-1.5" />Generando…</> : 'Generar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Dialog confirmación borrar */}
       <Dialog open={mostrarDialogSalir} onOpenChange={setMostrarDialogSalir}>
         <DialogContent className="max-w-sm rounded-2xl bg-card p-6">
@@ -175,6 +235,15 @@ export function FormularioCrearReceta() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <button
+        type="button"
+        onClick={() => { setMostrarDialogTexto(true); setErrorGeneracion(null) }}
+        className="w-full mb-3 flex items-center justify-center gap-2 rounded-2xl border border-brand/30 bg-[var(--brand-subtle)] py-3 text-sm font-bold text-brand transition-all hover:bg-brand/20 active:scale-95"
+      >
+        <Sparkles size={16} />
+        Crear desde descripción (IA)
+      </button>
 
       <FormProvider {...methods}>
         <form

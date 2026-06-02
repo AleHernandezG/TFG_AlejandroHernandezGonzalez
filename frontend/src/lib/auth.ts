@@ -45,11 +45,12 @@ export const opcionesAuth: NextAuthOptions = {
             contrasena: credentials.contrasena,
           });
 
+          const fotoUrl = usuario.foto && !usuario.foto.startsWith("data:") ? usuario.foto : null;
           return {
             id: usuario.id,
             name: usuario.nombre,
             email: usuario.correo,
-            image: usuario.foto ?? null,
+            image: fotoUrl,
             backendToken: token,
             rol: usuario.rol,
             perfilCompleto,
