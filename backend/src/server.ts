@@ -1,6 +1,9 @@
+import dns from "dns";
 import "dotenv/config";
 import app from "./app";
 import { conectarDB } from "./lib/db";
+
+dns.setDefaultResultOrder("ipv4first");
 
 const PUERTO = Number(process.env.PORT) || 4000;
 

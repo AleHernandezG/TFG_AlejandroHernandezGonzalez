@@ -1,5 +1,5 @@
 # Infraestructura Técnica — Cookr (TFG)
-> Stack MERN · PWA · Mobile-First · Inteligencia Artificial
+> Stack MERN · Mobile-First · Inteligencia Artificial
 
 ---
 

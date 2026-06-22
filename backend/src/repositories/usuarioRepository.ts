@@ -147,6 +147,14 @@ export const usuarioRepository = {
     await Promise.all([seguidor.save(), seguido.save()]);
     return { siguiendo: !yaSiguiendo };
   },
+
+  async obtenerDespensa(
+    usuarioId: string,
+  ): Promise<Array<{ nombre: string; cantidad: number; unidad: string }> | null> {
+    const usuario = await Usuario.findById(usuarioId).select("despensa").lean().exec();
+    if (!usuario) return null;
+    return (usuario.despensa as Array<{ nombre: string; cantidad: number; unidad: string }> | undefined) ?? [];
+  },
 };
 
 export type { IUsuario };

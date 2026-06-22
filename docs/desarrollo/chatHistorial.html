@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHAT-HIST-001 — Historial de chats persistente</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    header .meta { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.6rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 0.9rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.6rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    p { font-size: 0.875rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.4rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    li { font-size: 0.875rem; color: #d4d4d4; }
+    strong { color: #fff; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.78rem; color: #a3e635; font-family: 'JetBrains Mono', monospace; white-space: pre; }
+
+    .badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 999px; }
+    .badge.done { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .badge.fe { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .badge.fix { background: #f9731622; color: #fb923c; border: 1px solid #f9731644; }
+
+    .file { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.5rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>CHAT-HIST-001 — Historial de chats persistente</h1>
+  <div class="meta">Sprint 5 · 2026-06-02 · <span class="badge done">✅ Completado</span> <span class="badge fe">FE</span> <span class="badge fix">FIX z-index</span></div>
+</header>
+
+<nav>
+  <a href="#problema">Problema</a>
+  <a href="#solucion">Solución</a>
+  <a href="#store">chatStore</a>
+  <a href="#sheet">SheetHistorialChat</a>
+  <a href="#zindex">Fix z-index</a>
+  <a href="#flujo">Flujo completo</a>
+  <a href="#archivos">Archivos</a>
+</nav>
+
+<main>
+
+  <section id="problema">
+    <div class="section-header"><h2>Problema</h2></div>
+    <div class="body">
+      <p>El botón "Ver historial de chats" existía visualmente en <span class="file">headerChat.tsx</span> pero no hacía nada. <span class="file">contenidoChat.tsx</span> no pasaba <code>onVerHistorial</code> a <code>HeaderChat</code>, y no había ningún componente de historial ni persistencia implementada.</p>
+      <p>Adicionalmente, aunque se hubiera abierto un Sheet, este quedaba tapado por el contenedor del chat (<code>z-[60]</code>) porque el Sheet de shadcn/ui usa <code>z-50</code> por defecto, que es menor.</p>
+    </div>
+  </section>
+
+  <section id="solucion">
+    <div class="section-header"><h2>Solución</h2></div>
+    <div class="body">
+      <p>Tres piezas que trabajan juntas:</p>
+      <ol>
+        <li><strong>chatStore.ts</strong> reescrito con <code>zustand persist</code> — añade <code>historial: ConversacionGuardada[]</code> y tres acciones: guardar, restaurar, eliminar.</li>
+        <li><strong>SheetHistorialChat.tsx</strong> nuevo — componente Sheet que lista las conversaciones guardadas y expone las acciones del store.</li>
+        <li><strong>sheet.tsx</strong> — z-index bumpeado de <code>z-50</code> a <code>z-[70]</code> en overlay y content para aparecer por encima del chat.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="store">
+    <div class="section-header"><h2>chatStore.ts — zustand persist</h2></div>
+    <div class="body">
+      <p>El store usa <code>persist</code> con <code>partialize</code> para guardar solo el historial en localStorage, nunca los mensajes en curso (evita almacenar imágenes base64 entre sesiones).</p>
+      <pre>persist(
+  (set, get) => ({ ... }),
+  {
+    name: 'cookr-chat',
+    partialize: (state) => ({ historial: state.historial }),
+  }
+)</pre>
+      <p><strong>Nuevas acciones:</strong></p>
+      <ul>
+        <li><code>nuevaConversacion()</code> — si hay mensajes de usuario, crea un <code>ConversacionGuardada</code> con id, fecha ISO, primer mensaje (80 chars), y mensajes sin imagen. Limita el historial a 20 entradas. Limpia el chat actual.</li>
+        <li><code>restaurarConversacion(id)</code> — busca en historial y restaura los mensajes en el chat.</li>
+        <li><code>eliminarConversacion(id)</code> — filtra el historial y elimina la entrada.</li>
+      </ul>
+      <p><strong>Por qué se eliminan las imágenes al guardar:</strong> las imágenes base64 pueden pesar varios MB. Guardarlas en localStorage por cada conversación agotaría rápidamente el límite de 5–10 MB del storage. La imagen es útil durante la sesión; en el historial basta con el texto.</p>
+      <pre>mensajes: mensajes.map(({ imagen: _img, ...rest }) => rest)</pre>
+    </div>
+  </section>
+
+  <section id="sheet">
+    <div class="section-header"><h2>SheetHistorialChat.tsx</h2></div>
+    <div class="body">
+      <p>Sheet lateral (<code>side="right"</code>, <code>sm:max-w-sm</code>) con tres zonas:</p>
+      <ul>
+        <li><strong>Botón "Guardar y empezar nueva conversación"</strong> — solo visible cuando la conversación actual tiene mensajes del usuario. Llama a <code>nuevaConversacion()</code> y cierra el sheet.</li>
+        <li><strong>Lista de conversaciones</strong> — cada entrada muestra el primer mensaje (line-clamp-1), la fecha relativa (Hoy / Ayer / dd MMM) y el número de mensajes. Al pulsar restaura la conversación y cierra el sheet.</li>
+        <li><strong>Botón eliminar</strong> — visible al hacer hover sobre cada entrada (icono Trash2). Elimina sin confirmación.</li>
+      </ul>
+      <p><strong>Estado vacío:</strong> icono <code>MessageSquare</code> con texto "Aquí aparecerán tus conversaciones anteriores".</p>
+      <pre>function formatearFecha(iso: string): string {
+  const fecha = new Date(iso)
+  const hoy = new Date()
+  const ayer = new Date(hoy)
+  ayer.setDate(hoy.getDate() - 1)
+  if (fecha.toDateString() === hoy.toDateString()) return 'Hoy'
+  if (fecha.toDateString() === ayer.toDateString()) return 'Ayer'
+  return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+}</pre>
+    </div>
+  </section>
+
+  <section id="zindex">
+    <div class="section-header"><h2>Fix z-index — sheet.tsx</h2></div>
+    <div class="body">
+      <p>El contenedor del chat es <code>fixed inset-0 z-[60]</code>. El Sheet de shadcn/ui usaba <code>z-50</code> tanto en el overlay como en el content — ambos inferiores a 60, por lo que el sheet quedaba invisiblemente detrás del chat.</p>
+      <p><strong>Fix:</strong> cambiar las dos clases hardcodeadas en <span class="file">frontend/src/components/ui/sheet.tsx</span>:</p>
+      <table>
+        <thead><tr><th>Elemento</th><th>Antes</th><th>Después</th></tr></thead>
+        <tbody>
+          <tr><td>SheetOverlay</td><td><code>z-50</code></td><td><code>z-[70]</code></td></tr>
+          <tr><td>SheetContent</td><td><code>z-50</code></td><td><code>z-[70]</code></td></tr>
+        </tbody>
+      </table>
+      <p>Este cambio afecta a todos los Sheets de la app (despensa, historial, etc.), lo cual es correcto: cualquier Sheet debe aparecer por encima de cualquier overlay de navegación.</p>
+    </div>
+  </section>
+
+  <section id="flujo">
+    <div class="section-header"><h2>Flujo completo</h2></div>
+    <div class="body">
+      <ol>
+        <li>Usuario pulsa "Ver historial de chats" en el header → <code>setHistorialAbierto(true)</code> en <code>contenidoChat.tsx</code></li>
+        <li>Se renderiza <code>&lt;SheetHistorialChat abierto={true} /&gt;</code> — el Sheet aparece por encima del chat (z-[70] &gt; z-[60])</li>
+        <li>Si hay mensajes en curso → botón "Guardar y empezar nueva conversación" visible → <code>nuevaConversacion()</code> → persiste en localStorage → cierra sheet</li>
+        <li>Para recuperar una sesión → tap en una entrada → <code>restaurarConversacion(id)</code> → mensajes vuelven al chat → sheet cierra</li>
+        <li>Para borrar → hover + icono papelera → <code>eliminarConversacion(id)</code></li>
+        <li>El historial persiste entre recargas y sesiones del navegador</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="archivos">
+    <div class="section-header"><h2>Archivos modificados / creados</h2></div>
+    <div class="body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td class="file">frontend/src/stores/chatStore.ts</td><td>Reescrito con zustand persist. Añade ConversacionGuardada, historial, nuevaConversacion, restaurarConversacion, eliminarConversacion.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/types/chat.types.ts</td><td>Añade interfaz ConversacionGuardada.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/components/sheetHistorialChat.tsx</td><td>Nuevo. Sheet lado derecho con lista de conversaciones, botón nueva sesión, papelera por hover.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/components/contenidoChat.tsx</td><td>Añade historialAbierto state, pasa onVerHistorial a HeaderChat, renderiza SheetHistorialChat.</td></tr>
+          <tr><td class="file">frontend/src/components/ui/sheet.tsx</td><td>SheetOverlay y SheetContent: z-50 → z-[70].</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

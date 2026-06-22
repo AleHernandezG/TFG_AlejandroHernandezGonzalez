@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { usuarioRepository } from "../repositories/usuarioRepository";
-import { Usuario } from "../models/usuarioMongo";
 
 interface MensajeChat {
   rol: "user" | "model";
@@ -15,6 +14,29 @@ function obtenerCliente(): GoogleGenerativeAI {
   if (!apiKey) throw Object.assign(new Error("GEMINI_API_KEY no configurada"), { status: 503 });
   if (!_genAI) _genAI = new GoogleGenerativeAI(apiKey);
   return _genAI;
+}
+
+// ── Modelo y tope global diario de llamadas ──────────────────────────────────
+const MODELO_GEMINI = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const MAX_LLAMADAS_DIA = Number(process.env.GEMINI_MAX_LLAMADAS_DIA ?? 1000);
+
+let llamadasHoy = 0;
+let diaActual = new Date().toISOString().slice(0, 10);
+
+function registrarLlamadaGemini(): void {
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (hoy !== diaActual) {
+    diaActual = hoy;
+    llamadasHoy = 0;
+  }
+  if (llamadasHoy >= MAX_LLAMADAS_DIA) {
+    console.warn(`[Gemini guard] Tope diario alcanzado (${MAX_LLAMADAS_DIA}). Bloqueando llamadas hasta mañana.`);
+    throw Object.assign(
+      new Error("El asistente ha alcanzado el límite diario de uso. Inténtalo de nuevo mañana."),
+      { status: 503 },
+    );
+  }
+  llamadasHoy++;
 }
 
 // ── Caché de contexto de usuario ─────────────────────────────────────────────
@@ -49,11 +71,7 @@ async function obtenerContextoUsuario(usuarioId: string): Promise<string> {
 
   console.log(`[Gemini cache] MISS contexto usuario ${usuarioId.slice(-6)} — consultando MongoDB`);
   const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId);
-  const despensaDoc = usuario
-    ? await Usuario.findById(usuarioId).select("despensa").lean().exec()
-    : null;
-  const despensa =
-    (despensaDoc?.despensa as Array<{ nombre: string; cantidad: number; unidad: string }> | undefined) ?? [];
+  const despensa = usuario ? await usuarioRepository.obtenerDespensa(usuarioId) ?? [] : [];
 
   const lineas: string[] = [];
   if ((usuario?.preferencias ?? []).length > 0) {
@@ -150,11 +168,13 @@ export async function responderChat(
     return "El asistente no está disponible en este momento. Configura GEMINI_API_KEY para activarlo.";
   }
 
+  registrarLlamadaGemini();
+
   try {
     const contexto = await obtenerContextoUsuario(usuarioId);
 
     const model = obtenerCliente().getGenerativeModel({
-      model: "gemini-flash-latest",
+      model: MODELO_GEMINI,
       systemInstruction: SYSTEM_PROMPT(contexto),
     });
 
@@ -200,8 +220,10 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
     return entrada.resultado;
   }
 
+  registrarLlamadaGemini();
+
   try {
-    const model = obtenerCliente().getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = obtenerCliente().getGenerativeModel({ model: MODELO_GEMINI });
 
     const descripcionSegura = sanitizarTextoUsuario(descripcion);
     const prompt = `Genera una receta en JSON con exactamente este formato:
@@ -245,8 +267,10 @@ export async function escanearTicket(imagenBase64: string): Promise<Array<{ nomb
     throw Object.assign(new Error("Gemini no está configurado"), { status: 503 });
   }
 
+  registrarLlamadaGemini();
+
   try {
-    const model = obtenerCliente().getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = obtenerCliente().getGenerativeModel({ model: MODELO_GEMINI });
 
     const partes = imagenBase64.split(",");
     const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";
