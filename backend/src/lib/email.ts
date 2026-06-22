@@ -1,39 +1,39 @@
-import nodemailer, { type Transporter } from "nodemailer";
-import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import { lookup } from "dns/promises";
+import axios from "axios";
 
-const GMAIL_USER = process.env.GMAIL_USER;
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-const FROM = GMAIL_USER ?? "noreply@cookr.app";
+const MAILJET_API_KEY = process.env.MAILJET_API_KEY;
+const MAILJET_SECRET_KEY = process.env.MAILJET_SECRET_KEY;
+const SENDER_EMAIL = process.env.SENDER_EMAIL ?? process.env.GMAIL_USER ?? "noreply@cookr.app";
+const SENDER_NAME = process.env.SENDER_NAME ?? "Cookr";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:3000";
-const SMTP_HOST = "smtp.gmail.com";
+const MAILJET_URL = "https://api.mailjet.com/v3.1/send";
 
-let transporterPromise: Promise<Transporter> | null = null;
-
-async function getTransporter(): Promise<Transporter> {
-  if (!transporterPromise) {
-    transporterPromise = (async () => {
-      const { address } = await lookup(SMTP_HOST, { family: 4 });
-      const options: SMTPTransport.Options = {
-        host: address,
-        port: 465,
-        secure: true,
-        tls: { servername: SMTP_HOST },
-        auth: {
-          user: GMAIL_USER,
-          pass: GMAIL_APP_PASSWORD,
-        },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
-      };
-      return nodemailer.createTransport(options);
-    })().catch((err) => {
-      transporterPromise = null;
-      throw err;
-    });
+async function enviarEmail(opciones: {
+  correo: string;
+  nombre: string;
+  asunto: string;
+  html: string;
+}): Promise<void> {
+  if (!MAILJET_API_KEY || !MAILJET_SECRET_KEY) {
+    throw new Error("MAILJET_API_KEY / MAILJET_SECRET_KEY no configuradas");
   }
-  return transporterPromise;
+
+  await axios.post(
+    MAILJET_URL,
+    {
+      Messages: [
+        {
+          From: { Email: SENDER_EMAIL, Name: SENDER_NAME },
+          To: [{ Email: opciones.correo, Name: opciones.nombre }],
+          Subject: opciones.asunto,
+          HTMLPart: opciones.html,
+        },
+      ],
+    },
+    {
+      auth: { username: MAILJET_API_KEY, password: MAILJET_SECRET_KEY },
+      timeout: 10000,
+    },
+  );
 }
 
 export async function enviarEmailVerificacion(
@@ -42,11 +42,10 @@ export async function enviarEmailVerificacion(
   token: string,
 ): Promise<void> {
   const enlace = `${FRONTEND_URL}/verificar-email?token=${token}`;
-  const transporter = await getTransporter();
-  await transporter.sendMail({
-    from: FROM,
-    to: correo,
-    subject: "Verifica tu cuenta en Cookr",
+  await enviarEmail({
+    correo,
+    nombre,
+    asunto: "Verifica tu cuenta en Cookr",
     html: plantillaVerificacion(nombre, enlace),
   });
 }
@@ -57,11 +56,10 @@ export async function enviarEmailRecuperacion(
   token: string,
 ): Promise<void> {
   const enlace = `${FRONTEND_URL}/nueva-contrasena?token=${token}`;
-  const transporter = await getTransporter();
-  await transporter.sendMail({
-    from: FROM,
-    to: correo,
-    subject: "Restablece tu contraseña en Cookr",
+  await enviarEmail({
+    correo,
+    nombre,
+    asunto: "Restablece tu contraseña en Cookr",
     html: plantillaRecuperacion(nombre, enlace),
   });
 }
