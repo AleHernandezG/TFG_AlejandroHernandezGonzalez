@@ -43,11 +43,12 @@ export const authService = {
       expira: new Date(Date.now() + EXPIRACION_VERIFICACION_MS),
     });
 
-    try {
-      await enviarEmailVerificacion(datos.correo, datos.nombre, tokenValor);
-    } catch (err) {
-      console.error("[email] Error al enviar verificación:", err);
-    }
+    enviarEmailVerificacion(datos.correo, datos.nombre, tokenValor).catch(
+      (err) => {
+        console.error("[email] Error al enviar verificación:", err);
+      },
+    );
+
     return {
       mensaje:
         "Registro completado. Revisa tu correo para verificar la cuenta.",
@@ -154,11 +155,12 @@ export const authService = {
       expira: new Date(Date.now() + EXPIRACION_RECUPERACION_MS),
     });
 
-    try {
-      await enviarEmailRecuperacion(datos.correo, usuario.nombre, tokenValor);
-    } catch (err) {
-      console.error("[email] Error al enviar recuperación:", err);
-    }
+    enviarEmailRecuperacion(datos.correo, usuario.nombre, tokenValor).catch(
+      (err) => {
+        console.error("[email] Error al enviar recuperación:", err);
+      },
+    );
+
     return respuesta;
   },
 
@@ -264,11 +266,11 @@ export const authService = {
       expira: new Date(Date.now() + EXPIRACION_VERIFICACION_MS),
     });
 
-    try {
-      await enviarEmailVerificacion(datos.correo, usuario.nombre, tokenValor);
-    } catch (err) {
-      console.error("[email] Error al reenviar verificación:", err);
-    }
+    enviarEmailVerificacion(datos.correo, usuario.nombre, tokenValor).catch(
+      (err) => {
+        console.error("[email] Error al reenviar verificación:", err);
+      },
+    );
 
     return respuesta;
   },

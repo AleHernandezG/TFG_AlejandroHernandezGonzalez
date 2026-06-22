@@ -78,7 +78,7 @@
 <header>
   <div>
     <h1>Estado de Tareas — Cookr TFG</h1>
-    <div class="meta">Actualizado: 2026-06-02 · SEC-IA-001 ✅ · DISC-SCORE-001 ✅ · PEXELS-CASCADE-001 ✅ · GEMINI-CACHE-001 ✅</div>
+    <div class="meta">Actualizado: 2026-06-02 · NUTR-001 ✅ · NUTR-002 ✅ · INGR-BE-001 ✅ · INGR-FE-002 ✅ · CHAT-IMG-001 ✅</div>
   </div>
 </header>
 
@@ -100,7 +100,7 @@
     <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
     <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
     <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
-    <div class="counter done"><div class="num">131</div><div class="label">Completadas</div></div>
+    <div class="counter done"><div class="num">138</div><div class="label">Completadas</div></div>
   </div>
 
   <!-- SPRINT 2 — ALTA URGENCIA -->
@@ -1453,11 +1453,11 @@
         <tr>
           <td class="id">NUTR-001</td>
           <td class="desc">
-            <strong>Información nutricional automática — integración Edamam API</strong>
-            <small>La sección "Información nutricional" en previsualizacionReceta.tsx y en detalleReceta muestra un placeholder con "—" para calorías, proteínas, carbohidratos y grasas. La integración prevista: al publicar una receta (CREAR-002), llamar a Edamam Nutrition Analysis API con los ingredientes y guardar los macros en IReceta.macros. El plan de Fase 6 incluye también integrar Edamam Food Database para INGR-001. Requiere key de API de Edamam (tier gratuito: 100 llamadas/mes).</small>
-            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/types/receta.ts (IMacrosReceta)</span>
+            <strong>Información nutricional automática — Edamam Nutrition Analysis API</strong>
+            <small>Al publicar una receta, recetaRepository.crear() llama a calcularMacros(ingredientes[]) antes de guardar. La función convierte cada ingrediente a string "200g tomate" y hace POST a Edamam Nutrition Analysis API. Sin claves configuradas devuelve ceros (sin error). Requiere EDAMAM_APP_ID y EDAMAM_APP_KEY en backend/.env (tier gratuito: 100 análisis/mes, sin tarjeta).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/src/repositories/recetaRepository.ts · docs/desarrollo/nutricionIntegracion.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 6 (Fase 6)</span></td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1494,10 +1494,10 @@
           <td class="id">DET-007</td>
           <td class="desc">
             <strong>Modo Manos Libres (síntesis de voz)</strong>
-            <small>El botón de auriculares existe pero no hace nada. Hay que implementar Web Speech API para narrar los pasos de la receta con control por voz.</small>
-            <span class="source">📄 docs/phase-reports/fase-2-pendientes.md</span>
+            <small>Completado como HANDS-001 en Sprint 5. Ver entrada HANDS-001 en esta misma sección.</small>
+            <span class="source">📄 docs/desarrollo/modoManoLibres.html</span>
           </td>
-          <td><span class="status pending">⏳ Sprint 8</span></td>
+          <td><span class="status done">✅ Completado · ver HANDS-001</span></td>
           <td><span class="urg baja">Baja</span></td>
         </tr>
         <tr>
@@ -1751,6 +1751,56 @@
           </td>
           <td><span class="status done">✅ Completado · 2026-06-02</span></td>
           <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-002</td>
+          <td class="desc">
+            <strong>USDA FoodData Central como fallback de macros</strong>
+            <small>Cuando Edamam falla o no está configurado, calcularMacros() reintenta con USDA FoodData Central API (1000 req/hora con key gratuita). Busca cada ingrediente individualmente, escala por cantidad/unidad con conversión a gramos (kg×1000, tsp×5, tbsp×15, taza×240, unidad×100), y acumula macros. Nutrient IDs: 1008=calorías, 1003=proteínas, 1005=carbos, 1004=grasas. Flujo: Edamam → USDA → ceros. Requiere USDA_API_KEY en backend/.env (gratuita sin tarjeta en api.data.gov).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · docs/desarrollo/nutricionIntegracion.html#nutr-002</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-BE-001</td>
+          <td class="desc">
+            <strong>BE: autocompletado de ingredientes vía Open Food Facts</strong>
+            <small>ingredientesService.ts (BE) conecta al endpoint suggest.pl de Open Food Facts (world.openfoodfacts.org/cgi/suggest.pl?tagtype=ingredients&amp;term=&amp;lc=es). Sin API key, gratuito ilimitado, devuelve sugerencias en español. Timeout 3s, fallback a array vacío. La función buscarIngredientesEdamam() redirige a buscarIngredientesOpenFoodFacts() para mantener compatibilidad de interfaz. GET /api/ingredientes/buscar?q= registrado en app.ts, frontend conectado via apiClient.</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts · docs/desarrollo/nutricionIntegracion.html#ingr-003</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-FE-002</td>
+          <td class="desc">
+            <strong>FE: ingredientes.ts expandido a ~991 ingredientes — 18 categorías</strong>
+            <small>Lista local en frontend/src/config/ingredientes.ts ampliada de 239 a 991 ingredientes. Nueva categoría "preparados" (platos semielaborados, bases, masas). Fuentes: BEDCA, catálogos Mercadona/Carrefour, Open Food Facts, bases de datos de recetas. Categorías: harinas (34), pasta-arroz (32), lacteos (57), carnes (80), pescados (53), mariscos (31), verduras (147), frutas (92), legumbres (32), frutos-secos (40), especias (104), aceites (22), salsas (68), bebidas (33), dulces (58), otros (43), preparados (45).</small>
+            <span class="source">📄 frontend/src/config/ingredientes.ts · docs/desarrollo/nutricionIntegracion.html#ingr-002</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-HIST-001</td>
+          <td class="desc">
+            <strong>Historial de chats persistente — zustand persist + SheetHistorialChat</strong>
+            <small>chatStore.ts reescrito con zustand persist middleware. historial: ConversacionGuardada[] persiste en localStorage (clave 'cookr-chat', max 20 entradas, solo campo historial via partialize). nuevaConversacion() archiva la sesión actual; restaurarConversacion(id) la recupera; eliminarConversacion(id) la borra. Las imágenes se eliminan del historial al guardar para no saturar localStorage. Nuevo SheetHistorialChat.tsx (side=right) con botón "Guardar y empezar nueva conversación", lista de sesiones con fecha relativa (Hoy/Ayer/dd MMM), contador de mensajes y papelera por hover. Fix z-index: Sheet y SheetOverlay cambiados de z-50 a z-[70] para aparecer por encima del contenedor del chat (z-[60]).</small>
+            <span class="source">📄 frontend/src/stores/chatStore.ts · frontend/src/features/chat/components/sheetHistorialChat.tsx · frontend/src/features/chat/components/contenidoChat.tsx · frontend/src/components/ui/sheet.tsx · docs/desarrollo/chatHistorial.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-IMG-001</td>
+          <td class="desc">
+            <strong>Adjuntar imagen al chat IA — Gemini Vision multimodal</strong>
+            <small>Flujo completo FE+BE. FE: barraInputChat.tsx con input[file] oculto; al seleccionar imagen → FileReader base64; preview thumbnail 64×64 con X para quitar; placeholder textarea cambia a "Pregunta algo sobre la imagen…"; se puede enviar solo imagen, solo texto, o ambos. Límite 4 MB en cliente. BurbujaUsuario muestra la imagen como tarjeta encima del texto. Al guardar en historial la imagen se elimina para no saturar localStorage. BE: chat.routes.ts acepta imagenBase64 opcional (valida data:image/, ≤7 MB). chatService.responderChat() recibe imagenBase64: cuando está presente, el último mensaje a Gemini incluye inlineData + texto en lugar de texto solo. Si el usuario manda solo imagen sin texto, el prompt por defecto es "¿Qué ves en esta imagen? Ayúdame en el contexto culinario."</small>
+            <span class="source">📄 frontend/src/features/chat/components/barraInputChat.tsx · frontend/src/features/chat/components/burbujaUsuario.tsx · frontend/src/features/chat/types/chat.types.ts · frontend/src/stores/chatStore.ts · frontend/src/services/chatService.ts · backend/src/routes/chat.routes.ts · backend/src/services/chatService.ts · docs/desarrollo/chatImagen.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg media">Media</span></td>
         </tr>
         <tr>
           <td class="id">EDIT-RECETA-001</td>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHAT-IMG-001 — Adjuntar imagen al chat IA</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    header .meta { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.6rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 0.9rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.6rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    p { font-size: 0.875rem; color: #d4d4d4; }
+    ul, ol { padding-left: 1.4rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    li { font-size: 0.875rem; color: #d4d4d4; }
+    strong { color: #fff; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.78rem; color: #a3e635; font-family: 'JetBrains Mono', monospace; white-space: pre; }
+
+    .badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 999px; }
+    .badge.done { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .badge.fe { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .badge.be { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf644; }
+
+    .file { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.5rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    .diagram { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #94a3b8; white-space: pre; overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>CHAT-IMG-001 — Adjuntar imagen al chat IA</h1>
+  <div class="meta">Sprint 5 · 2026-06-02 · <span class="badge done">✅ Completado</span> <span class="badge fe">FE</span> <span class="badge be">BE</span></div>
+</header>
+
+<nav>
+  <a href="#contexto">Contexto</a>
+  <a href="#frontend">Frontend</a>
+  <a href="#backend">Backend</a>
+  <a href="#gemini">Gemini Vision</a>
+  <a href="#limites">Límites y seguridad</a>
+  <a href="#localStorage">localStorage</a>
+  <a href="#archivos">Archivos</a>
+</nav>
+
+<main>
+
+  <section id="contexto">
+    <div class="section-header"><h2>Contexto</h2></div>
+    <div class="body">
+      <p>El botón del clip (Paperclip) en <span class="file">barraInputChat.tsx</span> era un elemento visual sin <code>onClick</code>, completamente inerte. El chat solo aceptaba texto.</p>
+      <p>Gemini Flash soporta entrada multimodal (texto + imagen) mediante <code>inlineData</code>. Implementar este flujo permite al usuario fotografiar un plato, una nevera con ingredientes o una receta escrita en papel y pedirle al asistente que la analice.</p>
+    </div>
+  </section>
+
+  <section id="frontend">
+    <div class="section-header"><h2>Frontend — barraInputChat.tsx</h2></div>
+    <div class="body">
+      <p>Se añade un <code>input[type=file]</code> oculto con <code>ref</code>, accionado desde el botón Paperclip. Al seleccionar un archivo se convierte a base64 con <code>FileReader.readAsDataURL()</code>.</p>
+      <pre>function handleFileChange(e: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  if (file.size &gt; 4 * 1024 * 1024) return   // 4 MB límite cliente
+  const reader = new FileReader()
+  reader.onload = (ev) =&gt; setImagen(ev.target?.result as string)
+  reader.readAsDataURL(file)
+  e.target.value = ''   // permite re-seleccionar el mismo archivo
+}</pre>
+      <p><strong>Preview thumbnail:</strong> cuando hay imagen seleccionada se muestra un <code>img</code> de 64×64 px encima del input, con botón X (<code>XIcon</code>) superpuesto para quitarla. El clip se colorea con <code>text-brand</code> cuando hay imagen activa.</p>
+      <p><strong>Placeholder dinámico:</strong> cuando hay imagen el textarea muestra "Pregunta algo sobre la imagen…" en lugar del placeholder por defecto.</p>
+      <p><strong>Envío sin texto:</strong> el botón de enviar también se activa cuando hay imagen aunque el textarea esté vacío. En ese caso se manda solo la imagen y el backend añade un prompt por defecto.</p>
+      <pre>const puedeEnviar = (valor.trim().length &gt; 0 || imagen !== null) &amp;&amp; !deshabilitado</pre>
+      <p><strong>Prop actualizada:</strong></p>
+      <pre>onEnviar: (texto: string, imagen?: string) =&gt; void</pre>
+    </div>
+  </section>
+
+  <section id="backend">
+    <div class="section-header"><h2>Backend — chat.routes.ts + chatService.ts</h2></div>
+    <div class="body">
+      <p><span class="file">chat.routes.ts</span> extrae <code>imagenBase64</code> del body como campo opcional y lo valida antes de pasarlo al service:</p>
+      <pre>if (imagenBase64 !== undefined) {
+  if (typeof imagenBase64 !== "string" || !imagenBase64.startsWith("data:image/")) {
+    res.status(400).json({ error: "imagenBase64 no válida" })
+    return
+  }
+  if (imagenBase64.length &gt; 7_000_000) {
+    res.status(400).json({ error: "La imagen no puede superar 5 MB" })
+    return
+  }
+}</pre>
+      <p><span class="file">chatService.ts</span> actualiza la firma de <code>responderChat</code>:</p>
+      <pre>export async function responderChat(
+  mensajes: MensajeChat[],
+  usuarioId: string,
+  imagenBase64?: string,
+): Promise&lt;string&gt;</pre>
+    </div>
+  </section>
+
+  <section id="gemini">
+    <div class="section-header"><h2>Gemini Vision — cómo se envía la imagen</h2></div>
+    <div class="body">
+      <p>Cuando llega <code>imagenBase64</code>, el último mensaje al modelo se construye con dos partes en lugar de solo texto:</p>
+      <pre>if (imagenBase64) {
+  const partes = imagenBase64.split(",")
+  const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg"
+  const data = partes[1] ?? partes[0]
+  result = await chat.sendMessage([
+    { inlineData: { mimeType, data } },
+    { text: ultimo.texto || "¿Qué ves en esta imagen? Ayúdame en el contexto culinario." },
+  ])
+}</pre>
+      <p>El <code>mimeType</code> se extrae del propio prefijo base64 (<code>data:image/jpeg;base64,…</code>), por lo que funciona con JPEG, PNG, WebP y cualquier formato que el navegador incluya en <code>readAsDataURL()</code>.</p>
+      <p>Si el usuario no escribe texto pero adjunta una imagen, el prompt por defecto es <em>"¿Qué ves en esta imagen? Ayúdame en el contexto culinario."</em> para que Gemini siempre tenga contexto gastronómico.</p>
+      <p>El historial de mensajes anteriores (<code>history</code>) se mantiene igual que en el chat de solo texto; la imagen viaja únicamente en el último turno.</p>
+    </div>
+  </section>
+
+  <section id="limites">
+    <div class="section-header"><h2>Límites y seguridad</h2></div>
+    <div class="body">
+      <table>
+        <thead><tr><th>Capa</th><th>Validación</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Cliente (FE)</td><td>file.size máximo</td><td>4 MB</td></tr>
+          <tr><td>Servidor (BE)</td><td>imagenBase64.length máximo</td><td>7 000 000 chars (~5 MB datos reales)</td></tr>
+          <tr><td>Servidor (BE)</td><td>Formato obligatorio</td><td>Debe empezar con <code>data:image/</code></td></tr>
+          <tr><td>Servidor (BE)</td><td>Campo opcional</td><td>Si es undefined se ignora, no rompe el flujo</td></tr>
+        </tbody>
+      </table>
+      <p>La validación en cliente (4 MB) actúa como primera barrera UX — evita que el usuario espere a un rechazo del servidor. La validación de servidor es la barrera de seguridad real.</p>
+    </div>
+  </section>
+
+  <section id="localStorage">
+    <div class="section-header"><h2>localStorage — por qué las imágenes no se guardan en historial</h2></div>
+    <div class="body">
+      <p>Una imagen base64 de 2 MB codificada pesa ~2.7 MB como string. El límite de localStorage en la mayoría de navegadores es de 5–10 MB por origen. Guardar imágenes en el historial agotaría ese espacio con dos o tres conversaciones.</p>
+      <p>La solución: al llamar a <code>nuevaConversacion()</code>, los mensajes se copian al historial sin el campo <code>imagen</code>:</p>
+      <pre>mensajes: mensajes.map(({ imagen: _img, ...rest }) => rest)</pre>
+      <p>La imagen es visible durante la sesión activa (vive en el estado en memoria de Zustand). Al restaurar una conversación del historial, los mensajes aparecen con el texto pero sin la imagen. Esto es un trade-off aceptable: la imagen cumplió su propósito en el intercambio original.</p>
+    </div>
+  </section>
+
+  <section id="archivos">
+    <div class="section-header"><h2>Archivos modificados</h2></div>
+    <div class="body">
+      <table>
+        <thead><tr><th>Archivo</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td class="file">frontend/src/features/chat/components/barraInputChat.tsx</td><td>input[file] oculto, FileReader base64, estado imagen, preview thumbnail con X, envío imagen+texto.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/components/burbujaUsuario.tsx</td><td>Acepta prop imagen?: string. Muestra img encima del texto cuando está presente.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/types/chat.types.ts</td><td>Añade imagen?: string a interfaz Mensaje.</td></tr>
+          <tr><td class="file">frontend/src/stores/chatStore.ts</td><td>enviarMensaje acepta imagen?: string. La guarda en mensajes (sesión). La elimina al archivar en historial.</td></tr>
+          <tr><td class="file">frontend/src/services/chatService.ts</td><td>enviarMensaje acepta imagenBase64?: string. Lo incluye en el body del POST cuando está presente.</td></tr>
+          <tr><td class="file">frontend/src/features/chat/components/contenidoChat.tsx</td><td>Pasa imagen a BurbujaUsuario desde cada mensaje del store.</td></tr>
+          <tr><td class="file">backend/src/routes/chat.routes.ts</td><td>Extrae imagenBase64 del body. Valida formato y tamaño. Lo pasa a responderChat.</td></tr>
+          <tr><td class="file">backend/src/services/chatService.ts</td><td>responderChat acepta imagenBase64?: string. Envía inlineData a Gemini cuando está presente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
