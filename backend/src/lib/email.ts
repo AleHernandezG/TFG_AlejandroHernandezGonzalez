@@ -1,22 +1,40 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
+import type SMTPTransport from "nodemailer/lib/smtp-transport";
+import { lookup } from "dns/promises";
 
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 const FROM = GMAIL_USER ?? "noreply@cookr.app";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:3000";
+const SMTP_HOST = "smtp.gmail.com";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: GMAIL_USER,
-    pass: GMAIL_APP_PASSWORD,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-});
+let transporterPromise: Promise<Transporter> | null = null;
+
+async function getTransporter(): Promise<Transporter> {
+  if (!transporterPromise) {
+    transporterPromise = (async () => {
+      const { address } = await lookup(SMTP_HOST, { family: 4 });
+      const options: SMTPTransport.Options = {
+        host: address,
+        port: 465,
+        secure: true,
+        tls: { servername: SMTP_HOST },
+        auth: {
+          user: GMAIL_USER,
+          pass: GMAIL_APP_PASSWORD,
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
+      };
+      return nodemailer.createTransport(options);
+    })().catch((err) => {
+      transporterPromise = null;
+      throw err;
+    });
+  }
+  return transporterPromise;
+}
 
 export async function enviarEmailVerificacion(
   correo: string,
@@ -24,6 +42,7 @@ export async function enviarEmailVerificacion(
   token: string,
 ): Promise<void> {
   const enlace = `${FRONTEND_URL}/verificar-email?token=${token}`;
+  const transporter = await getTransporter();
   await transporter.sendMail({
     from: FROM,
     to: correo,
@@ -38,6 +57,7 @@ export async function enviarEmailRecuperacion(
   token: string,
 ): Promise<void> {
   const enlace = `${FRONTEND_URL}/nueva-contrasena?token=${token}`;
+  const transporter = await getTransporter();
   await transporter.sendMail({
     from: FROM,
     to: correo,
