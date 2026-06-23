@@ -104,6 +104,8 @@ export const opcionesAuth: NextAuthOptions = {
           });
           const result = await res.json();
           token.sub = result.usuario.id;
+          token.name = result.usuario.nombre ?? user.name;
+          token.picture = result.usuario.foto ?? user.image ?? null;
           token.backendToken = result.token;
           token.rol = result.usuario.rol;
           token.perfilCompleto = result.perfilCompleto;

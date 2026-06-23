@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { usuarioRepository } from "../repositories/usuarioRepository";
+import { recetaRepository, type RecetaCandidataDespensa } from "../repositories/recetaRepository";
 
 interface MensajeChat {
   rol: "user" | "model";
@@ -318,4 +319,140 @@ Solo responde con el JSON, sin markdown.`;
     console.error("[Gemini escanear-ticket] Error:", error.message);
     throw Object.assign(new Error("No se pudo procesar el ticket"), { status: 503 });
   }
+}
+
+// ── Receta con lo que tengo (despensa) ───────────────────────────────────────
+export interface RespuestaRecetaDespensa {
+  respuesta: string;
+  fuente: "bbdd" | "gemini" | "sin-despensa";
+  receta?: { id: string; titulo: string; imagenUrl: string };
+}
+
+function normalizarIngrediente(texto: string): string {
+  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+
+function ingredienteCoincide(itemDespensa: string, ingredientesReceta: string[]): boolean {
+  const objetivo = normalizarIngrediente(itemDespensa);
+  if (objetivo.length === 0) return false;
+
+  return ingredientesReceta.some((ing) => {
+    const candidato = normalizarIngrediente(ing);
+    if (objetivo.length < 4) return candidato.split(/\s+/).includes(objetivo);
+    return candidato.includes(objetivo) || objetivo.includes(candidato);
+  });
+}
+
+function elegirMejorReceta(
+  candidatas: RecetaCandidataDespensa[],
+  ingredientesDespensa: string[],
+  preferencias: string[],
+): RecetaCandidataDespensa | null {
+  const completas = candidatas.filter((receta) =>
+    ingredientesDespensa.every((item) => ingredienteCoincide(item, receta.ingredientes)),
+  );
+
+  if (completas.length === 0) return null;
+
+  const prefs = new Set(preferencias);
+  completas.sort((a, b) => {
+    const prefA = a.categorias.filter((c) => prefs.has(c)).length;
+    const prefB = b.categorias.filter((c) => prefs.has(c)).length;
+    if (prefB !== prefA) return prefB - prefA;
+    return b.likes - a.likes;
+  });
+
+  return completas[0];
+}
+
+function construirRespuestaBBDD(receta: RecetaCandidataDespensa): string {
+  return [
+    "¡Tengo justo lo que necesitas! 🧺",
+    "",
+    `Con lo que hay en tu despensa puedes preparar **${receta.titulo}**.`,
+    "",
+    `- ⏱️ ${receta.tiempo} · ${receta.dificultad}`,
+    `- ${receta.descripcion}`,
+    "",
+    `👉 [Ver la receta completa](/recetas/${receta.id})`,
+  ].join("\n");
+}
+
+async function sugerirRecetaConGemini(
+  ingredientes: string[],
+  alergias: string[],
+  preferencias: string[],
+): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) {
+    return "Ahora mismo no tengo ninguna receta guardada que use justo lo que tienes. Configura el asistente para que pueda inventarte una a medida.";
+  }
+
+  registrarLlamadaGemini();
+
+  const restricciones = alergias.length > 0
+    ? `Alergias e intolerancias que debes respetar SÍ o SÍ (no incluyas estos ingredientes ni derivados): ${alergias.join(", ")}.`
+    : "Sin alergias ni intolerancias.";
+  const gustos = preferencias.length > 0
+    ? `Preferencias de dieta del usuario: ${preferencias.join(", ")}.`
+    : "Sin preferencias de dieta concretas.";
+
+  const prompt = `El usuario tiene estos ingredientes en su despensa: ${ingredientes.join(", ")}.
+${restricciones}
+${gustos}
+
+No hay ninguna receta guardada que use todos esos ingredientes. Propón UNA receta realista que aproveche el máximo posible de esos ingredientes (puede usar básicos de despensa como aceite, sal o agua), respetando estrictamente las alergias e intolerancias y, si encajan, las preferencias.
+Responde en español con markdown: título en **negrita**, una lista de ingredientes y los pasos numerados. Sé concreto y conciso.`;
+
+  try {
+    const model = obtenerCliente().getGenerativeModel({
+      model: MODELO_GEMINI,
+      generationConfig: GENERATION_CONFIG,
+    });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (err) {
+    const error = err as Error;
+    console.error("[Gemini receta-despensa] Error:", error.message);
+    if (/429|quota|rate.?limit|too many requests/i.test(error.message)) {
+      throw Object.assign(
+        new Error("El asistente está recibiendo muchas peticiones ahora mismo. Espera unos segundos e inténtalo de nuevo."),
+        { status: 429 },
+      );
+    }
+    throw Object.assign(new Error("El asistente no está disponible en este momento"), { status: 503 });
+  }
+}
+
+export async function recetaConDespensa(usuarioId: string): Promise<RespuestaRecetaDespensa> {
+  const [perfil, despensa] = await Promise.all([
+    usuarioRepository.buscarPerfilPorId(usuarioId),
+    usuarioRepository.obtenerDespensa(usuarioId),
+  ]);
+
+  const ingredientes = (despensa ?? []).map((d) => d.nombre).filter((n) => n && n.trim().length > 0);
+
+  if (ingredientes.length === 0) {
+    return {
+      fuente: "sin-despensa",
+      respuesta:
+        "Tu despensa está vacía 🧺. Añade lo que tengas en la sección **Despensa** y te buscaré una receta que puedas cocinar ahora mismo. Mientras tanto, dime qué ingredientes tienes y te ayudo igual.",
+    };
+  }
+
+  const alergias = perfil?.alergias ?? [];
+  const preferencias = perfil?.preferencias ?? [];
+
+  const candidatas = await recetaRepository.buscarCandidatasParaDespensa(alergias);
+  const mejor = elegirMejorReceta(candidatas, ingredientes, preferencias);
+
+  if (mejor) {
+    return {
+      fuente: "bbdd",
+      respuesta: construirRespuestaBBDD(mejor),
+      receta: { id: mejor.id, titulo: mejor.titulo, imagenUrl: mejor.imagenUrl },
+    };
+  }
+
+  const respuesta = await sugerirRecetaConGemini(ingredientes, alergias, preferencias);
+  return { fuente: "gemini", respuesta };
 }

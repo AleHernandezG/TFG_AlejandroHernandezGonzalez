@@ -18,12 +18,12 @@ import bcrypt from "bcryptjs";
 import { conectarDB } from "../lib/db";
 import { Usuario } from "../models/usuarioMongo";
 import { Receta } from "../models/recetaMongo";
-import { buscarFotoPexels } from "../services/imagenService";
+import { buscarFotoPexelsCascada } from "../services/imagenService";
 
 const SIN_IMAGENES = process.argv.includes("--sin-imagenes");
 const PASSWORD_SEED = "Seed1234.";
 const PEXELS_SLEEP_MS = 380;
-const PEXELS_BUDGET = 190;
+const PEXELS_BUDGET = 200;
 let pexelsUsadas = 0;
 
 const placeholder = (titulo: string) =>
@@ -60,7 +60,8 @@ interface RecetaSeed {
   comentarios?: ComentarioSeed[];
 }
 
-const avatar = (seed: string) => `https://i.pravatar.cc/200?u=${seed}`;
+const avatar = (nombre: string) =>
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=9a5a2d&color=fff&bold=true&size=200`;
 
 const USUARIOS: UsuarioSeed[] = [
   { nombre: "Elena Vidal", correo: "elena.vidal@cookr.dev", foto: avatar("elena"), alergias: [], preferencias: ["mediterranea", "vegetariano"] },
@@ -2642,7 +2643,7 @@ async function obtenerImagen(receta: RecetaSeed): Promise<{
     return { imagenUrl: placeholder(receta.titulo), fotoFuente: "usuario", fotoCredito: null };
   }
   pexelsUsadas++;
-  const foto = await buscarFotoPexels(receta.titulo);
+  const foto = await buscarFotoPexelsCascada(receta.titulo, receta.categorias);
   await sleep(PEXELS_SLEEP_MS);
   if (!foto) {
     return { imagenUrl: placeholder(receta.titulo), fotoFuente: "usuario", fotoCredito: null };
@@ -2671,7 +2672,7 @@ async function run(): Promise<void> {
         nombre: u.nombre,
         correo: u.correo,
         contrasena: hash,
-        foto: u.foto,
+        foto: avatar(u.nombre),
         rol: "usuario",
         proveedor: "local",
         cuentaVerificada: true,

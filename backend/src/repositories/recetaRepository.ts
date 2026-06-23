@@ -21,6 +21,18 @@ const MAPA_DIFICULTAD: Record<string, "Fácil" | "Media" | "Difícil"> = {
 
 type UsuarioPopulado = { _id: Types.ObjectId; nombre: string; foto?: string };
 
+export interface RecetaCandidataDespensa {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  tiempo: string;
+  dificultad: string;
+  imagenUrl: string;
+  categorias: string[];
+  ingredientes: string[];
+  likes: number;
+}
+
 //Maria Isabel -> mariaisabel
 function nombreAUsername(nombre: string): string {
   return nombre
@@ -632,5 +644,32 @@ export const recetaRepository = {
     }
 
     await Receta.deleteOne({ _id: recetaId });
+  },
+
+  async buscarCandidatasParaDespensa(alergias: string[]): Promise<RecetaCandidataDespensa[]> {
+    const query: Record<string, unknown> = {};
+    if (alergias.length > 0) {
+      query["alergenos"] = { $nin: alergias };
+    }
+
+    const docs = await Receta.find(query)
+      .select("titulo descripcion tiempo dificultad imagenUrl categorias ingredientes likes")
+      .lean()
+      .exec();
+
+    return docs.map((d) => {
+      const doc = d as Record<string, unknown>;
+      return {
+        id: (doc._id as Types.ObjectId).toString(),
+        titulo: doc.titulo as string,
+        descripcion: doc.descripcion as string,
+        tiempo: doc.tiempo as string,
+        dificultad: doc.dificultad as string,
+        imagenUrl: doc.imagenUrl as string,
+        categorias: (doc.categorias as string[]) ?? [],
+        ingredientes: ((doc.ingredientes as Array<{ nombre: string }>) ?? []).map((i) => i.nombre),
+        likes: ((doc.likes as unknown[]) ?? []).length,
+      };
+    });
   },
 };

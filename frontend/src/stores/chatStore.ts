@@ -11,6 +11,7 @@ interface ChatStore {
   cargando: boolean
   historial: ConversacionGuardada[]
   enviarMensaje: (texto: string, imagen?: string) => void
+  recetaConDespensa: () => void
   limpiarChat: () => void
   nuevaConversacion: () => void
   restaurarConversacion: (id: string) => void
@@ -43,6 +44,49 @@ export const useChatStore = create<ChatStore>()(
           const token = session?.user?.backendToken ?? ''
           const todosLosMensajes = get().mensajes
           const respuestaTexto = await chatService.enviarMensaje(todosLosMensajes, token, imagen)
+
+          const respuesta: Mensaje = {
+            id: `${Date.now()}-ia`,
+            rol: 'ia',
+            contenido: respuestaTexto,
+            timestamp: new Date(),
+          }
+
+          set((state) => ({
+            mensajes: [...state.mensajes, respuesta],
+            cargando: false,
+          }))
+        } catch {
+          const errorMsg: Mensaje = {
+            id: `${Date.now()}-err`,
+            rol: 'ia',
+            contenido: 'No pude conectar con el asistente. Inténtalo de nuevo.',
+            timestamp: new Date(),
+          }
+          set((state) => ({
+            mensajes: [...state.mensajes, errorMsg],
+            cargando: false,
+          }))
+        }
+      },
+
+      recetaConDespensa: async () => {
+        const mensajeUsuario: Mensaje = {
+          id: `${Date.now()}-u`,
+          rol: 'usuario',
+          contenido: 'Receta con lo que tengo',
+          timestamp: new Date(),
+        }
+
+        set((state) => ({
+          mensajes: [...state.mensajes, mensajeUsuario],
+          cargando: true,
+        }))
+
+        try {
+          const session = await getSession()
+          const token = session?.user?.backendToken ?? ''
+          const respuestaTexto = await chatService.recetaConDespensa(token)
 
           const respuesta: Mensaje = {
             id: `${Date.now()}-ia`,

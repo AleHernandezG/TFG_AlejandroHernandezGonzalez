@@ -17,4 +17,13 @@ export const chatService = {
     )
     return data.respuesta
   },
+
+  async recetaConDespensa(token: string): Promise<string> {
+    const { data } = await apiClient.post<{ respuesta: string }>(
+      '/chat/receta-despensa',
+      {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    )
+    return data.respuesta
+  },
 }
