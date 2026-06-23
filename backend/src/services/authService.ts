@@ -147,6 +147,9 @@ export const authService = {
 
     if (!usuario) return respuesta;
 
+    // Cuentas creadas con Google no tienen contraseña local que recuperar.
+    if (usuario.proveedor === "google" && !usuario.contrasena) return respuesta;
+
     const tokenValor = crypto.randomBytes(32).toString("hex");
     await tokenRepository.crear({
       userId: usuario._id as Types.ObjectId,

@@ -1,8 +1,9 @@
 import { Sparkles } from 'lucide-react'
 import { CHIPS_SUGERIDOS } from '@/features/chat/data/datosChat'
+import type { ChipSugerido } from '@/features/chat/types/chat.types'
 
 interface Props {
-  onChipClick: (texto: string) => void
+  onChipClick: (chip: ChipSugerido) => void
 }
 
 export function EstadoVacioChat({ onChipClick }: Props) {
@@ -25,7 +26,7 @@ export function EstadoVacioChat({ onChipClick }: Props) {
           {CHIPS_SUGERIDOS.map((chip) => (
             <button
               key={chip.id}
-              onClick={() => onChipClick(chip.texto)}
+              onClick={() => onChipClick(chip)}
               className="flex items-center gap-3 rounded-xl bg-[var(--warm-bg)] px-5 py-3.5 text-left transition-colors hover:bg-[var(--warm-bg-accent)] active:scale-[0.98]"
             >
               <span className="text-xl">{chip.icono}</span>

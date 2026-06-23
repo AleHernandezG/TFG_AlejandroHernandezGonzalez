@@ -41,6 +41,11 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
                 li: ({ children }) => <li className="leading-relaxed">{children}</li>,
                 strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
                 h3: ({ children }) => <p className="mb-1 mt-3 font-semibold text-foreground first:mt-0">{children}</p>,
+                a: ({ href, children }) => (
+                  <a href={href} className="font-semibold text-brand underline underline-offset-2 hover:opacity-80">
+                    {children}
+                  </a>
+                ),
               }}
             >
               {contenido}

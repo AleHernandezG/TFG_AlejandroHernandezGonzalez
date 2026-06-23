@@ -11,7 +11,7 @@ import { BarraInputChat } from './barraInputChat'
 import { SheetHistorialChat } from './sheetHistorialChat'
 
 export function ContenidoChat() {
-  const { mensajes, cargando, enviarMensaje } = useChatStore()
+  const { mensajes, cargando, enviarMensaje, recetaConDespensa } = useChatStore()
   const [historialAbierto, setHistorialAbierto] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -19,13 +19,21 @@ export function ContenidoChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [mensajes, cargando])
 
+  const handleChip = (chip: { id: string; texto: string }) => {
+    if (chip.id === 'receta-ingredientes') {
+      recetaConDespensa()
+    } else {
+      enviarMensaje(chip.texto)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-background">
       <HeaderChat onVerHistorial={() => setHistorialAbierto(true)} />
 
       <div className="flex-1 overflow-y-auto">
         {mensajes.length === 0 ? (
-          <EstadoVacioChat onChipClick={enviarMensaje} />
+          <EstadoVacioChat onChipClick={handleChip} />
         ) : (
           <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-6">
             {mensajes.map((m) =>

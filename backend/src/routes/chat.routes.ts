@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requerirAuth } from "../middlewares/autenticacion";
 import { limitarPorUsuario } from "../middlewares/rateLimitIA";
-import { responderChat } from "../services/chatService";
+import { responderChat, recetaConDespensa } from "../services/chatService";
 
 const router = Router();
 
@@ -68,6 +68,21 @@ router.post(
         imagenBase64,
       );
       res.json({ respuesta });
+    } catch (err) {
+      const e = err as Error & { status?: number };
+      res.status(e.status ?? 500).json({ error: e.message ?? "Error interno" });
+    }
+  },
+);
+
+router.post(
+  "/receta-despensa",
+  requerirAuth,
+  limitarPorUsuario(30),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resultado = await recetaConDespensa(req.usuario!.id);
+      res.json(resultado);
     } catch (err) {
       const e = err as Error & { status?: number };
       res.status(e.status ?? 500).json({ error: e.message ?? "Error interno" });

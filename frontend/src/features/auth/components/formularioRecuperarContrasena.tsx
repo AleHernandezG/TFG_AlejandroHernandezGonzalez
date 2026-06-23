@@ -148,6 +148,12 @@ export function FormularioRecuperarContrasena() {
             </motion.div>
           </motion.form>
 
+          {/* Aviso cuentas Google */}
+          <p className="rounded-lg bg-muted/50 px-3 py-2.5 text-center text-xs text-muted-foreground">
+            ¿Te registraste con Google? No tienes contraseña que recuperar: vuelve
+            al login y entra con el botón de Google.
+          </p>
+
           {/* Volver al login */}
           <p className="text-center text-sm text-muted-foreground">
             ¿Recuerdas tu contraseña?{" "}
