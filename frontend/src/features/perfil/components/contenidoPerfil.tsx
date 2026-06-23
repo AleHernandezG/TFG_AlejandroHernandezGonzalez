@@ -3,20 +3,17 @@
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import { useSession } from 'next-auth/react'
-import { Lock, UtensilsCrossed, MapPin, Camera, Bell, LogOut } from 'lucide-react'
+import { Lock, UtensilsCrossed, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { usePerfilStore } from '@/stores/perfilStore'
 import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 import { TarjetaAvatarPerfil } from './tarjetaAvatarPerfil'
 import { GrupoAjustes } from './grupoAjustes'
 import { FilaAjuste } from './filaAjuste'
-import { FilaTogglePermiso } from './filaTogglePermiso'
 import { DialogCambiarContrasena } from './dialogCambiarContrasena'
 import { DialogPreferenciasAlergenos } from './dialogPreferenciasAlergenos'
 
 export function ContenidoPerfil() {
   const { data: session } = useSession()
-  const { permisos, togglePermiso } = usePerfilStore()
   const { data: perfil } = useMiPerfil()
 
   const [dialogContrasena, setDialogContrasena] = useState(false)
@@ -57,29 +54,6 @@ export function ContenidoPerfil() {
             icono={UtensilsCrossed}
             label="Cambiar preferencias y alérgenos"
             onClick={() => setDialogPreferencias(true)}
-            separador={false}
-          />
-        </GrupoAjustes>
-
-        {/* Grupo: Permisos */}
-        <GrupoAjustes titulo="Permisos">
-          <FilaTogglePermiso
-            icono={MapPin}
-            label="Localización"
-            activo={permisos.ubicacion}
-            onToggle={() => togglePermiso('ubicacion')}
-          />
-          <FilaTogglePermiso
-            icono={Camera}
-            label="Cámara"
-            activo={permisos.camara}
-            onToggle={() => togglePermiso('camara')}
-          />
-          <FilaTogglePermiso
-            icono={Bell}
-            label="Notificaciones"
-            activo={permisos.notificaciones}
-            onToggle={() => togglePermiso('notificaciones')}
             separador={false}
           />
         </GrupoAjustes>

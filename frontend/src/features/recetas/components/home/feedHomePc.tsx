@@ -2,10 +2,11 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDebounce } from '@/hooks/useDebounce'
-import { SearchX } from 'lucide-react'
+import { SearchX, Sparkles } from 'lucide-react'
 import type { FiltrosAvanzados } from '../../types/receta.types'
 import { TarjetaPostPc, type VarianteTarjeta } from './tarjetaPostPc'
 import { useRecetasFeed } from '@/features/recetas/hooks/useRecetasFeed'
+import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 
 // Bento grid layout pattern for first 7 posts:
 // [HERO col-span-2 row-span-2][SMALL]
@@ -15,6 +16,12 @@ import { useRecetasFeed } from '@/features/recetas/hooks/useRecetasFeed'
 const VARIANTES: VarianteTarjeta[] = [
   'hero', 'small', 'small', 'small', 'wide', 'small', 'small',
 ]
+
+function varianteParaIndice(i: number): VarianteTarjeta {
+  if (i < VARIANTES.length) return VARIANTES[i]
+  const resto = (i - VARIANTES.length) % 7
+  return VARIANTES[resto]
+}
 
 function TarjetaPostSkeletonPc() {
   return (
@@ -35,20 +42,59 @@ interface FeedHomePcProps {
 
 export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
   const busquedaDebounciada = useDebounce(busqueda, 300)
-  const cargando = busqueda !== busquedaDebounciada
+  const buscando = busqueda !== busquedaDebounciada
 
-  const { data, isLoading } = useRecetasFeed({
+  const { data: perfil } = useMiPerfil()
+
+  const feedSiguiendo = useRecetasFeed({
     q: busquedaDebounciada,
     filtrosAvanzados,
     excluirPropio: true,
     soloSiguiendo: true,
   })
 
-  const posts = data?.recetas ?? []
+  const sinSiguiendo =
+    feedSiguiendo.isSuccess &&
+    (feedSiguiendo.data?.recetas.length ?? 0) === 0 &&
+    !busquedaDebounciada &&
+    filtrosAvanzados.dietas.length === 0 &&
+    filtrosAvanzados.alergenos.length === 0 &&
+    filtrosAvanzados.dificultad.length === 0
+
+  const feedRecomendado = useRecetasFeed({
+    filtrosAvanzados: {
+      dietas: perfil?.preferencias ?? [],
+      alergenos: perfil?.alergias ?? [],
+      dificultad: [],
+    },
+    sort: 'likes',
+    excluirPropio: true,
+    enabled: sinSiguiendo,
+  })
+
+  const posts = sinSiguiendo
+    ? (feedRecomendado.data?.recetas ?? [])
+    : (feedSiguiendo.data?.recetas ?? [])
+
+  const cargando =
+    feedSiguiendo.isLoading ||
+    (sinSiguiendo && feedRecomendado.isLoading) ||
+    buscando
+
+  const esRecomendado = sinSiguiendo && posts.length > 0
 
   return (
     <div>
-      {cargando || isLoading ? (
+      {esRecomendado && (
+        <div className="mb-6 flex items-center gap-2 rounded-xl border border-brand/15 bg-brand/8 px-4 py-3">
+          <Sparkles size={16} className="shrink-0 text-brand" />
+          <p className="text-sm font-semibold text-brand">
+            Recetas para ti — basadas en tus gustos
+          </p>
+        </div>
+      )}
+
+      {cargando ? (
         <div className="grid grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <TarjetaPostSkeletonPc key={i} />
@@ -60,7 +106,7 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
             <TarjetaPostPc
               key={post.id}
               post={post}
-              variante={VARIANTES[i] ?? 'small'}
+              variante={varianteParaIndice(i)}
             />
           ))}
         </div>
@@ -69,7 +115,9 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
           <SearchX className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.5} />
           <p className="text-base font-semibold text-foreground">Sin resultados</p>
           <p className="text-sm text-muted-foreground">
-            Prueba con otro término o cambia el filtro
+            {busquedaDebounciada
+              ? 'Prueba con otro término o cambia el filtro'
+              : 'Sigue a otros usuarios para ver sus recetas aquí'}
           </p>
         </div>
       )}

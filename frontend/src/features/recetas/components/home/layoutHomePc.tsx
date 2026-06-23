@@ -5,7 +5,6 @@ import type { FiltrosAvanzados } from '../../types/receta.types'
 import { FeedHomePc } from './feedHomePc'
 import { HeaderHomePc } from './headerHomePc'
 import { SidebarNavPc } from './sidebarNavPc'
-import { SidebarTendencias } from './sidebarTendencias'
 
 // Desktop-only layout wrapper (rendered only on lg+, see home/page.tsx)
 export function LayoutHomePc() {
@@ -26,13 +25,11 @@ export function LayoutHomePc() {
       />
       <SidebarNavPc />
 
-      <main className="min-h-screen bg-background pb-12 pl-64 pr-80 pt-28">
-        <div className="px-8">
+      <main className="min-h-screen bg-background pb-12 pl-64 pt-28">
+        <div className="mx-auto max-w-6xl px-8">
           <FeedHomePc busqueda={busqueda} filtrosAvanzados={filtrosAvanzados} />
         </div>
       </main>
-
-      <SidebarTendencias />
     </>
   )
 }
