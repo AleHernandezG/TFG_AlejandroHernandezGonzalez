@@ -17,8 +17,12 @@ function obtenerCliente(): GoogleGenerativeAI {
 }
 
 // ── Modelo y tope global diario de llamadas ──────────────────────────────────
-const MODELO_GEMINI = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const MODELO_GEMINI = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 const MAX_LLAMADAS_DIA = Number(process.env.GEMINI_MAX_LLAMADAS_DIA ?? 1000);
+
+// gemini-2.5-flash activa "thinking" por defecto, lo que gasta tokens y cuota
+// sin aportar nada en un chat culinario. Lo desactivamos.
+const GENERATION_CONFIG = { thinkingConfig: { thinkingBudget: 0 } } as Record<string, unknown>;
 
 let llamadasHoy = 0;
 let diaActual = new Date().toISOString().slice(0, 10);
@@ -176,6 +180,7 @@ export async function responderChat(
     const model = obtenerCliente().getGenerativeModel({
       model: MODELO_GEMINI,
       systemInstruction: SYSTEM_PROMPT(contexto),
+      generationConfig: GENERATION_CONFIG,
     });
 
     const historial = mensajes.slice(0, -1).map((m) => ({
@@ -203,6 +208,12 @@ export async function responderChat(
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini chat] Error:", error.message);
+    if (/429|quota|rate.?limit|too many requests/i.test(error.message)) {
+      throw Object.assign(
+        new Error("El asistente está recibiendo muchas peticiones ahora mismo. Espera unos segundos e inténtalo de nuevo."),
+        { status: 429 },
+      );
+    }
     throw Object.assign(new Error("El asistente no está disponible en este momento"), { status: 503 });
   }
 }
@@ -223,7 +234,10 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
   registrarLlamadaGemini();
 
   try {
-    const model = obtenerCliente().getGenerativeModel({ model: MODELO_GEMINI });
+    const model = obtenerCliente().getGenerativeModel({
+      model: MODELO_GEMINI,
+      generationConfig: GENERATION_CONFIG,
+    });
 
     const descripcionSegura = sanitizarTextoUsuario(descripcion);
     const prompt = `Genera una receta en JSON con exactamente este formato:
@@ -270,7 +284,10 @@ export async function escanearTicket(imagenBase64: string): Promise<Array<{ nomb
   registrarLlamadaGemini();
 
   try {
-    const model = obtenerCliente().getGenerativeModel({ model: MODELO_GEMINI });
+    const model = obtenerCliente().getGenerativeModel({
+      model: MODELO_GEMINI,
+      generationConfig: GENERATION_CONFIG,
+    });
 
     const partes = imagenBase64.split(",");
     const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";

@@ -11,7 +11,9 @@
     "seed": "ts-node --transpile-only src/scripts/seed.ts",
     "seed:force": "ts-node --transpile-only src/scripts/seed.ts -- --force",
     "seed:completo": "ts-node --transpile-only src/scripts/seedCompleto.ts",
-    "seed:completo:force": "ts-node --transpile-only src/scripts/seedCompleto.ts -- --force"
+    "seed:completo:force": "ts-node --transpile-only src/scripts/seedCompleto.ts -- --force",
+    "seed:masivo": "ts-node --transpile-only src/scripts/seedMasivo.ts",
+    "seed:masivo:sin-imagenes": "ts-node --transpile-only src/scripts/seedMasivo.ts -- --sin-imagenes"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
