@@ -35,8 +35,8 @@ export const esquemaVerificarEmail = z.object({
 export const esquemaGoogleOAuth = z.object({
   googleId: z.string().min(1, "Google ID obligatorio"),
   correo: z.string().email("Correo no válido").trim().toLowerCase(),
-  nombre: z.string().min(1, "Nombre obligatorio").trim(),
-  foto: z.string().url().optional(),
+  nombre: z.string().trim().min(1).catch("Usuario"),
+  foto: z.string().url().optional().catch(undefined),
 });
 
 export const esquemaCompletarPerfil = z.object({

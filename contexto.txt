@@ -1,0 +1,139 @@
+# GET /api/auth/callback/google
+
+Status: 500 (FUNCTION_INVOCATION_FAILED)
+
+## Request
+
+Started: Jun 24 01:32:25.72 GMT+2
+
+Request ID: x9dsc-1782257545723-5dea8437fce4
+
+Path: /api/auth/callback/google
+
+Host: tfg-alejandro-hernandez-gonzalez.vercel.app
+
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+Referer: https://accounts.google.com/
+
+Search Params
+
+- state=8Cptp_C3h-tfA_c9Ce2jAooDxMcTIULg5DRMAK051mo
+- iss=https://accounts.google.com
+- code=4/0AdkVLPxVw89ospqiAxtaeyuf_dLlUM8BpqyxDhpWQhrJ8AKHxXLS59u4ZFFMcMLpEwj0GQ
+- scope=email profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid
+- authuser=0
+- prompt=none
+
+Error: FUNCTION_INVOCATION_FAILED
+
+Received in Paris, France (cdg1)
+
+Firewall Allowed
+
+Routed to Washington, D.C., USA (iad1)
+
+### Function Invocation
+
+Route: / api / auth / [...nextauth]
+
+Error Page: /500
+
+Execution Duration / Maximum: 1.41s / 5m
+
+External APIs
+
+| Method | Request |
+| --- | --- |
+| GET | Button: accounts.google.com/.well-known/openid-configuration |
+| POST | Button: oauth2.googleapis.com/token |
+| GET | Button: www.googleapis.com/oauth2/v3/certs |
+| POST | Button: tfg-alejandrohernandezgonzalez.onrender.com/api/auth/google |
+
+### Fluid
+
+315 MB
+
+Response finished in 2s
+
+## Deployment Information
+
+Deployment ID: dpl_EVvjw2qg8CMbvcQMRXCNmNZd4Sfn
+
+Environment: production
+
+Branch: main
+
+
+
+
+# GET /api/auth/callback/google
+
+Status: 500 (FUNCTION_INVOCATION_FAILED)
+
+## Request
+
+Started: Jun 24 01:32:17.69 GMT+2
+
+Request ID: br982-1782257537697-12414e73cac1
+
+Path: /api/auth/callback/google
+
+Host: tfg-alejandro-hernandez-gonzalez.vercel.app
+
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36
+
+Referer: https://accounts.google.com/
+
+Search Params
+
+- state=8Cptp_C3h-tfA_c9Ce2jAooDxMcTIULg5DRMAK051mo
+- iss=https://accounts.google.com
+- code=4/0AdkVLPxrr4Axk6SQz1uf2I8jAtYlrpfCGCm9nccBAFmWtyjdE3ZJQM63QkED5ZKga_pX_w
+- scope=email profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid
+- authuser=2
+- hd=usal.es
+- prompt=none
+- nxtPnextauth=callback/google
+
+Error: FUNCTION_INVOCATION_FAILED
+
+Received in Paris, France (cdg1)
+
+Firewall Allowed
+
+Routed to Washington, D.C., USA (iad1)
+
+### Function Invocation
+
+Route: / api / auth / [...nextauth]
+
+Error Page: /500
+
+Execution Duration / Maximum: 499ms / 5m
+
+External APIs
+
+| Method | Request |
+| --- | --- |
+| GET | Button: accounts.google.com/.well-known/openid-configuration |
+| POST | Button: oauth2.googleapis.com/token |
+| GET | Button: www.googleapis.com/oauth2/v3/certs |
+| POST | Button: tfg-alejandrohernandezgonzalez.onrender.com/api/auth/google |
+
+### Fluid
+
+310 MB
+
+Response finished in 601ms
+
+## Deployment Information
+
+Deployment ID: dpl_EVvjw2qg8CMbvcQMRXCNmNZd4Sfn
+
+Environment: production
+
+Branch: main
+
+
+En cambio desde un dispositivo movil si funciona pero desde brave en mi pc no funciona y salta este error.

@@ -91,6 +91,10 @@ export const opcionesAuth: NextAuthOptions = {
 
       // Google OAuth: primer login — llamar al backend para crear/recuperar usuario
       if (user && account?.provider === "google") {
+        const fotoValida =
+          typeof user.image === "string" && /^https?:\/\//.test(user.image) ? user.image : undefined;
+        const nombre = user.name?.trim() || user.email?.split("@")[0] || "Usuario";
+
         try {
           const res = await fetch(`${API_URL}/auth/google`, {
             method: "POST",
@@ -98,14 +102,20 @@ export const opcionesAuth: NextAuthOptions = {
             body: JSON.stringify({
               googleId: account.providerAccountId,
               correo: user.email,
-              nombre: user.name,
-              foto: user.image ?? undefined,
+              nombre,
+              foto: fotoValida,
             }),
           });
-          const result = await res.json();
+
+          const result = await res.json().catch(() => null);
+          if (!res.ok || !result?.usuario?.id) {
+            console.error("[NextAuth] /auth/google respondió mal:", res.status, result);
+            throw new Error(result?.error ?? "No se pudo iniciar sesión con Google.");
+          }
+
           token.sub = result.usuario.id;
-          token.name = result.usuario.nombre ?? user.name;
-          token.picture = result.usuario.foto ?? user.image ?? null;
+          token.name = result.usuario.nombre ?? nombre;
+          token.picture = result.usuario.foto ?? fotoValida ?? null;
           token.backendToken = result.token;
           token.rol = result.usuario.rol;
           token.perfilCompleto = result.perfilCompleto;
