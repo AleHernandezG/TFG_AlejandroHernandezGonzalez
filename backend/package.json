@@ -15,7 +15,8 @@
     "seed:masivo": "ts-node --transpile-only src/scripts/seedMasivo.ts",
     "seed:masivo:sin-imagenes": "ts-node --transpile-only src/scripts/seedMasivo.ts -- --sin-imagenes",
     "limpiar:test": "ts-node --transpile-only src/scripts/limpiarDatosTest.ts",
-    "avatares:seed": "ts-node --transpile-only src/scripts/actualizarAvataresSeed.ts"
+    "avatares:seed": "ts-node --transpile-only src/scripts/actualizarAvataresSeed.ts",
+    "normalizar:categorias": "ts-node --transpile-only src/scripts/normalizarCategorias.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

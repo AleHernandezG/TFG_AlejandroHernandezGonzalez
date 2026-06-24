@@ -46,9 +46,27 @@ A esto se sumaba que la búsqueda y los filtros se aplicaban solo dentro de las 
 - La **búsqueda y los filtros pasan a buscar en todas las recetas**, no solo en las de cuentas seguidas.
 - Retirada la barra lateral derecha de PC y centrado el contenido en una rejilla bento.
 
-**Nota de datos:** las categorías de receta están sembradas de forma inconsistente (`vegetariano` / `vegetariana` / `Vegetariana`, `mediterranea` / `mediterránea`). No rompe nada con este enfoque (las preferencias solo bonifican), pero conviene normalizarlas en un seed futuro para que el *boost* por gustos acierte siempre.
-
 **Archivos:** `frontend/src/features/recetas/hooks/useHomeFeed.ts` (nuevo), `feedHome.tsx`, `feedHomePc.tsx`, `useRecetasFeed.ts`, `backend/src/controllers/recetasController.ts` (acepta `sort=score`).
+
+---
+
+## 3 bis. Normalización de categorías en la base de datos
+
+**Problema:** los distintos scripts de seed sembraron la misma dieta con escrituras distintas, así que en la BBDD convivían `vegetariano` / `vegetariana` / `Vegetariana` y `mediterranea` / `mediterránea`. No rompe el home (las preferencias solo bonifican, no filtran), pero el *boost* por gustos no acierta: una receta etiquetada `Vegetariana` no recibe el empujón de un usuario con preferencia `vegetariano`, porque la comparación es exacta.
+
+**Qué hace el script (`normalizarCategorias.ts`):**
+- Recorre todas las recetas y todos los usuarios.
+- Para cada categoría/preferencia la pasa por un normalizador: minúsculas + sin acentos, un mapa de alias para las variantes de género (`vegetariana` → `vegetariano`, `vegana` → `vegano`) y una comprobación contra la lista de ids canónicos de dieta. Si coincide, la sustituye por el id canónico; si no es una dieta (cocinas y tipos de plato como `italiana`, `desayuno`, `postres`), **la deja igual**.
+- Tras mapear, elimina duplicados de cada lista (una receta con `vegetariano` y `Vegetariana` queda con `vegetariano` una sola vez).
+- Solo escribe los documentos que cambian.
+
+**Seguridad:** va en **dry-run por defecto** (enseña qué cambiaría sin tocar nada). Para aplicarlo de verdad hay que pasar `--apply`. En el dry-run sobre producción detectó 5 recetas a normalizar (3 con `mediterránea`, 2 con `vegetariana`/`Vegetariana`) y 0 usuarios.
+
+**Comandos:**
+- `npm run normalizar:categorias` → simulación, no escribe.
+- `npm run normalizar:categorias -- --apply` → aplica los cambios.
+
+**Archivos:** `backend/src/scripts/normalizarCategorias.ts` (nuevo), `backend/package.json` (script `normalizar:categorias`).
 
 ---
 
