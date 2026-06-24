@@ -11,7 +11,7 @@ interface UseRecetasFeedParams {
   pagina?: number;
   excluirPropio?: boolean;
   soloSiguiendo?: boolean;
-  sort?: 'reciente' | 'likes';
+  sort?: 'reciente' | 'likes' | 'score';
   enabled?: boolean;
 }
 

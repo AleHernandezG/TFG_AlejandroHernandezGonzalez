@@ -37,7 +37,7 @@ export const recetasController = {
         limite: limite ? Math.min(50, Number(limite)) : 20,
         excluirPropio: excluirPropio === "true",
         soloSiguiendo: soloSiguiendo === "true",
-        sort: (sort === "likes" || sort === "reciente") ? (sort as 'likes' | 'reciente') : undefined,
+        sort: (sort === "likes" || sort === "reciente" || sort === "score") ? (sort as 'likes' | 'reciente' | 'score') : undefined,
         soloEvento: soloEvento === "true",
         categoria: typeof categoria === "string" && categoria ? categoria : undefined,
       };
