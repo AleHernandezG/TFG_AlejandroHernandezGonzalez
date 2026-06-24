@@ -113,9 +113,16 @@ export const opcionesAuth: NextAuthOptions = {
             throw new Error(result?.error ?? "No se pudo iniciar sesión con Google.");
           }
 
+          // Una foto base64 (data:) no cabe en la cookie de sesión y rompe el login.
+          // Solo guardamos URLs; la foto subida vive en el perfil del backend.
+          const fotoBackend =
+            typeof result.usuario.foto === "string" && !result.usuario.foto.startsWith("data:")
+              ? result.usuario.foto
+              : null;
+
           token.sub = result.usuario.id;
           token.name = result.usuario.nombre ?? nombre;
-          token.picture = result.usuario.foto ?? fotoValida ?? null;
+          token.picture = fotoBackend ?? fotoValida ?? null;
           token.backendToken = result.token;
           token.rol = result.usuario.rol;
           token.perfilCompleto = result.perfilCompleto;
@@ -129,7 +136,13 @@ export const opcionesAuth: NextAuthOptions = {
       if (trigger === "update") {
         if (session?.perfilCompleto !== undefined) token.perfilCompleto = session.perfilCompleto;
         if (session?.name !== undefined) token.name = session.name;
-        if (session?.image !== undefined) token.picture = session.image;
+        if (session?.image !== undefined) {
+          // Nunca metemos data: URIs (base64) en la cookie de sesión: la revientan.
+          token.picture =
+            typeof session.image === "string" && session.image.startsWith("data:")
+              ? null
+              : session.image;
+        }
       }
 
       return token;

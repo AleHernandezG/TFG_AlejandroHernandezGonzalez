@@ -21,7 +21,9 @@ export function ContenidoPerfil() {
 
   const nombre = session?.user?.name ?? ''
   const email = session?.user?.email ?? ''
-  const avatar = session?.user?.image ?? null
+  // El perfil del backend tiene la foto completa (incluida la subida en base64,
+  // que no cabe en la sesión); la sesión solo guarda URLs.
+  const avatar = perfil?.foto ?? session?.user?.image ?? null
   const esLocal = perfil?.proveedor === 'local'
 
   async function handleCerrarSesion() {
