@@ -1,6 +1,6 @@
 import { INGREDIENTES_COMUNES, obtenerIngrediente } from '@/config/ingredientes'
 
-type IngredienteEscaneado = { nombre: string; cantidad: number; unidad: string }
+type IngredienteEscaneado = { nombre: string; cantidad: number; unidad?: string | null }
 
 // Lista de marcas españolas y términos comerciales comunes a omitir en la limpieza
 const MARCAS_Y_RELLENO = [
@@ -66,20 +66,51 @@ export function normalizarNombreIngrediente(nombreOriginal: string): string {
 /**
  * Normaliza las unidades estándar y convierte unidades compatibles para poder sumar cantidades.
  */
-function normalizarUnidadYCantidad(cantidad: number, unidad: string): { cantidad: number, unidad: string } {
-  const u = unidad.toLowerCase().trim();
+function normalizarUnidadYCantidad(cantidad: number, unidad?: string | null): { cantidad: number, unidad: string } {
+  let u = typeof unidad === 'string' ? unidad.toLowerCase().trim() : '';
   
+  if (!u) {
+    u = 'unidad';
+  }
+  
+  const PLURAL_A_SINGULAR: Record<string, string> = {
+    'sobres': 'sobre',
+    'latas': 'lata',
+    'bolsas': 'bolsa',
+    'dientes': 'diente',
+    'hojas': 'hoja',
+    'ramas': 'rama',
+    'rebanadas': 'rebanada',
+    'cucharaditas': 'cucharadita',
+    'cucharadas': 'cucharada',
+    'tazas': 'taza',
+    'pizcas': 'pizca',
+    'unidades': 'unidad',
+    'kilos': 'kg',
+    'kilo': 'kg',
+    'litros': 'l',
+    'litro': 'l',
+    'gramos': 'g',
+    'gramo': 'g',
+    'mililitros': 'ml',
+    'mililitro': 'ml',
+    'u': 'unidad',
+    'ud': 'unidad',
+    'uds': 'unidad'
+  };
+
+  if (PLURAL_A_SINGULAR[u]) {
+    u = PLURAL_A_SINGULAR[u];
+  }
+  
+  // Convertir escala
   // g / kg
-  if (u === 'kg' || u === 'kilo' || u === 'kilos') {
+  if (u === 'kg') {
     return { cantidad: cantidad * 1000, unidad: 'g' };
   }
   // l / ml
-  if (u === 'l' || u === 'litro' || u === 'litros') {
+  if (u === 'l') {
     return { cantidad: cantidad * 1000, unidad: 'ml' };
-  }
-  // u / ud / uds / unidad / unidades
-  if (['u', 'ud', 'uds', 'unidad', 'unidades'].includes(u)) {
-    return { cantidad, unidad: 'unidad' };
   }
   
   return { cantidad, unidad: u };

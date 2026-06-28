@@ -22,7 +22,7 @@ interface Props {
   ingredientesExistentes: ItemDespensa[]
 }
 
-type IngredienteEscaneado = { nombre: string; cantidad: number; unidad: string }
+type IngredienteEscaneado = { nombre: string; cantidad: number; unidad?: string | null }
 
 export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredientesExistentes }: Props) {
   const { data: session } = useSession()
@@ -110,7 +110,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
         aAnadir.push({
           nombre: ing.nombre,
           cantidad: ing.cantidad,
-          unidad: ing.unidad,
+          unidad: ing.unidad || 'unidad',
           emoji: getEmojiIngrediente(ing.nombre)
         })
       }

@@ -396,7 +396,8 @@ Posición en el router: ANTES de /:id para evitar colisión de parámetros.</pre
       <ul style="padding-left:1.25rem;font-size:0.83rem;color:#d4d4d4">
         <li><strong>Filtro de Marcas:</strong> Limpieza de marcas españolas comerciales (Hacendado, La Lechera, Orlando, Solís, Pascual, etc.) y eliminación de textos adicionales (ej: entre paréntesis).</li>
         <li><strong>Homologación de nombres:</strong> Se busca similitud en la lista local (<code>INGREDIENTES_COMUNES</code>) para homologar marcas de productos a su ingrediente base (ej. "flan de huevo La Lechera" se reduce a "Flan de huevo").</li>
-        <li><strong>Agrupación y Fusión:</strong> Conversión de unidades equivalentes (kg &rarr; g, l &rarr; ml) y suma de cantidades de ítems idénticos para mostrarlos consolidados.</li>
+        <li><strong>Agrupación y Fusión:</strong> Conversión de unidades de escala (kg &rarr; g, l &rarr; ml), agrupación y suma de cantidades de ítems idénticos para mostrarlos consolidados.</li>
+        <li><strong>Tratamiento de Unidades y Plurales:</strong> Si el ingrediente carece de unidad o es vacío en el ticket (ej. "Pan de molde Dia"), se asigna por defecto <code>"unidad"</code>. Si contiene una unidad en plural (ej. "sobres", "latas", "bolsas"), se mapea automáticamente a su formato singular estándar (<code>"sobre"</code>, <code>"lata"</code>, <code>"bolsa"</code>) para encajar con los dropdowns del formulario visual.</li>
       </ul>
 
       <h3>Inserción por Lotes (Batch Add)</h3>
