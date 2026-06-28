@@ -10,6 +10,11 @@ export const despensaService = {
     item: Omit<IItemDespensa, "_id">,
   ) => despensaRepository.añadir(usuarioId, item),
 
+  añadirLote: (
+    usuarioId: string,
+    items: Omit<IItemDespensa, "_id">[],
+  ) => despensaRepository.añadirLote(usuarioId, items),
+
   editar: (
     usuarioId: string,
     itemId: string,
