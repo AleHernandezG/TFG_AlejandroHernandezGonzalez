@@ -17,7 +17,7 @@ export const despensaService = {
 
   async añadir(
     token: string,
-    item: Omit<ItemDespensa, 'id'>,
+    item: Omit<ItemDespensa, 'id'> | Omit<ItemDespensa, 'id'>[],
   ): Promise<ItemDespensa[]> {
     const { data } = await apiClient.post<ItemRaw[]>('/despensa', item, {
       headers: { Authorization: `Bearer ${token}` },

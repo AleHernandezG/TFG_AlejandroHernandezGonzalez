@@ -20,7 +20,29 @@ export const despensaController = {
 
   async añadir(req: Request, res: Response): Promise<void> {
     try {
-      const { nombre, cantidad, unidad, emoji } = req.body as {
+      const body = req.body;
+
+      if (Array.isArray(body)) {
+        const itemsValidados = body.map((item: any) => {
+          const { nombre, cantidad, unidad, emoji } = item;
+          if (!nombre?.trim() || !unidad?.trim() || !emoji?.trim() || cantidad == null) {
+            throw Object.assign(new Error("nombre, cantidad, unidad y emoji son obligatorios en todos los elementos"), { status: 400 });
+          }
+          return {
+            nombre: nombre.trim(),
+            cantidad: Number(cantidad),
+            unidad: unidad.trim(),
+            emoji: emoji.trim(),
+            fechaAnadido: new Date(),
+          };
+        });
+
+        const items = await despensaService.añadirLote(req.usuario!.id, itemsValidados);
+        res.status(201).json(items);
+        return;
+      }
+
+      const { nombre, cantidad, unidad, emoji } = body as {
         nombre: string;
         cantidad: number;
         unidad: string;

@@ -18,7 +18,7 @@ const SUGERENCIAS_RAPIDAS = ['Tomate', 'Cebolla', 'Ajo', 'Zanahoria', 'Patata', 
 interface Props {
   abierto: boolean
   onCerrar: () => void
-  onAnadir: (item: Omit<ItemDespensa, 'id'>) => void
+  onAnadir: (item: Omit<ItemDespensa, 'id'> | Omit<ItemDespensa, 'id'>[]) => void
   ingredientesExistentes: ItemDespensa[]
 }
 
@@ -100,14 +100,26 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
 
   function confirmarEscaneados() {
     if (!ingredientesEscaneados) return
+    const aAnadir: Omit<ItemDespensa, 'id'>[] = []
+
     ingredientesEscaneados.forEach((ing) => {
       const yaExiste = ingredientes.some(
         (e) => e.nombre.toLowerCase() === ing.nombre.toLowerCase(),
       )
       if (!yaExiste) {
-        onAnadir({ nombre: ing.nombre, cantidad: ing.cantidad, unidad: ing.unidad, emoji: getEmojiIngrediente(ing.nombre) })
+        aAnadir.push({
+          nombre: ing.nombre,
+          cantidad: ing.cantidad,
+          unidad: ing.unidad,
+          emoji: getEmojiIngrediente(ing.nombre)
+        })
       }
     })
+
+    if (aAnadir.length > 0) {
+      onAnadir(aAnadir)
+    }
+
     setIngredientesEscaneados(null)
     onCerrar()
   }

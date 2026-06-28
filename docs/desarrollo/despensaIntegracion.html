@@ -385,16 +385,39 @@ Posición en el router: ANTES de /:id para evitar colisión de parámetros.</pre
       <h2 style="font-size:0.92rem;font-weight:700;color:#fff">Sprint 6 · C4 — DESP-TICKET-001: Escanear ticket de compra</h2>
     </div>
     <div style="padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
-      <p style="font-size:0.85rem;color:#d4d4d4">El usuario fotografía un ticket de supermercado. Gemini Vision extrae los ingredientes alimentarios y muestra una lista de confirmación. Al confirmar, los ingredientes se añaden a la despensa.</p>
+      <p style="font-size:0.85rem;color:#d4d4d4">El usuario fotografía un ticket de supermercado. Gemini Vision extrae los ingredientes alimentarios y muestra una lista de confirmación. Al confirmar, los ingredientes se añaden a la despensa de forma consolidada.</p>
 
       <div style="background:#eab30811;border:1px solid #eab30833;border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:#fbbf24">⚠️ Requiere <code>GEMINI_API_KEY</code> en <code>backend/.env</code>. Sin clave: error 503 manejado con mensaje visible.</div>
+
+      <h3>Mejoras de Limpieza y Normalización (FE)</h3>
+      <p style="font-size:0.83rem;color:#d4d4d4">
+        Los ingredientes extraídos por Gemini pasan por un proceso intermedio en el cliente (<code>normalizadorIngredientes.ts</code>) antes de previsualizarse:
+      </p>
+      <ul style="padding-left:1.25rem;font-size:0.83rem;color:#d4d4d4">
+        <li><strong>Filtro de Marcas:</strong> Limpieza de marcas españolas comerciales (Hacendado, La Lechera, Orlando, Solís, Pascual, etc.) y eliminación de textos adicionales (ej: entre paréntesis).</li>
+        <li><strong>Homologación de nombres:</strong> Se busca similitud en la lista local (<code>INGREDIENTES_COMUNES</code>) para homologar marcas de productos a su ingrediente base (ej. "flan de huevo La Lechera" se reduce a "Flan de huevo").</li>
+        <li><strong>Agrupación y Fusión:</strong> Conversión de unidades equivalentes (kg &rarr; g, l &rarr; ml) y suma de cantidades de ítems idénticos para mostrarlos consolidados.</li>
+      </ul>
+
+      <h3>Inserción por Lotes (Batch Add)</h3>
+      <p style="font-size:0.83rem;color:#d4d4d4">
+        Para solucionar fallos de persistencia (F5) y pérdida de ingredientes (conflictos de concurrencia en MongoDB al guardar concurrentemente), la inserción se realiza en una sola petición agrupada de red:
+      </p>
+      <ul style="padding-left:1.25rem;font-size:0.83rem;color:#d4d4d4">
+        <li><strong>Backend Multiuso:</strong> El endpoint <code>POST /api/despensa</code> acepta tanto un objeto individual como un array de objetos.</li>
+        <li><strong>Atomicidad en BD:</strong> Se utiliza el operador <code>$each</code> de MongoDB (<code>{ $push: { despensa: { $each: items } } }</code>) para guardar todo el lote en una sola operación de escritura.</li>
+        <li><strong>Actualización del Caché:</strong> La mutación de TanStack Query (<code>useAñadirItem</code>) procesa el lote de forma optimista con un rollback seguro en caso de error.</li>
+      </ul>
 
       <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
         <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Capa</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Detalle</th></tr></thead>
         <tbody>
-          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">chatService.ts → escanearTicket()</td><td style="padding:0.6rem 1rem">Gemini 1.5 Flash multimodal: imagen base64 → prompt extrae <code>[{nombre,cantidad,unidad}]</code>. Limpia markdown de la respuesta antes de <code>JSON.parse()</code>.</td></tr>
-          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">despensa.routes.ts</td><td style="padding:0.6rem 1rem"><code>POST /api/despensa/escanear-ticket</code> (requerirAuth). Body: <code>{imagenBase64}</code>. Responde: <code>{ingredientes: [{nombre,cantidad,unidad}]}</code>.</td></tr>
-          <tr><td style="padding:0.6rem 1rem">FE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">sheetAnadirIngrediente.tsx</td><td style="padding:0.6rem 1rem">Botón "Escanear ticket" + <code>input capture="environment"</code> → FileReader → POST → lista de confirmación → "Añadir todos" llama a <code>onAnadir</code> por cada ingrediente.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">chatService.ts → escanearTicket()</td><td style="padding:0.6rem 1rem">Gemini 2.5 Flash multimodal: imagen base64 → prompt extrae <code>[{nombre,cantidad,unidad}]</code>. Limpia markdown de la respuesta antes de <code>JSON.parse()</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">despensaRepository.ts</td><td style="padding:0.6rem 1rem">Añadido <code>añadirLote(userId, items)</code> con el operador <code>$each</code> de MongoDB para escrituras seguras no concurrentes.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">despensaController.ts</td><td style="padding:0.6rem 1rem">Actualizado <code>añadir()</code> para discernir entre lote (array) y objeto simple, garantizando compatibilidad y estabilidad.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">normalizadorIngredientes.ts</td><td style="padding:0.6rem 1rem">Utilidad de frontend que normaliza, limpia marcas y agrupa los duplicados consolidados.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">useMiDespensa.ts → useAñadirItem()</td><td style="padding:0.6rem 1rem">Hook de TanStack Query adaptado para realizar actualizaciones optimistas y peticiones HTTP en lote.</td></tr>
+          <tr><td style="padding:0.6rem 1rem">FE</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">sheetAnadirIngrediente.tsx</td><td style="padding:0.6rem 1rem">Botón "Escanear ticket" + FileReader + <code>normalizarYAgruparIngredientes</code>. Al confirmar, llama a <code>onAnadir</code> enviando el lote unificado.</td></tr>
         </tbody>
       </table>
     </div>

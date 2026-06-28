@@ -24,13 +24,19 @@ export function useAñadirItem() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: (item: Omit<ItemDespensa, 'id'>) =>
+    mutationFn: (item: Omit<ItemDespensa, 'id'> | Omit<ItemDespensa, 'id'>[]) =>
       despensaService.añadir(token, item),
     onMutate: async (nuevoItem) => {
       await qc.cancelQueries({ queryKey: QUERY_KEY })
       const prev = qc.getQueryData<ItemDespensa[]>(QUERY_KEY)
-      const optimista: ItemDespensa = { ...nuevoItem, id: `optimista-${Date.now()}` }
-      qc.setQueryData<ItemDespensa[]>(QUERY_KEY, (old) => [...(old ?? []), optimista])
+      
+      const nuevosItems = Array.isArray(nuevoItem) ? nuevoItem : [nuevoItem]
+      const optimistas: ItemDespensa[] = nuevosItems.map((item, index) => ({
+        ...item,
+        id: `optimista-${Date.now()}-${index}`
+      }))
+
+      qc.setQueryData<ItemDespensa[]>(QUERY_KEY, (old) => [...(old ?? []), ...optimistas])
       return { prev }
     },
     onError: (_err, _vars, ctx) => {
