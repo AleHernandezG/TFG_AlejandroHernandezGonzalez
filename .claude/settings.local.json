@@ -67,7 +67,8 @@
       "Bash(grep -n '\\\\\\\\ref{' anexos/A1_especificaciones.tex)",
       "Bash(python -)",
       "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tpng -Sdpi=200 img/anexos/a1/cu-auth.puml img/anexos/a1/cu-social.puml img/anexos/a1/modelo-dominio.puml)",
-      "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tsvg img/anexos/a1/cu-auth.puml img/anexos/a1/cu-social.puml img/anexos/a1/modelo-dominio.puml)"
+      "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tsvg img/anexos/a1/cu-auth.puml img/anexos/a1/cu-social.puml img/anexos/a1/modelo-dominio.puml)",
+      "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tpng -Sdpi=200 img/anexos/a1/cu-auth.puml img/anexos/a1/cu-recetas.puml img/anexos/a1/cu-despensa.puml img/anexos/a1/cu-chat.puml)"
     ],
     "additionalDirectories": [
       "c:\\Users\\usuario\\Desktop\\TFG_AlejandroHernandezGonzalez\\frontend\\src\\app\\(main)\\editar-receta"
