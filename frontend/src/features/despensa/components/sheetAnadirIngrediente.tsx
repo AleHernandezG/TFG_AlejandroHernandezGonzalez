@@ -11,6 +11,7 @@ import { useAutocompletadoIngredientes } from '@/features/recetas/hooks/useAutoc
 import { UNIDADES_INGREDIENTE } from '@/features/recetas/types/crearReceta.schema'
 import { getEmojiIngrediente } from '@/features/despensa/data/datosDespensa'
 import type { ItemDespensa } from '@/features/despensa/types/despensa.types'
+import { normalizarYAgruparIngredientes } from '../utils/normalizadorIngredientes'
 
 const SUGERENCIAS_RAPIDAS = ['Tomate', 'Cebolla', 'Ajo', 'Zanahoria', 'Patata', 'Huevos']
 
@@ -85,7 +86,8 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
         if (!data.ingredientes.length) {
           setErrorEscaneo('No se detectaron ingredientes en el ticket.')
         } else {
-          setIngredientesEscaneados(data.ingredientes)
+          const procesados = normalizarYAgruparIngredientes(data.ingredientes)
+          setIngredientesEscaneados(procesados)
         }
       } catch {
         setErrorEscaneo('No se pudo procesar la imagen. Inténtalo de nuevo.')

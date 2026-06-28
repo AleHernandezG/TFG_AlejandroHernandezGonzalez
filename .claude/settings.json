@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\6003766\\\\Documents\\\\TFG\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\features\\\\discover\" -Recurse | Select-Object FullName, @{Name='Type';Expression={if\\($_.PSIsContainer\\){'DIR'}else{'FILE'}}} | Format-Table -AutoSize)"
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\6003766\\\\Documents\\\\TFG\\\\TFG_AlejandroHernandezGonzalez\\\\frontend\\\\src\\\\features\\\\discover\" -Recurse | Select-Object FullName, @{Name='Type';Expression={if\\($_.PSIsContainer\\){'DIR'}else{'FILE'}}} | Format-Table -AutoSize)",
+      "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tpng -Sdpi=150 \"C:/Users/usuario/AppData/Local/Temp/claude/c--Users-usuario-Desktop-TFG-AlejandroHernandezGonzalez/69db0a61-d7e5-4ced-80de-ce8d51f0704b/scratchpad/test1.puml\")",
+      "Bash(java -jar .tools/plantuml.jar -charset UTF-8 -tpng -Sdpi=200 img/anexos/a1/cu-recetas.puml img/anexos/a1/cu-despensa.puml img/anexos/a1/cu-chat.puml img/anexos/a1/cu-auth.puml)"
     ]
   }
 }
