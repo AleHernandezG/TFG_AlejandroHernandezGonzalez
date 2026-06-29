@@ -121,6 +121,8 @@ export interface DatosCrearRecetaBody {
   ingredientes: { nombre: string; cantidad: string; unidad: string }[]
   pasos: { texto: string }[]
   imagenBase64?: string
+  fotoFuente?: 'usuario' | 'pexels'
+  fotoCredito?: IFotoCredito | null
 }
 
 export interface RecetaDetalleRespuesta extends PostFeedRespuesta {

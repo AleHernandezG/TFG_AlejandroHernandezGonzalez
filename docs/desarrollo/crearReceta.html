@@ -516,6 +516,36 @@ fotoCredito?: {
     </div>
   </section>
 
+  <!-- MEJORAS DE ROBUSTEZ Y NORMALIZACIÓN -->
+  <section id="mejoras-robustez">
+    <div class="section-header">
+      <span class="section-icon">🛠️</span>
+      <h2>Mejoras de Robustez y Normalización (Sprint 4)</h2>
+    </div>
+    <div class="section-body">
+      <h3>1. Normalización de Ingredientes en el Formulario</h3>
+      <p>
+        Para garantizar la consistencia en el catálogo de ingredientes, al hacer click en <strong>"Revisar receta"</strong> o al guardar las ediciones de una receta, todos los ingredientes ingresados manualmente por el usuario o sugeridos por IA son mapeados mediante la función <code>normalizarNombreIngrediente()</code>.
+      </p>
+      <p>
+        Esto permite que ingredientes como <code>"azúcar glass"</code> u ortografías con fallas en tildes se almacenen y previsualicen de forma homogénea (ej: <code>"Azúcar glas"</code>).
+      </p>
+
+      <h3>2. Persistencia Real de Imágenes Propias (Base64)</h3>
+      <p>
+        Anteriormente, al subir una imagen en los formularios de crear y editar, se utilizaban URLs temporales <code>blob:http://...</code> que provocaban imágenes rotas al recargar la página.
+      </p>
+      <p>
+        Se reemplazó este comportamiento leyendo el archivo local a través de <code>FileReader.readAsDataURL()</code> y almacenándolo en el store como una cadena en base64 real. Este formato se envía al backend, el cual lo guarda directamente como <code>imagenUrl</code> en MongoDB.
+      </p>
+
+      <h3>3. Sincronización de Imagen de Preview (Pexels)</h3>
+      <p>
+        Si el usuario no sube una imagen y se apoya en el preview de Pexels, al presionar "Publicar receta" la URL e información de atribución exacta de la foto de Pexels visualizada se envía al backend. Esto elimina las discrepancias visuales donde la receta publicada difería de la mostrada en el preview.
+      </p>
+    </div>
+  </section>
+
   <!-- TODOS FASE 5 -->
   <section id="todos">
     <div class="section-header">

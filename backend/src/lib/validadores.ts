@@ -70,4 +70,12 @@ export const esquemaCrearRecetaBody = z.object({
     .array(z.object({ texto: z.string().min(10, "El paso debe tener al menos 10 caracteres") }))
     .min(1, "Añade al menos un paso"),
   imagenBase64: z.string().optional(),
+  fotoFuente: z.enum(["usuario", "pexels"]).optional(),
+  fotoCredito: z
+    .object({
+      fotografo: z.string(),
+      urlFoto: z.string(),
+      urlPerfil: z.string(),
+    })
+    .nullish(),
 });
