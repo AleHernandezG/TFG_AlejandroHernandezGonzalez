@@ -505,10 +505,10 @@ export const recetaRepository = {
     const dificultad = MAPA_DIFICULTAD[datos.dificultad];
 
     let imagenUrl = datos.imagenBase64 ?? "";
-    let fotoFuente: "usuario" | "pexels" = "usuario";
-    let fotoCredito: IFotoCredito | null = null;
+    let fotoFuente: "usuario" | "pexels" = datos.fotoFuente ?? "usuario";
+    let fotoCredito: IFotoCredito | null = datos.fotoCredito ?? null;
 
-    if (!datos.imagenBase64) {
+    if (!imagenUrl) {
       const fotoPexels = await buscarFotoPexelsCascada(datos.titulo, datos.dietas);
       if (fotoPexels) {
         imagenUrl = fotoPexels.url;
@@ -621,8 +621,8 @@ export const recetaRepository = {
     if (datos.pasos !== undefined) update.pasos = datos.pasos.map((p) => p.texto);
     if (datos.imagenBase64 !== undefined) {
       update.imagenUrl = datos.imagenBase64;
-      update.fotoFuente = "usuario";
-      update.fotoCredito = null;
+      update.fotoFuente = datos.fotoFuente ?? "usuario";
+      update.fotoCredito = datos.fotoCredito ?? null;
     }
 
     await Receta.findByIdAndUpdate(recetaId, { $set: update });

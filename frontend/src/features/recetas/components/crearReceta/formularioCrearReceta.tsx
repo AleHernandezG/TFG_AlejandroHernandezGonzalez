@@ -21,6 +21,7 @@ import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 import { useCrearRecetaStore } from '@/stores/useCrearRecetaStore'
 import { esquemaCrearReceta, ETIQUETAS_DIFICULTAD, type DatosCrearReceta, type DificultadInterna } from '../../types/crearReceta.schema'
 import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
+import { normalizarNombreIngrediente } from '@/features/despensa/utils/normalizadorIngredientes'
 import { SeccionIngredientes } from './seccionIngredientes'
 import { SeccionPasos } from './seccionPasos'
 import { SeccionAlergenos } from './seccionAlergenos'
@@ -115,8 +116,13 @@ export function FormularioCrearReceta() {
     if (!file) return
     const url = URL.createObjectURL(file)
     setFotoUrl(url)
-    setFoto(url)
     setValue('foto', file)
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setFoto(reader.result as string)
+    }
+    reader.readAsDataURL(file)
   }
 
   async function handleGenerarDesdeTexto() {
@@ -130,13 +136,27 @@ export function FormularioCrearReceta() {
       setErrorGeneracion('No se pudo generar la receta. Inténtalo con una descripción más detallada.')
       return
     }
+    // Normalizar nombres de ingredientes mapeándolos contra la base de datos local
+    if (generado.ingredientes && Array.isArray(generado.ingredientes)) {
+      generado.ingredientes = generado.ingredientes.map((ing) => ({
+        ...ing,
+        nombre: normalizarNombreIngrediente(ing.nombre)
+      }))
+    }
     methods.reset(generado)
     setMostrarDialogTexto(false)
     setTextoDescripcion('')
   }
 
   function onSubmitValido(datos: DatosCrearReceta) {
-    setDatos(datos)
+    const ingredientesNormalizados = datos.ingredientes.map((ing) => ({
+      ...ing,
+      nombre: normalizarNombreIngrediente(ing.nombre),
+    }))
+    setDatos({
+      ...datos,
+      ingredientes: ingredientesNormalizados,
+    })
     router.push('/crear-receta/revisar')
   }
 
@@ -337,7 +357,7 @@ export function FormularioCrearReceta() {
             </div>
 
             {/* Tiempo + dificultad */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-1 gap-3 mb-4">
               {/* Tiempo */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">

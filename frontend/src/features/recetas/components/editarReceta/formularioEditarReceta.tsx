@@ -17,6 +17,7 @@ import { SeccionAlergenos } from '../crearReceta/seccionAlergenos'
 import { PopUpError } from '../crearReceta/popUpError'
 import { useEditarReceta } from '../../hooks/useEditarReceta'
 import type { RecetaDetalle } from '../../types/receta.types'
+import { normalizarNombreIngrediente } from '@/features/despensa/utils/normalizadorIngredientes'
 
 const DIFICULTADES: DificultadInterna[] = ['facil', 'media', 'dificil']
 
@@ -104,13 +105,24 @@ export function FormularioEditarReceta({ receta }: Props) {
   function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setFotoUrl(url)
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setFotoUrl(reader.result as string)
+    }
+    reader.readAsDataURL(file)
     setValue('foto', file)
   }
 
   function onSubmitValido(datos: DatosCrearReceta) {
-    guardar(datos, fotoUrl)
+    const ingredientesNormalizados = datos.ingredientes.map((ing) => ({
+      ...ing,
+      nombre: normalizarNombreIngrediente(ing.nombre),
+    }))
+    guardar({
+      ...datos,
+      ingredientes: ingredientesNormalizados,
+    }, fotoUrl)
   }
 
   function onSubmitInvalido() {

@@ -214,11 +214,19 @@
           </tr>
           <tr>
             <td>backend/src/repositories/recetaRepository.ts</td>
-            <td>Import cambiado a <code>buscarFotoPexelsCascada</code>. Llamada en <code>crear()</code> pasa <code>datos.dietas</code> como hint de categoría.</td>
+            <td>Import cambiado a <code>buscarFotoPexelsCascada</code>. Llamada en <code>crear()</code> pasa <code>datos.dietas</code> como hint de categoría. Modificado para soportar <code>fotoFuente</code> y <code>fotoCredito</code> desde el FE.</td>
           </tr>
           <tr>
             <td>backend/src/services/recetasService.ts</td>
             <td>Import cambiado a <code>buscarFotoPexelsCascada</code>. <code>obtenerFotoPreview()</code> usa la cascada (el query del usuario ya viene formateado desde el FE).</td>
+          </tr>
+          <tr>
+            <td>backend/src/lib/validadores.ts</td>
+            <td>Se añadieron campos opcionales <code>fotoFuente</code> y <code>fotoCredito</code> a <code>esquemaCrearRecetaBody</code> para aceptar metadatos de la imagen de Pexels seleccionada en el preview.</td>
+          </tr>
+          <tr>
+            <td>frontend/src/features/recetas/components/crearReceta/previsualizacionReceta.tsx</td>
+            <td>Se envía <code>fotoPexels</code> en la llamada de <code>publicar()</code> si no se subió una foto de usuario, garantizando persistencia exacta.</td>
           </tr>
         </tbody>
       </table>

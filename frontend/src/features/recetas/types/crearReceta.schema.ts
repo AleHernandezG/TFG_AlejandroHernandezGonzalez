@@ -46,6 +46,12 @@ export interface DatosRecetaNueva {
   ingredientes: { nombre: string; cantidad: string; unidad: string }[]
   pasos: { texto: string }[]
   imagenBase64?: string
+  fotoFuente?: 'usuario' | 'pexels'
+  fotoCredito?: {
+    fotografo: string
+    urlFoto: string
+    urlPerfil: string
+  } | null
 }
 
 export type DificultadInterna = 'facil' | 'media' | 'dificil'

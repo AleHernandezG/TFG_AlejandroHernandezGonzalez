@@ -13,7 +13,7 @@ export function useCrearReceta() {
   const [publicando, setPublicando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function publicar() {
+  async function publicar(pexelsInfo?: { url: string; fotografo: string; urlFoto: string; urlPerfil: string }) {
     if (!datos) return
     const token = session?.user?.backendToken ?? ''
 
@@ -34,7 +34,13 @@ export function useCrearReceta() {
           alergenos: alergenosDetectados,
           ingredientes: datos.ingredientes,
           pasos: datos.pasos,
-          imagenBase64: fotoPreview ?? undefined,
+          imagenBase64: fotoPreview ?? pexelsInfo?.url ?? undefined,
+          fotoFuente: fotoPreview ? 'usuario' : pexelsInfo ? 'pexels' : undefined,
+          fotoCredito: fotoPreview ? null : pexelsInfo ? {
+            fotografo: pexelsInfo.fotografo,
+            urlFoto: pexelsInfo.urlFoto,
+            urlPerfil: pexelsInfo.urlPerfil
+          } : null,
         },
         token,
       )

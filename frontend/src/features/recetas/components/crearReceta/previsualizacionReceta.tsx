@@ -296,7 +296,18 @@ export function PrevisualizacionReceta() {
             ← Seguir editando
           </Button>
           <Button
-            onClick={publicar}
+            onClick={() => {
+              if (!fotoPreview && fotoPexels) {
+                publicar({
+                  url: fotoPexels.url,
+                  fotografo: fotoPexels.fotografo,
+                  urlFoto: fotoPexels.urlFoto,
+                  urlPerfil: fotoPexels.urlPerfil
+                })
+              } else {
+                publicar()
+              }
+            }}
             disabled={publicando}
             className="flex-1 h-12 rounded-xl bg-brand text-brand-foreground font-bold"
           >
