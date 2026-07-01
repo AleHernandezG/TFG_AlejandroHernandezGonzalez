@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
 import { recetasService } from '@/services/recetasService'
 import type { CategoriaDiscover, TabDiscover } from '../types/discover.types'
@@ -43,24 +43,33 @@ export function useDiscover({
   // lowercase para que coincida con los valores en MongoDB ('vegano', 'pasta'…)
   const categoriaParam = categoria && categoria !== 'Todos' ? categoria.toLowerCase() : undefined
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['discover', q ?? '', categoria, tab, filtrosAvanzados, !!token],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const resp = await recetasService.obtenerFeed(
         {
           q: q || undefined,
           sort,
           soloEvento,
           categoria: categoriaParam,
-          limite: 30,
+          limite: 12,
+          pagina: pageParam as number,
           dietas: filtrosAvanzados?.dietas?.length ? filtrosAvanzados.dietas : undefined,
           dificultad: filtrosAvanzados?.dificultad?.length ? filtrosAvanzados.dificultad : undefined,
           alergenos: filtrosAvanzados?.alergenos?.length ? filtrosAvanzados.alergenos : undefined,
         },
         token,
       )
-      return resp.recetas.map(postFeedARecetaDiscover)
+      return {
+        recetas: resp.recetas.map(postFeedARecetaDiscover),
+        total: resp.total,
+      }
     },
+    getNextPageParam: (lastPage, allPages) => {
+      const totalCargadas = allPages.reduce((acc, page) => acc + page.recetas.length, 0);
+      return totalCargadas < lastPage.total ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: 30_000,
     placeholderData: (prev) => prev,
   })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useDebounce } from '@/hooks/useDebounce'
 import { HeaderDiscover } from './headerDiscover'
@@ -46,11 +46,35 @@ export function ContenidoDiscover() {
   const queryDebounced = useDebounce(query, 300)
   const buscando = queryDebounced.length > 0
 
-  const { data: recetas = [], isLoading } = useDiscover({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useDiscover({
     q: queryDebounced || undefined,
     tab: tabActiva,
     filtrosAvanzados,
   })
+
+  const recetas = data?.pages.flatMap((page) => page.recetas) ?? []
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!sentinelRef.current) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   function handleLimpiar() {
     setQuery('')
@@ -109,7 +133,7 @@ export function ContenidoDiscover() {
                 <div className="flex justify-center">
                   <div className="flex items-center gap-1 rounded-full bg-[var(--warm-bg-accent)] p-1">
                     {([
-                      { id: 'recientes', label: 'Recientes' },
+                      { id: 'recientes', label: 'Tendencias' },
                       { id: 'valorados', label: 'Mejor valorados' },
                       { id: 'evento', label: 'Especiales Evento' },
                     ] as { id: TabDiscover; label: string }[]).map(({ id, label }) => (
@@ -139,18 +163,31 @@ export function ContenidoDiscover() {
                 ))}
               </div>
             ) : (
-              <motion.div
-                variants={variantesGrid}
-                initial="oculto"
-                animate="visible"
-                className="grid grid-cols-2 gap-3 px-5 pb-28"
-              >
-                {recetas.map((receta) => (
-                  <motion.div key={receta.id} variants={varianteTarjeta}>
-                    <TarjetaDiscover receta={receta} />
-                  </motion.div>
-                ))}
-              </motion.div>
+              <>
+                <motion.div
+                  variants={variantesGrid}
+                  initial="oculto"
+                  animate="visible"
+                  className="grid grid-cols-2 gap-3 px-5"
+                >
+                  {recetas.map((receta) => (
+                    <motion.div key={receta.id} variants={varianteTarjeta}>
+                      <TarjetaDiscover receta={receta} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                <div ref={sentinelRef} className="h-10" />
+
+                {isFetchingNextPage && (
+                  <div className="grid grid-cols-2 gap-3 px-5 pb-28">
+                    <SkeletonTarjeta />
+                    <SkeletonTarjeta />
+                  </div>
+                )}
+
+                {!isFetchingNextPage && <div className="pb-28" />}
+              </>
             )}
           </motion.div>
         )}
