@@ -1,9 +1,16 @@
 'use client'
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InfiniteData } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { recetasService } from "@/services/recetasService";
 import type { RespuestaFeed } from "@/services/recetasService";
+
+type CacheData = InfiniteData<RespuestaFeed> | RespuestaFeed;
+
+function isInfiniteData(data: CacheData): data is InfiniteData<RespuestaFeed> {
+  return data !== undefined && 'pages' in data;
+}
 
 export function useToggleGuardado(recetaId: string) {
   const { data: session } = useSession();
@@ -15,11 +22,24 @@ export function useToggleGuardado(recetaId: string) {
 
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["recetas", "feed"] })
-      const snapshots = queryClient.getQueriesData<RespuestaFeed>({ queryKey: ["recetas", "feed"] })
-      queryClient.setQueriesData<RespuestaFeed>(
+      const snapshots = queryClient.getQueriesData<CacheData>({ queryKey: ["recetas", "feed"] })
+      queryClient.setQueriesData<CacheData>(
         { queryKey: ["recetas", "feed"] },
         (old) => {
           if (!old) return old
+
+          if (isInfiniteData(old)) {
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                recetas: page.recetas.map((r) =>
+                  r.id === recetaId ? { ...r, guardado: !r.guardado } : r
+                ),
+              })),
+            }
+          }
+
           return {
             ...old,
             recetas: old.recetas.map((r) =>
@@ -32,10 +52,23 @@ export function useToggleGuardado(recetaId: string) {
     },
 
     onSuccess: (data) => {
-      queryClient.setQueriesData<RespuestaFeed>(
+      queryClient.setQueriesData<CacheData>(
         { queryKey: ["recetas", "feed"] },
         (old) => {
           if (!old) return old
+
+          if (isInfiniteData(old)) {
+            return {
+              ...old,
+              pages: old.pages.map((page) => ({
+                ...page,
+                recetas: page.recetas.map((r) =>
+                  r.id === recetaId ? { ...r, guardado: data.guardado } : r
+                ),
+              })),
+            }
+          }
+
           return {
             ...old,
             recetas: old.recetas.map((r) =>

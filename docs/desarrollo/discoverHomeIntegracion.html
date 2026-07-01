@@ -101,8 +101,8 @@
           <tr><td>BE — controlador</td><td>Parse de 5 nuevos query params en <code>obtenerFeed()</code></td><td>DISC-BE-001</td></tr>
           <tr><td>FE — servicio</td><td><code>FiltrosFeed</code> extendido + <code>serializarFiltros()</code> actualizado</td><td>DISC-BE-001</td></tr>
           <tr><td>FE — hooks</td><td><code>useRecetasFeed</code>: soloSiguiendo + sort + dietas. <code>useDiscover</code>: nuevo hook completo</td><td>DISC-BE-001</td></tr>
-          <tr><td>FE — /home</td><td><code>feedHome.tsx</code> + <code>feedHomePc.tsx</code>: soloSiguiendo: true, migrado de mock</td><td>DISC-BE-001</td></tr>
-          <tr><td>FE — /discover</td><td><code>useDiscover</code>, chips eliminados, DrawerFiltros añadido, tarjeta mobile-first</td><td>FILT-001 / UI-030</td></tr>
+          <tr><td>FE — /home</td><td><code>feedHome.tsx</code> + <code>feedHomePc.tsx</code>: soloSiguiendo: true, migrado a scroll infinito con <code>useInfiniteQuery</code></td><td>DISC-BE-001</td></tr>
+          <tr><td>FE — /discover</td><td><code>useDiscover</code>: renombrada pestaña a "Tendencias" y migrado a scroll infinito con <code>useInfiniteQuery</code></td><td>FILT-001 / UI-030</td></tr>
           <tr><td>FE — drawer</td><td>Semántica explícita: "incluye" (dieta/dificultad) vs "oculta" (alérgenos)</td><td>FILT-002</td></tr>
           <tr><td>FE — middleware</td><td>Rutas protegidas restauradas con <code>withAuth</code></td><td>MIDDLEWARE-001</td></tr>
           <tr><td>Seed</td><td>esEvento en Paella Valenciana + seguimientos entre usuarios de prueba</td><td>SEED-001</td></tr>
@@ -392,7 +392,7 @@ const { data, isLoading } = useRecetasFeed({
       <p>Nuevo hook en <code>features/discover/hooks/useDiscover.ts</code>. Traduce las 3 tabs a parámetros del endpoint y aplica los filtros avanzados del drawer:</p>
       <pre>'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
 import { recetasService } from '@/services/recetasService'
 import type { CategoriaDiscover, TabDiscover } from '../types/discover.types'
@@ -427,31 +427,40 @@ export function useDiscover({
   const { data: session } = useSession()
   const token = session?.user?.backendToken
 
-  const sort = tab === 'valorados' ? 'likes' : 'reciente'
+  const sort = tab === 'valorados' ? 'likes' : tab === 'recientes' ? 'score' : 'reciente'
   const soloEvento = tab === 'evento'
   // lowercase para coincidir con valores en MongoDB ('vegano', 'pasta'…)
   const categoriaParam = categoria && categoria !== 'Todos'
     ? categoria.toLowerCase()
     : undefined
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['discover', q ?? '', categoria, tab, filtrosAvanzados, !!token],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const resp = await recetasService.obtenerFeed(
         {
           q: q || undefined,
           sort,
           soloEvento,
           categoria: categoriaParam,
-          limite: 30,
+          limite: 12,
+          pagina: pageParam as number,
           dietas: filtrosAvanzados?.dietas?.length ? filtrosAvanzados.dietas : undefined,
           dificultad: filtrosAvanzados?.dificultad?.length ? filtrosAvanzados.dificultad : undefined,
           alergenos: filtrosAvanzados?.alergenos?.length ? filtrosAvanzados.alergenos : undefined,
         },
         token,
       )
-      return resp.recetas.map(postFeedARecetaDiscover)
+      return {
+        recetas: resp.recetas.map(postFeedARecetaDiscover),
+        total: resp.total,
+      }
     },
+    getNextPageParam: (lastPage, allPages) => {
+      const totalCargadas = allPages.reduce((acc, page) => acc + page.recetas.length, 0);
+      return totalCargadas < lastPage.total ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: 30_000,
     placeholderData: (prev) => prev,
   })
