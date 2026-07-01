@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SearchX, Sparkles } from 'lucide-react'
 import type { FiltrosAvanzados, PostFeed } from '../../types/receta.types'
@@ -60,10 +61,31 @@ interface FeedHomePcProps {
 }
 
 export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
-  const { posts, indiceRecomendados, cargando, hayBusquedaOFiltros } = useHomeFeed(
-    busqueda,
-    filtrosAvanzados,
-  )
+  const {
+    posts,
+    indiceRecomendados,
+    cargando,
+    hayBusquedaOFiltros,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useHomeFeed(busqueda, filtrosAvanzados)
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!sentinelRef.current) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 0.1 },
+    )
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   if (cargando) {
     return (
@@ -89,16 +111,6 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
     )
   }
 
-  // Solo recomendaciones: banner arriba y una sola rejilla.
-  if (indiceRecomendados === 0) {
-    return (
-      <div>
-        <BannerRecomendados />
-        <GridBento posts={posts} />
-      </div>
-    )
-  }
-
   // Mezcla: rejilla de seguidos, divisor y rejilla de recomendados.
   if (indiceRecomendados > 0) {
     return (
@@ -106,9 +118,30 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
         <GridBento posts={posts.slice(0, indiceRecomendados)} />
         <BannerRecomendados />
         <GridBento posts={posts.slice(indiceRecomendados)} />
+        <div ref={sentinelRef} className="h-10" />
+        {isFetchingNextPage && (
+          <div className="grid grid-cols-3 gap-6">
+            <TarjetaPostSkeletonPc />
+            <TarjetaPostSkeletonPc />
+            <TarjetaPostSkeletonPc />
+          </div>
+        )}
       </div>
     )
   }
 
-  return <GridBento posts={posts} />
+  return (
+    <div className="space-y-6">
+      {indiceRecomendados === 0 && <BannerRecomendados />}
+      <GridBento posts={posts} />
+      <div ref={sentinelRef} className="h-10" />
+      {isFetchingNextPage && (
+        <div className="grid grid-cols-3 gap-6">
+          <TarjetaPostSkeletonPc />
+          <TarjetaPostSkeletonPc />
+          <TarjetaPostSkeletonPc />
+        </div>
+      )}
+    </div>
+  )
 }

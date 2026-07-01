@@ -12,6 +12,9 @@ export interface ResultadoHomeFeed {
   cargando: boolean
   esError: boolean
   hayBusquedaOFiltros: boolean
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  fetchNextPage: () => void
 }
 
 export function useHomeFeed(
@@ -52,7 +55,28 @@ export function useHomeFeed(
     enabled: !hayBusquedaOFiltros,
   })
 
-  const recetasBase = feedBase.data?.recetas ?? []
+  const recetasBase = feedBase.data?.pages.flatMap((page) => page.recetas) ?? []
+  const recomendadas = feedRecomendado.data?.pages.flatMap((page) => page.recetas) ?? []
+
+  const hasNextPage = hayBusquedaOFiltros
+    ? !!feedBase.hasNextPage
+    : (!!feedBase.hasNextPage || !!feedRecomendado.hasNextPage)
+
+  const isFetchingNextPage = hayBusquedaOFiltros
+    ? !!feedBase.isFetchingNextPage
+    : (!!feedBase.isFetchingNextPage || !!feedRecomendado.isFetchingNextPage)
+
+  const fetchNextPage = () => {
+    if (hayBusquedaOFiltros) {
+      feedBase.fetchNextPage()
+    } else {
+      if (feedBase.hasNextPage) {
+        feedBase.fetchNextPage()
+      } else if (feedRecomendado.hasNextPage) {
+        feedRecomendado.fetchNextPage()
+      }
+    }
+  }
 
   if (hayBusquedaOFiltros) {
     return {
@@ -61,20 +85,26 @@ export function useHomeFeed(
       cargando: feedBase.isLoading || buscando,
       esError: feedBase.isError,
       hayBusquedaOFiltros,
+      hasNextPage,
+      isFetchingNextPage,
+      fetchNextPage,
     }
   }
 
   const idsBase = new Set(recetasBase.map((r) => r.id))
-  const recomendadas = (feedRecomendado.data?.recetas ?? []).filter(
+  const recomendadasFiltradas = recomendadas.filter(
     (r) => !idsBase.has(r.id),
   )
-  const posts = [...recetasBase, ...recomendadas]
+  const posts = [...recetasBase, ...recomendadasFiltradas]
 
   return {
     posts,
-    indiceRecomendados: recomendadas.length > 0 ? recetasBase.length : -1,
+    indiceRecomendados: recomendadasFiltradas.length > 0 ? recetasBase.length : -1,
     cargando: feedBase.isLoading || feedRecomendado.isLoading || buscando,
     esError: feedBase.isError,
     hayBusquedaOFiltros,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
   }
 }
