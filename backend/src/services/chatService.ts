@@ -13,7 +13,14 @@ let _genAI: GoogleGenAI | null = null;
 function obtenerCliente(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error("GEMINI_API_KEY no configurada"), { status: 503 });
-  if (!_genAI) _genAI = new GoogleGenAI({ apiKey });
+  if (!_genAI) {
+    const baseUrl = process.env.GEMINI_BASE_URL;
+    const proxyToken = process.env.GEMINI_PROXY_TOKEN;
+    const httpOptions = baseUrl
+      ? { baseUrl, ...(proxyToken ? { headers: { "x-proxy-token": proxyToken } } : {}) }
+      : undefined;
+    _genAI = httpOptions ? new GoogleGenAI({ apiKey, httpOptions }) : new GoogleGenAI({ apiKey });
+  }
   return _genAI;
 }
 
