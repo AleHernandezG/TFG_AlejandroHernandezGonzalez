@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { usuarioRepository } from "../repositories/usuarioRepository";
 import { recetaRepository, type RecetaCandidataDespensa } from "../repositories/recetaRepository";
 
@@ -8,12 +8,12 @@ interface MensajeChat {
 }
 
 // ── Singleton del cliente Gemini ─────────────────────────────────────────────
-let _genAI: GoogleGenerativeAI | null = null;
+let _genAI: GoogleGenAI | null = null;
 
-function obtenerCliente(): GoogleGenerativeAI {
+function obtenerCliente(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error("GEMINI_API_KEY no configurada"), { status: 503 });
-  if (!_genAI) _genAI = new GoogleGenerativeAI(apiKey);
+  if (!_genAI) _genAI = new GoogleGenAI({ apiKey });
   return _genAI;
 }
 
@@ -23,7 +23,7 @@ const MAX_LLAMADAS_DIA = Number(process.env.GEMINI_MAX_LLAMADAS_DIA ?? 1000);
 
 // gemini-2.5-flash activa "thinking" por defecto, lo que gasta tokens y cuota
 // sin aportar nada en un chat culinario. Lo desactivamos.
-const GENERATION_CONFIG = { thinkingConfig: { thinkingBudget: 0 } } as Record<string, unknown>;
+const GENERATION_CONFIG = { thinkingConfig: { thinkingBudget: 0 } };
 
 let llamadasHoy = 0;
 let diaActual = new Date().toISOString().slice(0, 10);
@@ -178,34 +178,37 @@ export async function responderChat(
   try {
     const contexto = await obtenerContextoUsuario(usuarioId);
 
-    const model = obtenerCliente().getGenerativeModel({
-      model: MODELO_GEMINI,
-      systemInstruction: SYSTEM_PROMPT(contexto),
-      generationConfig: GENERATION_CONFIG,
-    });
-
     const historial = mensajes.slice(0, -1).map((m) => ({
       role: m.rol,
       parts: [{ text: m.texto }],
     }));
 
     const ultimo = mensajes[mensajes.length - 1];
-    const chat = model.startChat({ history: historial });
+    const chat = obtenerCliente().chats.create({
+      model: MODELO_GEMINI,
+      history: historial,
+      config: {
+        systemInstruction: SYSTEM_PROMPT(contexto),
+        ...GENERATION_CONFIG,
+      },
+    });
 
     let result;
     if (imagenBase64) {
       const partes = imagenBase64.split(",");
       const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";
       const data = partes[1] ?? partes[0];
-      result = await chat.sendMessage([
-        { inlineData: { mimeType, data } },
-        { text: ultimo.texto || "¿Qué ves en esta imagen? Ayúdame en el contexto culinario." },
-      ]);
+      result = await chat.sendMessage({
+        message: [
+          { inlineData: { mimeType, data } },
+          { text: ultimo.texto || "¿Qué ves en esta imagen? Ayúdame en el contexto culinario." },
+        ],
+      });
     } else {
-      result = await chat.sendMessage(ultimo.texto);
+      result = await chat.sendMessage({ message: ultimo.texto });
     }
 
-    return result.response.text();
+    return result.text ?? "";
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini chat] Error:", error.message);
@@ -235,11 +238,6 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
   registrarLlamadaGemini();
 
   try {
-    const model = obtenerCliente().getGenerativeModel({
-      model: MODELO_GEMINI,
-      generationConfig: GENERATION_CONFIG,
-    });
-
     const descripcionSegura = sanitizarTextoUsuario(descripcion);
     const prompt = `Genera una receta en JSON con exactamente este formato:
 {
@@ -258,8 +256,12 @@ Descripción del usuario: ${descripcionSegura}
 
 Solo responde con el JSON, sin markdown, sin explicaciones.`;
 
-    const result = await model.generateContent(prompt);
-    const texto = result.response.text().trim();
+    const result = await obtenerCliente().models.generateContent({
+      model: MODELO_GEMINI,
+      contents: prompt,
+      config: GENERATION_CONFIG,
+    });
+    const texto = (result.text ?? "").trim();
     const limpio = texto.replace(/^```json?\s*/i, "").replace(/```\s*$/i, "").trim();
     const receta = JSON.parse(limpio);
 
@@ -285,11 +287,6 @@ export async function escanearTicket(imagenBase64: string): Promise<Array<{ nomb
   registrarLlamadaGemini();
 
   try {
-    const model = obtenerCliente().getGenerativeModel({
-      model: MODELO_GEMINI,
-      generationConfig: GENERATION_CONFIG,
-    });
-
     const partes = imagenBase64.split(",");
     const mimeType = partes[0].match(/:(.*?);/)?.[1] ?? "image/jpeg";
     const data = partes[1] ?? partes[0];
@@ -300,12 +297,16 @@ Solo ingredientes comestibles. Si no puedes determinar la cantidad, usa 1.
 Si no hay ingredientes reconocibles, devuelve [].
 Solo responde con el JSON, sin markdown.`;
 
-    const result = await model.generateContent([
-      { inlineData: { mimeType, data } },
-      prompt,
-    ]);
+    const result = await obtenerCliente().models.generateContent({
+      model: MODELO_GEMINI,
+      contents: [
+        { inlineData: { mimeType, data } },
+        { text: prompt },
+      ],
+      config: GENERATION_CONFIG,
+    });
 
-    const texto = result.response.text().trim();
+    const texto = (result.text ?? "").trim();
     const limpio = texto.replace(/^```json?\s*/i, "").replace(/```\s*$/i, "").trim();
     const ingredientes = JSON.parse(limpio);
 
@@ -404,12 +405,12 @@ No hay ninguna receta guardada que use todos esos ingredientes. Propón UNA rece
 Responde en español con markdown: título en **negrita**, una lista de ingredientes y los pasos numerados. Sé concreto y conciso.`;
 
   try {
-    const model = obtenerCliente().getGenerativeModel({
+    const result = await obtenerCliente().models.generateContent({
       model: MODELO_GEMINI,
-      generationConfig: GENERATION_CONFIG,
+      contents: prompt,
+      config: GENERATION_CONFIG,
     });
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    return result.text ?? "";
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini receta-despensa] Error:", error.message);
