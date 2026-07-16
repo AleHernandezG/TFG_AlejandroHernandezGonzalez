@@ -3,6 +3,12 @@ import { authController } from "../controllers/authController";
 import { validarBody } from "../middlewares/validarBody";
 import { requerirAuth } from "../middlewares/autenticacion";
 import {
+  limiteLogin,
+  limiteRegistro,
+  limiteRecuperacion,
+  limiteReenvioVerificacion,
+} from "../middlewares/rateLimitAuth";
+import {
   esquemaRegistro,
   esquemaLogin,
   esquemaRecuperar,
@@ -15,11 +21,11 @@ import {
 
 const router = Router();
 
-router.post("/registro",             validarBody(esquemaRegistro),        authController.registro);
-router.post("/login",                validarBody(esquemaLogin),           authController.login);
+router.post("/registro",             limiteRegistro, validarBody(esquemaRegistro),        authController.registro);
+router.post("/login",                limiteLogin,    validarBody(esquemaLogin),           authController.login);
 router.post("/verificar-email",          validarBody(esquemaVerificarEmail),        authController.verificarEmail);
-router.post("/verificar-email/reenviar", validarBody(esquemaReenviarVerificacion),  authController.reenviarVerificacion);
-router.post("/recuperar-contrasena", validarBody(esquemaRecuperar),       authController.recuperarContrasena);
+router.post("/verificar-email/reenviar", limiteReenvioVerificacion, validarBody(esquemaReenviarVerificacion),  authController.reenviarVerificacion);
+router.post("/recuperar-contrasena", limiteRecuperacion, validarBody(esquemaRecuperar),   authController.recuperarContrasena);
 router.post("/nueva-contrasena",     validarBody(esquemaNuevaContrasena), authController.nuevaContrasena);
 router.post("/google",               validarBody(esquemaGoogleOAuth),     authController.googleOAuth);
 router.post("/completar-perfil",     requerirAuth, validarBody(esquemaCompletarPerfil), authController.completarPerfil);
