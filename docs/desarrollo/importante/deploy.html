@@ -75,7 +75,7 @@
 
 <header>
   <h1>Deploy — Cookr TFG</h1>
-  <div class="meta">Actualizado: 2026-04-23 · SETUP-008 · Sprint 3 · Verificado en producción</div>
+  <div class="meta">Actualizado: 2026-07-03 · SETUP-008 · Sprint 3 · Verificado en producción</div>
 </header>
 
 <nav>
@@ -83,6 +83,7 @@
   <a href="#flujo">Flujo CI/CD</a>
   <a href="#vercel">Vercel (FE)</a>
   <a href="#render">Render (BE)</a>
+  <a href="#gemini">Gemini / Proxy</a>
   <a href="#github">GitHub Actions</a>
   <a href="#secrets">Secrets</a>
   <a href="#google">Google OAuth</a>
@@ -230,6 +231,114 @@
           <tr><td class="key">GMAIL_APP_PASSWORD</td><td class="val">contraseña de aplicación Google (16 chars)</td></tr>
         </tbody>
       </table>
+      <p class="note" style="margin-top:0.5rem">Las variables <code>GEMINI_*</code> (incluidas <code>GEMINI_BASE_URL</code> y <code>GEMINI_PROXY_TOKEN</code>) se documentan en la sección <a href="#gemini" style="color:#f97316">Gemini / Proxy</a>.</p>
+    </div>
+  </section>
+
+  <!-- GEMINI / PROXY -->
+  <section id="gemini">
+    <div class="section-header">
+      <span>🤖</span>
+      <h2>Gemini en producción — Proxy Cloudflare</h2>
+    </div>
+    <div class="section-body">
+
+      <h3>El problema</h3>
+      <p style="font-size:0.82rem;color:#a3a3a3">Las llamadas a Gemini funcionaban en local pero en Render devolvían <code>503</code>, con un <code>403</code> de Google por debajo. Aparecieron dos errores distintos, que no son lo mismo:</p>
+      <table style="margin-top:0.5rem">
+        <thead><tr><th>Error de Google</th><th>Qué significa</th></tr></thead>
+        <tbody>
+          <tr><td class="val">403 · unregistered callers / callers without established identity</td><td>La clave llegaba <strong>vacía</strong> a Google. Pasa cuando la variable tiene espacios o saltos de línea, o no se inyecta bien en el proceso.</td></tr>
+          <tr><td class="val">403 HTML · "Your client does not have permission to get URL ... from this server"</td><td>Google <strong>bloquea la IP</strong> desde la que se llama. Lo sirve el frontend de Google (GFE), no la API.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:1rem">Diagnóstico</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>La misma clave funciona desde local</strong><p>Desde una IP residencial la clave responde 200 con cualquier modelo. Eso descarta que el fallo sea la clave, el código o el modelo.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Desde Render falla siempre</strong><p>El fallo es consistente en cada request, no intermitente. Apunta a un bloqueo por origen de red, no a reputación de IP que va y viene.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Restricciones de la clave en "Ninguna"</strong><p>Cloud Console → Credenciales → clave TFG: sin restricción de IP ni de referrer. Por tanto no es una restricción de la clave.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Conclusión: bloqueo de IP del nivel gratuito</strong><p>El tier gratuito de Gemini corta las IPs de datacenter (las de Render) como protección anti-abuso. Por eso funciona desde casa y no desde el servidor.</p></div></div>
+      </div>
+
+      <h3 style="margin-top:1rem">Migración del SDK</h3>
+      <p style="font-size:0.82rem;color:#a3a3a3">Investigando el 403 se cambió el SDK, que además ya estaba deprecado.</p>
+      <table style="margin-top:0.5rem">
+        <thead><tr><th>Antes</th><th>Ahora</th></tr></thead>
+        <tbody>
+          <tr><td class="val">@google/generative-ai 0.24.1 (deprecado)</td><td class="val">@google/genai 2.10.0</td></tr>
+          <tr><td class="val">new GoogleGenerativeAI(key)</td><td class="val">new GoogleGenAI({ apiKey })</td></tr>
+          <tr><td class="val">getGenerativeModel() + model.generateContent()</td><td class="val">models.generateContent({ model, contents, config })</td></tr>
+          <tr><td class="val">model.startChat() + chat.sendMessage(x)</td><td class="val">chats.create() + chat.sendMessage({ message: x })</td></tr>
+          <tr><td class="val">result.response.text() (método)</td><td class="val">result.text (propiedad)</td></tr>
+        </tbody>
+      </table>
+      <div class="alert" style="margin-top:0.5rem">
+        <strong>Node ≥ 20:</strong> <code>@google/genai</code> lo exige, así que se añadió <code>"engines": { "node": ">=20.0.0" }</code> en <code>backend/package.json</code> para que Render no arranque con una versión vieja. El SDK nuevo manda la clave en la cabecera <code>x-goog-api-key</code> y recorta espacios, más tolerante a variables sucias que el anterior.
+      </div>
+
+      <h3 style="margin-top:1rem">Cómo funciona el proxy</h3>
+      <p style="font-size:0.82rem;color:#a3a3a3">El Worker de Cloudflare reenvía las peticiones a Google desde una IP con buena reputación, que Gemini sí acepta.</p>
+      <div class="flow">
+        <div class="flow-step orange">Backend (Render)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step blue">Cloudflare Worker</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">generativelanguage.googleapis.com</div>
+      </div>
+      <div class="steps" style="margin-top:0.75rem">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>El backend apunta el SDK al Worker</strong><p>Si existe <code>GEMINI_BASE_URL</code>, <code>obtenerCliente()</code> pasa ese <code>baseUrl</code> al SDK. En local, sin esa variable, las llamadas van directas (desde el equipo de desarrollo funcionan sin proxy).</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>El Worker reenvía tal cual</strong><p>Copia método, ruta, query, body y cabeceras (incluida <code>x-goog-api-key</code> con la clave). No toca el contenido, solo cambia la IP de salida.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Puerta de token</strong><p>El Worker exige la cabecera <code>x-proxy-token</code> igual a su secreto <code>PROXY_TOKEN</code>. Sin eso sería un proxy abierto. El backend la manda vía <code>GEMINI_PROXY_TOKEN</code>. Si no coinciden, el Worker responde 403.</p></div></div>
+      </div>
+
+      <p style="font-size:0.82rem;color:#a3a3a3;margin-top:0.75rem">Worker desplegado:</p>
+      <div class="url">https://gemini-proxy.alejes.workers.dev</div>
+      <p style="font-size:0.82rem;color:#a3a3a3;margin-top:0.5rem">Código en <code>gemini-proxy/</code> del repo. El núcleo:</p>
+      <pre>export default {
+  async fetch(request, env) {
+    if (env.PROXY_TOKEN &amp;&amp; request.headers.get("x-proxy-token") !== env.PROXY_TOKEN) {
+      return new Response("Forbidden: invalid proxy token", { status: 403 });
+    }
+    const url = new URL(request.url);
+    const target = "https://generativelanguage.googleapis.com" + url.pathname + url.search;
+    const headers = new Headers(request.headers);
+    // se quitan host, x-proxy-token y las cabeceras cf-* / x-forwarded-*
+    const body = ["GET", "HEAD"].includes(request.method) ? undefined : await request.arrayBuffer();
+    return fetch(target, { method: request.method, headers, body });
+  },
+};</pre>
+
+      <div class="grid2" style="margin-top:0.75rem">
+        <div>
+          <h3>Variables en Render (backend)</h3>
+          <table>
+            <thead><tr><th>Variable</th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td class="key">GEMINI_API_KEY</td><td class="val">clave de AI Studio (AQ.…)</td></tr>
+              <tr><td class="key">GEMINI_MODEL</td><td class="val">gemini-3.5-flash</td></tr>
+              <tr><td class="key">GEMINI_BASE_URL</td><td class="val">URL del Worker</td></tr>
+              <tr><td class="key">GEMINI_PROXY_TOKEN</td><td class="val">= PROXY_TOKEN del Worker</td></tr>
+              <tr><td class="key">GEMINI_MAX_LLAMADAS_DIA</td><td class="val">tope diario de coste (p.ej. 300)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>Variables en Cloudflare (Worker)</h3>
+          <table>
+            <thead><tr><th>Variable</th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td class="key">PROXY_TOKEN</td><td class="val">token secreto, mismo valor que GEMINI_PROXY_TOKEN</td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="margin-top:0.5rem">En local <strong>no</strong> se define <code>GEMINI_BASE_URL</code>: las llamadas van directas y desde el equipo de desarrollo funcionan sin proxy.</p>
+        </div>
+      </div>
+
+      <div class="alert" style="margin-top:0.75rem">
+        <strong>Alternativa descartada:</strong> pasar la clave a pago (pay-as-you-go) también levanta el bloqueo de IPs de datacenter, pero pide tarjeta. El proxy es gratis y no depende de facturación, así que encaja mejor para el TFG.
+      </div>
+
     </div>
   </section>
 
@@ -269,6 +378,8 @@ jobs:
           echo "Render deploy hook HTTP status: $STATUS"
           # Render responde 202 Accepted (deploy asíncrono)
           [ "$STATUS" = "200" ] || [ "$STATUS" = "201" ] || [ "$STATUS" = "202" ] || exit 1</pre>
+
+      <p class="note">Actions actualizadas a <code>actions/checkout@v5</code> y <code>actions/setup-node@v5</code>, y Node del CI a <code>22</code>. Node 20 quedó deprecado como runtime de las actions en los runners, y <code>@google/genai</code> pide Node ≥ 20.</p>
 
       <h3>Branch protection en main</h3>
       <div class="steps">
