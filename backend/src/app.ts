@@ -13,6 +13,10 @@ import { manejadorErrores } from "./middlewares/errores";
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(helmet()); //Esto es pa mas seguridad en las cabeceras HTTP
 app.use(morgan("dev")); //Muestra las peticiones en consola para debuggear
 
