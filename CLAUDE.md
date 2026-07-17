@@ -50,7 +50,7 @@ cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
 ```
 
-**Hay 63 tests, y solo en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026). El frontend no tiene ni uno, y no hay E2E: Playwright sigue pendiente. El CI ejecuta lint, typecheck y `npm test`, y el job `deploy` depende de `ci-backend`, así que un test en rojo bloquea el despliegue a Render.
+**Hay 75 tests, y solo en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026). El frontend no tiene ni uno, y no hay E2E: Playwright sigue pendiente. El CI ejecuta lint, typecheck y `npm test`, y el job `deploy` depende de `ci-backend`, así que un test en rojo bloquea el despliegue a Render.
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -64,7 +64,7 @@ Dos cosas del código de producción que existen por los tests, para que nadie l
 - `middlewares/rateLimitAuth.ts` exporta **`reiniciarLimitesAuth()`** y usa stores explícitos. Los limitadores son estado global en memoria: sin reiniciarlos, el cupo se agota entre tests y revientan tests que no tienen la culpa. No lo sustituyas por un `skip` con variable de entorno, que eso sí se puede apagar en producción por error.
 - `app.ts` **calla a morgan cuando `NODE_ENV === "test"`**, o la salida de `npm test` es ilegible.
 
-**Aviso: algunos tests fijan comportamiento que está mal, a propósito.** Los de `feed.alergenos.test.ts` y uno de `validadores.test.ts` documentan bugs reales en vez de validar que el código acierte, y lo dicen en un bloque de comentario. Están descritos en la Fase 2b de `PLAN_AUDITORIA.md`, que es donde se arreglan. Si arreglas el bug, hay que darle la vuelta al test: no lo "arregles" para que vuelva a pasar.
+Ya **no** queda ningún test que fije comportamiento equivocado a propósito: los tres bugs que documentaban se arreglaron en la Fase 2b (17/07/2026) y los tests están del derecho.
 
 ## Arquitectura: lo que no se ve leyendo un solo fichero
 
@@ -106,6 +106,22 @@ Reglas que sigue el código actual:
 - La **autenticación va en la ruta**, con `requerirAuth` (`middlewares/autenticacion.ts`), que rellena `req.usuario`.
 - Los **repositorios son los únicos que tocan Mongoose**. Los servicios no importan modelos.
 - Los servicios lanzan errores con status embebido: `throw Object.assign(new Error("..."), { status: 503 })`.
+
+### El filtro de alérgenos es un suelo, no un filtro de búsqueda
+
+La regla, decidida en la Fase 2b y viva en `recetasService.resolverAlergenos()`:
+
+```
+alergenosEfectivos = union(perfil.alergias, query.alergenos)
+```
+
+Los alérgenos del perfil se aplican **siempre** al usuario autenticado, mande el cliente lo que mande. El drawer de filtros solo puede **sumar** por encima; la única forma de dejar de filtrar por uno es quitarlo del perfil. Un visitante anónimo no tiene perfil, así que solo se le aplica el query.
+
+Es un requisito de salud, no una preferencia de navegación, y por eso vive en el backend: si dependiera de que el cliente se acuerde de mandar el parámetro, no sería una protección. **No lo muevas al frontend ni al controlador**, y no añadas un parámetro para "desactivar" el perfil.
+
+Se aplica al feed y a los `similares` (los de `findById` y los de `findSimilares`). Si añades otra vía que devuelva recetas, pásale la unión también.
+
+En el frontend, `drawerFiltros.tsx` enseña los alérgenos del perfil marcados y deshabilitados, con candado y enlace a `/perfil`. Si los dejas togglear, el control miente: el backend los aplica igual. `tests/feed.alergenos.test.ts` fija todo esto.
 
 ### Manejo de errores: tres patrones conviviendo
 
@@ -152,11 +168,6 @@ Los mensajes de commit sí van en inglés e imperativo.
 
 ## Trampas conocidas
 
-Las tres primeras están verificadas contra la app y pendientes de arreglo en la **Fase 2b de `PLAN_AUDITORIA.md`**, que es donde está el detalle y las decisiones de diseño. No las arregles a medias sin leer eso.
-
-- **El feed no filtra por los alérgenos del perfil.** `usuario.alergias` no se consulta en ninguna parte del feed: el filtro sale solo del query string (`recetasController.ts:32`), así que solo protege si el cliente se acuerda de mandarlo. Un celíaco registrado ve recetas con cereales al abrir la home. Es un requisito de salud incumplido, no una preferencia. La despensa **sí** lee el perfil (`chatService.ts:450`), de ahí la incoherencia. La regla ya decidida para arreglarlo: **`alergenosEfectivos = union(perfil.alergias, query.alergenos)`**, el perfil es un suelo y el drawer solo suma por encima. Va en `recetasService`, no en el controlador ni en el frontend.
-- **`dietas` y `categoria` se pisan** en `recetaRepository.findAll`: las líneas 161 y 172 escriben `query["categorias"]` sin `else`, y la segunda gana. `?dietas=vegano&categoria=postre` devuelve recetas **no veganas**. Mismo patrón con `excluirPropio` y `soloSiguiendo` sobre `query["autorId"]` (líneas 170 y 182).
-- **El `.trim()` de los correos no hace nada.** En `lib/validadores.ts` los esquemas son `.email().trim()`, y Zod valida antes de recortar: un correo con espacios se rechaza en vez de limpiarse. Afecta a registro, login, recuperación y reenvío, o sea a las cuatro puertas de entrada.
 - `services/ingredientesService.ts`: `buscarIngredientesEdamam()` **no llama a Edamam**, llama a Open Food Facts. Edamam se usa en `nutritionService.ts` (junto con USDA). El nombre es engañoso.
 - `middlewares/rateLimitIA.ts` guarda las ventanas en un `Map` en memoria: se reinicia en cada redeploy y no funciona con varias instancias. Además hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar**. El login sí está limitado desde la Fase 1, pero por otro middleware distinto (`rateLimitAuth.ts`); no los confundas.
 - `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están en `.env` pero no se usan en ningún sitio.

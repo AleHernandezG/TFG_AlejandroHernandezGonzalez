@@ -102,7 +102,7 @@ Usa `/cookr-tests`, que ya no lleva bootstrap: la infraestructura está montada 
 - [x] **Enganchar al CI** (`.github/workflows/ci-cd.yml`, job `ci-backend`, tras el typecheck). Hecho, con caché del binario de mongod (son ~80 MB por ejecución si no). El job `deploy` depende de `ci-backend`, así que un test en rojo bloquea el despliegue a Render.
 - [ ] **Playwright para E2E** del flujo registro → login → crear receta. Lo único que queda de esta fase. Necesita frontend y backend levantados, así que es una sesión en sí mismo.
 
-**Comprobado (16/07/2026):** `cd backend && npm test` → **63 tests en verde**, 4 suites, ~5 s. `npm run lint` y `tsc --noEmit -p tsconfig.test.json` también en verde.
+**Comprobado (17/07/2026):** `cd backend && npm test` → **75 tests en verde**, 5 suites, ~15 s. `npm run lint` y `tsc --noEmit -p tsconfig.test.json` también en verde.
 
 Y, más importante, se comprobó que **fallan cuando deben**, que es lo único que convierte una suite en una red de seguridad:
 
@@ -120,11 +120,13 @@ Ninguno cambia el comportamiento en producción, pero conviene saber por qué es
 
 ## Fase 2b — Bugs que destaparon las pruebas
 
+**Hecha el 17/07/2026.** Los tres arreglados y cubiertos por pruebas. La suite pasó de 63 a 75 casos: los 12 nuevos fallan contra el código anterior, comprobado revirtiendo `src/` y ejecutándolos.
+
 **Por qué aquí:** los tres salieron al escribir la Fase 2 y ninguno es deuda técnica ni mejora, son cosas que hacen lo contrario de lo que dicen hacer. El primero incumple un requisito de salud. Van antes de la Fase 4 porque ahora ya hay pruebas que cubren la zona, que era justo el motivo de poner la Fase 2 antes que los refactors.
 
-Los tres están verificados contra la app, no deducidos leyendo el código.
+Los tres estaban verificados contra la app, no deducidos leyendo el código.
 
-### 1. El feed no filtra por los alérgenos del perfil
+### 1. El feed no filtra por los alérgenos del perfil — [x] HECHO
 
 **El bug.** El filtro de alérgenos sale **solo del query string** (`recetasController.ts:32-35`). `usuario.alergias` no se consulta en ninguna parte del feed, aunque el modelo lo tenga (`usuarioMongo.ts:60`) y el usuario lo haya rellenado al completar el perfil. Un celíaco registrado abre la home y ve recetas con cereales. Solo se filtra si el cliente manda el parámetro a mano, y el frontend únicamente manda lo que el usuario marca en el drawer (`recetasService.ts:29`).
 
@@ -163,9 +165,15 @@ Lo de «para esa sesión» sale gratis y no hay que construirlo: el backend es s
 - Añade el del visitante anónimo, que no tiene perfil y solo filtra por query.
 - Los 8 casos actuales del fichero deben seguir en verde: prueban el filtro por query, que sigue existiendo igual.
 
-**No olvides la memoria.** Si el Anexo I dice que el sistema filtra por alérgenos, hoy el código no lo cumple. Esto se arregla en el código, pero conviene releer cómo está redactado el requisito.
+**Cómo quedó.** `recetasService` resuelve la unión en `resolverAlergenos()` y se la pasa ya hecha a `recetaRepository`, que no ha cambiado su forma de aplicarla (`$nin`). Lee el perfil por `usuarioRepository.obtenerAlergias()`, que es un `select("alergias").lean()`: el servicio no toca Mongoose, se respeta la capa. Los `similares` de `findById` y de `findSimilares` reciben el mismo filtro, así que el carrusel del detalle ya no cuela lo que el feed esconde.
 
-### 2. `dietas` y `categoria` se pisan en el feed
+En el frontend, `drawerFiltros.tsx` enseña los alérgenos del perfil marcados, con candado y deshabilitados, y un enlace a `/perfil` para cambiarlos.
+
+Y un efecto secundario que no estaba previsto: `useHomeFeed.ts` mandaba `perfil?.alergias` a mano, pero **solo en el feed de recomendados**, no en el de «a quien sigues» ni al buscar. O sea que el filtro existía a medias y encima dependía de que `useMiPerfil()` hubiera cargado ya; mientras el perfil estaba en vuelo, mandaba la lista vacía. Ahora que el suelo lo pone el backend, ese parámetro sobra y se ha quitado: se acabó la ventana en la que un alérgico veía recetas con su alérgeno mientras cargaba el perfil.
+
+**No olvides la memoria.** El Anexo I dice que el sistema filtra por alérgenos. Ahora el código lo cumple, pero conviene releer cómo está redactado el requisito para que describa la regla de unión.
+
+### 2. `dietas` y `categoria` se pisan en el feed — [x] HECHO
 
 **El bug.** `recetaRepository.findAll` escribe la misma clave dos veces sin `else`: `query["categorias"] = { $in: dietas }` en la línea 161 y `query["categorias"] = { $in: [categoria] }` en la 172. La segunda machaca a la primera.
 
@@ -173,9 +181,17 @@ Lo de «para esa sesión» sale gratis y no hay que construirlo: el backend es s
 
 **El mismo patrón, dos líneas más abajo:** `excluirPropio` escribe `query["autorId"]` (línea 170) y `soloSiguiendo` lo vuelve a escribir (línea 182). Pedir las dos cosas a la vez pierde `excluirPropio`.
 
-**Cómo se arregla.** Componer en vez de asignar. Para `categorias`, combinar ambas listas en un solo `$in` (o usar `$all` si la intención es que se cumplan las dos condiciones, que hay que decidir). Para `autorId`, combinar `$ne` y `$in` en el mismo objeto, que Mongo admite sin problema. Añade un test por cada combinación en `tests/feed.alergenos.test.ts` o en un fichero nuevo del feed.
+**Cómo quedó.** Componiendo en vez de asignando: se construye un objeto por campo y se escribe una sola vez.
 
-### 3. El `.trim()` de los correos no hace nada
+Para `categorias` había que decidir entre `$in` y `$all`, y la respuesta no es la misma para los dos filtros. Dentro de `dietas` la relación es **O** (`?dietas=vegano,vegetariano` = cualquiera de las dos), pero entre `dietas` y `categoria` es **Y** (un vegano en «postres» quiere postres veganos, no todo lo vegano más todo lo dulce). Fundirlo todo en un `$in` daría la unión, que es más ancha que cualquiera de los dos filtros por separado: peor que el bug. Quedó `{ $in: dietas, $all: [categoria] }`, que Mongo evalúa como Y entre los dos operadores y O dentro del `$in`. Cada filtro por separado se comporta exactamente igual que antes.
+
+Para `autorId`, `{ $ne: propio, $in: seguidos }` en el mismo objeto.
+
+Cubre `tests/feed.filtros.test.ts` (fichero nuevo, 7 casos).
+
+**Matiz honesto sobre `autorId`:** este medio bug no era alcanzable desde la API. `toggleSeguir` prohíbe seguirse a uno mismo, así que `$in: seguidos` ya excluía las recetas propias y perder el `$ne` no cambiaba nada de cara al usuario. Se ha arreglado igual porque la corrección es la misma y depender de un invariante que nada obliga a nivel de datos es frágil. El test que lo fija tiene que forzar el auto-seguimiento escribiendo en la base de datos.
+
+### 3. El `.trim()` de los correos no hace nada — [x] HECHO
 
 **El bug.** En `lib/validadores.ts`, todos los esquemas de correo son `z.string().email("Correo no válido").trim().toLowerCase()`. Zod aplica las comprobaciones en el orden en que se encadenan, así que **`.email()` valida antes de que `.trim()` recorte**. Un correo con espacios alrededor se rechaza en vez de limpiarse.
 
@@ -183,9 +199,9 @@ Lo de «para esa sesión» sale gratis y no hay que construirlo: el backend es s
 
 Es menor pero se lo come el usuario final: copiar y pegar, y el autocompletado del teclado del móvil, meten espacios al final constantemente. Afecta al registro, al login, a la recuperación de contraseña y al reenvío de verificación, o sea a las cuatro puertas de entrada.
 
-**Cómo se arregla.** Reordenar a `.trim().toLowerCase().email("Correo no válido")` en los cinco esquemas. Comprobado que arregla los tres casos con espacios y sigue rechazando `"no-es-correo"`.
+**Cómo quedó.** Reordenado a `.trim().toLowerCase().email("Correo no válido")` en los cinco esquemas. Sigue rechazando `"no-es-correo"`.
 
-**Se comprueba:** `tests/validadores.test.ts` tiene el test `"rechaza un correo con espacios alrededor en vez de recortarlo"`, que hoy documenta el bug. Al arreglarlo hay que darle la vuelta y afirmar que lo recorta.
+**Se comprueba:** en `tests/validadores.test.ts`, el test que documentaba el bug ahora afirma lo contrario (`"recorta los espacios alrededor del correo en vez de rechazarlo"`), y hay otro que comprueba que recorta y normaliza a minúsculas a la vez.
 
 ---
 
@@ -245,9 +261,9 @@ Producto (las dos primeras ya están en el guion de la defensa):
 
 1. **Fase 0** (tú) — *a falta de decisión sobre el dominio.* Bloquea la Fase 3.
 2. **Fase 1** — *hecha el 16/07/2026*, salvo dos flecos anotados al final de la fase: verificar los saltos de proxy en el primer deploy y limitar las dos rutas de token que faltan.
-3. **Fase 2** — *hecha el 16/07/2026* salvo Playwright. 63 tests en verde y CI ejecutándolos. Red de seguridad para todo lo demás.
-4. **Fase 2b** — **la siguiente**, y salió de escribir la Fase 2. Tres bugs verificados; el de los alérgenos incumple un requisito de salud. Ya hay pruebas cubriendo la zona, que era el motivo de poner la Fase 2 antes.
-5. **Fase 3** — código menor, pero la verificación depende de la Fase 0.
+3. **Fase 2** — *hecha el 16/07/2026* salvo Playwright, que es lo único que queda. Red de seguridad para todo lo demás.
+4. **Fase 2b** — *hecha el 17/07/2026*. Los tres bugs arreglados. 75 tests en verde y CI ejecutándolos.
+5. **Fase 3** — **la siguiente**, aunque la verificación depende de la Fase 0.
 6. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
 7. **Fase 5** — mejoras, sobre una base sana.
 
