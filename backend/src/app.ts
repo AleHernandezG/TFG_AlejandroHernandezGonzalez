@@ -18,7 +18,9 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(helmet()); //Esto es pa mas seguridad en las cabeceras HTTP
-app.use(morgan("dev")); //Muestra las peticiones en consola para debuggear
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev")); //Muestra las peticiones en consola para debuggear
+}
 
 // Solo acepta peticiones de una URL específica (la del frontend) y permite enviar cookies (credenciales)
 app.use(

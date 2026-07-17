@@ -34,7 +34,7 @@ jobs:
 
   # ── CI Backend ───────────────────────────────────────────────────────────────
   ci-backend:
-    name: Typecheck — Backend
+    name: Typecheck & tests — Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,6 +53,20 @@ jobs:
 
       - name: TypeScript (tsc --noEmit)
         run: npm run lint
+
+      # mongodb-memory-server descarga un mongod real la primera vez.
+      # Sin caché son ~80 MB en cada ejecución del CI.
+      - name: Cache del binario de mongodb-memory-server
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}
+
+      - name: Tests
+        run: npm test
+        env:
+          JWT_SECRET: test-secret-solo-para-ci
+          MONGOMS_DOWNLOAD_DIR: /home/runner/.cache/mongodb-binaries
 
   # ── Deploy (solo push a main) ─────────────────────────────────────────────────
   deploy:
