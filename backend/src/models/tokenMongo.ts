@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import { IToken } from "../types/token";
 
 export interface ITokenDoc extends IToken, Document {}

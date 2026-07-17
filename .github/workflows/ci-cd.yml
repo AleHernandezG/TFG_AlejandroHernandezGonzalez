@@ -51,7 +51,7 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: TypeScript (tsc --noEmit)
+      - name: ESLint & typecheck
         run: npm run lint
 
       # mongodb-memory-server descarga un mongod real la primera vez.

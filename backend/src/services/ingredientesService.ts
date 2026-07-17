@@ -3,10 +3,6 @@ import axios from "axios";
 const OFF_SUGGEST_URL =
   "https://world.openfoodfacts.org/cgi/suggest.pl";
 
-export async function buscarIngredientesEdamam(query: string): Promise<string[]> {
-  return buscarIngredientesOpenFoodFacts(query);
-}
-
 export async function buscarIngredientesOpenFoodFacts(
   query: string,
 ): Promise<string[]> {

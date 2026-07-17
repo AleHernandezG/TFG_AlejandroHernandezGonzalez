@@ -1,14 +1,6 @@
 import { Request, Response } from "express";
 import { authService } from "../services/authService";
-
-type ErrorConStatus = Error & { status?: number };
-
-function manejarError(res: Response, error: unknown): void {
-  const err = error as ErrorConStatus;
-  const status = err.status ?? 500;
-  const mensaje = err.message ?? "Error interno del servidor";
-  res.status(status).json({ error: mensaje });
-}
+import { manejarError } from "../middlewares/errores";
 
 export const authController = {
   async registro(req: Request, res: Response): Promise<void> {

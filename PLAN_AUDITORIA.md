@@ -248,14 +248,14 @@ Tres selectores que dieron guerra y quedan anotados para el siguiente que amplí
 
 **Por qué ahora:** son refactors sobre código sin pruebas hasta la Fase 2. Con los tests puestos, se pueden hacer sin miedo.
 
-- [ ] **Unificar el manejo de errores.** Hoy hay tres patrones: `manejarError` **duplicado literalmente en los cuatro controladores**, try/catch inline en `chat.routes.ts`, y `manejadorErrores` global en `app.ts` que **nunca se ejecuta** y que además descarta `err.status` devolviendo siempre 500. El que está mal es el middleware global. Extrae `manejarError` a un módulo compartido y arregla o elimina el global.
-- [ ] **Rate limit con Redis.** `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` llevan en `.env` desde siempre **sin usarse en ninguna parte**. Era justo para esto: sobrevive a los redeploys y funciona con varias instancias.
-- [ ] **Acotar `express.json({ limit: '10mb' })`.** Es global. Solo lo necesitas donde se sube imagen o ticket; en el resto es superficie de ataque gratis.
-- [ ] **ESLint en el backend.** `npm run lint` del backend es `tsc --noEmit`, que es typecheck, no linting. El frontend sí tiene ESLint + Prettier + Husky.
-- [ ] **Renombrar `buscarIngredientesEdamam` → `buscarIngredientesOpenFoodFacts`.** No llama a Edamam, llama a Open Food Facts. Edamam se usa en `nutritionService.ts`. El nombre engaña a cualquiera que lea el código, incluido un tribunal.
-- [ ] **`morgan("combined")` en producción.** `"dev"` mete códigos de color ANSI en los logs de Render.
-- [ ] **Arreglar las insignias del `README.md`.** Dicen Next 15 / React 19 / Express 5. Lo real es Next 14.2.35, React 18, Express 4.19. Si el tribunal las lee, es una inconsistencia gratuita.
-- [ ] **Neutralizar los comentarios coloquiales** de `app.ts` ("Esto es pa mas seguridad", "Pa parsear").
+- [x] **Unificar el manejo de errores.** Hecho (17/07/2026). `manejarError` sale a `middlewares/errores.ts` y lo importan los cuatro controladores y las dos rutas inline de `chat.routes.ts`. El `manejadorErrores` global ya no devuelve 500 a secas: respeta `err.status` (delega en `manejarError`), no reescribe si las cabeceras ya se enviaron, y solo loguea cuando el status es 5xx. Sigue siendo la red de último recurso; los controladores capturan antes.
+- [ ] **Rate limit con Redis.** `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` llevan en `.env` desde siempre **sin usarse en ninguna parte**. Era justo para esto: sobrevive a los redeploys y funciona con varias instancias. **Único punto de la fase que queda abierto:** depende de credenciales reales de Upstash y no se puede verificar en local (el guard del E2E prohíbe claves reales), y en un Render de una sola instancia el retorno es marginal. Pendiente de decidir con el autor si merece la pena.
+- [x] **Acotar `express.json({ limit: '10mb' })`.** Hecho. Dos parsers en `app.ts`: `jsonEstandar` (100 kb) para `/api/auth` e `/api/ingredientes`, que nunca reciben imágenes, y `jsonConImagen` (10 mb) para recetas, usuarios (foto), despensa (ticket) y chat, que sí. Se achica justo la puerta de entrada más atacada, el login.
+- [x] **ESLint en el backend.** Hecho. ESLint 9 (flat config, `eslint.config.mjs`) + typescript-eslint sobre `src/`. `npm run lint` pasa a ser `eslint src && tsc --noEmit`, y hay `lint:fix` y `typecheck` sueltos. El CI ya lo ejecuta (mismo paso `npm run lint` de `ci-backend`). Los 5 avisos que salieron, arreglados en código salvo la augmentación de `Express.Request`, que es `namespace` legítimo y se permite con `allowDeclarations`.
+- [x] **Renombrar `buscarIngredientesEdamam` → `buscarIngredientesOpenFoodFacts`.** Hecho. `buscarIngredientesOpenFoodFacts` ya existía; `buscarIngredientesEdamam` era un wrapper con un solo caller. Se quitó el wrapper y `ingredientes.routes.ts` llama al nombre real.
+- [x] **`morgan("combined")` en producción.** Hecho. `morgan(NODE_ENV === "production" ? "combined" : "dev")`, callado en test como antes.
+- [x] **Arreglar las insignias del `README.md`.** Hecho. Next 15 → 14, React 19 → 18, Express 5 → 4.
+- [x] **Neutralizar los comentarios coloquiales** de `app.ts` ("Esto es pa mas seguridad", "Pa parsear"). Hechos fuera.
 
 ---
 
@@ -288,7 +288,7 @@ Producto (las dos primeras ya están en el guion de la defensa):
 4. **Fase 2b** — *hecha el 17/07/2026*. Los tres bugs arreglados. 75 tests unitarios en verde y CI ejecutándolos.
 5. **Fase 2c** — *hecha el 17/07/2026*. E2E con Playwright del flujo completo, en un job de CI que no bloquea el deploy.
 6. **Fase 3** — **la siguiente**, aunque la verificación depende de la Fase 0.
-7. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
+7. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2. *7 de 8 hechas el 17/07/2026; solo queda Redis, a la espera de decidir si compensa.*
 8. **Fase 5** — mejoras, sobre una base sana.
 
 La idea de fondo: **primero lo que sangra, luego la red de seguridad, luego lo que se apoya en ella.**

@@ -33,8 +33,9 @@ bash scripts/lint.sh
 cd frontend && npm run lint    # next lint (ESLint real)
 cd frontend && npx tsc --noEmit
 
-# Backend  ── OJO: "npm run lint" aquí es tsc --noEmit, NO un linter.
-cd backend && npm run lint     # tsc --noEmit (solo src/, no los tests)
+# Backend  ── "npm run lint" es ESLint (src/) + tsc --noEmit, en ese orden.
+cd backend && npm run lint     # eslint src && tsc --noEmit (no toca los tests)
+cd backend && npm run lint:fix # eslint src --fix
 cd backend && npm run build    # tsc → dist/
 
 # Tests (solo backend)

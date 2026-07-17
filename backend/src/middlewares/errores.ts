@@ -1,12 +1,23 @@
 import { Request, Response, NextFunction } from "express";
 
-//Este Middleware es una funcion para capturar cualquier error que no se controle para indicarlo como 500 y evitar que se caiga el servidor.
+type ErrorConStatus = Error & { status?: number };
+
+export function manejarError(res: Response, error: unknown): void {
+  const err = error as ErrorConStatus;
+  res.status(err.status ?? 500).json({ error: err.message ?? "Error interno del servidor" });
+}
+
 export function manejadorErrores(
   err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction,
+  next: NextFunction,
 ): void {
-  console.error("❌ Error no controlado:", err.message);
-  res.status(500).json({ error: "Error interno del servidor" });
+  if (res.headersSent) {
+    next(err);
+    return;
+  }
+  const status = (err as ErrorConStatus).status ?? 500;
+  if (status >= 500) console.error("❌ Error no controlado:", err.message);
+  manejarError(res, err);
 }

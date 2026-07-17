@@ -17,12 +17,11 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-app.use(helmet()); //Esto es pa mas seguridad en las cabeceras HTTP
+app.use(helmet());
 if (process.env.NODE_ENV !== "test") {
-  app.use(morgan("dev")); //Muestra las peticiones en consola para debuggear
+  app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 }
 
-// Solo acepta peticiones de una URL específica (la del frontend) y permite enviar cookies (credenciales)
 app.use(
   cors({
     origin: process.env.FRONTEND_URL ?? "http://localhost:3000",
@@ -30,13 +29,15 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: '10mb' })); // Pa parsear el cuerpo de las peticiones como JSON
-app.use("/api/auth", authRoutes);
-app.use("/api/recetas", recetasRoutes);
-app.use("/api/usuarios", usuariosRoutes);
-app.use("/api/despensa", despensaRoutes);
-app.use("/api/ingredientes", ingredientesRoutes);
-app.use("/api/chat", chatRoutes);
+const jsonEstandar = express.json({ limit: "100kb" });
+const jsonConImagen = express.json({ limit: "10mb" });
+
+app.use("/api/auth", jsonEstandar, authRoutes);
+app.use("/api/recetas", jsonConImagen, recetasRoutes);
+app.use("/api/usuarios", jsonConImagen, usuariosRoutes);
+app.use("/api/despensa", jsonConImagen, despensaRoutes);
+app.use("/api/ingredientes", jsonEstandar, ingredientesRoutes);
+app.use("/api/chat", jsonConImagen, chatRoutes);
 
 // GET /api/health — health check público (sin auth).
 // Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.
@@ -45,6 +46,6 @@ app.get("/api/health", (_req, res) => {
   res.json({ estado: "ok", entorno: process.env.NODE_ENV });
 });
 
-app.use(manejadorErrores); // Middleware para manejar errores de forma centralizada. Si alguna ruta lanza un error, este middleware lo captura y responde con un mensaje adecuado.
+app.use(manejadorErrores);
 
 export default app;

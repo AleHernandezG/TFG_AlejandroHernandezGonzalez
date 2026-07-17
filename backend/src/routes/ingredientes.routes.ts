@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { buscarIngredientesEdamam } from "../services/ingredientesService";
+import { buscarIngredientesOpenFoodFacts } from "../services/ingredientesService";
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.get("/buscar", async (req: Request, res: Response): Promise<void> => {
     res.json([]);
     return;
   }
-  const resultados = await buscarIngredientesEdamam(q);
+  const resultados = await buscarIngredientesOpenFoodFacts(q);
   res.json(resultados);
 });
 

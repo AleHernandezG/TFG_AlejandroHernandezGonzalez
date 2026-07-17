@@ -729,7 +729,7 @@ async function seed(): Promise<void> {
       listaComentarios: listaComentarios.map(({ autorIndex: ci, texto }) => ({
         autorId: usuariosCreados[ci]._id,
         autorNombre: usuariosCreados[ci].nombre,
-        avatarUrl: (usuariosCreados[ci] as any).foto ?? null,
+        avatarUrl: (usuariosCreados[ci] as { foto?: string }).foto ?? null,
         texto,
         fecha: new Date(),
       })),

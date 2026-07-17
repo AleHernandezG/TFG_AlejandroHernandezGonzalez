@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
 import { despensaService } from "../services/despensaService";
-
-type ErrorConStatus = Error & { status?: number };
-
-function manejarError(res: Response, error: unknown): void {
-  const err = error as ErrorConStatus;
-  res.status(err.status ?? 500).json({ error: err.message ?? "Error interno del servidor" });
-}
+import { manejarError } from "../middlewares/errores";
 
 export const despensaController = {
   async obtener(req: Request, res: Response): Promise<void> {
@@ -23,7 +17,7 @@ export const despensaController = {
       const body = req.body;
 
       if (Array.isArray(body)) {
-        const itemsValidados = body.map((item: any) => {
+        const itemsValidados = body.map((item: { nombre: string; cantidad: number; unidad: string; emoji: string }) => {
           const { nombre, cantidad, unidad, emoji } = item;
           if (!nombre?.trim() || !unidad?.trim() || !emoji?.trim() || cantidad == null) {
             throw Object.assign(new Error("nombre, cantidad, unidad y emoji son obligatorios en todos los elementos"), { status: 400 });

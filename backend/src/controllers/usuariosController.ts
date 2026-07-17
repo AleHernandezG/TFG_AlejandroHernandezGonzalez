@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
 import { usuariosService } from "../services/usuariosService";
-
-type ErrorConStatus = Error & { status?: number };
-
-function manejarError(res: Response, error: unknown): void {
-  const err = error as ErrorConStatus;
-  res.status(err.status ?? 500).json({ error: err.message ?? "Error interno del servidor" });
-}
+import { manejarError } from "../middlewares/errores";
 
 export const usuariosController = {
   async obtenerDestacados(req: Request, res: Response): Promise<void> {
