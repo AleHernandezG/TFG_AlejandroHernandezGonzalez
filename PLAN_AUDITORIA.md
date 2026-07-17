@@ -120,7 +120,9 @@ Ninguno cambia el comportamiento en producción, pero conviene saber por qué es
 
 ## Fase 2b — Bugs que destaparon las pruebas
 
-**Hecha el 17/07/2026.** Los tres arreglados y cubiertos por pruebas. La suite pasó de 63 a 75 casos: los 12 nuevos fallan contra el código anterior, comprobado revirtiendo `src/` y ejecutándolos.
+**Hecha el 17/07/2026.** Los tres arreglados y cubiertos por pruebas. La suite pasó de 63 a 75 casos.
+
+Comprobado que las pruebas nuevas sirven de red: revirtiendo `src/` al estado anterior y ejecutándolas, **9 de los 12 casos nuevos fallan**, uno por cada comportamiento que se ha cambiado. Los otros 3 pasan en las dos versiones a propósito (`"un perfil sin alergias no filtra nada por sí solo"`, `"el visitante anónimo…"`, `"solo dieta filtra por dieta"`): fijan lo que **no** debía cambiar al arreglar lo demás, que es justo lo que hace falta para que el arreglo no se lleve nada por delante.
 
 **Por qué aquí:** los tres salieron al escribir la Fase 2 y ninguno es deuda técnica ni mejora, son cosas que hacen lo contrario de lo que dicen hacer. El primero incumple un requisito de salud. Van antes de la Fase 4 porque ahora ya hay pruebas que cubren la zona, que era justo el motivo de poner la Fase 2 antes que los refactors.
 
