@@ -1,4 +1,4 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { MemoryStore } from "express-rate-limit";
 
 type OpcionesLimite = {
   ventanaMinutos: number;
@@ -7,7 +7,12 @@ type OpcionesLimite = {
   soloContarFallos?: boolean;
 };
 
+const stores: MemoryStore[] = [];
+
 function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, soloContarFallos = false }: OpcionesLimite) {
+  const store = new MemoryStore();
+  stores.push(store);
+
   return rateLimit({
     windowMs: ventanaMinutos * 60_000,
     limit: maxIntentos,
@@ -15,7 +20,12 @@ function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, soloContarFallos =
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: soloContarFallos,
+    store,
   });
+}
+
+export function reiniciarLimitesAuth(): void {
+  for (const store of stores) store.resetAll();
 }
 
 export const limiteLogin = limitarPorIP({
