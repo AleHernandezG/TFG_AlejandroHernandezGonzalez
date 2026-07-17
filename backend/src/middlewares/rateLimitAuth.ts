@@ -1,18 +1,15 @@
-import rateLimit, { MemoryStore } from "express-rate-limit";
+import rateLimit from "express-rate-limit";
+import { crearStore, reiniciarStores } from "../lib/rateLimitStore";
 
 type OpcionesLimite = {
   ventanaMinutos: number;
   maxIntentos: number;
   mensaje: string;
+  prefijo: string;
   soloContarFallos?: boolean;
 };
 
-const stores: MemoryStore[] = [];
-
-function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, soloContarFallos = false }: OpcionesLimite) {
-  const store = new MemoryStore();
-  stores.push(store);
-
+function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, prefijo, soloContarFallos = false }: OpcionesLimite) {
   return rateLimit({
     windowMs: ventanaMinutos * 60_000,
     limit: maxIntentos,
@@ -20,18 +17,19 @@ function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, soloContarFallos =
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: soloContarFallos,
-    store,
+    store: crearStore(`auth:${prefijo}`),
   });
 }
 
 export function reiniciarLimitesAuth(): void {
-  for (const store of stores) store.resetAll();
+  reiniciarStores();
 }
 
 export const limiteLogin = limitarPorIP({
   ventanaMinutos: 15,
   maxIntentos: 10,
   mensaje: "Demasiados intentos fallidos de inicio de sesión. Vuelve a probar en 15 minutos.",
+  prefijo: "login",
   soloContarFallos: true,
 });
 
@@ -39,16 +37,19 @@ export const limiteRegistro = limitarPorIP({
   ventanaMinutos: 60,
   maxIntentos: 5,
   mensaje: "Se han creado demasiadas cuentas desde esta conexión. Vuelve a probar en una hora.",
+  prefijo: "registro",
 });
 
 export const limiteRecuperacion = limitarPorIP({
   ventanaMinutos: 60,
   maxIntentos: 5,
   mensaje: "Demasiadas solicitudes de recuperación de contraseña. Vuelve a probar en una hora.",
+  prefijo: "recuperacion",
 });
 
 export const limiteReenvioVerificacion = limitarPorIP({
   ventanaMinutos: 60,
   maxIntentos: 5,
   mensaje: "Demasiados reenvíos del correo de verificación. Vuelve a probar en una hora.",
+  prefijo: "reenvio",
 });

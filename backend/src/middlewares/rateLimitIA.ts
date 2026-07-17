@@ -1,49 +1,19 @@
-import { Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
+import { crearStore } from "../lib/rateLimitStore";
 
-interface Ventana {
-  count: number;
-  inicio: number;
-}
-
-const VENTANA_MS = 60_000;
+let contador = 0;
 
 export function limitarPorUsuario(maxPorMinuto: number) {
-  const ventanas = new Map<string, Ventana>();
-  let ultimaPurga = Date.now();
+  const id = contador++;
 
-  function purgarVentanasCaducadas(ahora: number): void {
-    if (ahora - ultimaPurga < VENTANA_MS) return;
-
-    for (const [id, ventana] of ventanas) {
-      if (ahora - ventana.inicio > VENTANA_MS) ventanas.delete(id);
-    }
-    ultimaPurga = ahora;
-  }
-
-  return function (req: Request, res: Response, next: NextFunction): void {
-    const usuarioId = req.usuario?.id;
-    if (!usuarioId) {
-      next();
-      return;
-    }
-
-    const ahora = Date.now();
-    purgarVentanasCaducadas(ahora);
-
-    const ventana = ventanas.get(usuarioId);
-
-    if (!ventana || ahora - ventana.inicio > VENTANA_MS) {
-      ventanas.set(usuarioId, { count: 1, inicio: ahora });
-      next();
-      return;
-    }
-
-    if (ventana.count >= maxPorMinuto) {
-      res.status(429).json({ error: "Demasiadas peticiones. Espera un momento antes de continuar." });
-      return;
-    }
-
-    ventana.count++;
-    next();
-  };
+  return rateLimit({
+    windowMs: 60_000,
+    limit: maxPorMinuto,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Demasiadas peticiones. Espera un momento antes de continuar." },
+    keyGenerator: (req) => req.usuario?.id ?? "sin-usuario",
+    skip: (req) => !req.usuario,
+    store: crearStore(`ia:${id}`),
+  });
 }

@@ -51,7 +51,7 @@ cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
 ```
 
-**Hay 75 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 80 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -170,8 +170,8 @@ Los mensajes de commit sí van en inglés e imperativo.
 ## Trampas conocidas
 
 - `services/ingredientesService.ts`: `buscarIngredientesEdamam()` **no llama a Edamam**, llama a Open Food Facts. Edamam se usa en `nutritionService.ts` (junto con USDA). El nombre es engañoso.
-- `middlewares/rateLimitIA.ts` guarda las ventanas en un `Map` en memoria: se reinicia en cada redeploy y no funciona con varias instancias. Además hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar**. El login sí está limitado desde la Fase 1, pero por otro middleware distinto (`rateLimitAuth.ts`); no los confundas.
-- `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están en `.env` pero no se usan en ningún sitio.
+- `middlewares/rateLimitIA.ts` limita por usuario (`express-rate-limit`, ventana de 60 s) y hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar** (todas sus rutas llevan `requerirAuth` delante, así que en la práctica siempre hay usuario). El login se limita por otro middleware distinto, `rateLimitAuth.ts`, por IP; no los confundas.
+- Los dos limitadores comparten store vía `lib/rateLimitStore.ts`: **Redis (Upstash) si `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están definidas, memoria si no.** El fallback en memoria se reinicia en cada redeploy; el de Redis sobrevive. `reiniciarLimitesAuth()` (que usa `tests/setup.ts`) reinicia todos los stores registrados.
 - Las insignias del `README.md` mienten: dicen Next 15 / React 19 / Express 5. Lo real es **Next 14.2.35, React 18, Express 4.19, Node ≥20**.
 
 ## Entorno

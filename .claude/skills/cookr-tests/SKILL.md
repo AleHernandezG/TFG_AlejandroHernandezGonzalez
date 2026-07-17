@@ -7,7 +7,7 @@ description: Escribir y ejecutar pruebas en Cookr (Jest + Supertest + mongodb-me
 
 ## Estado actual (17/07/2026)
 
-**La infraestructura ya está montada. No la vuelvas a crear.** 75 tests en 5 suites, solo en el backend.
+**La infraestructura ya está montada. No la vuelvas a crear.** 80 tests en 6 suites, solo en el backend.
 
 | Fichero | Qué cubre |
 |---|---|
@@ -16,6 +16,7 @@ description: Escribir y ejecutar pruebas en Cookr (Jest + Supertest + mongodb-me
 | `tests/rateLimitAuth.test.ts` | Limitadores de la Fase 1 (8 casos) |
 | `tests/feed.alergenos.test.ts` | Alérgenos del feed: query, perfil y la unión de ambos (12 casos) |
 | `tests/feed.filtros.test.ts` | `dietas` × `categoria` y `excluirPropio` × `soloSiguiendo` (7 casos) |
+| `tests/upstashStore.test.ts` | El store de Redis del rate limiting, contra un Redis falso (5 casos) |
 | `tests/setup.ts` | Mongo efímero, limpieza, reinicio de limitadores |
 | `tests/helpers/factories.ts` | `crearUsuario`, `crearReceta`, `tokenDe`, tokens de verificación y recuperación |
 
