@@ -5,16 +5,17 @@ description: Escribir y ejecutar pruebas en Cookr (Jest + Supertest + mongodb-me
 
 # Pruebas en Cookr
 
-## Estado actual (16/07/2026)
+## Estado actual (17/07/2026)
 
-**La infraestructura ya está montada. No la vuelvas a crear.** 63 tests en 4 suites, solo en el backend.
+**La infraestructura ya está montada. No la vuelvas a crear.** 75 tests en 5 suites, solo en el backend.
 
 | Fichero | Qué cubre |
 |---|---|
 | `tests/auth.test.ts` | Registro, login, verificación, recuperación, Google OAuth (27 casos) |
-| `tests/validadores.test.ts` | Esquemas Zod de `lib/validadores.ts` (20 casos) |
+| `tests/validadores.test.ts` | Esquemas Zod de `lib/validadores.ts` (21 casos) |
 | `tests/rateLimitAuth.test.ts` | Limitadores de la Fase 1 (8 casos) |
-| `tests/feed.alergenos.test.ts` | Filtros de alérgenos del feed (8 casos) |
+| `tests/feed.alergenos.test.ts` | Alérgenos del feed: query, perfil y la unión de ambos (12 casos) |
+| `tests/feed.filtros.test.ts` | `dietas` × `categoria` y `excluirPropio` × `soloSiguiendo` (7 casos) |
 | `tests/setup.ts` | Mongo efímero, limpieza, reinicio de limitadores |
 | `tests/helpers/factories.ts` | `crearUsuario`, `crearReceta`, `tokenDe`, tokens de verificación y recuperación |
 
@@ -97,11 +98,13 @@ expect(mockVerificacion).toHaveBeenCalledWith("nuevo@cookr.dev", "Alejandro", ex
 - **morgan está callado** con `NODE_ENV === "test"` (`app.ts`). Si lo quitas, la salida de `npm test` se vuelve ilegible.
 - **Mongo se levanta por fichero de test**, no por proceso. Añadir ficheros cuesta segundos, no décimas.
 
-## Algunos tests fijan comportamiento que está MAL, a propósito
+## Lo que fija `feed.alergenos.test.ts`, y por qué no se toca a la ligera
 
-`feed.alergenos.test.ts` y un caso de `validadores.test.ts` documentan bugs reales en vez de comprobar que el código acierta. Llevan un bloque de comentario que lo explica y están descritos en la **Fase 2b de `PLAN_AUDITORIA.md`**.
+Los alérgenos del perfil son un **suelo**: `alergenosEfectivos = union(perfil.alergias, query.alergenos)`. El query solo suma, nunca resta. Vive en `recetasService.resolverAlergenos()` y es un requisito de salud, no una preferencia de navegación.
 
-Si arreglas el bug, **dale la vuelta al test**: no lo "arregles" para que vuelva a pasar en verde, que es justo lo contrario de lo que documenta.
+Si un caso de ese fichero se pone en rojo, la sospecha por defecto es que has rebajado la protección, no que el test esté anticuado. El caso `"el query no puede rebajar el suelo del perfil"` existe justo para eso.
+
+Ya **no** queda ningún test que fije comportamiento equivocado a propósito: los tres bugs que documentaban se arreglaron en la Fase 2b (17/07/2026) y los tests están del derecho.
 
 ## E2E con Playwright (pendiente, no existe todavía)
 
@@ -117,7 +120,7 @@ Ojo con dos cosas del proyecto al montarlo: el registro exige verificar el corre
 
 Por lo que más duele si se rompe:
 
-1. Filtros del feed más allá de los alérgenos (dietas, dificultad, paginación, `sort`). Es la lógica con más reglas del proyecto y ahí ya apareció un bug de claves que se pisan.
+1. Lo que queda de los filtros del feed: `dificultad`, paginación y `sort` (`reciente`, `likes`, `score`). `dietas` y `categoria` ya están cubiertos en `feed.filtros.test.ts`, pero el resto no, y es la lógica con más reglas del proyecto: ahí ya aparecieron dos bugs de claves que se pisaban.
 2. Cálculo de raciones y macros.
 3. Permisos de recetas: editar y borrar la de otro debe dar 403 (`recetaRepository.ts:599` y `:642`).
 4. E2E con Playwright: registro → login → crear receta.
