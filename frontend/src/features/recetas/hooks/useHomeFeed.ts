@@ -2,7 +2,6 @@
 
 import { useDebounce } from '@/hooks/useDebounce'
 import { useRecetasFeed } from './useRecetasFeed'
-import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 import type { FiltrosAvanzados, PostFeed } from '../types/receta.types'
 
 export interface ResultadoHomeFeed {
@@ -24,8 +23,6 @@ export function useHomeFeed(
   const busquedaDebounciada = useDebounce(busqueda, 300)
   const buscando = busqueda !== busquedaDebounciada
 
-  const { data: perfil } = useMiPerfil()
-
   const hayBusquedaOFiltros =
     !!busquedaDebounciada ||
     filtros.dietas.length > 0 ||
@@ -42,12 +39,13 @@ export function useHomeFeed(
 
   // Recomendaciones personalizadas. Las preferencias puntúan (sort 'score'),
   // no filtran: así un usuario con un gusto que ninguna receta tiene no se
-  // queda sin nada. Los alérgenos sí filtran (seguridad). Sirven de relleno
-  // cuando no sigues a nadie o a quien sigues publica poco.
+  // queda sin nada. Los alérgenos del perfil los aplica el backend a todo el
+  // feed, no hace falta mandarlos. Sirven de relleno cuando no sigues a nadie
+  // o a quien sigues publica poco.
   const feedRecomendado = useRecetasFeed({
     filtrosAvanzados: {
       dietas: [],
-      alergenos: perfil?.alergias ?? [],
+      alergenos: [],
       dificultad: [],
     },
     sort: 'score',

@@ -18,12 +18,14 @@ describe("esquemaRegistro", () => {
     expect(res.correo).toBe("alejandro@cookr.dev");
   });
 
-  // Comportamiento actual, no deseado: en `.email().trim()` el email() valida primero,
-  // así que un correo con espacios alrededor se rechaza en vez de recortarse.
-  // Reordenar a `.trim().toLowerCase().email()` lo arreglaría.
-  it("rechaza un correo con espacios alrededor en vez de recortarlo", () => {
-    const res = esquemaRegistro.safeParse({ ...valido, correo: " alejandro@cookr.dev " });
-    expect(res.success).toBe(false);
+  it("recorta los espacios alrededor del correo en vez de rechazarlo", () => {
+    const res = esquemaRegistro.parse({ ...valido, correo: " alejandro@cookr.dev " });
+    expect(res.correo).toBe("alejandro@cookr.dev");
+  });
+
+  it("recorta y normaliza a la vez", () => {
+    const res = esquemaRegistro.parse({ ...valido, correo: "  ALEJANDRO@Cookr.DEV\t" });
+    expect(res.correo).toBe("alejandro@cookr.dev");
   });
 
   it("rechaza un correo sin formato", () => {

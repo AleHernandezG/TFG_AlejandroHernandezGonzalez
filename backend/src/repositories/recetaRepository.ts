@@ -157,29 +157,38 @@ export const recetaRepository = {
         { descripcion: { $regex: q, $options: "i" } },
       ];
     }
+    const categorias: Record<string, unknown> = {};
     if (dietas && dietas.length > 0) {
-      query["categorias"] = { $in: dietas };
+      categorias["$in"] = dietas;
     }
+    if (categoria) {
+      categorias["$all"] = [categoria];
+    }
+    if (Object.keys(categorias).length > 0) {
+      query["categorias"] = categorias;
+    }
+
     if (dificultad && dificultad.length > 0) {
       query["dificultad"] = { $in: dificultad };
     }
     if (alergenos && alergenos.length > 0) {
       query["alergenos"] = { $nin: alergenos };
     }
-    if (excluirPropio && usuarioId) {
-      query["autorId"] = { $ne: new Types.ObjectId(usuarioId) };
-    }
     if (soloEvento) {
       query["esEvento"] = true;
     }
-    if (categoria) {
-      query["categorias"] = { $in: [categoria] };
+
+    const autor: Record<string, unknown> = {};
+    if (excluirPropio && usuarioId) {
+      autor["$ne"] = new Types.ObjectId(usuarioId);
     }
     if (soloSiguiendo && usuarioId) {
-      const seguidosArr = [...(await obtenerSeguidosSet(usuarioId))].map(
+      autor["$in"] = [...(await obtenerSeguidosSet(usuarioId))].map(
         (id) => new Types.ObjectId(id),
       );
-      query["autorId"] = { $in: seguidosArr };
+    }
+    if (Object.keys(autor).length > 0) {
+      query["autorId"] = autor;
     }
 
     const skip = (pagina - 1) * limite;
@@ -248,6 +257,7 @@ export const recetaRepository = {
   async findById(
     id: string,
     usuarioId?: string,
+    alergenos?: string[],
   ): Promise<RecetaDetalleRespuesta | null> {
     if (!Types.ObjectId.isValid(id)) return null;
 
@@ -272,6 +282,7 @@ export const recetaRepository = {
     // Recetas similares: misma dificultad o categorías compartidas
     const similaresDocs = await Receta.find({
       _id: { $ne: id },
+      ...(alergenos && alergenos.length > 0 ? { alergenos: { $nin: alergenos } } : {}),
       $or: [
         { categorias: { $in: doc.categorias as string[] } },
         { dificultad: doc.dificultad },
@@ -324,6 +335,7 @@ export const recetaRepository = {
   async findSimilares(
     recetaId: string,
     usuarioId?: string,
+    alergenos?: string[],
   ): Promise<PostFeedRespuesta[]> {
     if (!Types.ObjectId.isValid(recetaId)) return [];
 
@@ -334,16 +346,13 @@ export const recetaRepository = {
 
     if (!receta) return [];
 
-    const guardadasSet = usuarioId
-      ? await obtenerGuardadasSet(usuarioId)
-      : undefined;
-
-    const [guardadasSet2, seguidosSet2] = usuarioId
+    const [guardadasSet, seguidosSet] = usuarioId
       ? await Promise.all([obtenerGuardadasSet(usuarioId), obtenerSeguidosSet(usuarioId)])
       : [undefined, undefined];
 
     const docs = await Receta.find({
       _id: { $ne: recetaId },
+      ...(alergenos && alergenos.length > 0 ? { alergenos: { $nin: alergenos } } : {}),
       $or: [
         { categorias: { $in: receta.categorias as string[] } },
         { dificultad: receta.dificultad },
@@ -356,7 +365,7 @@ export const recetaRepository = {
       .exec();
 
     return docs.map((doc) =>
-      docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet2, seguidosSet2),
+      docAPostFeed(doc as Record<string, unknown>, usuarioId, guardadasSet, seguidosSet),
     );
   },
 
