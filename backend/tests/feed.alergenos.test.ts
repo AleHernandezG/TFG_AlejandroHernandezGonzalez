@@ -17,15 +17,15 @@ async function feed(query: string, token?: string) {
   return req;
 }
 
-describe("filtro de alérgenos del feed", () => {
-  beforeEach(async () => {
-    const autor = await crearUsuario({ correo: "autor@cookr.dev" });
-    await crearReceta({ titulo: "Tortilla", autorId: autor._id as never, alergenos: ["huevo"] });
-    await crearReceta({ titulo: "Tarta de queso", autorId: autor._id as never, alergenos: ["lacteos", "huevo"] });
-    await crearReceta({ titulo: "Pan con tomate", autorId: autor._id as never, alergenos: ["cereales"] });
-    await crearReceta({ titulo: "Ensalada", autorId: autor._id as never, alergenos: [] });
-  });
+beforeEach(async () => {
+  const autor = await crearUsuario({ correo: "autor@cookr.dev" });
+  await crearReceta({ titulo: "Tortilla", autorId: autor._id as never, alergenos: ["huevo"] });
+  await crearReceta({ titulo: "Tarta de queso", autorId: autor._id as never, alergenos: ["lacteos", "huevo"] });
+  await crearReceta({ titulo: "Pan con tomate", autorId: autor._id as never, alergenos: ["cereales"] });
+  await crearReceta({ titulo: "Ensalada", autorId: autor._id as never, alergenos: [] });
+});
 
+describe("filtro de alérgenos del feed", () => {
   it("excluye del feed toda receta que contenga el alérgeno pedido", async () => {
     const res = await feed("?alergenos=huevo");
 
@@ -77,36 +77,44 @@ describe("filtro de alérgenos del feed", () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGO (16/07/2026). El plan pide asegurar que «un usuario con alérgenos no
-// puede ver recetas que los contengan». Eso HOY NO SE CUMPLE: el filtro sale
-// solo del query string (`recetasController.ts:32`), nunca de `usuario.alergias`.
-// El feed no consulta el perfil, así que las alergias registradas no protegen
-// nada por sí solas: solo filtran si el cliente las manda a mano, y el frontend
-// únicamente manda lo que el usuario marca en el drawer de filtros.
-//
-// La ruta de la despensa sí lee el perfil (`chatService.ts:450`), lo que hace
-// la incoherencia más visible.
-//
-// Estos tests fijan el comportamiento REAL para que el cambio sea deliberado
-// y se vea en el diff. No validan que esté bien.
-//
-// Ya está decidido cómo se arregla (Fase 2b de PLAN_AUDITORIA.md):
-//   alergenosEfectivos = union(perfil.alergias, query.alergenos)
-// El perfil es un suelo y el drawer solo suma por encima; la única forma de
-// dejar de filtrar por un alérgeno es quitarlo del perfil. Al implementarlo hay
-// que DARLE LA VUELTA a este test, no borrarlo, y añadir el de la unión.
-// ─────────────────────────────────────────────────────────────────────────────
-describe("alergias del perfil (comportamiento actual, no el deseado)", () => {
-  it("el feed NO filtra por las alergias del perfil si el cliente no las manda", async () => {
-    const autor = await crearUsuario({ correo: "autor2@cookr.dev" });
-    await crearReceta({ titulo: "Tortilla", autorId: autor._id as never, alergenos: ["huevo"] });
-    await crearReceta({ titulo: "Ensalada", autorId: autor._id as never, alergenos: [] });
-
+describe("alergias del perfil", () => {
+  it("el feed filtra por las alergias del perfil aunque el cliente no las mande", async () => {
     const alergico = await crearUsuario({ correo: "alergico@cookr.dev", alergias: ["huevo"] });
     const res = await feed("", tokenDe(alergico as never));
 
     const titulos = (res.body.recetas as PostFeed[]).map((p) => p.receta.titulo);
-    expect(titulos).toContain("Tortilla");
+    expect(titulos).not.toContain("Tortilla");
+    expect(titulos).not.toContain("Tarta de queso");
+    expect(res.body.total).toBe(2);
+  });
+
+  it("los alérgenos del query se suman a los del perfil", async () => {
+    const alergico = await crearUsuario({ correo: "alergico2@cookr.dev", alergias: ["huevo"] });
+    const res = await feed("?alergenos=cereales", tokenDe(alergico as never));
+
+    const titulos = (res.body.recetas as PostFeed[]).map((p) => p.receta.titulo);
+    expect(titulos).toEqual(["Ensalada"]);
+  });
+
+  it("el query no puede rebajar el suelo del perfil", async () => {
+    const alergico = await crearUsuario({ correo: "alergico3@cookr.dev", alergias: ["huevo"] });
+    const res = await feed("?alergenos=lacteos", tokenDe(alergico as never));
+
+    for (const post of res.body.recetas as PostFeed[]) {
+      expect(post.receta.alergenos).not.toContain("huevo");
+    }
+    expect(res.body.total).toBe(2);
+  });
+
+  it("un perfil sin alergias no filtra nada por sí solo", async () => {
+    const usuario = await crearUsuario({ correo: "sinalergias@cookr.dev", alergias: [] });
+    const res = await feed("", tokenDe(usuario as never));
+
+    expect(res.body.total).toBe(4);
+  });
+
+  it("el visitante anónimo no tiene perfil, así que solo filtra por query", async () => {
+    const res = await feed("");
+    expect(res.body.total).toBe(4);
   });
 });

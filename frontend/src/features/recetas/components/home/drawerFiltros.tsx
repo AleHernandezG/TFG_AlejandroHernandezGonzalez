@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 import {
   Drawer,
   DrawerContent,
@@ -25,6 +28,8 @@ interface Props {
 export function DrawerFiltros({ filtros, onChange, children }: Props) {
   const [open, setOpen] = useState(false)
   const [local, setLocal] = useState<FiltrosAvanzados>(filtros)
+  const { data: perfil } = useMiPerfil()
+  const alergenosDelPerfil = perfil?.alergias ?? []
 
   function handleOpen(v: boolean) {
     if (v) setLocal(filtros)
@@ -50,6 +55,7 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
   }
 
   function toggleAlergeno(id: string) {
+    if (alergenosDelPerfil.includes(id)) return
     setLocal((prev) => ({
       ...prev,
       alergenos: prev.alergenos.includes(id)
@@ -141,17 +147,21 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
             <p className="mb-3 text-[11px] text-muted-foreground/70">Oculta recetas que contengan estos alérgenos</p>
             <div className="flex flex-wrap gap-2">
               {ALERGENOS_OPCIONES.map((a) => {
-                const activo = local.alergenos.includes(a.id)
+                const fijo = alergenosDelPerfil.includes(a.id)
+                const activo = fijo || local.alergenos.includes(a.id)
                 return (
                   <button
                     key={a.id}
                     type="button"
                     onClick={() => toggleAlergeno(a.id)}
+                    disabled={fijo}
+                    title={fijo ? 'Lo tienes en tu perfil. Se aplica siempre.' : undefined}
                     className={cn(
                       'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
                       activo
                         ? 'border-destructive bg-destructive/10 text-destructive'
                         : 'border-border bg-muted text-muted-foreground hover:bg-muted/70',
+                      fijo && 'cursor-not-allowed opacity-70',
                     )}
                   >
                     <Image
@@ -162,10 +172,20 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
                       className="h-4 w-4 object-contain"
                     />
                     {a.label}
+                    {fijo && <Lock className="h-3 w-3" aria-label="Fijado en tu perfil" />}
                   </button>
                 )
               })}
             </div>
+            {alergenosDelPerfil.length > 0 && (
+              <p className="mt-3 text-[11px] text-muted-foreground/70">
+                Los que tienen candado vienen de tu perfil y se aplican siempre. Puedes{' '}
+                <Link href="/perfil" className="underline hover:text-foreground">
+                  cambiarlos en tu perfil
+                </Link>
+                .
+              </p>
+            )}
           </div>
         </div>
 

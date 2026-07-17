@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const esquemaRegistro = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(50).trim(),
-  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+  correo: z.string().trim().toLowerCase().email("Correo no válido"),
   contrasena: z
     .string()
     .min(8, "La contraseña debe tener al menos 8 caracteres")
@@ -11,12 +11,12 @@ export const esquemaRegistro = z.object({
 });
 
 export const esquemaLogin = z.object({
-  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+  correo: z.string().trim().toLowerCase().email("Correo no válido"),
   contrasena: z.string().min(1, "La contraseña es obligatoria"),
 });
 
 export const esquemaRecuperar = z.object({
-  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+  correo: z.string().trim().toLowerCase().email("Correo no válido"),
 });
 
 export const esquemaNuevaContrasena = z.object({
@@ -34,7 +34,7 @@ export const esquemaVerificarEmail = z.object({
 
 export const esquemaGoogleOAuth = z.object({
   googleId: z.string().min(1, "Google ID obligatorio"),
-  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+  correo: z.string().trim().toLowerCase().email("Correo no válido"),
   nombre: z.string().trim().min(1).catch("Usuario"),
   foto: z.string().url().optional().catch(undefined),
 });
@@ -45,7 +45,7 @@ export const esquemaCompletarPerfil = z.object({
 });
 
 export const esquemaReenviarVerificacion = z.object({
-  correo: z.string().email("Correo no válido").trim().toLowerCase(),
+  correo: z.string().trim().toLowerCase().email("Correo no válido"),
 });
 
 export const esquemaCrearRecetaBody = z.object({

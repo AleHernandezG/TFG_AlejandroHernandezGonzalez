@@ -70,6 +70,12 @@ export const usuarioRepository = {
   buscarPerfilPorId: (id: string): Promise<IUsuarioDoc | null> =>
     Usuario.findById(id).select("nombre correo foto alergias preferencias proveedor"),
 
+  async obtenerAlergias(id: string): Promise<string[]> {
+    if (!Types.ObjectId.isValid(id)) return [];
+    const usuario = await Usuario.findById(id).select("alergias").lean().exec();
+    return (usuario?.alergias as string[] | undefined) ?? [];
+  },
+
   actualizarPreferencias: (
     id: string,
     datos: DatosActualizarPreferencias,

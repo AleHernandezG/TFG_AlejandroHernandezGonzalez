@@ -1,14 +1,26 @@
 import { recetaRepository } from "../repositories/recetaRepository";
+import { usuarioRepository } from "../repositories/usuarioRepository";
 import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
 import { buscarFotoPexelsCascada } from "./imagenService";
 
+async function resolverAlergenos(
+  delQuery: string[] | undefined,
+  usuarioId?: string,
+): Promise<string[] | undefined> {
+  const delPerfil = usuarioId ? await usuarioRepository.obtenerAlergias(usuarioId) : [];
+  const union = [...new Set([...delPerfil, ...(delQuery ?? [])])];
+  return union.length > 0 ? union : undefined;
+}
+
 export const recetasService = {
   async obtenerFeed(filtros: FiltrosFeed, usuarioId?: string) {
-    return recetaRepository.findAll(filtros, usuarioId);
+    const alergenos = await resolverAlergenos(filtros.alergenos, usuarioId);
+    return recetaRepository.findAll({ ...filtros, alergenos }, usuarioId);
   },
 
   async obtenerPorId(id: string, usuarioId?: string) {
-    const receta = await recetaRepository.findById(id, usuarioId);
+    const alergenos = await resolverAlergenos(undefined, usuarioId);
+    const receta = await recetaRepository.findById(id, usuarioId, alergenos);
     if (!receta) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
@@ -16,7 +28,8 @@ export const recetasService = {
   },
 
   async obtenerSimilares(recetaId: string, usuarioId?: string) {
-    return recetaRepository.findSimilares(recetaId, usuarioId);
+    const alergenos = await resolverAlergenos(undefined, usuarioId);
+    return recetaRepository.findSimilares(recetaId, usuarioId, alergenos);
   },
 
   async toggleLike(recetaId: string, usuarioId: string) {
