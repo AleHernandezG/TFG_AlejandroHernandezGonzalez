@@ -100,7 +100,7 @@ Usa `/cookr-tests`, que ya no lleva bootstrap: la infraestructura está montada 
 - [x] **Pruebas de los filtros de alérgenos del feed** (`tests/feed.alergenos.test.ts`, 8 casos). **Ojo: fijan el comportamiento actual, que no cumple el requisito.** Ver la Fase 2b, que es donde se arregla.
 - [x] **Pruebas del rate limiting de la Fase 1** (`tests/rateLimitAuth.test.ts`, 8 casos). No estaban en el plan. Cierran la trampa que dejó anotada la revisión de seguridad: si alguien hace que el login responda 200 con un cuerpo de error, `skipSuccessfulRequests` deja de contar y el limitador se vuelve inerte **en silencio**. Ahora eso tumba 4 tests.
 - [x] **Enganchar al CI** (`.github/workflows/ci-cd.yml`, job `ci-backend`, tras el typecheck). Hecho, con caché del binario de mongod (son ~80 MB por ejecución si no). El job `deploy` depende de `ci-backend`, así que un test en rojo bloquea el despliegue a Render.
-- [ ] **Playwright para E2E** del flujo registro → login → crear receta. Lo único que queda de esta fase. Necesita frontend y backend levantados, así que es una sesión en sí mismo.
+- [x] **Playwright para E2E** del flujo registro → verificación → login → completar perfil → crear receta. Hecho el 17/07/2026 (`frontend/e2e/`, dos casos). Detalle en la Fase 2c, aquí abajo.
 
 **Comprobado (17/07/2026):** `cd backend && npm test` → **75 tests en verde**, 5 suites, ~15 s. `npm run lint` y `tsc --noEmit -p tsconfig.test.json` también en verde.
 
@@ -207,6 +207,27 @@ Es menor pero se lo come el usuario final: copiar y pegar, y el autocompletado d
 
 ---
 
+## Fase 2c — E2E con Playwright
+
+**Hecha el 17/07/2026.** Cierra lo único que quedaba de la Fase 2. `frontend/e2e/`, dos casos que pasan en ~40 s:
+
+1. Registro → verificación del correo → login → completar perfil → crear y publicar una receta. Comprueba en la base que la receta existe y que su autor es el usuario nuevo.
+2. Un usuario registrado pero sin verificar no puede entrar (el 403 de `authService.iniciarSesion` se ve como mensaje en la UI y no hay redirección a `/home`).
+
+**La decisión de fondo: base de datos efímera y sin credenciales reales, ni mocks.** El E2E arranca los servidores de verdad, pero contra un Mongo en memoria, no Atlas. `backend/scripts/servidorE2E.js` levanta un `mongodb-memory-server` en el puerto 27018 y carga **`dist/app.js`**, no `server.ts`. Esto no es un detalle: `app.ts` no importa `dotenv`, así que el proceso E2E **nunca carga `backend/.env`** con las credenciales de producción. Como cinturón y tirantes, el script aborta al arrancar si encuentra `MONGODB_URI`, `PEXELS_API_KEY`, `EDAMAM_*`, `USDA_API_KEY`, `GEMINI_API_KEY` o `MAILJET_*` en el entorno. Verificado que rechaza tanto una URI de Atlas como una clave real de Pexels.
+
+Los tres servicios externos no se mockean: se dejan sin clave y devuelven `null` solos, así que crear una receta funciona sin foto de Pexels ni macros de Edamam/USDA y sin gastar cuota. Es más fiel a producción que un mock, y no hay stub que se pueda desincronizar del servicio real.
+
+**La verificación del correo se hace por la vía real.** El registro exige verificar antes de entrar. En vez de marcar `cuentaVerificada` a mano, `e2e/helpers/bd.ts` lee el token de la colección `tokens` del Mongo efímero y el test navega a `/verificar-email?token=...`, que es lo que haría el enlace del email. Se ejercita el endpoint de verificación de verdad.
+
+**Por qué `reuseExistingServer: false` también en local:** si hay un `npm run dev` corriendo, su backend está atado a Atlas. Reutilizarlo lanzaría el E2E contra producción. Es preferible que Playwright falle por puerto ocupado.
+
+**En CI va en un job aparte que NO bloquea el deploy** (`.github/workflows/ci-cd.yml`, job `e2e`). Los E2E son flaky por naturaleza y un falso rojo no debe dejar sin desplegar un hotfix, y menos con Render en plan gratuito. Se ve, se arregla, pero no secuestra el despliegue. Cuando lleve una temporada estable, promoverlo a bloqueante es meterlo en el `needs` de `deploy`.
+
+Tres selectores que dieron guerra y quedan anotados para el siguiente que amplíe la suite: el campo de contraseña comparte nombre accesible con su botón de mostrar/ocultar (usar `{ exact: true }`); la unidad del ingrediente es un `<select>` (usar `selectOption`); y `coleccion/page.tsx` monta el contenido dos veces (móvil y escritorio), así que hay que filtrar por `{ visible: true }`.
+
+---
+
 ## Fase 3 — Correo
 
 > **Bloqueada por la decisión del dominio (Fase 0).** No empezar hasta que esté decidido. Redactar `.env.example` o el `ReplyTo` sin saber el dominio final es escribir dos veces lo mismo. Lo único que se puede sacar de aquí sin dominio es borrar las dependencias muertas, y para eso no hace falta abrir esta fase.
@@ -263,11 +284,12 @@ Producto (las dos primeras ya están en el guion de la defensa):
 
 1. **Fase 0** (tú) — *a falta de decisión sobre el dominio.* Bloquea la Fase 3.
 2. **Fase 1** — *hecha el 16/07/2026*, salvo dos flecos anotados al final de la fase: verificar los saltos de proxy en el primer deploy y limitar las dos rutas de token que faltan.
-3. **Fase 2** — *hecha el 16/07/2026* salvo Playwright, que es lo único que queda. Red de seguridad para todo lo demás.
-4. **Fase 2b** — *hecha el 17/07/2026*. Los tres bugs arreglados. 75 tests en verde y CI ejecutándolos.
-5. **Fase 3** — **la siguiente**, aunque la verificación depende de la Fase 0.
-6. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
-7. **Fase 5** — mejoras, sobre una base sana.
+3. **Fase 2** — *hecha del todo el 17/07/2026*, Playwright incluido. Red de seguridad para todo lo demás.
+4. **Fase 2b** — *hecha el 17/07/2026*. Los tres bugs arreglados. 75 tests unitarios en verde y CI ejecutándolos.
+5. **Fase 2c** — *hecha el 17/07/2026*. E2E con Playwright del flujo completo, en un job de CI que no bloquea el deploy.
+6. **Fase 3** — **la siguiente**, aunque la verificación depende de la Fase 0.
+7. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
+8. **Fase 5** — mejoras, sobre una base sana.
 
 La idea de fondo: **primero lo que sangra, luego la red de seguridad, luego lo que se apoya en ella.**
 
