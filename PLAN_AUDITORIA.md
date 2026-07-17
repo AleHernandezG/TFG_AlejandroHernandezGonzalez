@@ -91,17 +91,101 @@ Se pasó `/security-review` al diff. **Sin hallazgos** de severidad alta ni medi
 
 Y al margen del orden técnico: un TFG de Ingeniería Informática sin una sola prueba es el hueco más visible que tiene el proyecto.
 
-Usa `/cookr-tests`, que lleva el bootstrap completo y qué mockear.
+Usa `/cookr-tests`, que ya no lleva bootstrap: la infraestructura está montada y la skill describe las convenciones de la suite que existe.
 
-- [ ] **Montar la infraestructura**: Jest + ts-jest + Supertest + mongodb-memory-server. Nunca contra Atlas.
-- [ ] **Mockear siempre los servicios externos**: `lib/email.ts`, `chatService.ts`, `imagenService.ts`, `nutritionService.ts`, `ingredientesService.ts`. Una prueba jamás debe gastar cuota real de Gemini ni de Mailjet.
-- [ ] **Pruebas de `authService`**: registro, login, verificación de correo, token caducado.
-- [ ] **Pruebas de los esquemas Zod** (`lib/validadores.ts`). Baratas y evitan regresiones.
-- [ ] **Prueba de los filtros de alérgenos del feed.** La más importante del proyecto: un usuario con alérgenos no puede ver recetas que los contengan. Es un requisito de salud, no una preferencia.
-- [ ] **Enganchar al CI** (`.github/workflows/ci-cd.yml`, job `ci-backend`, tras el typecheck). El job `deploy` depende de él, así que un test en rojo bloqueará el despliegue a Render.
-- [ ] **Playwright para E2E** del flujo registro → login → crear receta. Después de lo anterior.
+- [x] **Montar la infraestructura**: Jest + ts-jest + Supertest + mongodb-memory-server. Hecho. `jest.config.js`, `tsconfig.test.json` (los tests viven fuera del `rootDir` de `tsconfig.json`, por eso necesitan el suyo) y `tests/setup.ts`, que levanta un Mongo efímero por fichero de test. Nunca toca Atlas.
+- [x] **Mockear siempre los servicios externos.** Hecho con `jest.mock()` en cada fichero que lo necesita: `lib/email.ts` en los de auth, `imagenService.ts` y `nutritionService.ts` en los del feed. Ninguna prueba gasta cuota real de Gemini, Mailjet ni Pexels.
+- [x] **Pruebas de `authService`** (`tests/auth.test.ts`, 27 casos): registro, hash de contraseña, correo duplicado, login, cuenta sin verificar, cuenta de Google sin contraseña local, verificación de correo, token caducado, token reutilizado, token del tipo equivocado, recuperación y vinculación de Google.
+- [x] **Pruebas de los esquemas Zod** (`tests/validadores.test.ts`, 20 casos).
+- [x] **Pruebas de los filtros de alérgenos del feed** (`tests/feed.alergenos.test.ts`, 8 casos). **Ojo: fijan el comportamiento actual, que no cumple el requisito.** Ver la Fase 2b, que es donde se arregla.
+- [x] **Pruebas del rate limiting de la Fase 1** (`tests/rateLimitAuth.test.ts`, 8 casos). No estaban en el plan. Cierran la trampa que dejó anotada la revisión de seguridad: si alguien hace que el login responda 200 con un cuerpo de error, `skipSuccessfulRequests` deja de contar y el limitador se vuelve inerte **en silencio**. Ahora eso tumba 4 tests.
+- [x] **Enganchar al CI** (`.github/workflows/ci-cd.yml`, job `ci-backend`, tras el typecheck). Hecho, con caché del binario de mongod (son ~80 MB por ejecución si no). El job `deploy` depende de `ci-backend`, así que un test en rojo bloquea el despliegue a Render.
+- [ ] **Playwright para E2E** del flujo registro → login → crear receta. Lo único que queda de esta fase. Necesita frontend y backend levantados, así que es una sesión en sí mismo.
 
-**Se comprueba:** `cd backend && npm test` en verde y el CI ejecutando tests en el PR.
+**Comprobado (16/07/2026):** `cd backend && npm test` → **63 tests en verde**, 4 suites, ~5 s. `npm run lint` y `tsc --noEmit -p tsconfig.test.json` también en verde.
+
+Y, más importante, se comprobó que **fallan cuando deben**, que es lo único que convierte una suite en una red de seguridad:
+
+- Invertir el `$nin` del filtro de alérgenos (`recetaRepository.ts:167`) tumba 5 de los 8 tests del feed.
+- Hacer que el login devuelva 200 en vez de 401 con credenciales malas tumba 4 tests, incluido el del limitador. Es exactamente la regresión que la Fase 1 dejó anotada como peligrosa.
+
+### Dos cambios en código de producción que hizo falta hacer
+
+Ninguno cambia el comportamiento en producción, pero conviene saber por qué están:
+
+- **`middlewares/rateLimitAuth.ts`: stores explícitos y `reiniciarLimitesAuth()`.** Los limitadores son estado global en memoria y agotaban el cupo entre tests, haciendo fallar tests que no tenían la culpa. `tests/setup.ts` los reinicia en cada `afterEach`. Se descartó la alternativa habitual (un `skip` por variable de entorno tipo `DISABLE_RATE_LIMIT`): un control de seguridad que se apaga con una variable es un pie de banco, porque basta con ponerla mal en Render para matar la protección sin que nadie se entere. Esta costura no desactiva nada, solo permite reiniciar.
+- **`app.ts`: morgan callado cuando `NODE_ENV === "test"`.** Los logs de cada petición hacían ilegible la salida de `npm test`. La Fase 4 tiene su propia tarea sobre morgan (`"combined"` en producción); esto no la pisa.
+
+---
+
+## Fase 2b — Bugs que destaparon las pruebas
+
+**Por qué aquí:** los tres salieron al escribir la Fase 2 y ninguno es deuda técnica ni mejora, son cosas que hacen lo contrario de lo que dicen hacer. El primero incumple un requisito de salud. Van antes de la Fase 4 porque ahora ya hay pruebas que cubren la zona, que era justo el motivo de poner la Fase 2 antes que los refactors.
+
+Los tres están verificados contra la app, no deducidos leyendo el código.
+
+### 1. El feed no filtra por los alérgenos del perfil
+
+**El bug.** El filtro de alérgenos sale **solo del query string** (`recetasController.ts:32-35`). `usuario.alergias` no se consulta en ninguna parte del feed, aunque el modelo lo tenga (`usuarioMongo.ts:60`) y el usuario lo haya rellenado al completar el perfil. Un celíaco registrado abre la home y ve recetas con cereales. Solo se filtra si el cliente manda el parámetro a mano, y el frontend únicamente manda lo que el usuario marca en el drawer (`recetasService.ts:29`).
+
+Lo que hay hoy es un filtro de búsqueda, no una protección. La diferencia importa: el requisito es de salud, no una preferencia de navegación.
+
+La incoherencia se ve mejor al lado de la despensa, que **sí** lee el perfil: `chatService.ts:450` saca `alergias` del perfil y se las pasa a Gemini como restricción dura. La app te protege cuando le pides una receta con lo que tienes en la nevera, pero no cuando haces scroll.
+
+**El comportamiento que se quiere** (decidido el 16/07/2026). La regla, en una frase: **los alérgenos del perfil son un suelo, y el drawer solo puede añadir por encima.**
+
+- Por defecto, en cada sesión, el feed filtra por los alérgenos del perfil que hay en la base de datos. Sin que el cliente tenga que pedirlo.
+- Si el usuario toca el drawer de home o discover, esos alérgenos **se suman** a los del perfil para esa sesión. Nunca los sustituyen ni los quitan.
+- La **única** forma de dejar de filtrar por un alérgeno es que el usuario lo quite de su perfil, y eso persiste en la base de datos y pasa a ser la nueva base por defecto.
+
+O sea: `alergenosEfectivos = union(perfil.alergias, query.alergenos)`. Ningún control de la interfaz puede rebajar la protección; para eso hay que ir al perfil a propósito.
+
+Esto tiene una consecuencia buena y gratis: **un drawer vacío deja de ser ambiguo.** Daba igual que `serializarFiltros` omita el parámetro cuando la lista está vacía (`recetasService.ts:29`), porque unir con el conjunto vacío devuelve el perfil. No hace falta ningún parámetro nuevo para distinguir «he desmarcado todo» de «no he tocado nada»: las dos cosas significan lo mismo, que se aplica el perfil.
+
+**Dónde se toca.** El sitio correcto es el backend, no el frontend: si la protección depende de que el cliente se acuerde de mandar el parámetro, no es una protección. Con la regla actual del proyecto (la autenticación va en la ruta, y `optionalAuth` ya rellena `req.usuario` en `GET /recetas`), el feed resuelve los alérgenos así:
+
+- Hay usuario autenticado → se filtra por la **unión** de sus alergias del perfil y las que venga en `alergenos`.
+- No hay usuario → se filtra solo por lo que venga en `alergenos`, que es lo que hace hoy. Un visitante sin cuenta no tiene perfil del que tirar.
+
+Ojo con dónde va esa lógica: `recetasController.ts` solo traduce el query string, y `recetaRepository` es quien toca Mongoose. Leer el perfil para decidir el filtro es una decisión de negocio, así que va en `recetasService.obtenerFeed`, que hoy es un passthrough al repositorio. Eso obliga a que el servicio consulte el usuario, cosa que hoy no hace ningún servicio de recetas. El repositorio ya sabe aplicar la lista (`$nin`), así que no hay que tocarlo: recibe la unión ya resuelta.
+
+Aplícalo también a `GET /recetas/:id/similares` y a los `similares` que devuelve el detalle (`recetaRepository.findById` los calcula sin mirar alérgenos). No tiene sentido blindar el feed y luego colar la misma receta por el carrusel de «recetas parecidas».
+
+**Consecuencia en el frontend que hay que resolver, no ignorar.** El drawer de filtros lista los alérgenos con toggles independientes (`drawerFiltros.tsx:55`). Con la regla de unión, si el perfil tiene `huevo` y el usuario lo desmarca en el drawer, **no pasa nada**: sigue filtrado. Un control que no hace lo que aparenta es peor que no tenerlo, así que el drawer tiene que enseñar los alérgenos del perfil como fijos (marcados y deshabilitados, con una pista del tipo «lo tienes en tu perfil» y un enlace a editarlo) y dejar togglear solo los demás. Si no, el usuario pensará que la app está rota.
+
+Lo de «para esa sesión» sale gratis y no hay que construirlo: el backend es stateless (JWT, sin sesión de servidor) y el estado del drawer ya vive en el componente (`contenidoDiscover.tsx:42`), así que se pierde al recargar por sí solo. No inventes almacenamiento de sesión en el servidor para esto.
+
+**Se comprueba:** `tests/feed.alergenos.test.ts` ya tiene el caso escrito y hoy **fija el comportamiento equivocado a propósito**, con un bloque de comentario que lo explica. Al arreglarlo:
+
+- Dale la vuelta a `"el feed NO filtra por las alergias del perfil si el cliente no las manda"` y quita el bloque de comentario.
+- Añade el caso de la unión, que es el que define la decisión: perfil `["huevo"]` + query `["lacteos"]` → no salen ni las de huevo ni las de lácteos.
+- Añade el caso que impide la regresión peligrosa: perfil `["huevo"]` + query `["lacteos"]` **no** puede devolver recetas con huevo. Es la prueba de que el drawer no rebaja el suelo.
+- Añade el del visitante anónimo, que no tiene perfil y solo filtra por query.
+- Los 8 casos actuales del fichero deben seguir en verde: prueban el filtro por query, que sigue existiendo igual.
+
+**No olvides la memoria.** Si el Anexo I dice que el sistema filtra por alérgenos, hoy el código no lo cumple. Esto se arregla en el código, pero conviene releer cómo está redactado el requisito.
+
+### 2. `dietas` y `categoria` se pisan en el feed
+
+**El bug.** `recetaRepository.findAll` escribe la misma clave dos veces sin `else`: `query["categorias"] = { $in: dietas }` en la línea 161 y `query["categorias"] = { $in: [categoria] }` en la 172. La segunda machaca a la primera.
+
+**Verificado:** `?dietas=vegano&categoria=postre` devuelve una receta **no vegana**. El filtro de dieta desaparece sin error ni aviso. Para un vegano que navega por la categoría «postres», el resultado es que le aparecen postres con huevo y leche.
+
+**El mismo patrón, dos líneas más abajo:** `excluirPropio` escribe `query["autorId"]` (línea 170) y `soloSiguiendo` lo vuelve a escribir (línea 182). Pedir las dos cosas a la vez pierde `excluirPropio`.
+
+**Cómo se arregla.** Componer en vez de asignar. Para `categorias`, combinar ambas listas en un solo `$in` (o usar `$all` si la intención es que se cumplan las dos condiciones, que hay que decidir). Para `autorId`, combinar `$ne` y `$in` en el mismo objeto, que Mongo admite sin problema. Añade un test por cada combinación en `tests/feed.alergenos.test.ts` o en un fichero nuevo del feed.
+
+### 3. El `.trim()` de los correos no hace nada
+
+**El bug.** En `lib/validadores.ts`, todos los esquemas de correo son `z.string().email("Correo no válido").trim().toLowerCase()`. Zod aplica las comprobaciones en el orden en que se encadenan, así que **`.email()` valida antes de que `.trim()` recorte**. Un correo con espacios alrededor se rechaza en vez de limpiarse.
+
+**Verificado:** `" alejandro@cookr.dev "` → `RECHAZADO` con «Correo no válido». El `.trim()` no llega a ejecutarse nunca para ese caso, así que está ahí sin hacer nada. El `.toLowerCase()` sí funciona, porque solo actúa sobre los correos que ya han pasado la validación.
+
+Es menor pero se lo come el usuario final: copiar y pegar, y el autocompletado del teclado del móvil, meten espacios al final constantemente. Afecta al registro, al login, a la recuperación de contraseña y al reenvío de verificación, o sea a las cuatro puertas de entrada.
+
+**Cómo se arregla.** Reordenar a `.trim().toLowerCase().email("Correo no válido")` en los cinco esquemas. Comprobado que arregla los tres casos con espacios y sigue rechazando `"no-es-correo"`.
+
+**Se comprueba:** `tests/validadores.test.ts` tiene el test `"rechaza un correo con espacios alrededor en vez de recortarlo"`, que hoy documenta el bug. Al arreglarlo hay que darle la vuelta y afirmar que lo recorta.
 
 ---
 
@@ -161,9 +245,12 @@ Producto (las dos primeras ya están en el guion de la defensa):
 
 1. **Fase 0** (tú) — *a falta de decisión sobre el dominio.* Bloquea la Fase 3.
 2. **Fase 1** — *hecha el 16/07/2026*, salvo dos flecos anotados al final de la fase: verificar los saltos de proxy en el primer deploy y limitar las dos rutas de token que faltan.
-3. **Fase 2** — **la siguiente**. Red de seguridad para todo lo demás. Va antes de tocar nada.
-4. **Fase 3** — código menor, pero la verificación depende de la Fase 0.
-5. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
-6. **Fase 5** — mejoras, sobre una base sana.
+3. **Fase 2** — *hecha el 16/07/2026* salvo Playwright. 63 tests en verde y CI ejecutándolos. Red de seguridad para todo lo demás.
+4. **Fase 2b** — **la siguiente**, y salió de escribir la Fase 2. Tres bugs verificados; el de los alérgenos incumple un requisito de salud. Ya hay pruebas cubriendo la zona, que era el motivo de poner la Fase 2 antes.
+5. **Fase 3** — código menor, pero la verificación depende de la Fase 0.
+6. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2.
+7. **Fase 5** — mejoras, sobre una base sana.
 
 La idea de fondo: **primero lo que sangra, luego la red de seguridad, luego lo que se apoya en ella.**
+
+La Fase 2b es la prueba de que el orden funcionaba: los tres bugs llevaban meses en el repo y ninguno se vio en la auditoría leyendo código. Aparecieron al escribir pruebas que ejercitaban el comportamiento de verdad.
