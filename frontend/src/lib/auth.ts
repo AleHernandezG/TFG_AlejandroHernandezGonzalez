@@ -95,16 +95,16 @@ export const opcionesAuth: NextAuthOptions = {
           typeof user.image === "string" && /^https?:\/\//.test(user.image) ? user.image : undefined;
         const nombre = user.name?.trim() || user.email?.split("@")[0] || "Usuario";
 
+        if (!account.id_token) {
+          console.error("[NextAuth] Google no ha devuelto id_token");
+          throw new Error("No se pudo iniciar sesión con Google.");
+        }
+
         try {
           const res = await fetch(`${API_URL}/auth/google`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              googleId: account.providerAccountId,
-              correo: user.email,
-              nombre,
-              foto: fotoValida,
-            }),
+            body: JSON.stringify({ idToken: account.id_token }),
           });
 
           const result = await res.json().catch(() => null);

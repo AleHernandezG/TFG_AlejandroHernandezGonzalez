@@ -3,6 +3,10 @@ jest.mock("../src/lib/email", () => ({
   enviarEmailRecuperacion: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock("../src/lib/googleAuth", () => ({
+  verificarIdTokenGoogle: jest.fn().mockRejectedValue(new Error("Invalid token signature")),
+}));
+
 import request from "supertest";
 import app from "../src/app";
 import { crearUsuario, CONTRASENA_VALIDA } from "./helpers/factories";
@@ -78,6 +82,33 @@ describe("limitador del registro", () => {
       .send({ nombre: "Alta", correo: "alta5@cookr.dev", contrasena: CONTRASENA_VALIDA });
 
     expect(bloqueado.status).toBe(429);
+  });
+});
+
+describe("limitador del login con Google", () => {
+  it("corta al intento 11 tras 10 tokens invalidos desde la misma IP", async () => {
+    for (let i = 0; i < 10; i++) {
+      const res = await request(app).post("/api/auth/google").send({ idToken: `falso-${i}` });
+      expect(res.status).toBe(401);
+    }
+
+    const bloqueado = await request(app).post("/api/auth/google").send({ idToken: "falso-11" });
+
+    expect(bloqueado.status).toBe(429);
+  });
+
+  it("no comparte cupo con el limitador del login", async () => {
+    await crearUsuario({ correo: "aparte@cookr.dev", cuentaVerificada: true });
+
+    for (let i = 0; i < 10; i++) {
+      await request(app).post("/api/auth/google").send({ idToken: `falso-${i}` });
+    }
+
+    const login = await request(app)
+      .post("/api/auth/login")
+      .send({ correo: "aparte@cookr.dev", contrasena: CONTRASENA_VALIDA });
+
+    expect(login.status).toBe(200);
   });
 });
 

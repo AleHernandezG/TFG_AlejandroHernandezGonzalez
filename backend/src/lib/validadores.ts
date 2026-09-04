@@ -33,11 +33,23 @@ export const esquemaVerificarEmail = z.object({
 });
 
 export const esquemaGoogleOAuth = z.object({
-  googleId: z.string().min(1, "Google ID obligatorio"),
-  correo: z.string().trim().toLowerCase().email("Correo no válido"),
-  nombre: z.string().trim().min(1).catch("Usuario"),
-  foto: z.string().url().optional().catch(undefined),
+  idToken: z.string().trim().min(1, "Falta el id_token de Google"),
 });
+
+export const esquemaEditarDespensa = z
+  .object({
+    nombre: z.string().trim().min(1, "El nombre no puede estar vacío").max(80).optional(),
+    cantidad: z
+      .number({ invalid_type_error: "La cantidad tiene que ser un número" })
+      .finite("La cantidad tiene que ser un número")
+      .min(0, "La cantidad no puede ser negativa")
+      .optional(),
+    unidad: z.string().trim().min(1, "La unidad no puede estar vacía").max(20).optional(),
+    emoji: z.string().trim().min(1, "El emoji no puede estar vacío").max(16).optional(),
+  })
+  .refine((cambios) => Object.keys(cambios).length > 0, {
+    message: "Sin campos a actualizar",
+  });
 
 export const esquemaCompletarPerfil = z.object({
   alergias: z.array(z.string()).default([]),

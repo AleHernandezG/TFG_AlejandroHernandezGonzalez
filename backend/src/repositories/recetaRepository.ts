@@ -139,6 +139,10 @@ function calcularScoreFeed(
   return popularidad * decay + followBoost + prefBoost;
 }
 
+function escaparRegex(texto: string): string {
+  return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export const recetaRepository = {
   async findAll(
     filtros: FiltrosFeed = {},
@@ -152,9 +156,10 @@ export const recetaRepository = {
     const query: Record<string, unknown> = {};
 
     if (q) {
+      const busqueda = escaparRegex(q);
       query["$or"] = [
-        { titulo: { $regex: q, $options: "i" } },
-        { descripcion: { $regex: q, $options: "i" } },
+        { titulo: { $regex: busqueda, $options: "i" } },
+        { descripcion: { $regex: busqueda, $options: "i" } },
       ];
     }
     const categorias: Record<string, unknown> = {};

@@ -40,6 +40,7 @@ export function tokenDe(usuario: { _id: unknown; correo: string; rol: string }) 
 
 export async function crearReceta(datos: Partial<{
   titulo: string;
+  descripcion: string;
   autorId: Types.ObjectId;
   alergenos: string[];
   categorias: string[];
@@ -49,7 +50,7 @@ export async function crearReceta(datos: Partial<{
   return Receta.create({
     autorId,
     titulo: datos.titulo ?? "Receta de prueba",
-    descripcion: "Una descripción suficientemente larga para el esquema.",
+    descripcion: datos.descripcion ?? "Una descripción suficientemente larga para el esquema.",
     imagenUrl: "https://example.com/foto.jpg",
     tiempo: "20 min",
     dificultad: datos.dificultad ?? "Fácil",

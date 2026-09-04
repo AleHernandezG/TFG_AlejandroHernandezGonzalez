@@ -11,14 +11,22 @@ Flujo:
 Backend (Render) ──► Cloudflare Worker ──► generativelanguage.googleapis.com
 ```
 
-El backend solo cambia a qué URL apunta el SDK (`GEMINI_BASE_URL`). El Worker no toca la
-petición: la reenvía tal cual, incluida la cabecera `x-goog-api-key` con tu clave.
+El backend solo cambia a qué URL apunta el SDK (`GEMINI_BASE_URL`). El Worker no toca el cuerpo
+de la petición: la reenvía tal cual, incluida la cabecera `x-goog-api-key` con tu clave.
 
 ## Seguridad
 
 El Worker exige una cabecera `x-proxy-token` que debe coincidir con el secreto `PROXY_TOKEN`.
 Sin eso sería un proxy abierto y cualquiera podría gastar tu cuota de Cloudflare. El backend
 manda ese token automáticamente cuando defines `GEMINI_PROXY_TOKEN`.
+
+Falla cerrado a propósito: **si `PROXY_TOKEN` no está definido, el Worker responde 500 a todo**.
+Un despliegue sin los secretos puestos se queda inservible, que es mejor que quedarse abierto.
+Sin la cabecera, o con una que no coincida, responde 403.
+
+Solo reenvía las rutas que empiezan por `/v1beta/models/`, que es lo único que usa el backend.
+Cualquier otra responde 404 sin salir a Google, para que el Worker no sirva de relé anónimo
+hacia el resto de la API.
 
 Genera un token cualquiera, por ejemplo:
 

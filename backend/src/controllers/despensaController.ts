@@ -64,23 +64,12 @@ export const despensaController = {
   async editar(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { nombre, cantidad, unidad, emoji } = req.body as Partial<{
+      const cambios = req.body as Partial<{
         nombre: string;
         cantidad: number;
         unidad: string;
         emoji: string;
       }>;
-
-      const cambios: Record<string, unknown> = {};
-      if (nombre !== undefined) cambios.nombre = nombre.trim();
-      if (cantidad !== undefined) cambios.cantidad = Number(cantidad);
-      if (unidad !== undefined) cambios.unidad = unidad.trim();
-      if (emoji !== undefined) cambios.emoji = emoji.trim();
-
-      if (Object.keys(cambios).length === 0) {
-        res.status(400).json({ error: "Sin campos a actualizar" });
-        return;
-      }
 
       const items = await despensaService.editar(req.usuario!.id, id, cambios);
       res.status(200).json(items);

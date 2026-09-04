@@ -4,6 +4,7 @@ import {
   esquemaCrearRecetaBody,
   esquemaGoogleOAuth,
   esquemaCompletarPerfil,
+  esquemaEditarDespensa,
 } from "../src/lib/validadores";
 
 describe("esquemaRegistro", () => {
@@ -61,23 +62,46 @@ describe("esquemaLogin", () => {
 });
 
 describe("esquemaGoogleOAuth", () => {
-  it("cae a «Usuario» cuando el nombre viene vacío", () => {
-    const res = esquemaGoogleOAuth.parse({
-      googleId: "123",
-      correo: "a@cookr.dev",
-      nombre: "",
-    });
-    expect(res.nombre).toBe("Usuario");
+  it("solo acepta el idToken", () => {
+    const res = esquemaGoogleOAuth.parse({ idToken: "  eyJhbGciOi.xxx.yyy  " });
+    expect(res).toEqual({ idToken: "eyJhbGciOi.xxx.yyy" });
   });
 
-  it("descarta una foto que no es una URL en vez de fallar", () => {
+  it("descarta la identidad que venga en el cuerpo", () => {
     const res = esquemaGoogleOAuth.parse({
+      idToken: "eyJhbGciOi.xxx.yyy",
+      googleId: "g-suplantador",
+      correo: "victima@cookr.dev",
+    });
+    expect(res).not.toHaveProperty("googleId");
+    expect(res).not.toHaveProperty("correo");
+  });
+
+  it("rechaza el cuerpo de la versión antigua, sin idToken", () => {
+    const res = esquemaGoogleOAuth.safeParse({
       googleId: "123",
       correo: "a@cookr.dev",
       nombre: "Ana",
-      foto: "no-es-una-url",
     });
-    expect(res.foto).toBeUndefined();
+    expect(res.success).toBe(false);
+  });
+});
+
+describe("esquemaEditarDespensa", () => {
+  it("recorta los textos y deja pasar un cambio parcial", () => {
+    const res = esquemaEditarDespensa.parse({ nombre: "  Sal gorda  " });
+    expect(res).toEqual({ nombre: "Sal gorda" });
+  });
+
+  it("rechaza un tipo que no toca en vez de dejarlo llegar al modelo", () => {
+    expect(esquemaEditarDespensa.safeParse({ nombre: 123 }).success).toBe(false);
+    expect(esquemaEditarDespensa.safeParse({ cantidad: "muchas" }).success).toBe(false);
+    expect(esquemaEditarDespensa.safeParse({ cantidad: -1 }).success).toBe(false);
+    expect(esquemaEditarDespensa.safeParse({ nombre: "   " }).success).toBe(false);
+  });
+
+  it("rechaza un cuerpo sin ningún campo", () => {
+    expect(esquemaEditarDespensa.safeParse({}).success).toBe(false);
   });
 });
 

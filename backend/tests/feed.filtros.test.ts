@@ -21,6 +21,54 @@ function titulosDe(res: { body: { recetas: PostFeed[] } }) {
   return res.body.recetas.map((p) => p.receta.titulo).sort();
 }
 
+describe("la busqueda del feed trata q como texto, no como expresion regular", () => {
+  beforeEach(async () => {
+    const autor = await crearUsuario({ correo: "buscador@cookr.dev" });
+    const de = { autorId: autor._id as never };
+
+    await crearReceta({ ...de, titulo: "Tarta de queso" });
+    await crearReceta({ ...de, titulo: "Arroz con leche" });
+    await crearReceta({ ...de, titulo: "Postre a+ especial" });
+  });
+
+  it("un cuantificador solo encuentra la receta que lo lleva escrito", async () => {
+    const res = await feed(`?q=${encodeURIComponent("a+")}`);
+
+    expect(res.status).toBe(200);
+    expect(titulosDe(res)).toEqual(["Postre a+ especial"]);
+  });
+
+  it("los parentesis y corchetes no abren grupos ni clases", async () => {
+    const res = await feed(`?q=${encodeURIComponent("[a-z]")}`);
+
+    expect(res.status).toBe(200);
+    expect(titulosDe(res)).toEqual([]);
+  });
+
+  it("una busqueda normal sigue funcionando", async () => {
+    const res = await feed(`?q=${encodeURIComponent("tarta")}`);
+
+    expect(titulosDe(res)).toEqual(["Tarta de queso"]);
+  });
+
+  it("una expresion con retroceso catastrofico responde en menos de un segundo", async () => {
+    await crearReceta({
+      titulo: "Cebo para el motor de regex",
+      descripcion: "a".repeat(600) + "!",
+    });
+
+    await feed("?q=calentando");
+
+    const inicio = Date.now();
+    const res = await feed(`?q=${encodeURIComponent("(a+)+$")}`);
+    const tardanza = Date.now() - inicio;
+
+    expect(res.status).toBe(200);
+    expect(titulosDe(res)).toEqual([]);
+    expect(tardanza).toBeLessThan(1000);
+  });
+});
+
 describe("dietas y categoria se combinan en vez de pisarse", () => {
   beforeEach(async () => {
     const autor = await crearUsuario({ correo: "autor@cookr.dev" });

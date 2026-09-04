@@ -33,6 +33,14 @@ export const limiteLogin = limitarPorIP({
   soloContarFallos: true,
 });
 
+export const limiteGoogle = limitarPorIP({
+  ventanaMinutos: 15,
+  maxIntentos: 10,
+  mensaje: "Demasiados intentos de inicio de sesión con Google. Vuelve a probar en 15 minutos.",
+  prefijo: "google",
+  soloContarFallos: true,
+});
+
 export const limiteRegistro = limitarPorIP({
   ventanaMinutos: 60,
   maxIntentos: 5,

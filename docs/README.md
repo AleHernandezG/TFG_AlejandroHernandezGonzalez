@@ -33,6 +33,7 @@ hace falta.
 |---|---|
 | `AUDITORIA-2026-09.md` | Auditoría del 4 de septiembre. Hallazgos con fichero, línea y arreglo |
 | `PLAN-2026-09.md` | Plan de trabajo que sale de esa auditoría. Bloques F0 y F6 a F12 |
+| `changes/f6-seguridad.md` | Qué se tocó al cerrar el bloque F6, las decisiones que costaron y lo que quedó a medias |
 | `METODO-COOKR.md` | Qué se adopta del método de DietMetric y qué no |
 | `METODO-DE-TRABAJO.md` | El método de DietMetric, tal cual. Material de referencia, no aplica a Cookr sin adaptar |
 | `infraestructura.md` | Stack, servicios externos, variables. Junio, sigue siendo correcto en lo esencial |
@@ -57,7 +58,7 @@ Nada de esto describe el estado actual.
 | `checklist-revision-sprint6.md` | 1 de junio | Cerrado |
 | `tareas-vistas-pendientes.md` | 30 de abril | Lista de vistas del frontend, ya construidas |
 | `phase-reports/` | marzo a junio | Siete informes de fase. `tech-debt.md` es el más útil de los siete para entender por qué el código es como es |
-| `changes/` | variable | Tres registros de cambios por área (api, dominio, ui) que se dejaron de mantener |
+| `changes/` | variable | Tres registros de cambios por área (api, dominio, ui) que se dejaron de mantener. `f6-seguridad.md` sí está vigente, mira la tabla de arriba |
 | `desarrollo/` | marzo a junio | 36 ficheros, casi todos `.html`: planes de implementación de funcionalidades concretas, exportados de una herramienta. Los `.md` de dentro son los planes de feed-score, caché de Gemini y cascada de Pexels, útiles si tocas esos servicios |
 | `stitch/` | marzo | Maquetas de las ocho pantallas. Material de diseño |
 

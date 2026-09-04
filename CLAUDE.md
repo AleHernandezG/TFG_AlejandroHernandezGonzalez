@@ -178,7 +178,11 @@ Los mensajes de commit sí van en inglés e imperativo.
 
 Plantillas en `backend/.env.example` y `frontend/.env.example`.
 
-Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`.
+Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
+`GOOGLE_CLIENT_ID`.
+
+`GOOGLE_CLIENT_ID` tiene que valer **lo mismo** en el backend y en el frontend: el backend lo usa
+como `audience` al verificar el `id_token` de Google en `lib/googleAuth.ts`. Si falta, `POST /api/auth/google` responde 503 en vez de dejar pasar a nadie.
 
 Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend), `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
 
