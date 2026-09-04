@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle de Receta — Documentación técnica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #b45309;
+      border-bottom: 3px solid #b45309;
+      padding-bottom: 6px;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1c3d5a;
+      border-bottom: 1.5px solid #dbeafe;
+      padding-bottom: 4px;
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 6px;
+    }
+
+    p { margin: 8px 0 12px; }
+    strong { color: #111; }
+    em { color: #6b7280; font-style: italic; }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 6px;
+      padding: 16px 18px;
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+      font-size: 8.5pt;
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    pre .cm { color: #6c7086; }
+    pre .kw { color: #cba6f7; }
+    pre .fn { color: #89b4fa; }
+    pre .st { color: #a6e3a1; }
+    pre .ty { color: #f38ba8; }
+    pre .nm { color: #fab387; }
+    pre .nu { color: #fab387; }
+    pre .hl { color: #f9e2af; }
+
+    code {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      color: #b45309;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+      font-size: 10pt;
+    }
+
+    th {
+      background: #1c3d5a;
+      color: #fff;
+      padding: 9px 14px;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+
+    td {
+      padding: 8px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #f9fafb; }
+
+    ul, ol { margin: 8px 0 12px; padding-left: 22px; }
+    li { margin-bottom: 4px; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+    .badge-gray   { background: #f3f4f6; color: #374151; }
+    .badge-red    { background: #fee2e2; color: #991b1b; }
+    .badge-purple { background: #ede9fe; color: #5b21b6; }
+    .badge-yellow { background: #fef9c3; color: #92400e; }
+
+    .callout {
+      border-left: 4px solid #b45309;
+      background: #fffbeb;
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+    }
+
+    .callout-blue {
+      border-left: 4px solid #1c3d5a;
+      background: #eff6ff;
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+    }
+
+    .callout-red {
+      border-left: 4px solid #dc2626;
+      background: #fef2f2;
+      padding: 10px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+    }
+
+    .section-index {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 22px;
+      margin: 24px 0 36px;
+    }
+    .section-index li { margin-bottom: 2px; }
+    .section-index a { color: #1c3d5a; text-decoration: none; }
+    .section-index a:hover { text-decoration: underline; }
+
+    .tag { font-size: 8pt; font-family: monospace; background:#f3f4f6; border:1px solid #e5e7eb; padding:1px 5px; border-radius:3px; color:#374151; }
+
+    header {
+      background: #b45309;
+      color: #fff;
+      padding: 24px 40px 18px;
+      margin: 0 -40px 0;
+    }
+    header h1 { color: #fff; border-bottom-color: rgba(255,255,255,0.4); font-size:22pt; margin-top:0; }
+    header p { margin: 4px 0 0; font-size: 10pt; opacity: 0.85; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Detalle de Receta — Documentación técnica</h1>
+  <p>TFG-21 · Sprint 2 · Vista <code style="color:#fde68a;background:transparent;border:none">/recetas/[id]</code> · Implementado: 2026-04-07</p>
+</header>
+
+<div class="section-index">
+  <strong>Índice de secciones</strong>
+  <ol>
+    <li><a href="#resumen">Resumen de la vista</a></li>
+    <li><a href="#archivos">Archivos creados y modificados</a></li>
+    <li><a href="#tipos">Tipos TypeScript (RecetaDetalle)</a></li>
+    <li><a href="#chipAlergeno">Componente ChipAlergeno</a></li>
+    <li><a href="#componentes">Componentes de la vista</a></li>
+    <li><a href="#layout">Layout responsive (mobile / desktop)</a></li>
+    <li><a href="#estado">Estado local e interactividad</a></li>
+    <li><a href="#datos">Datos mock (datosDetalle.ts)</a></li>
+    <li><a href="#colores">Sistema de color</a></li>
+    <li><a href="#pendientes">Funcionalidades pendientes</a></li>
+  </ol>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="resumen">1. Resumen de la vista</h1>
+
+<p>
+  La vista <strong>Detalle de Receta</strong> está disponible en la ruta dinámica
+  <code>/recetas/[id]</code>. Presenta todos los datos de una receta: imagen hero,
+  metadatos, ingredientes escalables, información nutricional, pasos de cocción,
+  comentarios y un carrusel de recetas similares.
+</p>
+
+<table>
+  <tr><th>Propiedad</th><th>Valor</th></tr>
+  <tr><td>Ruta</td><td><code>/recetas/[id]</code></td></tr>
+  <tr><td>Tipo Next.js</td><td>Server Component (page.tsx) + Client Components anidados</td></tr>
+  <tr><td>Layout</td><td><code>src/app/(main)/layout.tsx</code> — incluye NavBarInferior global</td></tr>
+  <tr><td>Icono activo NavBar</td><td>Ninguno</td></tr>
+  <tr><td>Datos</td><td>Mock en <code>datosDetalle.ts</code> — se conecta al backend en Fase 5</td></tr>
+  <tr><td>Responsive</td><td>Mobile-first 390px · Bento grid 2 columnas en ≥ md (768px)</td></tr>
+  <tr><td>Estado de revisión</td><td><span class="badge badge-yellow">👁️ Pendiente revisión</span></td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="archivos">2. Archivos creados y modificados</h1>
+
+<h3>Creados</h3>
+<table>
+  <tr><th>Archivo</th><th>Descripción</th></tr>
+  <tr><td><code>src/components/common/chipAlergeno.tsx</code></td><td>Chip reutilizable para los 14 alérgenos UE (WebP locales)</td></tr>
+  <tr><td><code>src/features/recetas/components/detalleRecetaCliente.tsx</code></td><td>Client Component orquestador — mantiene estado guardado y compone el layout</td></tr>
+  <tr><td><code>src/features/recetas/components/heroReceta.tsx</code></td><td>Hero imagen full-width ~45vh con botones flotantes glassmorphism</td></tr>
+  <tr><td><code>src/features/recetas/components/cabeceraReceta.tsx</code></td><td>Título, chips categoría/alérgeno, autor, stats con like animado</td></tr>
+  <tr><td><code>src/features/recetas/components/tabsReceta.tsx</code></td><td>Tabs sticky: ingredientes escalables + grid nutrición 2×2</td></tr>
+  <tr><td><code>src/features/recetas/components/pasosReceta.tsx</code></td><td>Lista de pasos con badge numerado brand + botón Manos Libres (no funcional)</td></tr>
+  <tr><td><code>src/features/recetas/components/comentariosReceta.tsx</code></td><td>Preview 3 comentarios con avatar y tiempo relativo</td></tr>
+  <tr><td><code>src/features/recetas/components/carruselSimilares.tsx</code></td><td>Embla Carousel horizontal con 2.5 cards visibles</td></tr>
+  <tr><td><code>src/features/recetas/data/datosDetalle.ts</code></td><td>Mock RecetaDetalle con 8 ingredientes, 5 pasos, 3 alérgenos, 3 comentarios</td></tr>
+  <tr><td><code>src/app/(main)/recetas/[id]/page.tsx</code></td><td>Server Component — ruta dinámica, carga datos mock y renderiza DetalleRecetaCliente</td></tr>
+  <tr><td><code>docs/historico/desarrollo/detalleReceta.html</code></td><td>Esta documentación técnica</td></tr>
+</table>
+
+<h3>Modificados</h3>
+<table>
+  <tr><th>Archivo</th><th>Cambio</th></tr>
+  <tr><td><code>src/features/recetas/types/receta.types.ts</code></td><td>Añadidos tipos: <code>Ingrediente</code>, <code>Comentario</code>, <code>MacrosReceta</code>, <code>RecetaDetalle</code></td></tr>
+  <tr><td><code>src/features/recetas/components/index.ts</code></td><td>Añadidos barrel exports de los 7 nuevos componentes</td></tr>
+</table>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="tipos">3. Tipos TypeScript (RecetaDetalle)</h1>
+
+<p>
+  <code>RecetaDetalle</code> extiende <code>PostFeed</code> (tipo del feed) con los campos
+  específicos del detalle. Los componentes consumen este tipo directamente para garantizar
+  que en Fase 5 solo sea necesario cambiar la fuente de datos, no los componentes.
+</p>
+
+<pre>
+<span class="kw">export type</span> <span class="ty">Ingrediente</span> = {
+  nombre:   <span class="ty">string</span>
+  cantidad: <span class="ty">number</span>
+  unidad:   <span class="ty">string</span>
+}
+
+<span class="kw">export type</span> <span class="ty">Comentario</span> = {
+  autorNombre: <span class="ty">string</span>
+  avatarUrl:   <span class="ty">string | null</span>
+  texto:       <span class="ty">string</span>
+  fecha:       <span class="ty">string</span>  <span class="cm">// ISO 8601</span>
+}
+
+<span class="kw">export type</span> <span class="ty">MacrosReceta</span> = {
+  calorias:  <span class="ty">number</span>
+  proteinas: <span class="ty">number</span>
+  carbos:    <span class="ty">number</span>
+  grasas:    <span class="ty">number</span>
+}
+
+<span class="kw">export type</span> <span class="ty">RecetaDetalle</span> = <span class="ty">PostFeed</span> & {
+  categorias:  <span class="ty">string[]</span>
+  pasos:       <span class="ty">string[]</span>
+  ingredientes: <span class="ty">Ingrediente[]</span>
+  alergenos:   <span class="ty">string[]</span>    <span class="cm">// ids exactos del map ALERGENOS</span>
+  macros:      <span class="ty">MacrosReceta</span>
+  comentarios: <span class="ty">Comentario[]</span>
+  similares:   <span class="ty">PostFeed[]</span>
+  porciones:   <span class="ty">number</span>     <span class="cm">// porciones base para escalar ingredientes</span>
+}
+</pre>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="chipAlergeno">4. Componente ChipAlergeno</h1>
+
+<p>
+  Componente <strong>reutilizable</strong> que renderiza un chip con icono WebP oficial y
+  etiqueta para cualquiera de los 14 alérgenos del Reglamento UE 1169/2011.
+</p>
+
+<h3>Props</h3>
+<table>
+  <tr><th>Prop</th><th>Tipo</th><th>Default</th><th>Descripción</th></tr>
+  <tr><td><code>alergenoId</code></td><td><code>string</code></td><td>—</td><td>ID del alérgeno. Si no existe en el mapa, no renderiza nada.</td></tr>
+  <tr><td><code>size</code></td><td><code>'sm' | 'md'</code></td><td><code>'sm'</code></td><td><code>sm</code> para detalle receta · <code>md</code> para filtros y crear receta</td></tr>
+</table>
+
+<h3>IDs disponibles</h3>
+<p>
+  <code>gluten</code> · <code>crustaceos</code> · <code>huevo</code> · <code>pescado</code> ·
+  <code>cacahuetes</code> · <code>soja</code> · <code>lacteos</code> · <code>frutosSecos</code> ·
+  <code>apio</code> · <code>mostaza</code> · <code>sesamo</code> · <code>sulfitos</code> ·
+  <code>moluscos</code> · <code>altramuz</code>
+</p>
+
+<h3>Uso</h3>
+<pre>
+<span class="cm">// Tamaño sm (detalle receta)</span>
+{receta.alergenos.<span class="fn">map</span>((id) =&gt; (
+  &lt;<span class="fn">ChipAlergeno</span> <span class="nm">key</span>={id} <span class="nm">alergenoId</span>={id} <span class="nm">size</span>=<span class="st">"sm"</span> /&gt;
+))}
+
+<span class="cm">// Tamaño md (filtros / crear receta)</span>
+&lt;<span class="fn">ChipAlergeno</span> <span class="nm">alergenoId</span>=<span class="st">"gluten"</span> <span class="nm">size</span>=<span class="st">"md"</span> /&gt;
+</pre>
+
+<div class="callout-blue">
+  <strong>Imágenes WebP:</strong> Los iconos están en <code>public/alergenos/&lt;id&gt;.webp</code>.
+  Se sirven vía <code>next/image</code> con optimización automática. No se requiere configuración adicional en <code>next.config.ts</code>.
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="componentes">5. Componentes de la vista</h1>
+
+<h2>5.1 DetalleRecetaCliente</h2>
+<p>
+  Client Component orquestador. Mantiene el estado <code>guardado</code> compartido
+  entre el hero y la barra de stats. Compone el layout mobile y desktop.
+</p>
+<pre>
+<span class="kw">type</span> <span class="ty">Props</span> = { receta: <span class="ty">RecetaDetalle</span> }
+
+<span class="kw">const</span> [guardado, setGuardado] = <span class="fn">useState</span>(receta.guardado)
+</pre>
+
+<h2>5.2 HeroReceta</h2>
+<p>
+  Hero full-width de ~45vh. Imagen <code>next/image</code> con <code>object-cover</code>.
+  Gradiente inferior que disuelve la imagen en el fondo.
+  Botones flotantes glassmorphism (ArrowLeft + Bookmark/BookmarkCheck).
+</p>
+<table>
+  <tr><th>Prop</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr><td><code>imagenUrl</code></td><td><code>string</code></td><td>URL de la imagen de la receta</td></tr>
+  <tr><td><code>titulo</code></td><td><code>string</code></td><td>Alt text de la imagen</td></tr>
+  <tr><td><code>guardado</code></td><td><code>boolean</code></td><td>Estado del bookmark</td></tr>
+  <tr><td><code>onToggleGuardado</code></td><td><code>() => void</code></td><td>Callback para toggle guardado</td></tr>
+</table>
+
+<h2>5.3 CabeceraReceta</h2>
+<p>
+  Overlapping con el gradiente del hero (<code>-mt-8 z-10</code>). Contiene:
+  título, chips categoría (Badge shadcn), chips alérgenos (ChipAlergeno),
+  avatar + nombre + tiempo relativo del autor, barra de stats (Heart con Framer Motion,
+  MessageCircle, Share2, Bookmark).
+</p>
+<p>
+  Estado local: <code>liked</code> + <code>likes</code>. El like activo usa
+  <code>fill-brand text-brand</code> con animación <code>scale(1.3)</code> de Framer Motion.
+</p>
+
+<h2>5.4 TabsReceta</h2>
+<p>
+  Tabs shadcn con <code>sticky top-0 z-30</code>. Dos pestañas:
+</p>
+<ul>
+  <li>
+    <strong>Ingredientes:</strong> Ajustador de porciones (−/número/+) con <code>useState</code>.
+    Las cantidades escalan proporcionalmente según el <code>factor = porciones / porcionesBase</code>.
+    Lista con Checkbox shadcn. Link "Añadir a mi despensa" (no funcional — Sprint 6).
+  </li>
+  <li>
+    <strong>Nutrición:</strong> Grid 2×2 con Calorías, Proteínas, Carbohidratos, Grasas.
+    Macros escalados con el mismo factor de porciones. Cards con <code>bg-[var(--warm-bg)] rounded-2xl</code>.
+  </li>
+</ul>
+
+<h2>5.5 PasosReceta</h2>
+<p>
+  Lista numerada de pasos. Badge numerado con <code>bg-brand text-brand-foreground rounded-full</code>.
+  Separación tonal entre pasos alternos (sin border línea).
+  Botón "Manos libres" con icono Headphones (no funcional — Sprint 8).
+</p>
+
+<h2>5.6 ComentariosReceta</h2>
+<p>
+  Muestra hasta 3 comentarios preview: Avatar shadcn + nombre font-semibold + texto
+  con <code>line-clamp-2</code> + tiempo relativo.
+  Botón "Ver todos los comentarios" (no funcional — pendiente Sprint 4).
+</p>
+
+<h2>5.7 CarruselSimilares</h2>
+<p>
+  Embla Carousel horizontal con <code>dragFree: true</code> y 2.5 cards visibles
+  (<code>w-[calc(100%/2.5)]</code>). Cada mini card: imagen <code>rounded-2xl</code> +
+  título <code>line-clamp-2</code> + avatar del autor.
+</p>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="layout">6. Layout responsive</h1>
+
+<h3>Mobile (&lt; 768px) — scroll único vertical</h3>
+<pre>
+HeroReceta         <span class="cm">// ~45vh</span>
+CabeceraReceta     <span class="cm">// overlapping -mt-8</span>
+TabsReceta         <span class="cm">// sticky tabs</span>
+PasosReceta
+ComentariosReceta
+CarruselSimilares
+NavBarInferior     <span class="cm">// global en (main)/layout.tsx</span>
+</pre>
+
+<h3>Desktop (≥ 768px) — bento grid 2 columnas</h3>
+<pre>
+┌──────────────────────┬──────────────────────┐
+│  HeroReceta          │  PasosReceta         │
+│  CabeceraReceta      │  ComentariosReceta   │
+│  TabsReceta          │  CarruselSimilares   │
+│  (overflow-y: auto)  │  (overflow-y: auto)  │
+└──────────────────────┴──────────────────────┘
+</pre>
+
+<p>
+  La separación entre columnas usa <code>border-r border-border/40</code>
+  (tono sutil, sin línea dura). Cada columna tiene <code>overflow-y: auto</code>
+  para scroll independiente en desktop.
+</p>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="estado">7. Estado local e interactividad</h1>
+
+<table>
+  <tr><th>Estado</th><th>Componente</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr>
+    <td><code>guardado</code></td>
+    <td><code>DetalleRecetaCliente</code></td>
+    <td><code>boolean</code></td>
+    <td>Compartido entre HeroReceta y CabeceraReceta. Toggle sincronizado.</td>
+  </tr>
+  <tr>
+    <td><code>liked</code> / <code>likes</code></td>
+    <td><code>CabeceraReceta</code></td>
+    <td><code>boolean</code> / <code>number</code></td>
+    <td>Like con animación scale Framer Motion. Contador +1/-1 local.</td>
+  </tr>
+  <tr>
+    <td><code>porciones</code></td>
+    <td><code>TabsReceta</code></td>
+    <td><code>number</code></td>
+    <td>Escalado de ingredientes y macros según porciones. Min: 1.</td>
+  </tr>
+  <tr>
+    <td>Tab activo</td>
+    <td><code>TabsReceta</code></td>
+    <td><code>Tabs shadcn</code></td>
+    <td>Controlado internamente por shadcn Tabs. Default: "ingredientes".</td>
+  </tr>
+  <tr>
+    <td>Checkboxes ingredientes</td>
+    <td><code>TabsReceta</code></td>
+    <td><code>Checkbox shadcn</code></td>
+    <td>Estado propio de cada Checkbox shadcn. Sin estado global.</td>
+  </tr>
+</table>
+
+<div class="callout">
+  <strong>Regla Sprint 2:</strong> Todo el estado interactivo usa <code>useState</code> local.
+  Zustand se introduce en Sprint 3 o cuando el estado deba compartirse entre rutas.
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="datos">8. Datos mock (datosDetalle.ts)</h1>
+
+<p>
+  Receta mock: <strong>Pollo al limón con alcaparras y espinacas</strong>.
+  Datos realistas para validar el layout completo.
+</p>
+
+<table>
+  <tr><th>Campo</th><th>Valor mock</th></tr>
+  <tr><td>Porciones base</td><td>2</td></tr>
+  <tr><td>Ingredientes</td><td>8 (pollo, mantequilla, AOVE, limón, alcaparras, espinacas, ajo, caldo)</td></tr>
+  <tr><td>Alérgenos</td><td><code>lacteos</code>, <code>huevo</code></td></tr>
+  <tr><td>Pasos</td><td>5 pasos descriptivos</td></tr>
+  <tr><td>Macros (por porción)</td><td>380 kcal · 42 g proteína · 6 g carbos · 20 g grasas</td></tr>
+  <tr><td>Comentarios</td><td>3 comentarios con avatares y tiempo relativo</td></tr>
+  <tr><td>Recetas similares</td><td>3 posts de <code>datosFeed.ts</code> (posts 4, 3, 7)</td></tr>
+  <tr><td>Categorías</td><td>Mediterráneo · Alto en proteína · Sin gluten</td></tr>
+</table>
+
+<h3>Estrategia de migración a backend (Fase 5)</h3>
+<pre>
+<span class="cm">// ANTES (mock)</span>
+<span class="kw">export default function</span> <span class="fn">PaginaDetalleReceta</span>() {
+  <span class="kw">const</span> receta = RECETA_DETALLE_MOCK
+  <span class="kw">return</span> &lt;<span class="fn">DetalleRecetaCliente</span> <span class="nm">receta</span>={receta} /&gt;
+}
+
+<span class="cm">// DESPUÉS (Fase 5 — solo cambia page.tsx)</span>
+<span class="kw">export default async function</span> <span class="fn">PaginaDetalleReceta</span>({ params }) {
+  <span class="kw">const</span> receta = <span class="kw">await</span> recetasService.<span class="fn">obtenerPorId</span>(params.id)
+  <span class="kw">return</span> &lt;<span class="fn">DetalleRecetaCliente</span> <span class="nm">receta</span>={receta} /&gt;
+}
+<span class="cm">// Los componentes NO cambian</span>
+</pre>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="colores">9. Sistema de color</h1>
+
+<table>
+  <tr><th>Elemento</th><th>Clase Tailwind / CSS var</th></tr>
+  <tr><td>Fondo página</td><td><code>bg-background</code></td></tr>
+  <tr><td>Hero placeholder</td><td><code>bg-[var(--warm-bg-accent)]</code></td></tr>
+  <tr><td>Gradiente hero</td><td><code>from-transparent via-background/50 to-background</code></td></tr>
+  <tr><td>Botones flotantes</td><td><code>bg-background/70 backdrop-blur-sm</code></td></tr>
+  <tr><td>Chips categoría</td><td><code>bg-brand/10 text-brand</code></td></tr>
+  <tr><td>Chips alérgeno</td><td><code>bg-destructive/10 text-destructive</code></td></tr>
+  <tr><td>Stats inactivos</td><td><code>text-muted-foreground</code></td></tr>
+  <tr><td>Like/bookmark activo</td><td><code>fill-brand text-brand</code></td></tr>
+  <tr><td>Cards macros</td><td><code>bg-[var(--warm-bg)] rounded-2xl</code></td></tr>
+  <tr><td>Badge número paso</td><td><code>bg-brand text-brand-foreground rounded-full</code></td></tr>
+  <tr><td>Botón Manos Libres</td><td><code>bg-brand/10 text-brand rounded-full</code></td></tr>
+  <tr><td>Separación pasos</td><td>Fondo alterno <code>var(--warm-bg)</code> gradiente (sin border)</td></tr>
+  <tr><td>Mini cards carrusel</td><td><code>bg-[var(--warm-bg)] rounded-2xl</code></td></tr>
+</table>
+
+<div class="callout-red">
+  <strong>Regla de color:</strong> NUNCA <code>bg-white</code>, <code>text-gray-*</code>,
+  colores hex hardcodeados ni variables Stitch. Solo variables de <code>globals.css</code>
+  o tokens Tailwind mapeados a esas variables.
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<h1 id="pendientes">10. Funcionalidades pendientes</h1>
+
+<p>Las siguientes funcionalidades están presentes en la UI pero marcadas como no funcionales
+hasta el sprint indicado. El código placeholder existe; solo necesita conectarse.</p>
+
+<table>
+  <tr><th>ID</th><th>Funcionalidad</th><th>Componente</th><th>Sprint</th><th>Descripción técnica</th></tr>
+  <tr>
+    <td><span class="badge badge-red">DET-001</span></td>
+    <td>Guardar receta persistente</td>
+    <td><code>HeroReceta</code> / <code>CabeceraReceta</code></td>
+    <td>Sprint 3</td>
+    <td>Actualmente <code>useState</code> local. Conectar a <code>POST /api/recetas/:id/guardar</code> y Zustand store. Icono BookmarkCheck refleja estado del servidor.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-002</span></td>
+    <td>Like persistente</td>
+    <td><code>CabeceraReceta</code></td>
+    <td>Sprint 3</td>
+    <td>Actualmente <code>useState</code> local. Conectar a <code>POST /api/recetas/:id/like</code> con optimistic update TanStack Query.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-003</span></td>
+    <td>Compartir receta</td>
+    <td><code>CabeceraReceta</code></td>
+    <td>Sprint 5</td>
+    <td>Botón Share2 sin handler. Implementar Web Share API (<code>navigator.share</code>) con fallback a copiar URL al portapapeles.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-004</span></td>
+    <td>Ver comentarios completos</td>
+    <td><code>ComentariosReceta</code></td>
+    <td>Sprint 4</td>
+    <td>Botón "Ver todos" sin handler. Requiere modal/sheet con lista paginada y endpoint <code>GET /api/recetas/:id/comentarios</code>.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-005</span></td>
+    <td>Añadir comentario</td>
+    <td><code>ComentariosReceta</code></td>
+    <td>Sprint 4</td>
+    <td>No existe input de comentario aún. Añadir textarea + botón enviar + <code>POST /api/recetas/:id/comentarios</code> con autenticación.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-006</span></td>
+    <td>Añadir ingredientes a despensa</td>
+    <td><code>TabsReceta</code></td>
+    <td>Sprint 6</td>
+    <td>Link "Añadir a mi despensa" sin handler. Requiere modelo Despensa en MongoDB y endpoint <code>POST /api/despensa/anadir-desde-receta</code>.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-007</span></td>
+    <td>Modo Manos Libres</td>
+    <td><code>PasosReceta</code></td>
+    <td>Sprint 8</td>
+    <td>Botón "Manos libres" con icono Headphones sin handler. Requiere Web Speech API (síntesis de voz) con navegación por comandos de voz entre pasos.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-008</span></td>
+    <td>Cargar receta real por ID</td>
+    <td><code>page.tsx</code></td>
+    <td>Sprint 5 (Fase 5)</td>
+    <td>Actualmente usa <code>RECETA_DETALLE_MOCK</code>. Sustituir por <code>await recetasService.obtenerPorId(params.id)</code> + hook <code>useRecetaDetalle(id)</code>. Los componentes no cambian.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-009</span></td>
+    <td>Navegación carrusel similares funcional</td>
+    <td><code>CarruselSimilares</code></td>
+    <td>Sprint 3</td>
+    <td>Los links de las mini cards apuntan a <code>/recetas/:id</code> real. Cuando haya backend, cada ID cargará su propia <code>RecetaDetalle</code>.</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-red">DET-010</span></td>
+    <td>Metadatos dinámicos por receta</td>
+    <td><code>page.tsx</code></td>
+    <td>Sprint 5</td>
+    <td>Actualmente <code>export const metadata</code> es estático. Migrar a <code>export async function generateMetadata({ params })</code> para SEO dinámico por receta.</td>
+  </tr>
+</table>
+
+<div class="callout-blue">
+  <strong>Nota arquitectónica:</strong> La separación Server Component (page.tsx) /
+  Client Components (componentes) garantiza que en Fase 5 solo sea necesario modificar
+  <code>page.tsx</code> para conectar el backend. Los 7 componentes de la vista no
+  requieren cambios.
+</div>
+
+</body>
+</html>

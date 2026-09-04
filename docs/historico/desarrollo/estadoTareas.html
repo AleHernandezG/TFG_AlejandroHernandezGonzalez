@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estado de Tareas — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .meta { font-size: 0.78rem; color: #737373; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* Resumen contadores */
+    .counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; }
+    .counter { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 1rem; text-align: center; }
+    .counter .num { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .counter .label { font-size: 0.72rem; color: #737373; margin-top: 0.35rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .counter.done .num { color: #22c55e; }
+    .counter.review .num { color: #f97316; }
+    .counter.alta .num { color: #ef4444; }
+    .counter.media .num { color: #eab308; }
+    .counter.baja .num { color: #3b82f6; }
+
+    /* Sección */
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .sprint-badge { font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-left: auto; }
+    .sprint-badge.actual { background: #f97316; color: #fff; }
+    .sprint-badge.s3 { background: #eab30822; color: #eab308; border: 1px solid #eab30844; }
+    .sprint-badge.s4 { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; }
+    .sprint-badge.s5 { background: #8b5cf622; color: #c084fc; border: 1px solid #8b5cf644; }
+    .sprint-badge.fase6 { background: #6b728022; color: #9ca3af; border: 1px solid #6b728044; }
+
+    /* Tabla de tareas */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.7rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.83rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    /* ID */
+    .id { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    /* Estado */
+    .status { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+    .status.done { color: #22c55e; }
+    .status.review { color: #f97316; }
+    .status.pending { color: #737373; }
+
+    /* Urgencia */
+    .urg { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+    .urg.alta { background: #ef444422; color: #f87171; border: 1px solid #ef444433; }
+    .urg.media { background: #eab30822; color: #fbbf24; border: 1px solid #eab30833; }
+    .urg.baja { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+
+    /* Descripción corta */
+    .desc { color: #d4d4d4; }
+    .desc small { display: block; margin-top: 0.2rem; color: #525252; font-size: 0.76rem; }
+    .desc .source { display: block; margin-top: 0.3rem; color: #3b82f6; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; opacity: 0.8; }
+
+    /* Leyenda */
+    .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: #111; border-top: 1px solid #222; }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: #737373; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Estado de Tareas — Cookr TFG</h1>
+    <div class="meta">Actualizado: 2026-06-02 · NUTR-001 ✅ · NUTR-002 ✅ · INGR-BE-001 ✅ · INGR-FE-002 ✅ · CHAT-IMG-001 ✅</div>
+  </div>
+</header>
+
+<nav>
+  <a href="#sprint2">Sprint 2 actual</a>
+  <a href="#sprint3">Sprint 3</a>
+  <a href="#sprint4">Sprint 4</a>
+  <a href="#sprint5plus">Sprint 5+</a>
+  <a href="#techdebt">Tech Debt</a>
+  <a href="#fase6">Fase 6 deploy</a>
+  <a href="#completadas">Completadas</a>
+</nav>
+
+<main>
+
+  <!-- CONTADORES -->
+  <div class="counters">
+    <div class="counter review"><div class="num">0</div><div class="label">Pendiente revisión</div></div>
+    <div class="counter alta"><div class="num">5</div><div class="label">Urgencia alta</div></div>
+    <div class="counter media"><div class="num">14</div><div class="label">Urgencia media</div></div>
+    <div class="counter baja"><div class="num">16</div><div class="label">Urgencia baja</div></div>
+    <div class="counter done"><div class="num">138</div><div class="label">Completadas</div></div>
+  </div>
+
+  <!-- SPRINT 2 — ALTA URGENCIA -->
+  <section id="sprint2">
+    <div class="section-header">
+      <span class="section-icon">🔥</span>
+      <h2>Sprint 2 — Tareas activas ahora</h2>
+      <span class="sprint-badge actual">Sprint 2 · activo</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">TFG-17</td>
+          <td class="desc">
+            <strong>Revisar NavBar inferior en el navegador</strong>
+            <small>Claude la implementó pero el autor aún no la ha revisado visualmente. Hasta que no dé el visto bueno no se marca como ✅.</small>
+            <span class="source">📄 docs/historico/context.md</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">TFG-21 / UI-014 / UI-015</td>
+          <td class="desc">
+            <strong>Revisar Home (mobile + PC) y Detalle de Receta en el navegador</strong>
+            <small>Ambas vistas implementadas. El autor tiene que abrirlas en el navegador y aprobarlas para marcarlas ✅ y pasar al siguiente sprint.</small>
+            <span class="source">📄 docs/historico/context.md · docs/historico/cambios/ui.md</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-002</td>
+          <td class="desc">
+            <strong>Crear rama develop en git</strong>
+            <small>Recomendado antes de continuar con el Sprint 2 BE para no mezclar todo en main. Solo requiere dos comandos git.</small>
+            <span class="source">📄 docs/historico/fases/fase-0-pendientes.md</span>
+          </td>
+          <td><span class="status done">✅ Completado</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-001</td>
+          <td class="desc">
+            <strong>Cambiar callbackUrl del botón Google de "/" a "/home"</strong>
+            <small>Ya estaba implementado: urlRetorno = "/home" en botonGoogle.tsx. Comentario JSDoc actualizado.</small>
+            <span class="source">📄 docs/historico/context.md</span>
+          </td>
+          <td><span class="status done">✅ Completado</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-005</td>
+          <td class="desc">
+            <strong>Proteger las rutas autenticadas (/home, /recetas/[id])</strong>
+            <small>middleware.ts creado en frontend/src/. Protege /home, /coleccion, /recetas/*, /completar-perfil. Sin sesión → /login. Con sesión y perfilCompleto=false → /completar-perfil. Con sesión y perfilCompleto=true intentando acceder a /completar-perfil → /home.</small>
+            <span class="source">📄 frontend/src/middleware.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-001</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Usuario</strong>
+            <small>El backend necesita este schema de Mongoose para poder registrar y autenticar usuarios. Bloquea todos los endpoints BE de auth.</small>
+            <span class="source">📄 docs/historico/cambios/dominio.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-002</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Token</strong>
+            <small>Necesario para guardar los tokens de verificación de email y de recuperación de contraseña con expiración automática (TTL index).</small>
+            <span class="source">📄 docs/historico/cambios/dominio.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-004</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/registro</strong>
+            <small>Endpoint para crear cuenta con correo/contraseña. Hashea la contraseña con bcrypt y genera un token de verificación de email.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-005</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/login</strong>
+            <small>Endpoint para iniciar sesión con correo y contraseña. Comprueba bcrypt y devuelve un JWT de sesión.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-006</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/verificar-email</strong>
+            <small>Valida el token del enlace que llega al correo y marca la cuenta como verificada en MongoDB.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-007</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/recuperar-contrasena</strong>
+            <small>Genera un token de recuperación de 1h y (en Fase 6 con Resend) lo envía por correo.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-008 / API-009</td>
+          <td class="desc">
+            <strong>BE: POST /api/auth/nueva-contrasena + JWT Middleware</strong>
+            <small>Permite resetear la contraseña con un token válido. El middleware JWT protegerá las rutas privadas de la API.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 BE</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 3 — MEDIA -->
+  <section id="sprint3">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Sprint 3 — Sprint activo</h2>
+      <span class="sprint-badge actual">Sprint 3 · activo</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">DET-001</td>
+          <td class="desc">
+            <strong>Guardar receta (persistente)</strong>
+            <small>Toggle persistente con optimistic update. BE: POST /api/recetas/:id/guardar + recetasGuardadas en usuarioMongo. FE: useToggleGuardado(receta.id) en detalleRecetaCliente.tsx — setState optimistic + rollback en onError.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleGuardado.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-002</td>
+          <td class="desc">
+            <strong>Like persistente en recetas</strong>
+            <small>Toggle persistente con optimistic update. BE: POST /api/recetas/:id/like. FE: useToggleLike(receta.id) en cabeceraReceta.tsx — setLiked + setLikes ±1 inmediato, rollback completo si el BE falla.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleLike.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-009</td>
+          <td class="desc">
+            <strong>Carrusel de recetas similares funcional</strong>
+            <small>Similares incluidos en la respuesta de GET /api/recetas/:id (campo similares: PostFeed[]). recetaRepository.findById() los calcula con $or [{categorias: $in}, {dificultad}]. CarruselSimilares recibe datos reales sin cambiar su interfaz.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-001</td>
+          <td class="desc">
+            <strong>Imágenes reales en el carrusel de la landing</strong>
+            <small>4 fotografías WebP reales en public/images/hero/ (desayuno, ensalada, postre, pasta). next/image fill + dos capas de overlay. imageUrl añadido a SlideHero, emoji eliminado.</small>
+            <span class="source">📄 docs/historico/fases/fase-1-sprint-1-carrousel-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-002</td>
+          <td class="desc">
+            <strong>Transición mejorada entre slides</strong>
+            <small>6 opciones evaluadas en heroOpciones.html. Elegida T1 Crossfade (patrón Airbnb/Apple): fundido de opacidad puro, sin scale/zoom. duration 1.2s easeInOut. AnimatePresence mode="popLayout".</small>
+            <span class="source">📄 docs/historico/fases/fase-1-sprint-1-carrousel-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">CAROUSEL-003</td>
+          <td class="desc">
+            <strong>Controles accesibles del carrusel</strong>
+            <small>aria-live="polite" aria-atomic="true" en span.sr-only. Puntos indicadores con aria-label + aria-current. Sin prev/next (decisión de diseño: carrusel automático 5s, UX más limpia).</small>
+            <span class="source">📄 docs/historico/fases/fase-1-sprint-1-carrousel-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">ARCH-001</td>
+          <td class="desc">
+            <strong>BE: Separar interfaces de dominio de schemas Mongoose</strong>
+            <small>Creada carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces puras sin acoplamiento a Mongoose. Los modelos (usuarioMongo.ts, tokenMongo.ts) definen IXxxDoc extends IXxx, Document. Los repositories importan de types/ (contrato) y models/ (Mongoose). TypeScript check: 0 errores.</small>
+            <span class="source">📄 docs/arquitectura-backend-tipos.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">ARCH-002</td>
+          <td class="desc">
+            <strong>BE: Renombrar modelos y types con nomenclatura BD-explícita</strong>
+            <small>usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo, la carpeta ya indica que son interfaces). Regla añadida a docs/historico/rules.md sección 4 y 6. Archivos antiguos eliminados.</small>
+            <span class="source">📄 docs/historico/rules.md · backend/src/models/ · backend/src/types/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-001</td>
+          <td class="desc">
+            <strong>Limpiar docs/ — eliminar duplicados entre context.md, folderStructure.md y rules.md</strong>
+            <small>context.md: eliminadas 6 secciones duplicadas (reglas de arquitectura, paleta, Stitch, sprint paralelo, filtros del feed, estados de vistas) — queda solo contexto narrativo, historial de sesiones y estado de rutas. folderStructure.md: eliminadas 4 secciones duplicadas (Reglas, Patrón de capas BE, Regla de oro, Árbol stitch/) — queda solo el árbol real actualizado con types/ BE. Header de context.md actualizado a Sprint 3 / 2026-04-17.</small>
+            <span class="source">📄 docs/historico/context.md · docs/referencia/estructura-frontend.md · docs/historico/rules.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-002</td>
+          <td class="desc">
+            <strong>Revisar phase-reports/ y changes/ — renombrar archivos de pendientes a completados</strong>
+            <small>fase-1-sprint-1-carrousel-pendientes.md → carrousel-completados.md (git mv). AUTH-001/002/003 y LANDING-001 actualizados a ✅ en fase-1-completados.md. fase-0 y fase-2 conservan "-pendientes" porque aún tienen tareas Fase 6 y DET-series pendientes.</small>
+            <span class="source">📄 docs/historico/fases/ · docs/historico/cambios/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-023</td>
+          <td class="desc">
+            <strong>Homogeneizar estética auth — fondo y tipografía en todas las vistas</strong>
+            <small>Replicar el layout de /login y /registro (fondo fondo-auth.webp + overlay, título Cookr amber italic, tagline + features list) en: /recuperar-contrasena, /nueva-contrasena (split-screen), /verificar-email/pendiente, /recuperar-contrasena/pendiente y /verificar-email (tarjeta centrada sobre imagen).</small>
+            <span class="source">📄 app/recuperar-contrasena/page.tsx · app/nueva-contrasena/page.tsx · app/verificar-email/pendiente/page.tsx · app/recuperar-contrasena/pendiente/page.tsx · app/verificar-email/contenidoVerificacion.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-003</td>
+          <td class="desc">
+            <strong>Subir HTMLs de /desarrollo a OneDrive y eliminarlos del repo una vez aprobados</strong>
+            <small>Los archivos HTML de docs/historico/desarrollo/ (registro.html, landingPage.html, estadoTareas.html, arquitectura-backend-tipos.html...) son documentación visual de vistas. Una vez aprobada la vista, subir a OneDrive y borrar del repo para no inflar el historial git.</small>
+            <span class="source">📄 docs/historico/desarrollo/</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 3 / continuo</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-016</td>
+          <td class="desc">
+            <strong>Buscar recetas — vista FE mock (Sprint 3)</strong>
+            <small>Barra de búsqueda con debounce 300 ms, skeleton loaders mientras rebota el valor, estado vacío con icono SearchX. Funciona en móvil y escritorio.</small>
+            <span class="source">📄 docs/historico/desarrollo/busquedaFiltros.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-017</td>
+          <td class="desc">
+            <strong>Filtrar recetas — Drawer filtros FE mock (Sprint 3)</strong>
+            <small>Botón "Filtros" junto a la barra de búsqueda (nunca se corta). Drawer (vaul) con 3 secciones: Dieta (DIETAS_OPCIONES), Dificultad, Excluir alérgenos (ALERGENOS_OPCIONES). Badge con total de filtros activos. Duplicados eliminados de config.</small>
+            <span class="source">📄 docs/historico/desarrollo/busquedaFiltros.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-021</td>
+          <td class="desc">
+            <strong>Vista Guardadas — cuadrícula portrait 2 cols con bookmark</strong>
+            <small>Rediseñada con Stitch (docs/diseno/stitch/coleccion/guardadas/). Header sticky con título editorial "¡Mis recetas Guardadas!" en brand italic + segmented control pill. Grid 2 cols aspect-[3/4], gradient overlay bottom, bookmark filled (bg-white/80 glass) top-right. AnimatePresence fade en cambio de pestaña. Datos mock en features/coleccion/data/datosColeccion.ts. Pendiente: conectar BE Fase 5.</small>
+            <span class="source">📄 features/coleccion/components/ · features/coleccion/data/datosColeccion.ts · app/(main)/coleccion/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-022</td>
+          <td class="desc">
+            <strong>Vista Mis Recetas — cuadrícula portrait 2 cols con menú ···</strong>
+            <small>Rediseñada con Stitch (docs/diseno/stitch/coleccion/misrecetas/). Mismo layout que Guardadas pero título "¡Mis Recetas!" y botón top-right MoreHorizontal (blanco) en lugar de bookmark. Estado vacío con ChefHat + CTA "Crear primera receta" → /crear-receta. Datos mock con 4 recetas propias. TypeScript 0 errores. Pendiente: conectar BE Fase 5.</small>
+            <span class="source">📄 features/coleccion/components/ · features/coleccion/data/datosColeccion.ts · app/(main)/coleccion/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018</td>
+          <td class="desc">
+            <strong>Crear receta — flujo completo FE mock (Sprint 3)</strong>
+            <small>Flujo completo: /crear-receta (formulario RHF+Zod) → validación → /crear-receta/revisar (preview) → publicar mock → /home. PopUp tutorial (primer usuario), PopUp error (validación), stepper tutorial, detección automática de alérgenos. Store Zustand compartido entre formulario y preview. 15 ficheros nuevos, TypeScript 0 errores.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/ · stores/useCrearRecetaStore.ts · docs/crearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-A</td>
+          <td class="desc">
+            <strong>datosIngredientes.ts + detectarAlergenos.ts + crearReceta.schema.ts</strong>
+            <small>30 ingredientes mock con mapa alérgenos, función pura detectarAlergenos(), schema Zod v4 compatible (z.number().refine() en vez de invalid_type_error).</small>
+            <span class="source">📄 features/recetas/data/datosIngredientes.ts · features/recetas/utils/detectarAlergenos.ts · features/recetas/types/crearReceta.schema.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-B</td>
+          <td class="desc">
+            <strong>useCrearRecetaStore.ts (Zustand)</strong>
+            <small>Store global que comparte el estado del formulario entre /crear-receta y /crear-receta/revisar. Guarda datos validados + URL de preview de foto. Se limpia tras publicar.</small>
+            <span class="source">📄 stores/useCrearRecetaStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-C</td>
+          <td class="desc">
+            <strong>Secciones del formulario: SeccionIngredientes, SeccionPasos, SeccionAlergenos</strong>
+            <small>SeccionIngredientes: filas nombre/cantidad/unidad con autocompletado live desde datosIngredientes.ts. SeccionPasos: badge numerado + textarea + drag handle visual. SeccionAlergenos: chips read-only + disclaimer obligatorio.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · seccionPasos.tsx · seccionAlergenos.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-D</td>
+          <td class="desc">
+            <strong>PopUps: PopUpTutorial, TutorialCrearReceta, PopUpError</strong>
+            <small>PopUpTutorial: Dialog shadcn con 3 pasos (Camera/ListOrdered/Eye) → acepta o salta. TutorialCrearReceta: stepper animado 3 pasos con Framer Motion. PopUpError: Dialog con lista dinámica de campos erróneos + scroll al primer error.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/popUpTutorial.tsx · tutorialCrearReceta.tsx · popUpError.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-E</td>
+          <td class="desc">
+            <strong>FormularioCrearReceta.tsx — componente principal</strong>
+            <small>Client component que ensambla todas las secciones. RHF + zodResolver + FormProvider. Gestiona foto (File + URL.createObjectURL), dificultad como botones de selección, SelectorChips para dietas, detección live de alérgenos, Dialog confirmación "Borrar y salir". Botones al final del formulario (no fixed — visible al scrollear). Grid tiempo/porciones: grid-cols-1 sm:grid-cols-2 (stacked en mobile, side-by-side en tablet+).</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-F</td>
+          <td class="desc">
+            <strong>PrevisualizacionReceta.tsx + rutas Next.js</strong>
+            <small>Preview rediseñada como post real (idéntica a /recetas/[id]): hero h-[400px], chip "Vista previa" flotante sobre la imagen (bg-black/50 backdrop-blur), botón volver glassmorphism, tarjeta -mt-8 rounded-t-[2rem]. Cabecera con autor placeholder Avatar "TÚ" + acciones sociales (Heart/MessageCircle/Share2 a 0). Meta pills "Listo en X min" + porciones. Contadores "Ingredientes (N)" y "Pasos (N)". Divisores h-px entre secciones. Modo manos libres. Botones al final sin fixed. Lee datos desde useCrearRecetaStore. Publicar mock → limpiar → /home. Rutas: /crear-receta/page.tsx + /crear-receta/revisar/page.tsx.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · app/(main)/crear-receta/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-018-G</td>
+          <td class="desc">
+            <strong>UX fixes crear receta — autocompletado, layout mobile, preview</strong>
+            <small>
+              (1) SeccionIngredientes — bug crítico: ref de RHF sobreescrita por ref local → setValue no actualizaba el DOM. Fix: desestructurar {ref: rhfRef, onChange: rhfOnChange, onBlur: rhfOnBlur} de register() y fusionar refs manualmente. onMouseDown → onPointerDown + e.preventDefault() para bloquear blur antes del tap en mobile. onBlur con setTimeout 150ms para cerrar lista al pulsar fuera.
+              (2) Formulario — grid-cols-2 en tiempo/porciones era demasiado estrecho en mobile (62-77px para el input de tiempo). Fix: grid-cols-1 sm:grid-cols-2.
+              (3) Formulario — botones fixed solapaban la NavBar inferior. Fix: removed fixed, botones en flujo normal al final del form (solo visibles al scrollear hasta abajo).
+              (4) Preview — banner "Vista previa" era sticky (tapaba contenido al scrollear). Fix: eliminado sticky.
+            </small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · formularioCrearReceta.tsx · previsualizacionReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-006</td>
+          <td class="desc">
+            <strong>Google OAuth — detectar usuario nuevo y redirigir a /completar-perfil</strong>
+            <small>botonGoogle.tsx usa callbackUrl="/completar-perfil". El backend ya devuelve perfilCompleto en POST /api/auth/google, que el callback jwt guarda en el token. El middleware redirige a /home si perfilCompleto=true, o deja pasar a /completar-perfil si es false. Funciona igual para usuario nuevo que para usuario existente.</small>
+            <span class="source">📄 frontend/src/middleware.ts · frontend/src/lib/auth.ts · frontend/src/features/auth/components/botonGoogle.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-008</td>
+          <td class="desc">
+            <strong>CI/CD GitHub Actions — alpha en main, desarrollo en develop</strong>
+            <small>Revisar y configurar workflow de GitHub Actions para que main sirva como rama alpha (deploy automático a Vercel FE + Render BE via Deploy Hook) mientras develop sigue siendo la rama de trabajo diario. Incluye: branch protection en main, PR develop → main para promover cambios estables, secrets RENDER_DEPLOY_HOOK_URL + RENDER_APP_URL + Vercel en GitHub. Anticipa SETUP-001 (Fase 6) pero con alcance mínimo de alpha.</small>
+            <span class="source">📄 docs/historico/fases/fase-0-pendientes.md · SETUP-001 · docs/referencia/infraestructura.md §7</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEV-001</td>
+          <td class="desc">
+            <strong>Script de arranque conjunto FE + BE</strong>
+            <small>scripts/dev.sh — arranca Next.js (:3000) y Express (:4000) en paralelo con prefijos coloreados [FE]/[BE]. Sin dependencias externas (bash puro). Ctrl+C mata ambos procesos. Lint y build verificados: BE tsc --noEmit ✅ · FE next lint ✅. También creados scripts/lint.sh y scripts/build.sh.</small>
+            <span class="source">📄 scripts/dev.sh · scripts/lint.sh · scripts/build.sh · docs/referencia/estructura-frontend.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-019</td>
+          <td class="desc">
+            <strong>Revisar y modificar la NavBar inferior</strong>
+            <small>La NavBar actual está aprobada visualmente pero puede necesitar ajustes conforme avanza el desarrollo: rutas activas reales (ahora son mock), iconos de nuevas secciones (Grupos, Notificaciones en Sprint 6+), protección de rutas privadas. Revisar en cada sprint si requiere cambios.</small>
+            <span class="source">📄 docs/historico/context.md · features/recetas/components/home/ · components/common/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOCS-004</td>
+          <td class="desc">
+            <strong>Esquema de conexiones entre vistas — mapa de navegación</strong>
+            <small>Diagrama visual de cómo se conectan todas las rutas de la app: qué vista lleva a cuál, con qué acción (tap en tarjeta, botón, redirect post-login…). Útil para la memoria del TFG y para detectar rutas huérfanas. Formato sugerido: Excalidraw o draw.io exportado a PNG + referenciado desde docs/.</small>
+            <span class="source">📄 docs/historico/sprints/roadmap.md · docs/historico/context.md · rutas del proyecto</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-025</td>
+          <td class="desc">
+            <strong>Mejorar contraste visual del formulario crear receta</strong>
+            <small>Las tarjetas de sección del formulario apenas se distinguen del fondo general. Elegir una de las 5 opciones de diseño propuestas en docs/historico/desarrollo/opcionesUiCrearReceta.html: warm cards, brand sections, glass warm, linear-style o layered elevation. Implementar usando variables CSS de globals.css (--warm-bg, --brand-subtle, etc.) — 0 colores hardcodeados.</small>
+            <span class="source">📄 docs/historico/desarrollo/opcionesUiCrearReceta.html · features/recetas/components/crearReceta/formularioCrearReceta.tsx · docs/historico/rules.md §3</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-026</td>
+          <td class="desc">
+            <strong>Crear receta: título hero con tipografía de marca</strong>
+            <small>Cambiar h1 "Nueva receta" por "¿Cuál es tu nueva creación?" con tipografía centrada, word "creación" en font-black italic text-brand, SVG underline curvo y drop-shadow naranja. Mismo patrón visual que el hero del landing page.</small>
+            <span class="source">📄 app/(main)/crear-receta/page.tsx · docs/historico/cambios/ui.md [UI-026]</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-027</td>
+          <td class="desc">
+            <strong>Crear receta: alérgenos chips tamaño md</strong>
+            <small>Aumentar tamaño de chips de alérgenos detectados de size="sm" (icono 16px, text-[10px]) a size="md" (icono 20px, text-xs) para mejorar legibilidad de un dato de seguridad alimentaria importante.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionAlergenos.tsx · docs/historico/cambios/ui.md [UI-027]</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-028</td>
+          <td class="desc">
+            <strong>Crear receta: fondo fotográfico con atribución Unsplash</strong>
+            <small>Añadir imagen de fondo crearRecetaImagen.webp (1920×2880) con overlay bg-black/45 y object-top para encuadre móvil. Créditos de autor Delfina Iacub en esquina inferior derecha (text-white/40). Misma arquitectura que login/page.tsx.</small>
+            <span class="source">📄 app/(main)/crear-receta/page.tsx · public/images/recetas/crearRecetaImagen.webp · docs/historico/rules.md §16</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">STRUCT-001</td>
+          <td class="desc">
+            <strong>Scaffolding vistas Sprint 3+ — carpetas, barrels y placeholders</strong>
+            <small>Estructura de carpetas para features/despensa/, features/coleccion/, features/chat/ con components/index.ts (barrel vacío // Sprint 3+), data/, hooks/ y types/. Pages placeholder Server Component en app/(main)/despensa/, /chat/, /perfil/. Carpetas docs/diseno/stitch/ para despensa, coleccion, chat, discover, perfil. docs/tareas-vistas-pendientes.md creado con spec completa de componentes, stores y datos mock por vista. docs/historico/context.md, folderStructure.md y roadmap.md actualizados.</small>
+            <span class="source">📄 features/despensa/ · features/coleccion/ · features/chat/ · app/(main)/despensa/page.tsx · app/(main)/chat/page.tsx · app/(main)/perfil/page.tsx · docs/tareas-vistas-pendientes.md</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── FE: DET completadas Sprint 3 (entradas anteriores actualizadas) ── -->
+        <tr>
+          <td class="id">DET-001</td>
+          <td class="desc">
+            <strong>Guardar receta — toggle persistente FE + BE</strong>
+            <small>BE: POST /api/recetas/:id/guardar + recetasGuardadas en usuarioMongo (REC-005). FE: useToggleGuardado(receta.id) en detalleRecetaCliente.tsx — setState optimistic + rollback en onError (REC-007).</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleGuardado.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-002</td>
+          <td class="desc">
+            <strong>Like persistente en recetas — toggle FE + BE</strong>
+            <small>BE: POST /api/recetas/:id/like (REC-004). FE: useToggleLike(receta.id) en cabeceraReceta.tsx — setLiked + setLikes ±1 inmediato, rollback completo si el BE falla (REC-007).</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · features/recetas/hooks/useToggleLike.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-009</td>
+          <td class="desc">
+            <strong>Carrusel de recetas similares — datos reales</strong>
+            <small>Similares incluidos en la respuesta de GET /api/recetas/:id (campo similares: PostFeed[]). recetaRepository.findById() los calcula con $or [{categorias: $in}, {dificultad}]. CarruselSimilares recibe datos reales sin cambiar su interfaz (REC-003 + REC-006).</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── BE: Integración Sprint 2 (Home + Detalle) ── -->
+        <tr>
+          <td class="id">REC-001</td>
+          <td class="desc">
+            <strong>Modelo Receta BE — schema Mongoose + interface IReceta + repository</strong>
+            <small>Creados: types/receta.ts (IReceta pura), models/recetaMongo.ts (sub-schemas ingrediente/macros/comentario con _id:false), repositories/recetaRepository.ts (findAll, findById, findSimilares, toggleLike, toggleGuardado). TypeScript 0 errores.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/types/receta.ts · backend/src/models/recetaMongo.ts · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-002</td>
+          <td class="desc">
+            <strong>GET /api/recetas — Feed del Home</strong>
+            <small>Implementado. optionalAuth, filtros q (regex)/dificultad ($in)/alergenos ($nin), paginación skip/limit. Devuelve { recetas: PostFeed[], total }. liked/guardado calculados si hay token. Montado en app.ts como /api/recetas.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/routes/recetas.routes.ts · backend/src/controllers/recetasController.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-003</td>
+          <td class="desc">
+            <strong>GET /api/recetas/:id — Detalle completo de receta</strong>
+            <small>Implementado. Devuelve RecetaDetalleRespuesta con ingredientes, pasos, macros, alérgenos, similares embebidos (6 tarjetas). 404 si id inválido o no existe. optionalAuth. Avanza DET-008 a Sprint 3.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (findById)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-004</td>
+          <td class="desc">
+            <strong>POST /api/recetas/:id/like — Toggle like BE</strong>
+            <small>requerirAuth. Toggle: push/filter del ObjectId de usuario en el array likes del documento Receta. Devuelve { liked, totalLikes }. Campo likes: [ObjectId] ya en recetaMongo.ts.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (toggleLike)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-005</td>
+          <td class="desc">
+            <strong>POST /api/recetas/:id/guardar — Toggle guardar BE</strong>
+            <small>requerirAuth. Campo recetasGuardadas: [ObjectId] añadido a IUsuario + usuarioMongo.ts. Toggle en array del usuario. Devuelve { guardado }. Complementa DET-001.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (toggleGuardado) · backend/src/models/usuarioMongo.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-006</td>
+          <td class="desc">
+            <strong>GET /api/recetas/:id/similares — Carrusel similares BE</strong>
+            <small>optionalAuth. Devuelve PostFeed[] — recetas con misma dificultad o categorías compartidas, excluyendo la actual, límite 6. También incluidos en RecetaDetalleRespuesta.similares (GET /:id). Complementa DET-009.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/repositories/recetaRepository.ts (findSimilares)</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-007</td>
+          <td class="desc">
+            <strong>recetasService.ts FE + hooks TanStack Query</strong>
+            <small>Creados: services/recetasService.ts (obtenerFeed, obtenerPorId, obtenerSimilares, toggleLike, toggleGuardado), hooks useRecetasFeed / useToggleLike / useToggleGuardado. QueryClientProvider añadido a providers.tsx. TypeScript 0 errores.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · frontend/src/services/recetasService.ts · frontend/src/features/recetas/hooks/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-008</td>
+          <td class="desc">
+            <strong>Conectar Home feed — datos reales</strong>
+            <small>POSTS_MOCK y filtrado local eliminados de feedHome.tsx. Conectado a useRecetasFeed({q, filtrosAvanzados}). isLoading → 3 skeletons; isError → mensaje; sin resultados → SearchX. Debounce 300ms sigue activo. TarjetaPost sin cambios.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · features/recetas/components/home/feedHome.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">REC-009</td>
+          <td class="desc">
+            <strong>Conectar Detalle de receta — datos reales</strong>
+            <small>RECETA_DETALLE_MOCK eliminado. Server Component usa getServerSession + recetasService.obtenerPorId(params.id, token). notFound() si null. Componentes hijo (heroReceta, cabeceraReceta, tabsReceta...) sin cambios. Avanzó DET-008 de Fase 5 a Sprint 3.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · app/(main)/recetas/[id]/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 4 — MEDIA -->
+  <section id="sprint4">
+    <div class="section-header">
+      <span class="section-icon">🔧</span>
+      <h2>Sprint 4 — Refactors y capa de servicios</h2>
+      <span class="sprint-badge s4">Sprint 4</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">API-010</td>
+          <td class="desc">
+            <strong>Crear apiClient.ts — instancia Axios centralizada</strong>
+            <small>Actualmente no existe ningún cliente Axios compartido. Este fichero añade la base URL, el header JWT automático y el interceptor de 401 → /login. Lo necesitan todos los services.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-011</td>
+          <td class="desc">
+            <strong>Crear authService.ts — capa de servicio HTTP para auth</strong>
+            <small>Centraliza todas las llamadas de auth (registro, login, verificar, recuperar, nueva contraseña). Los componentes ya no harán fetch directamente.</small>
+            <span class="source">📄 docs/historico/cambios/api.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-012</td>
+          <td class="desc">
+            <strong>Crear useAuth.ts — hook de abstracción de auth</strong>
+            <small>Creado frontend/src/features/auth/hooks/useAuth.ts con 6 métodos: iniciarSesion (signIn credentials + redirect por perfilCompleto), registrar, recuperarContrasena, nuevaContrasena (devuelve boolean para exito in-page), reenviarVerificacion, reenviarRecuperacion. Gestiona cargando:boolean y error:string|null centralizados. Barrel en hooks/index.ts. AUTH-004 verificado: session.user.image ya funcionaba — token.picture mapeado desde user.image en credentials y Google OAuth automático.</small>
+            <span class="source">📄 frontend/src/features/auth/hooks/useAuth.ts · frontend/src/features/auth/hooks/index.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-002</td>
+          <td class="desc">
+            <strong>Conectar formulario de registro con el backend real</strong>
+            <small>Formulario conectado a POST /api/auth/registro con manejo de errores 409 (correo ya registrado). authService.registro() creado en Sprint 2.</small>
+            <span class="source">📄 docs/historico/fases/fase-1-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-003</td>
+          <td class="desc">
+            <strong>Añadir CredentialsProvider a NextAuth</strong>
+            <small>CredentialsProvider añadido a lib/auth.ts, conectado a POST /api/auth/login. Maneja 401 (credenciales inválidas) y 403 (cuenta no verificada).</small>
+            <span class="source">📄 docs/historico/fases/fase-1-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 2 FE</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">AUTH-004</td>
+          <td class="desc">
+            <strong>Enriquecer la sesión NextAuth con avatar, nombre y rol</strong>
+            <small>Verificado: ya funcionaba. En credentials: token.picture = user.image (de usuarioRepository), token.name, token.sub, token.backendToken, token.rol, token.perfilCompleto. En Google OAuth: foto pasada al BE en POST /auth/google, token enriquecido. Session callback mapea token.picture → session.user.image. Sin cambios necesarios.</small>
+            <span class="source">📄 frontend/src/lib/auth.ts</span>
+          </td>
+          <td><span class="status done">✅ Verificado · Sprint 5 (ya implementado)</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-008 → UI-013</td>
+          <td class="desc">
+            <strong>Refactor de capas: 6 componentes de auth → useAuth</strong>
+            <small>formularioLogin: eliminados estadoEnvio, mensajeError, signIn inline, useRouter — usa iniciarSesion(). formularioRegistro: eliminados estadoEnvio, mensajeError, authService, axios — usa registrar(). formularioRecuperarContrasena: eliminados estadoEnvio, mensajeError, authService, useRouter — usa recuperarContrasena(). formularioNuevaContrasena: eliminados estadoEnvio, mensajeError, authService, axios — usa nuevaContrasena() que devuelve boolean → exito local. tarjetaVerificacionPendiente: eliminado authService — usa reenviarVerificacion(). tarjetaRecuperacionPendiente: eliminado authService — usa reenviarRecuperacion(). Comportamiento idéntico, 0 cambios visuales.</small>
+            <span class="source">📄 frontend/src/features/auth/components/ · frontend/src/features/auth/hooks/useAuth.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-007</td>
+          <td class="desc">
+            <strong>Redirigir a /completar-perfil tras el registro (Google y correo)</strong>
+            <small>Vista /completar-perfil implementada (selección de alergias y dietas). Pendiente revisión visual del autor y de ajustar los flujos de redirección post-registro.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-004</td>
+          <td class="desc">
+            <strong>Paginación de comentarios con infinite scroll</strong>
+            <small>
+              BE: GET /api/recetas/:id/comentarios?pagina=1&limite=8 → recetaRepository.findComentarios() (slice+reverse del subdocumento, paginación en memoria) → service → controller → route. optionalAuth.<br>
+              FE: recetasService.obtenerComentarios() · useComentarios.ts (useInfiniteQuery, queryKey ['comentarios', recetaId]) · useInvalidarComentarios().<br>
+              comentariosReceta.tsx: preview usa SSR+nuevos, Sheet usa solo API (sin duplicados). IntersectionObserver sentinel para infinite scroll automático. Sheet rediseñado: handle táctil, título centrado, input inline, skeletons con anatomía real. Fix duplicados: nuevos no se mezclan con datos de API en el Sheet.
+            </small>
+            <span class="source">📄 docs/historico/desarrollo/funcionalidadSocial.html#det004 · backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useComentarios.ts · components/detalleReceta/comentariosReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-005</td>
+          <td class="desc">
+            <strong>Añadir comentario en una receta</strong>
+            <small>Implementado vía COM-001. textarea (maxLength 500) + hook useAgregarComentario (TanStack Query mutación) + comprobación de sesión NextAuth (input solo visible si hay sesión). Actualización optimista local + rollback si falla el BE. Estado vacío "Sé el primero en comentar".</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/comentariosReceta.tsx · features/recetas/hooks/useAgregarComentario.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-009<br><small style="color:#525252">→ UI-026</small></td>
+          <td class="desc">
+            <strong>Extraer useCrearReceta hook — formularioCrearReceta + previsualizacionReceta</strong>
+            <small>Implementado: features/recetas/hooks/useCrearReceta.ts creado. Detecta alérgenos, llama a recetasService.crear(), limpia el store Zustand y redirige a /coleccion?tab=mis-recetas. previsualizacionReceta.tsx simplificado — elimina useState(publicando) y handlePublicar() inline.</small>
+            <span class="source">📄 features/recetas/hooks/useCrearReceta.ts · previsualizacionReceta.tsx · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">SVC-001</td>
+          <td class="desc">
+            <strong>Crear recetasService.ts — capa HTTP para recetas</strong>
+            <small>Completado en Sprint 3 como parte de REC-007. services/recetasService.ts implementado con obtenerFeed, obtenerPorId, obtenerSimilares, toggleLike, toggleGuardado + hooks TanStack Query.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · frontend/src/services/recetasService.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3 (REC-007)</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DOM-003</td>
+          <td class="desc">
+            <strong>Crear modelo MongoDB — Receta</strong>
+            <small>Completado en Sprint 3 como parte de REC-001. types/receta.ts (IReceta pura) + models/recetaMongo.ts (sub-schemas ingrediente/macros/comentario con _id:false) + repositories/recetaRepository.ts.</small>
+            <span class="source">📄 docs/historico/desarrollo/integracionRecetas.html · backend/src/types/receta.ts · backend/src/models/recetaMongo.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3 (REC-001)</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FEED-001</td>
+          <td class="desc">
+            <strong>Excluir recetas propias del feed de home</strong>
+            <small>Implementado: el repositorio aplica { autorId: { $ne: userId } } cuando el parámetro excluirPropio=true llega al endpoint GET /api/recetas. El FE pasa excluirPropio: true en useRecetasFeed solo cuando hay sesión activa (!!token incluido en la query key para refetch automático al cargar la sesión). staleTime: 0 garantiza que el feed siempre obtiene datos frescos al montar.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useRecetasFeed.ts · frontend/src/features/recetas/components/home/feedHome.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">LIKE-001</td>
+          <td class="desc">
+            <strong>Like persistente en BD — toggle único por usuario</strong>
+            <small>Implementado: endpoint POST /api/recetas/:id/like que añade/elimina el userId del array likes con toggle (un like por usuario). Devuelve { liked, totalLikes }. FE: hook useToggleLike con mutación TanStack Query y actualización optimista en cabeceraReceta. En el feed las tarjetas muestran el contador de likes solo como dato informativo (sin interacción) para evitar problemas de sincronía entre vistas. La vista detalle llama a router.refresh() en onSuccess para refrescar los datos SSR tras cada acción.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useToggleLike.ts · frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx · frontend/src/features/recetas/components/home/tarjetaPost.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COM-001</td>
+          <td class="desc">
+            <strong>Comentarios persistentes en BD (ver + añadir)</strong>
+            <small>Implementado: endpoint POST /api/recetas/:id/comentarios que guarda en listaComentarios del documento Receta (requiere auth). El FE usa hook useAgregarComentario con actualización optimista local (el comentario aparece al instante) y llama a router.refresh() en onSuccess para recargar la lista desde el servidor. El contador de comentarios se muestra en la tarjeta del feed. Estado vacío muestra "Sé el primero en comentar".</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/hooks/useAgregarComentario.ts · frontend/src/features/recetas/components/detalleReceta/comentariosReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">SOC-001</td>
+          <td class="desc">
+            <strong>Botón Seguir / Dejar de seguir en detalle de receta</strong>
+            <small>Implementado: esquema Usuario con arrays seguidos[] y seguidores[]. Endpoint POST /api/usuarios/:id/seguir (toggle add/remove, devuelve { siguiendo }). FE: botón Seguir/Siguiendo en cabeceraReceta junto al avatar del autor, oculto en recetas propias. Estado inicial sigueAlAutor viene del SSR (page.tsx con export const dynamic = 'force-dynamic' para evitar caché). Llamada a router.refresh() en onSuccess para mantener sincronía.</small>
+            <span class="source">📄 backend/src/models/usuarioMongo.ts · backend/src/repositories/usuarioRepository.ts · frontend/src/features/recetas/components/detalleReceta/cabeceraReceta.tsx · frontend/src/app/(main)/recetas/[id]/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">ALEG-001</td>
+          <td class="desc">
+            <strong>Auditoría de iconos de alérgenos — verificación completa</strong>
+            <small>14 archivos webp verificados en frontend/public/alergenos/: altramuz, apio, cacahuetes, cereales, crustaceo, frutos-secos, huevo, lacteos, moluscos, mostaza, pescado, sesamo, soja, sulfitos. Los 14 IDs de chipAlergeno.tsx coinciden con los de ALERGENOS_OPCIONES en opcionesUsuario.ts. Rutas en icono de opcionesUsuario (/alergenos/crustaceo.webp) y en chipAlergeno ('crustaceo') consistentes. next/image carga rutas locales sin configuración extra. Sin cambios en código.</small>
+            <span class="source">📄 frontend/src/components/common/chipAlergeno.tsx · frontend/src/config/opcionesUsuario.ts · frontend/public/alergenos/</span>
+          </td>
+          <td><span class="status done">✅ Verificado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-003</td>
+          <td class="desc">
+            <strong>Compartir receta — Web Share API + fallback clipboard</strong>
+            <small>Botón Compartir en cabeceraReceta.tsx ahora funcional. En móvil usa navigator.share() que abre el share sheet nativo del SO (WhatsApp, Telegram, copia de enlace, etc.). En escritorio (sin navigator.share) copia la URL al portapapeles con navigator.clipboard.writeText(). Feedback visual: icono Share2 → Check y label "Compartir" → "¡Copiado!" durante 2 segundos con color text-brand. Estado urlCopiada local (useState). Sin backend ni nuevo hook — es una API del navegador, no una llamada HTTP. TypeScript: función async con bloques try/catch separados para share y clipboard. Sin breaking changes en otros componentes.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · docs/historico/desarrollo/funcionalidadSocial.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">STRUCT-002</td>
+          <td class="desc">
+            <strong>Scaffolding vistas /despensa, /discover y /perfil</strong>
+            <small>Completado: las tres vistas están implementadas con contenido funcional completo. /despensa (DESP-001) · /discover (DISC-001) · /perfil (PERF-001). Todas aprobadas por el autor en Sprint 4.</small>
+            <span class="source">📄 frontend/src/app/(main)/despensa · /discover · /perfil</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-029</td>
+          <td class="desc">
+            <strong>Tarjeta fantasma "+ Nueva receta" en Mis Recetas</strong>
+            <small>Primera celda del grid de Mis Recetas en /coleccion: tarjeta aspect-[3/4] con borde punteado brand, círculo con icono Plus brand y texto "Nueva receta". Enlaza directamente a /crear-receta. Solo aparece en la pestaña "mis-recetas", no en "guardadas". Patrón contextual (Opción D de opcionesCrearRecetaBtn.html). Sin hooks ni BE — puramente UI. Server component, 0 colores hardcodeados, imports @/.</small>
+            <span class="source">📄 features/coleccion/components/gridRecetasColeccion.tsx · docs/historico/desarrollo/opcionesCrearRecetaBtn.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-001</td>
+          <td class="desc">
+            <strong>Autocompletado de ingredientes con fuente real</strong>
+            <small>Reemplazado el mock de 30 ingredientes (datosIngredientes.ts, eliminado) por src/config/ingredientes.ts con 200+ ingredientes en 17 categorías, aliases multilingüe (español/inglés/catalán) y alérgenos EU completos (14 ids). seccionIngredientes.tsx ahora llama a buscarIngredientes(valor, 6) del nuevo fichero — busca contra nombre principal Y aliases. Filtrado client-side sin latencia de red.</small>
+            <span class="source">📄 src/config/ingredientes.ts · features/recetas/components/crearReceta/seccionIngredientes.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">ALERG-002</td>
+          <td class="desc">
+            <strong>Alérgenos desde la fuente de ingredientes real</strong>
+            <small>features/recetas/utils/detectarAlergenos.ts reescrito como re-export de @/config/ingredientes (detectarAlergenos + obtenerIngrediente + AlergenoId). La nueva detectarAlergenos usa obtenerIngrediente() con matching exacto por nombre y aliases — más preciso que el matching parcial anterior. Imports de formularioCrearReceta.tsx y previsualizacionReceta.tsx corregidos a @/features/recetas/utils/detectarAlergenos (alias @/ en lugar de rutas relativas cross-folder).</small>
+            <span class="source">📄 features/recetas/utils/detectarAlergenos.ts · src/config/ingredientes.ts · formularioCrearReceta.tsx · previsualizacionReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-002</td>
+          <td class="desc">
+            <strong>Capa de infraestructura para ingredientes externos — service + store</strong>
+            <small>ingredientesService.ts: stub para futura integración con Edamam Food Database API (buscarEdamam devuelve [] hasta Fase 6). ingredientesCustomStore.ts: Zustand persist store que guarda ingredientes que el usuario encontró vía Edamam; persiste en localStorage con la key 'cookr-ingredientes-custom'. Métodos: añadir (deduplica por nombre), buscarEnCustom (filtra por nombre + aliases, devuelve máx 4), limpiar.</small>
+            <span class="source">📄 src/services/ingredientesService.ts · src/stores/ingredientesCustomStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-003</td>
+          <td class="desc">
+            <strong>Hook useAutocompletadoIngredientes — local + custom + Edamam fallback</strong>
+            <small>features/recetas/hooks/useAutocompletadoIngredientes.ts. Orden de prioridad: (1) buscarIngredientes(query) — local instantáneo, 239 ingredientes; (2) buscarEnCustom(query) — caché Zustand persist; combinados 1+2 antes de evaluar si hay suficientes (≥3). Si hay menos de 3 resultados combinados: debounce 300ms → ingredientesService.buscarEdamam() (placeholder Fase 6). Retorna: { sugerencias: DatoIngrediente[], cargando: boolean, esFallback: boolean }.</small>
+            <span class="source">📄 src/features/recetas/hooks/useAutocompletadoIngredientes.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-004</td>
+          <td class="desc">
+            <strong>seccionIngredientes.tsx — usa useAutocompletadoIngredientes</strong>
+            <small>Reemplazado el filtrado inline (buscarIngredientes(valor, 6) directo en el handler) por el hook. Estado refactorizado: sugerencias:{idx,lista} → inputActivo:{idx,query} + hook. El dropdown ahora renderiza DatoIngrediente[].nombre en lugar de string[]. La lógica de debounce y fallback queda en el hook, el componente solo gestiona qué fila está activa.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <!-- ── Colección — conectar BE ── -->
+        <tr>
+          <td class="id">COL-001</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas/guardadas — recetas guardadas del usuario</strong>
+            <small>Implementado: recetaRepository.findGuardadas() busca en usuarioMongo.recetasGuardadas y popula los documentos Receta. Ruta añadida ANTES de /:id en el router para evitar colisión de parámetros.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-002</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas/mis-recetas — recetas creadas por el usuario</strong>
+            <small>Implementado: recetaRepository.findPorAutor() con filtro { autorId } + sort fechaPublicacion desc. Ruta añadida ANTES de /:id.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-007</td>
+          <td class="desc">
+            <strong>BE: DELETE /api/recetas/:id — eliminar receta propia</strong>
+            <small>Implementado: recetaRepository.eliminar() verifica autorId === userId (403 si no coincide, 404 si no existe). Respuesta 204 sin cuerpo.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-004</td>
+          <td class="desc">
+            <strong>FE: hooks useRecetasGuardadas + useMisRecetas — conectar contenidoColeccion.tsx</strong>
+            <small>Implementado: hooks TanStack Query en features/coleccion/hooks/. contenidoColeccion.tsx reemplaza mocks por hooks reales, añade GridSkeletonColeccion (animate-pulse) durante carga, y lee ?tab=mis-recetas del URL con useSearchParams.</small>
+            <span class="source">📄 features/coleccion/hooks/useRecetasGuardadas.ts · useMisRecetas.ts · contenidoColeccion.tsx · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-005</td>
+          <td class="desc">
+            <strong>FE: Bookmark funcional — desguardar desde /coleccion (pestaña Guardadas)</strong>
+            <small>Implementado: tarjetaColeccion.tsx usa useToggleGuardado(receta.id). Actualización optimista: setGuardado(false) inmediato + return null si !guardado. Rollback en onError.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">COL-006</td>
+          <td class="desc">
+            <strong>FE: Botón ··· funcional — eliminar receta desde /coleccion (pestaña Mis recetas)</strong>
+            <small>Implementado: tarjetaColeccion.tsx abre Sheet (shadcn) con opciones → Dialog de confirmación → useEliminarReceta.mutate(). Actualización optimista: setEliminada(true) en onSuccess. Opción "Editar" desactivada hasta Sprint 5.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx · features/coleccion/hooks/useEliminarReceta.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── Despensa ── -->
+        <tr>
+          <td class="id">DESP-001</td>
+          <td class="desc">
+            <strong>Vista /despensa — FE completa con mock (Sprint 4)</strong>
+            <small>FE completa: types/despensa.types.ts · datosDespensa.ts (12 items mock + EMOJIS map + getEmojiIngrediente) · despensaStore.ts (Zustand: añadir/editar/eliminar, estado inicial con mock). Componentes: headerDespensa (título editorial + contador) · barraAnadirIngrediente (pill CTA + botón + brand) · estadoVacioDespensa (ShoppingBasket + CTA) · tarjetaIngrediente (emoji avatar + nombre + cantidad + pencil/trash, AnimatePresence exit) · listaIngredientes (AnimatePresence) · sheetAnadirIngrediente (Sheet shadcn + input + autocompletado + chips rápidas + cantidad/unidad + detección duplicados case-insensitive → Dialog "ya está en tu despensa") · dialogEditarIngrediente (Dialog shadcn + form pre-rellenado) · contenidoDespensa (orquestador client) · page.tsx (mobile + desktop SidebarNavPc). Stitch: docs/diseno/stitch/despensa/.</small>
+            <span class="source">📄 features/despensa/ · stores/despensaStore.ts · app/(main)/despensa/page.tsx · docs/diseno/stitch/despensa/</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Despensa BE+FE ── -->
+        <tr>
+          <td class="id">DESP-BE-001</td>
+          <td class="desc">
+            <strong>BE: Schema MongoDB despensa — IItemDespensa + subdocumento en Usuario</strong>
+            <small>Creado backend/src/types/despensa.ts con IItemDespensa (_id?, nombre, cantidad, unidad, emoji, fechaAnadido). Extendido IUsuario con despensa?: IItemDespensa[]. Añadido itemDespensaSchema (subdocumento embebido) en usuarioMongo.ts con campo despensa: [itemDespensaSchema] default [].</small>
+            <span class="source">📄 backend/src/types/despensa.ts · backend/src/types/usuario.ts · backend/src/models/usuarioMongo.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-002</td>
+          <td class="desc">
+            <strong>BE: despensaRepository — obtener / añadir / editar / eliminar</strong>
+            <small>Creado backend/src/repositories/despensaRepository.ts. obtener(): findById().select('despensa'). añadir(): $push. editar(): $set posicional con 'despensa.$.campo'. eliminar(): $pull por _id. Todos devuelven el array despensa actualizado. Valida ObjectId en editar y eliminar (400 si inválido).</small>
+            <span class="source">📄 backend/src/repositories/despensaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-003</td>
+          <td class="desc">
+            <strong>BE: despensaService + despensaController</strong>
+            <small>despensaService.ts: capa de negocio ligera, delega en el repositorio. despensaController.ts: obtener (GET), añadir (POST, valida 4 campos obligatorios), editar (PUT /:id, construye $set dinámico), eliminar (DELETE /:id). manejarError() centralizado igual que recetasController.</small>
+            <span class="source">📄 backend/src/services/despensaService.ts · backend/src/controllers/despensaController.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-BE-004</td>
+          <td class="desc">
+            <strong>BE: despensa.routes.ts + registro en app.ts</strong>
+            <small>GET / · POST / · PUT /:id · DELETE /:id, todas con requerirAuth. Registrado en app.ts como app.use('/api/despensa', despensaRoutes) junto a los demás routers.</small>
+            <span class="source">📄 backend/src/routes/despensa.routes.ts · backend/src/app.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-001</td>
+          <td class="desc">
+            <strong>FE: despensaService.ts — 4 métodos HTTP con normalización _id→id</strong>
+            <small>Creado frontend/src/services/despensaService.ts con obtener(), añadir(), editar(), eliminar(). Todos envían Authorization: Bearer {token}. normalizar() mapea _id de MongoDB a id para compatibilidad con ItemDespensa del frontend.</small>
+            <span class="source">📄 frontend/src/services/despensaService.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-002</td>
+          <td class="desc">
+            <strong>FE: hooks TanStack Query — useMiDespensa + useAñadirItem + useEditarItem + useEliminarItem</strong>
+            <small>Creado frontend/src/features/despensa/hooks/useMiDespensa.ts. useMiDespensa: useQuery con staleTime:0. Las 3 mutations usan optimistic update (onMutate) + rollback completo (onError) + sync desde BE (onSuccess). Mismo patrón que useToggleLike y useToggleGuardado.</small>
+            <span class="source">📄 frontend/src/features/despensa/hooks/useMiDespensa.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-FE-003</td>
+          <td class="desc">
+            <strong>FE: contenidoDespensa + sheetAnadirIngrediente conectados a hooks reales — despensaStore eliminado</strong>
+            <small>contenidoDespensa.tsx: usa useMiDespensa/useAñadirItem/useEditarItem/useEliminarItem en lugar de useDespensaStore. Spinner de carga mientras isLoading. sheetAnadirIngrediente.tsx: recibe ingredientesExistentes como prop en lugar de leer el store (para detección de duplicados). despensaStore.ts vaciado (store Zustand eliminado, no hay estado mock).</small>
+            <span class="source">📄 frontend/src/features/despensa/components/contenidoDespensa.tsx · sheetAnadirIngrediente.tsx · stores/despensaStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Vista /perfil ── -->
+        <tr>
+          <td class="id">PERF-001</td>
+          <td class="desc">
+            <strong>Vista /perfil — FE completa con mock (Sprint 4)</strong>
+            <small>FE completa: types/perfil.types.ts · datosPerfil.ts (mock: nombre, email, dietas, alérgenos, permisos) · perfilStore.ts (Zustand: actualizarDietas, actualizarAlergenos, togglePermiso). Componentes: tarjetaAvatarPerfil (display-only: avatar 80px + camera button, sin "Editar nombre" ni Dialog) · grupoAjustes · filaAjuste · filaTogglePermiso (switch role=switch) · dialogCambiarContrasena (RHF + Zod, mock submit) · dialogPreferenciasAlergenos (chips Dieta + Alérgenos) · contenidoPerfil (orquestador, botón único "Guardar cambios" full-width, sin botón "Volver"). page.tsx: mobile + desktop. Stitch: docs/diseno/stitch/perfil/.</small>
+            <span class="source">📄 features/perfil/ · stores/perfilStore.ts · app/(main)/perfil/page.tsx · docs/diseno/stitch/perfil/</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Perfil BE+FE ── -->
+        <tr>
+          <td class="id">PERF-BE-001</td>
+          <td class="desc">
+            <strong>BE: GET /api/usuarios/me — perfil del usuario autenticado</strong>
+            <small>Nuevo endpoint requerirAuth. usuarioRepository.buscarPerfilPorId() con .select('nombre correo foto alergias preferencias proveedor'). usuariosService.obtenerPerfil() + usuariosController.obtenerPerfil(). Devuelve: { nombre, correo, foto, alergias, preferencias, proveedor }.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts · backend/src/routes/usuarios.routes.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-BE-002</td>
+          <td class="desc">
+            <strong>BE: PUT /api/usuarios/me/contrasena — cambiar contraseña (solo proveedor local)</strong>
+            <small>requerirAuth. Valida contrasenaActual + contrasenaNueva (mín. 8 chars). bcrypt.compare(actual, hash) → 400 si no coincide. bcrypt.hash(nueva, 10) → usuarioRepository.actualizarContrasena(). 400 si proveedor !== 'local'. Devuelve 200 { mensaje }.</small>
+            <span class="source">📄 backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts · backend/src/routes/usuarios.routes.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-BE-003</td>
+          <td class="desc">
+            <strong>BE: PUT /api/usuarios/me/preferencias — guardar dietas y alérgenos en BD</strong>
+            <small>requerirAuth. Body: { dietas: string[], alergenos: string[] }. Mapea dietas→preferencias, alergenos→alergias en el documento Usuario. usuarioRepository.actualizarPreferencias(). Devuelve el perfil actualizado.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/services/usuariosService.ts · backend/src/controllers/usuariosController.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-001</td>
+          <td class="desc">
+            <strong>FE: perfilService.ts — 3 métodos HTTP con Authorization Bearer</strong>
+            <small>Creado frontend/src/services/perfilService.ts. getMiPerfil(token): GET /usuarios/me. cambiarContrasena(token, actual, nueva): PUT /usuarios/me/contrasena. actualizarPreferencias(token, dietas, alergenos): PUT /usuarios/me/preferencias. Exporta PerfilRespuesta con los campos del BE. Fix: import { apiClient } corregido (era default import).</small>
+            <span class="source">📄 frontend/src/services/perfilService.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-002</td>
+          <td class="desc">
+            <strong>FE: hooks TanStack Query — useMiPerfil + useCambiarContrasena + useActualizarPreferencias</strong>
+            <small>Creado features/perfil/hooks/usePerfil.ts. useMiPerfil: useQuery staleTime 5min (refetchOnMount:always eliminado). useCambiarContrasena: useMutation. useActualizarPreferencias: useMutation con optimistic update (alergias + preferencias) y rollback en onError. extraerMensajeError() helper para errores Axios.</small>
+            <span class="source">📄 frontend/src/features/perfil/hooks/usePerfil.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FE-003</td>
+          <td class="desc">
+            <strong>FE: contenidoPerfil + dialogCambiarContrasena + perfilStore conectados al BE real</strong>
+            <small>contenidoPerfil.tsx: nombre/email/foto de useSession(), dietas/alergenos de useMiPerfil(), "Cambiar contraseña" oculto si proveedor==='google'. perfilStore.ts simplificado a solo permisos. dialogCambiarContrasena.tsx: onSubmit llama a useCambiarContrasena() con error visible si contraseña actual incorrecta (400). dialogPreferenciasAlergenos: llama useMiPerfil() directamente (cache hit) y sincroniza draft con [abierto, perfil].</small>
+            <span class="source">📄 features/perfil/components/contenidoPerfil.tsx · dialogPreferenciasAlergenos.tsx · dialogCambiarContrasena.tsx · stores/perfilStore.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-FIX-001</td>
+          <td class="desc">
+            <strong>FIX: dialog preferencias no mostraba chips activos al abrirse</strong>
+            <small>Causa: refetchOnMount:always + invalidateQueries en mount → perfil undefined durante refetch → props vacías al dialog. Fix: staleTime 5min en useMiPerfil, eliminado useEffect invalidateQueries en contenidoPerfil, dialogPreferenciasAlergenos usa useMiPerfil() directamente (cache hit, sin fetch extra) y sincroniza draft con [abierto, perfil]. tsc --noEmit: 0 errores.</small>
+            <span class="source">📄 features/perfil/hooks/usePerfil.ts · contenidoPerfil.tsx · dialogPreferenciasAlergenos.tsx · docs/historico/desarrollo/perfilIntegracion.html#fix</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Vista /chat ── -->
+        <tr>
+          <td class="id">CHAT-001</td>
+          <td class="desc">
+            <strong>Vista /chat — FE completa con mock (Sprint 4)</strong>
+            <small>Chat IA full-screen sin NavBar. Estado vacío con 3 chips sugeridos. Burbujas usuario (derecha, bg-brand) y IA (izquierda, bg-card + chef avatar). IndicadorPensando animado (Framer Motion). BarraInputChat sticky bottom con textarea auto-resize. chatStore Zustand con enviarMensaje + getMockRespuesta (1.4s delay). ContenidoChat usa fixed inset-0 z-[60] overlay. NavBar oculto en /chat. HeaderChat: botón ← + título centrado + spacer (sin botón "Historial" top-right) + pill "Ver historial". 10 ficheros nuevos.</small>
+            <span class="source">📄 features/chat/ · stores/chatStore.ts · app/(main)/chat/page.tsx · docs/diseno/stitch/chat/</span>
+          </td>
+          <td><span class="status done">✅ Aprobado autor · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Vista /discover ── -->
+        <tr>
+          <td class="id">DISC-001</td>
+          <td class="desc">
+            <strong>Vista /discover — FE completa con mock (Sprint 4)</strong>
+            <small>Feed de descubrimiento global. Header editorial "Descubre lo que está trending?" con barra de búsqueda pill. Chips de categoría (Todos · Desayuno · Pasta · Vegano · Postres) con single-select. TarjetaDestacada — hero card evento semanal con fondo degradado y etiqueta Sparkles. Grid 2 columnas de TarjetaDiscover (aspect-[3/4] con foto, overlay gradiente, autor + likes + tiempo). Tabs "Más nuevo / Reciente" en sección Inspiración. Búsqueda con debounce 300ms (useDebounce reutilizado) filtra por título y autor. Estado vacío con query resaltada en brand, CTA "Limpiar búsqueda" y 4 chips de sugerencias populares. AnimatePresence entre vista principal y estado vacío. 7 componentes + 1 data file + 2 tipos. Diseño: The Digital Gourmet Editorial (Stitch). Integración BE en Fase 5.</small>
+            <span class="source">📄 features/discover/ · app/(main)/discover/page.tsx · docs/historico/desarrollo/discover.html · docs/diseno/stitch/discover/</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Crear receta ── -->
+        <tr>
+          <td class="id">CREAR-001</td>
+          <td class="desc">
+            <strong>Tutorial crear receta activado por datos reales del usuario</strong>
+            <small>MOCK_ES_PRIMER_USUARIO eliminado. Se llama al hook useMisRecetas() (reutiliza GET /api/recetas/mis-recetas, COL-002 activo en BE). useEffect reactivo a cargandoRecetas + misRecetas: cuando la query termina y el array está vacío, muestra PopUpTutorial → TutorialCrearReceta (stepper animado). Condición misRecetas?.length ?? 1 evita activar el tutorial mientras la query está cargando.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · features/coleccion/hooks/useMisRecetas.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CREAR-002</td>
+          <td class="desc">
+            <strong>Publicar receta real — endpoint BE + servicio FE + subida de foto</strong>
+            <small>Implementado: BE POST /api/recetas con validación Zod + recetaRepository.crear(). FE: recetasService.crear() + useCrearReceta hook. previsualizacionReceta.tsx usa publicar() del hook en lugar de setTimeout. Foto como base64 en el body. Redirección a /coleccion?tab=mis-recetas tras publicar.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/previsualizacionReceta.tsx · backend/src/routes/recetas.routes.ts · features/recetas/hooks/useCrearReceta.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+
+        <!-- ── Fixes y mejoras UI Sprint 4 ── -->
+        <tr>
+          <td class="id">FIX-001</td>
+          <td class="desc">
+            <strong>BE: Fix publicar receta con foto — express.json limit 10mb</strong>
+            <small>El límite por defecto de express.json() es 100 KB. Las fotos en base64 superan fácilmente 500 KB, provocando un 413 Payload Too Large antes de llegar al controller. Fix: app.use(express.json({ limit: '10mb' })) en app.ts.</small>
+            <span class="source">📄 backend/src/app.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FIX-002</td>
+          <td class="desc">
+            <strong>FE: Fix redirect a ?tab=mis-recetas tras publicar — Suspense en coleccion/page.tsx</strong>
+            <small>useSearchParams() en contenidoColeccion.tsx requiere un Suspense boundary en Next.js 14 App Router. Sin él, searchParams era null en el render inicial y tabInicial siempre era 'guardadas', ignorando el parámetro de URL. Fix: envolver ContenidoColeccion en &lt;Suspense&gt; en page.tsx (mobile y desktop).</small>
+            <span class="source">📄 app/(main)/coleccion/page.tsx · features/coleccion/components/contenidoColeccion.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-001</td>
+          <td class="desc">
+            <strong>FE: Botón ··· de tarjetaColeccion más visible — círculo bg-white/20</strong>
+            <small>El botón MoreHorizontal pasó de text-white/80 sin fondo a un círculo w-8 h-8 con bg-white/20 backdrop-blur-sm, igual que el botón bookmark de la pestaña Guardadas. Affordance visual consistente entre las dos pestañas.</small>
+            <span class="source">📄 features/coleccion/components/tarjetaColeccion.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-002</td>
+          <td class="desc">
+            <strong>FE: Botón Eliminar en detalle receta — solo visible para el autor</strong>
+            <small>Icono Trash2 añadido a la fila de acciones sociales en cabeceraReceta.tsx (junto a Compartir), visible solo cuando session.user.id === receta.autor.id. Abre Dialog de confirmación. En onSuccess redirige a /coleccion?tab=mis-recetas. Reutiliza useEliminarReceta hook de coleccion.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx · features/coleccion/hooks/useEliminarReceta.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-003</td>
+          <td class="desc">
+            <strong>FE: seccionIngredientes rediseñada — card por ingrediente, dos filas, 20 unidades</strong>
+            <small>Cada ingrediente es ahora una card con borde: fila superior con el nombre a ancho completo (h-12, autocompletado funcional) + icono eliminar; separador; fila inferior con Cantidad | Unidad divididos en dos columnas. Unidades ampliadas de 7 a 20 (g, kg, mg, ml, cl, dl, l, cucharadita, cucharada, taza, pizca, unidad, diente, hoja, rama, rebanada, lata, sobre, bolsa, al gusto). Targets mínimos h-12 en nombre, h-10 en cantidad/unidad.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionIngredientes.tsx · features/recetas/types/crearReceta.schema.ts</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-AF-004</td>
+          <td class="desc">
+            <strong>FE: seccionPasos con textarea auto-resize — el texto siempre visible</strong>
+            <small>El textarea de cada paso crece automáticamente con el contenido (onInput → scrollHeight), eliminando el scroll interno. Arranca con min-h de 80px (3 filas) y se expande sin límite. resize-none + overflow-hidden evitan el scroll visual dentro del campo. Target mínimo py-3.5 para mayor comodidad en móvil.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/seccionPasos.tsx</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── /discover + /home integración BE ── -->
+        <tr>
+          <td class="id">DISC-BE-001</td>
+          <td class="desc">
+            <strong>BE: Conectar /discover al backend + /home solo-siguiendo</strong>
+            <small>
+              BE — 4 ficheros modificados:<br>
+              · <code>types/receta.ts</code>: campo <code>esEvento?</code> en IReceta; campos <code>soloSiguiendo</code>, <code>sort</code>, <code>soloEvento</code>, <code>categoria</code>, <code>dietas</code> en FiltrosFeed.<br>
+              · <code>models/recetaMongo.ts</code>: campo <code>esEvento: Boolean, default:false</code>.<br>
+              · <code>repositories/recetaRepository.ts</code>: findAll() maneja 5 filtros nuevos; sort in-memory por likes (todos.sort comparando longitud de array likes).<br>
+              · <code>controllers/recetasController.ts</code>: parsea los 5 nuevos query params, split por coma para arrays, comparación con "true" para booleanos.<br>
+              FE — 6 ficheros modificados:<br>
+              · <code>services/recetasService.ts</code>: FiltrosFeed + serializarFiltros extendido.<br>
+              · <code>hooks/useRecetasFeed.ts</code>: soloSiguiendo (solo si !!token), sort, dietas.<br>
+              · <code>feedHome.tsx</code>: soloSiguiendo:true, excluirPropio:true.<br>
+              · <code>feedHomePc.tsx</code>: migrado de POSTS_MOCK a useRecetasFeed real con mismos parámetros.<br>
+              · <code>features/discover/hooks/useDiscover.ts</code>: hook nuevo — tab→sort/soloEvento, filtrosAvanzados, limite:30.<br>
+              · <code>features/discover/types/discover.types.ts</code>: categoria opcional, esEvento opcional.
+            </small>
+            <span class="source">📄 docs/historico/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FILT-001</td>
+          <td class="desc">
+            <strong>FE: Fix case sensitivity en chips de categoría de /discover</strong>
+            <small>Los chips enviaban valores capitalizados (<code>'Vegano'</code>, <code>'Pasta'</code>) pero MongoDB almacena los valores de categorías en minúsculas (<code>'vegano'</code>, <code>'pasta'</code>) según el seed. Fix: <code>categoria.toLowerCase()</code> en useDiscover.ts antes de pasar el parámetro al servicio. Sin cambios en BE.</small>
+            <span class="source">📄 features/discover/hooks/useDiscover.ts · docs/historico/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">FILT-002</td>
+          <td class="desc">
+            <strong>FE: DrawerFiltros en /discover + semántica incluir/excluir + filtro dietas real</strong>
+            <small>
+              headerDiscover.tsx reescrito para incluir DrawerFiltros (reutilizando el componente de /home). Estado filtrosAvanzados vive en contenidoDiscover.tsx y fluye hacia el hook.<br>
+              Nuevo parámetro <code>dietas</code> en FiltrosFeed y serializarFiltros — los ids de DIETAS_OPCIONES ('vegano', 'vegetariano'…) ya son lowercase y coinciden con MongoDB.<br>
+              BE: recetaRepository.findAll() aplica <code>categorias:{$in:dietas}</code>.<br>
+              Etiquetas en drawerFiltros.tsx actualizadas:<br>
+              · "Tipo de dieta" + subtítulo "Muestra recetas que incluyan esta dieta" ($in — incluyente)<br>
+              · "Dificultad" + subtítulo "Muestra recetas de este nivel de dificultad" ($in — incluyente)<br>
+              · "Alérgenos" + subtítulo "Oculta recetas que contengan estos alérgenos" ($nin — excluyente)<br>
+              Chips de categoría eliminados de contenidoDiscover.tsx (reemplazados por el drawer).
+            </small>
+            <span class="source">📄 features/discover/components/headerDiscover.tsx · contenidoDiscover.tsx · features/recetas/components/home/drawerFiltros.tsx · backend/src/repositories/recetaRepository.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-030</td>
+          <td class="desc">
+            <strong>FE: TarjetaDiscover rediseñada — mobile-first editorial</strong>
+            <small>Mejoras: group+group-hover:scale-105 en imagen (zoom suave). Gradiente from-black/90 via-black/25 to-transparent (más agresivo para legibilidad). Badge likes esquina top-right con Heart relleno rose-400 + bg-black/40 backdrop-blur-sm. Avatar autor circular bg-brand/70. Función formatTiempo() que formatea 90min como "1h 30m" con guard tiempoMin>0 (no muestra el campo si es 0).</small>
+            <span class="source">📄 features/discover/components/tarjetaDiscover.tsx · docs/historico/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEED-001</td>
+          <td class="desc">
+            <strong>Seed: esEvento + relaciones de seguimiento entre usuarios de prueba</strong>
+            <small>
+              · Paella Valenciana marcada con <code>esEvento:true</code> → permite probar la tab "Especiales Evento".<br>
+              · Seguimientos creados con $addToSet tras insertar los 4 usuarios: María→Carlos, María→Lucía, Carlos→María, Carlos→Andrés. Los seguidores recíprocos también se actualizan. Permite probar el feed soloSiguiendo con el usuario María.
+            </small>
+            <span class="source">📄 backend/src/scripts/seedCompleto.ts · docs/historico/desarrollo/discoverHomeIntegracion.html#seed</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">MIDDLEWARE-001</td>
+          <td class="desc">
+            <strong>FE: Restaurar rutas protegidas en middleware.ts</strong>
+            <small>El middleware estaba desactivado (stub vacío + matcher:[]) durante el desarrollo. Se restaura usando <code>export { default } from "next-auth/middleware"</code> con matcher para: /home, /discover, /despensa, /perfil, /chat, /coleccion, /crear-receta, /crear-receta/revisar, /recetas/:path*. Sin sesión → redirige a /login (configurado en lib/auth.ts como pages.signIn).</small>
+            <span class="source">📄 frontend/src/middleware.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SPRINT 5+ — BAJA -->
+  <section id="sprint5plus">
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <h2>Sprint 5 en adelante — No urgente</h2>
+      <span class="sprint-badge s5">Sprint 5+</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">HANDS-001</td>
+          <td class="desc">
+            <strong>Modo manos libres — TTS + Wake Lock</strong>
+            <small>Creado useModoManoLibres.ts: Web Speech API (es-ES, rate 0.9), auto-avance en utterance.onend, Navigator Wake Lock para pantalla always-on, cleanup en useEffect. Controles: ← anterior · ⏸/▶ pausar/reanudar · → siguiente · ✕ detener. Paso activo resaltado con ring-brand. Botón oculto en navegadores sin soporte (guard soportado). Integrado en pasosReceta.tsx (pasos: string[]) y previsualizacionReceta.tsx (mapea {texto}[] a string[]).</small>
+            <span class="source">📄 docs/historico/desarrollo/modoManoLibres.html · frontend/src/features/recetas/hooks/useModoManoLibres.ts · pasosReceta.tsx · previsualizacionReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-001</td>
+          <td class="desc">
+            <strong>Información nutricional automática — Edamam Nutrition Analysis API</strong>
+            <small>Al publicar una receta, recetaRepository.crear() llama a calcularMacros(ingredientes[]) antes de guardar. La función convierte cada ingrediente a string "200g tomate" y hace POST a Edamam Nutrition Analysis API. Sin claves configuradas devuelve ceros (sin error). Requiere EDAMAM_APP_ID y EDAMAM_APP_KEY en backend/.env (tier gratuito: 100 análisis/mes, sin tarjeta).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/src/repositories/recetaRepository.ts · docs/historico/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">UI-010 / UI-011 / UI-012 / UI-013</td>
+          <td class="desc">
+            <strong>Refactor de capas: formularios de recuperación y verificación</strong>
+            <small>Extraer lógica de envío de FormularioRecuperarContrasena, FormularioNuevaContrasena, TarjetaVerificacionPendiente y TarjetaRecuperacionPendiente a useAuth.ts.</small>
+            <span class="source">📄 docs/historico/cambios/ui.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-003</td>
+          <td class="desc">
+            <strong>Compartir receta (Web Share API) — movido a Sprint 4</strong>
+            <small>Ver entrada actualizada en la sección Sprint 4.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/cabeceraReceta.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-006</td>
+          <td class="desc">
+            <strong>Añadir ingredientes de una receta a la despensa (FE mock)</strong>
+            <small>Botón "Añadir a mi despensa" en tabsReceta.tsx conectado a useDespensaStore. handleAnadirDespensa itera los ingredientes de la receta, filtra duplicados case-insensitive comparando con el store, y llama a añadir() con emoji via getEmojiIngrediente(). Feedback visual 3 s: "✓ Añadidos" + disabled. FE mock Sprint 4 — integración real con BE en Fase 5 (despensaRepository).</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/tabsReceta.tsx · stores/despensaStore.ts · features/despensa/data/datosDespensa.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-007</td>
+          <td class="desc">
+            <strong>Modo Manos Libres (síntesis de voz)</strong>
+            <small>Completado como HANDS-001 en Sprint 5. Ver entrada HANDS-001 en esta misma sección.</small>
+            <span class="source">📄 docs/historico/desarrollo/modoManoLibres.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · ver HANDS-001</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-008</td>
+          <td class="desc">
+            <strong>Cargar receta real por ID desde el backend</strong>
+            <small>Ahora /recetas/[id] siempre muestra los mismos datos mock. En Fase 5 hay que sustituirlo por una llamada real a GET /api/recetas/:id.</small>
+            <span class="source">📄 docs/historico/fases/fase-2-pendientes.md</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DET-010</td>
+          <td class="desc">
+            <strong>Metadatos dinámicos por receta (SEO / Open Graph)</strong>
+            <small>Implementado: export const metadata estático eliminado de app/(main)/recetas/[id]/page.tsx. Reemplazado por export async function generateMetadata que llama a recetasService.obtenerPorId(params.id) sin token (contexto separado del page component). Devuelve title = "{titulo} — Cookr", description con tiempo y dificultad, y openGraph con images si imagenUrl existe. Fallback genérico si la receta no existe.</small>
+            <span class="source">📄 frontend/src/app/(main)/recetas/[id]/page.tsx · docs/historico/desarrollo/integracionRecetas.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">LANDING-001</td>
+          <td class="desc">
+            <strong>Configurar imágenes reales en el carrusel hero (landing)</strong>
+            <small>Completado junto a CAROUSEL-001. imageUrl añadido a SlideHero, emoji eliminado, next/image fill con dos capas de overlay. Ver fase-1-sprint-1-carrousel-completados.md</small>
+            <span class="source">📄 docs/historico/fases/fase-1-sprint-1-carrousel-completados.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-013</td>
+          <td class="desc">
+            <strong>BE: POST /api/recetas — crear receta</strong>
+            <small>Implementado en Sprint 4: recetaRepository.crear() mapea dificultad (facil→Fácil), concatena tiempo+unidadTiempo, convierte cantidades string→number. Foto almacenada como base64 en imagenUrl (MVP; Cloudinary en Sprint 6). Macros en 0 hasta Edamam (Sprint 6).</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/routes/recetas.routes.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-014</td>
+          <td class="desc">
+            <strong>BE: GET /api/recetas + GET /api/recetas/:id — feed y detalle reales</strong>
+            <small>Implementado: GET /api/recetas con optionalAuth, filtros (q, dificultad, alergenos, excluirPropio) y paginación. GET /api/recetas/:id con autor populado. FE: recetasService.obtenerFeed() + useRecetasFeed hook (TanStack Query, staleTime:0). Detalle: recetasService.obtenerPorId() llamado en SSR (force-dynamic). Feed home y vista detalle muestran datos reales de MongoDB.</small>
+            <span class="source">📄 backend/src/routes/recetas.routes.ts · backend/src/controllers/recetasController.ts · frontend/src/services/recetasService.ts · features/recetas/hooks/useRecetasFeed.ts · app/(main)/recetas/[id]/page.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">FOTO-001</td>
+          <td class="desc">
+            <strong>Foto automática vía Pexels API si el usuario no sube imagen</strong>
+            <small>Si el campo foto queda vacío, llamar a Pexels API (GET /v1/search?query={titulo}&per_page=1) desde imagenService.ts y guardar la URL devuelta en MongoDB. Requiere: PEXELS_API_KEY en Render + campo fotoFuente ('usuario'|'pexels') + fotoCredito ({fotografo, urlFoto, urlPerfil}) en el modelo Receta (DOM-003). Depende de API-013. Ver docs/historico/desarrollo/crearReceta.html §foto-auto.</small>
+            <span class="source">📄 backend/src/services/imagenService.ts · TODO-CR-03 · DOM-003 · docs/historico/desarrollo/crearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">FOTO-002</td>
+          <td class="desc">
+            <strong>Mostrar créditos Pexels en la vista de detalle de receta</strong>
+            <small>Implementado en heroReceta.tsx: cuando fotoFuente === 'pexels' && fotoCredito, se renderiza atribución bajo la imagen con enlaces al fotógrafo y a Pexels (obligatorio por licencia). Props fotoFuente y fotoCredito pasadas desde detalleRecetaCliente.tsx. Ver docs/historico/desarrollo/fotoAutoReceta.html.</small>
+            <span class="source">📄 features/recetas/components/detalleReceta/heroReceta.tsx · docs/historico/desarrollo/fotoAutoReceta.html · FOTO-001</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+
+        <!-- ── Nuevas tareas 2026-05-31 ── -->
+        <tr>
+          <td class="id">FEED-SMART-001</td>
+          <td class="desc">
+            <strong>Feed inteligente en /home — seguidos + recomendaciones por gustos</strong>
+            <small>feedHome.tsx: doble query con useRecetasFeed. Primera: soloSiguiendo:true. Si está vacía y sin filtros activos → segunda query con dietas:preferencias + alergenos:alergias + sort:likes (recomendadas). useRecetasFeed recibe enabled:boolean. useMiPerfil() provee preferencias y alergias. Cuando el feed es recomendado → chip naranja "Recetas para ti — basadas en tus gustos" encima del feed. Estado vacío sin seguidos muestra mensaje contextual.</small>
+            <span class="source">📄 frontend/src/features/recetas/components/home/feedHome.tsx · hooks/useRecetasFeed.ts · docs/historico/desarrollo/discoverHomeIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-003</td>
+          <td class="desc">
+            <strong>Vaciar despensa — eliminar todos los ítems de golpe</strong>
+            <small>BE: DELETE /api/despensa/vaciar (requerirAuth, antes de /:id en router) → despensaRepository.vaciar() → $set:{despensa:[]} → 204. FE: despensaService.vaciar() + useVaciarDespensa mutation (optimistic: setQueryData [] + rollback onError). headerDespensa: pill button rounded-full con border neutro que transiciona a destructive en hover (patrón iOS/Notion/Linear). Visible solo cuando items.length > 0. Dialog de confirmación antes de ejecutar.</small>
+            <span class="source">📄 backend/src/repositories/despensaRepository.ts · backend/src/routes/despensa.routes.ts · frontend/src/features/despensa/hooks/useMiDespensa.ts · frontend/src/features/despensa/components/headerDespensa.tsx · docs/historico/desarrollo/despensaIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">PERF-SSR-001</td>
+          <td class="desc">
+            <strong>Loading states — skeletons para /home y /recetas/[id]</strong>
+            <small>Creados loading.tsx en app/(main)/home/ y app/(main)/recetas/[id]/. Next.js los sirve automáticamente como Suspense boundary durante la carga de la ruta. /home/loading.tsx: skeleton con header + chips de filtro + 3 tarjetas. /recetas/[id]/loading.tsx: skeleton del hero + cabecera + lista de ingredientes.</small>
+            <span class="source">📄 frontend/src/app/(main)/home/loading.tsx · app/(main)/recetas/[id]/loading.tsx · docs/historico/desarrollo/optimizacionRendimiento.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">STATE-001</td>
+          <td class="desc">
+            <strong>Auditoría cache TanStack Query — 3 bugs corregidos</strong>
+            <small>Bugs corregidos: (1) useAgregarComentario invalidaba ['recetas','detalle',id] inexistente → ahora invalida ['comentarios',recetaId] correcto. (2) useToggleGuardado no invalidaba ['coleccion','guardadas'] → ahora sí. (3) useEliminarReceta no invalidaba ['recetas','feed'] → ahora sí. Las mutations están 100% sincronizadas con sus queries correspondientes.</small>
+            <span class="source">📄 features/recetas/hooks/useAgregarComentario.ts · useToggleGuardado.ts · features/coleccion/hooks/useEliminarReceta.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DESP-TICKET-001</td>
+          <td class="desc">
+            <strong>OCR de ticket de compra → ingredientes en despensa (Gemini Vision)</strong>
+            <small>BE: POST /api/despensa/escanear-ticket → chatService.escanearTicket(imagenBase64) → Gemini 1.5 Flash multimodal extrae [{nombre,cantidad,unidad}] del ticket. FE: sheetAnadirIngrediente.tsx añade botón "Escanear ticket" + input capture="environment" + FileReader a base64 + lista de confirmación con "Añadir todos". Fallback cuando no hay GEMINI_API_KEY: error 503 manejado. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/despensa.routes.ts · backend/src/services/chatService.ts · frontend/src/features/despensa/components/sheetAnadirIngrediente.tsx · docs/historico/desarrollo/despensaIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-SMART-001</td>
+          <td class="desc">
+            <strong>Chat Gemini real con contexto despensa + perfil (C1 + C2)</strong>
+            <small>BE: POST /api/chat → chatService.responderChat() construye un system prompt con preferencias, alergias y despensa del usuario antes de llamar a Gemini 1.5 Flash. FE: chatStore.ts reemplaza getMockRespuesta por llamada real a chatService.enviarMensaje(). Nuevo frontend/src/services/chatService.ts. Fallback sin clave: respuesta informativa. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/chat.routes.ts · backend/src/services/chatService.ts · frontend/src/stores/chatStore.ts · frontend/src/services/chatService.ts · docs/historico/desarrollo/chat.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEED-002</td>
+          <td class="desc">
+            <strong>Refactorizar imágenes del seed — Pexels API en lugar de picsum</strong>
+            <small>Script backend/src/scripts/updateSeedImages.ts ya disponible. Itera recetas con picsum en imagenUrl, llama a buscarFotoPexels(titulo), actualiza imagenUrl + fotoFuente + fotoCredito. Requiere ejecutar: cd backend && npx ts-node src/scripts/updateSeedImages.ts</small>
+            <span class="source">📄 backend/src/scripts/updateSeedImages.ts · backend/src/services/imagenService.ts</span>
+          </td>
+          <td><span class="status review">⚠️ Pendiente ejecución</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CREAR-TEXT-001</td>
+          <td class="desc">
+            <strong>Crear receta a partir de texto libre (Gemini)</strong>
+            <small>BE: POST /api/recetas/generar-desde-texto → chatService.generarRecetaDesdeTexto(descripcion) → Gemini genera JSON {titulo,descripcion,tiempo,dificultad,ingredientes,pasos} → responde sin markdown. FE: botón "Crear desde descripción (IA)" en formularioCrearReceta.tsx → dialog con textarea → recetasService.generarDesdeTexto() → methods.reset(datos) pre-rellena el form. Requiere GEMINI_API_KEY.</small>
+            <span class="source">📄 backend/src/routes/recetas.routes.ts · backend/src/services/chatService.ts · features/recetas/components/crearReceta/formularioCrearReceta.tsx · frontend/src/services/recetasService.ts · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-001</td>
+          <td class="desc">
+            <strong>Macros reales al publicar receta — Edamam Nutrition Analysis</strong>
+            <small>BE: nutritionService.ts → calcularMacros(ingredientes[]) llama a POST https://api.edamam.com/api/nutrition-details. Integrado en recetaRepository.crear() antes de guardar. Fallback cuando falta EDAMAM_APP_ID: macros {0,0,0,0}. Requiere EDAMAM_APP_ID + EDAMAM_APP_KEY.</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/src/repositories/recetaRepository.ts · docs/historico/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-001-EXT</td>
+          <td class="desc">
+            <strong>Búsqueda de ingredientes con Edamam Food Database</strong>
+            <small>Reemplazado por INGR-003 (Open Food Facts) ya que Edamam Food Database requería plan de pago. El endpoint GET /api/ingredientes/buscar ahora llama a Open Food Facts gratuitamente.</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts → ver INGR-003</span>
+          </td>
+          <td><span class="status done">✅ Migrado a INGR-003 · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-002</td>
+          <td class="desc">
+            <strong>Expansión lista local de ingredientes a ~1000</strong>
+            <small>ingredientes.ts pasó de 239 a 991 ingredientes cubriendo 18 categorías (nueva: preparados). Incluye ingredientes ibéricos, asiáticos, europeos, tropicales, especias del mundo, embutidos, mariscos gallegos y platos semielaborados. Fuentes: BEDCA, catálogos Mercadona/Carrefour, Open Food Facts, bases de recetas.</small>
+            <span class="source">📄 frontend/src/config/ingredientes.ts · docs/historico/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-003</td>
+          <td class="desc">
+            <strong>Open Food Facts como fallback de autocompletado</strong>
+            <small>ingredientesService.ts (BE) ahora llama a world.openfoodfacts.org/cgi/suggest.pl en lugar de Edamam Food DB. Sin API key, gratuito ilimitado (15 req/min recomendado). Devuelve nombres en español directamente. Timeout 3s + fallback a [].</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts · docs/historico/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-002</td>
+          <td class="desc">
+            <strong>USDA FoodData Central como fallback de cálculo de macros</strong>
+            <small>nutritionService.calcularMacros() ahora tiene doble fallback: Edamam primero (100/mes) → USDA si falla (1000/hora gratis). USDA busca cada ingrediente, escala por unidad con conversión g/kg/ml/tsp/tbsp/taza/unidad, y suma calorías+proteínas+carbos+grasas (nutrientIds USDA: 1008, 1003, 1005, 1004). Requiere USDA_API_KEY en .env (gratis en api.data.gov).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · backend/.env · docs/historico/desarrollo/nutricionIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">AVATAR-001</td>
+          <td class="desc">
+            <strong>Avatar upload real en /perfil</strong>
+            <small>BE: PUT /api/usuarios/me/foto → usuarioRepository.actualizarFoto(id, fotoBase64). FE: perfilService.subirFoto() + useSubirFoto mutation (invalida cache perfil + llama a NextAuth update({image})). tarjetaAvatarPerfil.tsx: input file oculto, preview optimista, spinner, rollback en error.</small>
+            <span class="source">📄 backend/src/routes/usuarios.routes.ts · frontend/src/services/perfilService.ts · frontend/src/features/perfil/hooks/usePerfil.ts · features/perfil/components/tarjetaAvatarPerfil.tsx · docs/historico/desarrollo/perfilIntegracion.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DISC-SCORE-001</td>
+          <td class="desc">
+            <strong>Algoritmo de scoring híbrido para el feed de Discover</strong>
+            <small>Tab "Recientes" usa sort:score en lugar de sort:reciente. Fórmula: score = (likes×2 + comentarios×3) × decay + followBoost + prefBoost. Decay: 1/(1+√diasAntiguo). followBoost +1.5 si el usuario sigue al autor. prefBoost +0.5 por categoría coincidente con preferencias del usuario. BE: calcularScoreFeed() + obtenerPreferenciasUsuario() en recetaRepository.ts. Sort in-memory sobre todos los docs (mismo patrón que sort:likes). FE: useDiscover.ts mapea tab recientes → sort:score.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · backend/src/types/receta.ts · frontend/src/features/discover/hooks/useDiscover.ts · frontend/src/services/recetasService.ts · docs/historico/desarrollo/discoverScoreAlgoritmo.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">PEXELS-CASCADE-001</td>
+          <td class="desc">
+            <strong>Búsqueda Pexels en cascada — tipo de plato como clave visual</strong>
+            <small>buscarFotoPexelsCascada(titulo, categorias) en imagenService.ts. Intento 1: detecta tipo de plato en el título con regex (sopa→soup, guiso→stew, pasta→pasta dish, paella→paella…). Intento 2: ingrediente principal visual si no hay tipo de plato (pollo→chicken, salmón→salmon…). Intento 3: dieta/categoría genérica como fallback. orientation:landscape + per_page:3 en cada intento. Nunca se manda el título crudo a Pexels. Sustituye a buscarFotoPexels() en recetaRepository.crear() y recetasService.obtenerFotoPreview().</small>
+            <span class="source">📄 backend/src/services/imagenService.ts · backend/src/repositories/recetaRepository.ts · backend/src/services/recetasService.ts · docs/historico/desarrollo/plan-pexels-cascade.md</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SEC-IA-001</td>
+          <td class="desc">
+            <strong>Auditoría seguridad endpoints IA — 7 vulnerabilidades corregidas</strong>
+            <small>(1) Prompt injection en generarRecetaDesdeTexto: sanitizarTextoUsuario() + prompt reestructurado. (2) Rate limiting por usuario: middleware limitarPorUsuario() — chat 30/min, generar 5/min, ticket 5/min. (3) Límites chat: max 50 mensajes, 2000 chars/mensaje. (4) Jailbreak por rol: último mensaje debe ser "user". (5) imagenBase64: límite 7M chars + validación data:image/. (6) /foto-preview requiere auth. (7) Schema validation en respuestas Gemini: validarEsquemaReceta() + validarEsquemaIngredientes(). 0 errores tsc.</small>
+            <span class="source">📄 backend/src/middlewares/rateLimitIA.ts · backend/src/services/chatService.ts · backend/src/routes/chat.routes.ts · backend/src/routes/recetas.routes.ts · backend/src/routes/despensa.routes.ts · docs/historico/desarrollo/seguridadIA.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg alta">Alta</span></td>
+        </tr>
+        <tr>
+          <td class="id">GEMINI-CACHE-001</td>
+          <td class="desc">
+            <strong>Caché en memoria para llamadas a Gemini — 3 optimizaciones</strong>
+            <small>(1) Contexto de usuario cacheado por userId con TTL 5 min y límite 100 entradas: evita 2 queries a MongoDB en cada mensaje del chat. (2) Singleton GoogleGenerativeAI: instancia creada una sola vez y reutilizada. (3) Caché de receta generada desde texto con TTL 2 min: protege ante doble-submit. invalidarContextoUsuario() exportada para uso futuro. escanearTicket() sin caché (imágenes únicas). 0 cambios de schema, 0 dependencias nuevas.</small>
+            <span class="source">📄 backend/src/services/chatService.ts · docs/historico/desarrollo/geminiCache.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">NUTR-002</td>
+          <td class="desc">
+            <strong>USDA FoodData Central como fallback de macros</strong>
+            <small>Cuando Edamam falla o no está configurado, calcularMacros() reintenta con USDA FoodData Central API (1000 req/hora con key gratuita). Busca cada ingrediente individualmente, escala por cantidad/unidad con conversión a gramos (kg×1000, tsp×5, tbsp×15, taza×240, unidad×100), y acumula macros. Nutrient IDs: 1008=calorías, 1003=proteínas, 1005=carbos, 1004=grasas. Flujo: Edamam → USDA → ceros. Requiere USDA_API_KEY en backend/.env (gratuita sin tarjeta en api.data.gov).</small>
+            <span class="source">📄 backend/src/services/nutritionService.ts · docs/historico/desarrollo/nutricionIntegracion.html#nutr-002</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-BE-001</td>
+          <td class="desc">
+            <strong>BE: autocompletado de ingredientes vía Open Food Facts</strong>
+            <small>ingredientesService.ts (BE) conecta al endpoint suggest.pl de Open Food Facts (world.openfoodfacts.org/cgi/suggest.pl?tagtype=ingredients&amp;term=&amp;lc=es). Sin API key, gratuito ilimitado, devuelve sugerencias en español. Timeout 3s, fallback a array vacío. La función buscarIngredientesEdamam() redirige a buscarIngredientesOpenFoodFacts() para mantener compatibilidad de interfaz. GET /api/ingredientes/buscar?q= registrado en app.ts, frontend conectado via apiClient.</small>
+            <span class="source">📄 backend/src/services/ingredientesService.ts · docs/historico/desarrollo/nutricionIntegracion.html#ingr-003</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">INGR-FE-002</td>
+          <td class="desc">
+            <strong>FE: ingredientes.ts expandido a ~991 ingredientes — 18 categorías</strong>
+            <small>Lista local en frontend/src/config/ingredientes.ts ampliada de 239 a 991 ingredientes. Nueva categoría "preparados" (platos semielaborados, bases, masas). Fuentes: BEDCA, catálogos Mercadona/Carrefour, Open Food Facts, bases de datos de recetas. Categorías: harinas (34), pasta-arroz (32), lacteos (57), carnes (80), pescados (53), mariscos (31), verduras (147), frutas (92), legumbres (32), frutos-secos (40), especias (104), aceites (22), salsas (68), bebidas (33), dulces (58), otros (43), preparados (45).</small>
+            <span class="source">📄 frontend/src/config/ingredientes.ts · docs/historico/desarrollo/nutricionIntegracion.html#ingr-002</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-01</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-HIST-001</td>
+          <td class="desc">
+            <strong>Historial de chats persistente — zustand persist + SheetHistorialChat</strong>
+            <small>chatStore.ts reescrito con zustand persist middleware. historial: ConversacionGuardada[] persiste en localStorage (clave 'cookr-chat', max 20 entradas, solo campo historial via partialize). nuevaConversacion() archiva la sesión actual; restaurarConversacion(id) la recupera; eliminarConversacion(id) la borra. Las imágenes se eliminan del historial al guardar para no saturar localStorage. Nuevo SheetHistorialChat.tsx (side=right) con botón "Guardar y empezar nueva conversación", lista de sesiones con fecha relativa (Hoy/Ayer/dd MMM), contador de mensajes y papelera por hover. Fix z-index: Sheet y SheetOverlay cambiados de z-50 a z-[70] para aparecer por encima del contenedor del chat (z-[60]).</small>
+            <span class="source">📄 frontend/src/stores/chatStore.ts · frontend/src/features/chat/components/sheetHistorialChat.tsx · frontend/src/features/chat/components/contenidoChat.tsx · frontend/src/components/ui/sheet.tsx · docs/historico/desarrollo/chatHistorial.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">CHAT-IMG-001</td>
+          <td class="desc">
+            <strong>Adjuntar imagen al chat IA — Gemini Vision multimodal</strong>
+            <small>Flujo completo FE+BE. FE: barraInputChat.tsx con input[file] oculto; al seleccionar imagen → FileReader base64; preview thumbnail 64×64 con X para quitar; placeholder textarea cambia a "Pregunta algo sobre la imagen…"; se puede enviar solo imagen, solo texto, o ambos. Límite 4 MB en cliente. BurbujaUsuario muestra la imagen como tarjeta encima del texto. Al guardar en historial la imagen se elimina para no saturar localStorage. BE: chat.routes.ts acepta imagenBase64 opcional (valida data:image/, ≤7 MB). chatService.responderChat() recibe imagenBase64: cuando está presente, el último mensaje a Gemini incluye inlineData + texto en lugar de texto solo. Si el usuario manda solo imagen sin texto, el prompt por defecto es "¿Qué ves en esta imagen? Ayúdame en el contexto culinario."</small>
+            <span class="source">📄 frontend/src/features/chat/components/barraInputChat.tsx · frontend/src/features/chat/components/burbujaUsuario.tsx · frontend/src/features/chat/types/chat.types.ts · frontend/src/stores/chatStore.ts · frontend/src/services/chatService.ts · backend/src/routes/chat.routes.ts · backend/src/services/chatService.ts · docs/historico/desarrollo/chatImagen.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · 2026-06-02</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">EDIT-RECETA-001</td>
+          <td class="desc">
+            <strong>Editar receta propia</strong>
+            <small>BE: PUT /api/recetas/:id → recetaRepository.actualizar() verifica autoría (403) + $set parcial. FE: recetasService.actualizar() + useEditarReceta hook + FormularioEditarReceta (re-usa SeccionIngredientes, SeccionPasos, SeccionAlergenos) + page /editar-receta/[id]/. tarjetaColeccion.tsx botón "Editar receta" activado.</small>
+            <span class="source">📄 backend/src/repositories/recetaRepository.ts · frontend/src/features/recetas/components/editarReceta/ · frontend/src/app/(main)/editar-receta/[id]/page.tsx · docs/historico/desarrollo/coleccionYCrearReceta.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- TECH DEBT -->
+  <section id="techdebt">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <h2>Tech Debt — Deuda técnica detectada</h2>
+      <span class="sprint-badge s4">Resolver en Sprint 4-6</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es y qué viola</th><th>Cuándo resolver</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">DEBT-001<br><small style="color:#525252">→ UI-008</small></td>
+          <td class="desc">
+            <strong>FormularioRegistro — lógica de envío inline en el componente</strong>
+            <small>La función alEnviar está directamente en el componente visual. Viola el patrón Componente → Hook → Service → apiClient. Al conectar el backend habría que modificar el componente UI.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-002<br><small style="color:#525252">→ UI-009</small></td>
+          <td class="desc">
+            <strong>FormularioLogin — lógica de envío inline en el componente</strong>
+            <small>Mismo problema que DEBT-001. Si cambia la URL de login o la librería HTTP, hay que buscar el componente UI en lugar de tocar el hook/service.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-003<br><small style="color:#525252">→ UI-010</small></td>
+          <td class="desc">
+            <strong>FormularioRecuperarContrasena — lógica de envío inline</strong>
+            <small>La lógica de envío del email de recuperación queda acoplada al componente, dificultando el reuso y los tests.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-004<br><small style="color:#525252">→ UI-011</small></td>
+          <td class="desc">
+            <strong>FormularioNuevaContrasena — lógica de envío inline</strong>
+            <small>El token de recuperación y la lógica de cambio de contraseña quedan acoplados al componente visual.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-005<br><small style="color:#525252">→ UI-012</small></td>
+          <td class="desc">
+            <strong>TarjetaVerificacionPendiente — lógica de reenvío inline</strong>
+            <small>Si se cambia el proveedor de email (Resend por otro), hay que buscar el componente UI en lugar de tocar únicamente el service.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5 / Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-006<br><small style="color:#525252">→ UI-013</small></td>
+          <td class="desc">
+            <strong>TarjetaRecuperacionPendiente — lógica de reenvío inline</strong>
+            <small>El cooldown de 60 s y la lógica de reintento de envío del correo quedan atados a la tarjeta visual en lugar de a un hook/service.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md</span>
+          </td>
+          <td><span class="status pending">⏳ Sprint 5 / Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-009<br><small style="color:#525252">→ UI-026</small></td>
+          <td class="desc">
+            <strong>formularioCrearReceta + previsualizacionReceta — lógica de envío inline</strong>
+            <small>onSubmitValido() en formularioCrearReceta.tsx y handlePublicar() en previsualizacionReceta.tsx están directamente en el componente visual. Viola la regla Componente → Hook → Service → apiClient. Si cambia la llamada al backend hay que buscar el componente UI. Resolver con useCrearReceta.ts en features/recetas/hooks/.</small>
+            <span class="source">📄 features/recetas/components/crearReceta/formularioCrearReceta.tsx · previsualizacionReceta.tsx · docs/historico/rules.md §1</span>
+          </td>
+          <td><span class="status done">✅ Aprobado · Sprint 4</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+        <tr>
+          <td class="id">TEND-001</td>
+          <td class="desc">
+            <strong>SidebarTendencias — datos reales (Recetas Populares + Chefs Destacados)</strong>
+            <small>BE: GET /api/usuarios/destacados?limite=5 (optionalAuth) — findDestacados() ordena por nº seguidores, filtra perfilCompleto:true, excluye al propio usuario, devuelve siguiendo:boolean. FE: useRecetasPopulares (sort:likes, staleTime:5min) · useChefsDestacados (staleTime:10min). sidebarTendencias.tsx → 'use client', Link en recetas populares hacia /recetas/:id, BotonSeguir con useMutation + optimistic update. Skeletons de carga con anatomía real. datosTendencias.ts (mock) reemplazado por hooks reales.</small>
+            <span class="source">📄 backend/src/repositories/usuarioRepository.ts · backend/src/routes/usuarios.routes.ts · frontend/src/features/recetas/hooks/useRecetasPopulares.ts · useChefsDestacados.ts · frontend/src/features/recetas/components/home/sidebarTendencias.tsx · frontend/src/services/usuariosService.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 5</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">DEBT-007</td>
+          <td class="desc">
+            <strong>Flujo post-registro no pasa por /completar-perfil</strong>
+            <small>Resuelto. formularioLogin.tsx usa getSession() tras signIn para redirigir a /home o /completar-perfil según perfilCompleto. middleware.ts fuerza /completar-perfil en cualquier ruta protegida si perfilCompleto=false. Google OAuth ya usaba callbackUrl="/completar-perfil".</small>
+            <span class="source">📄 frontend/src/middleware.ts · frontend/src/features/auth/components/formularioLogin.tsx</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg media">Media</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FASE 6 — DEPLOY -->
+  <section id="fase6">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <h2>Fase 6 — Deploy e infraestructura (no tocar antes)</h2>
+      <span class="sprint-badge fase6">Fase 6 · Sprint 15</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th><th>Urgencia</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="id">DEV-002</td>
+          <td class="desc">
+            <strong>Script keep-alive para Render — activación manual antes de demos</strong>
+            <small>scripts/keep-alive.sh creado y completo: ping cada 4 min, duración máxima 2 h con auto-stop, timestamp + status HTTP en cada ping, banner de inicio, Ctrl+C limpio. La URL DEFAULT_URL tiene el placeholder {nombre-servicio} — editar cuando se cree el servicio en Render. Activación 100% manual.</small>
+            <span class="source">📄 scripts/keep-alive.sh · backend/src/app.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3 — URL: tfg-alejandrohernandezgonzalez.onrender.com</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-001</td>
+          <td class="desc">
+            <strong>GitHub Actions — CI/CD (lint + typecheck automático)</strong>
+            <small>.github/workflows/ci-cd.yml implementado en Sprint 3 (SETUP-008): CI para FE (next lint + tsc --noEmit) y BE (tsc --noEmit) en push a main/develop y PR a main. CD: deploy a Vercel + Render Deploy Hook en push a main. Branch protection en main activada.</small>
+            <span class="source">📄 .github/workflows/ci-cd.yml · SETUP-008</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3 (cubierto por SETUP-008)</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-003</td>
+          <td class="desc">
+            <strong>Variables de entorno en Vercel</strong>
+            <small>NEXTAUTH_SECRET, NEXTAUTH_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXT_PUBLIC_API_URL configuradas en Vercel (All Environments).</small>
+            <span class="source">📄 docs/historico/desarrollo/importante/deploy.html §vercel</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-005</td>
+          <td class="desc">
+            <strong>Actualizar paquetes deprecated (eslint@8, next-pwa@5)</strong>
+            <small>Hay warnings en npm install pero no bloquean nada. Están atados a Next.js 14. Se actualizarán con la migración a Next.js 15 en Fase 6.</small>
+            <span class="source">📄 docs/historico/fases/tech-debt.md (DEBT-008)</span>
+          </td>
+          <td><span class="status pending">⏳ Fase 6</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-006</td>
+          <td class="desc">
+            <strong>Deploy completo: Render + Vercel + CI/CD</strong>
+            <small>FE live en https://tfg-alejandro-hernandez-gonzalez.vercel.app · BE live en https://tfg-alejandrohernandezgonzalez.onrender.com · CI/CD funcionando · Google OAuth operativo en producción. Documentado en docs/historico/desarrollo/importante/deploy.html.</small>
+            <span class="source">📄 docs/historico/desarrollo/importante/deploy.html</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">SETUP-007 / API-003</td>
+          <td class="desc">
+            <strong>OAuth Google para producción + NEXTAUTH_URL</strong>
+            <small>Google Cloud Console: URI autorizada https://tfg-alejandro-hernandez-gonzalez.vercel.app/api/auth/callback/google y origen https://tfg-alejandro-hernandez-gonzalez.vercel.app añadidos. NEXTAUTH_URL configurada en Vercel.</small>
+            <span class="source">📄 docs/historico/desarrollo/importante/deploy.html §google</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+        <tr>
+          <td class="id">API-002</td>
+          <td class="desc">
+            <strong>Configurar CORS en el backend para producción</strong>
+            <small>FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app configurada en Render. backend/src/app.ts usa cors({ origin: process.env.FRONTEND_URL }) en producción.</small>
+            <span class="source">📄 backend/src/app.ts</span>
+          </td>
+          <td><span class="status done">✅ Completado · Sprint 3</span></td>
+          <td><span class="urg baja">Baja</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- COMPLETADAS -->
+  <section id="completadas">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Completadas y aprobadas</h2>
+    </div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Qué es</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="id">Sprint 1 — Landing</td><td class="desc">TFG-14: Landing page completa — 4 iteraciones (base → UI → footer → renombrado español → tipografía creativa). SeccionHero, BentoCaracteristicas, BentoTestimonios, TarjetaTestimonio, PiePagina, datos mock, Framer Motion. Documentado en docs/historico/desarrollo/landingPage.md</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">Sprint 1 — Registro</td><td class="desc">TFG-15: /registro completo — RHF + Zod (nombre/correo/contraseña/confirmación), Google OAuth funcional, toggle contraseña, estados idle/cargando/exito/error, animaciones Framer Motion, NextAuth + route handler, layout split-screen con fondo-auth.jpg. Documentado en docs/historico/desarrollo/registro.html</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">SETUP-004</td><td class="desc">Google Cloud Console — credenciales OAuth configuradas</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-001</td><td class="desc">Layout split-screen en /registro con imagen gastronómica</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-002</td><td class="desc">Paleta de colores Cookr completa — 0 colores hardcodeados</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-003</td><td class="desc">Páginas legales /privacidad y /terminos (RGPD)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-004</td><td class="desc">Tipografía creativa en SeccionHero (badge, wavy underline, gradient)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-005</td><td class="desc">Flujo verificación email: /verificar-email/pendiente + /verificar-email (mock)</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">UI-006 / TFG-16</td><td class="desc">Login /login — split-screen espejado, RHF + Zod, toggle contraseña</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">UI-007</td><td class="desc">Flujo recuperación contraseña: 3 vistas /recuperar-contrasena, /pendiente, /nueva-contrasena</td><td><span class="status done">✅ Aprobado autor</span></td></tr>
+        <tr><td class="id">Landing</td><td class="desc">Landing Page — SeccionHero, BentoCaracteristicas, BentoTestimonios, carrusel, datos mock</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">TFG-15</td><td class="desc">Registro /registro — RHF + Zod, Google OAuth, flujo verificación email</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">NextAuth</td><td class="desc">NextAuth configurado: opcionesAuth + route handler /api/auth/[...nextauth]</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">Rebrand</td><td class="desc">Rebrand completo a Cookr en todo el frontend</td><td><span class="status done">✅ Completado</span></td></tr>
+        <tr><td class="id">Refactor</td><td class="desc">Refactor: components/recetas → subcarpetas home/ y detalleReceta/</td><td><span class="status done">✅ Completado · 2026-04-09</span></td></tr>
+        <tr><td class="id">DOM-001</td><td class="desc">Modelo MongoDB Usuario — backend/src/models/usuario.model.ts: nombre, correo (único), contrasena (bcrypt), foto, rol, cuentaVerificada, proveedor, googleId, alergias, preferencias, fechaRegistro</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">DOM-002</td><td class="desc">Modelo MongoDB Token — backend/src/models/token.model.ts: userId (ref Usuario), token, tipo (verificacion/recuperacion), expira (TTL index), usado. TTL MongoDB borra automáticamente al expirar.</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-004</td><td class="desc">BE POST /api/auth/registro — bcrypt hash, crea Usuario, genera Token verificación 24h. Response 201 / 400 Zod / 409 correo duplicado</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-005</td><td class="desc">BE POST /api/auth/login — bcrypt compare, verifica cuentaVerificada, devuelve JWT sesión. Response 200 / 401 credenciales / 403 no verificado</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-006</td><td class="desc">BE POST /api/auth/verificar-email — valida JWT firma + expiración + existe en BD → cuentaVerificada=true → invalida token</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-007</td><td class="desc">BE POST /api/auth/recuperar-contrasena — genera token JWT 1h, persiste en Token collection. Resend pendiente Fase 6. Response always 200 (no revela si email existe)</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-008 / API-009</td><td class="desc">BE POST /api/auth/nueva-contrasena + middleware autenticacion.ts — bcrypt nueva contraseña, invalida token. Middleware JWT lee Bearer, adjunta req.usuario = {id, correo, rol}.</td><td><span class="status done">✅ Completado · Sprint 2 BE</span></td></tr>
+        <tr><td class="id">API-010</td><td class="desc">FE apiClient.ts — instancia Axios con baseURL = NEXT_PUBLIC_API_URL. Interceptores de request (JWT header) y response (401 → /login). frontend/src/services/apiClient.ts</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">API-011</td><td class="desc">FE authService.ts — capa HTTP para auth: registro, login, verificarEmail, recuperarContrasena, nuevaContrasena (5 métodos). frontend/src/services/authService.ts</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">AUTH-002</td><td class="desc">formularioRegistro.tsx conectado a POST /api/auth/registro — maneja 409 (correo duplicado). authService.registro() a través de apiClient.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">AUTH-003 / AUTH-007 / AUTH-008 / AUTH-009</td><td class="desc">lib/auth.ts: CredentialsProvider conectado a POST /api/auth/login (401/403). formularioLogin → signIn("credentials"). formularioRecuperarContrasena → POST /api/auth/recuperar-contrasena. formularioNuevaContrasena → POST /api/auth/nueva-contrasena.</td><td><span class="status done">✅ Completado · Sprint 2 FE</span></td></tr>
+        <tr><td class="id">ARCH-001</td><td class="desc">BE separación tipos/schemas — Nueva carpeta backend/src/types/ con IUsuario (usuario.ts) e IToken (token.ts) como interfaces de dominio puras sin Document ni schemas. Los modelos usuarioMongo.ts y tokenMongo.ts definen IUsuarioDoc/ITokenDoc extends IXxx, Document y contienen el schema Mongoose completo (select: false, unique, TTL index, etc.). Los repositories importan IXxx de types/ (contrato de dominio) e IXxxDoc + modelo de models/ (persistencia). Beneficio: cambiar el schema no afecta al contrato; cambiar la BD solo toca models/ y repositories/. TypeScript check: 0 errores.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DOCS-001</td><td class="desc">Limpieza de duplicados en docs/ — 6 secciones eliminadas de context.md (reglas arquitectura, paleta, Stitch, sprint paralelo, filtros feed, estados vistas) y 4 de folderStructure.md (Reglas, Patrón capas BE, Regla de oro, Árbol stitch/). context.md queda como contexto narrativo puro. folderStructure.md queda con el árbol real actualizado (incluye types/ BE de ARCH-001). Header de context.md actualizado a Sprint 3 / 2026-04-17.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-016</td><td class="desc">Buscar recetas FE — debounce 300 ms en barra de búsqueda, skeleton loaders (3 móvil / 6 escritorio) mientras rebota el valor, estado vacío con icono SearchX de lucide-react. Hook useDebounce.ts genérico creado en hooks/. Funciona en feedHome.tsx y feedHomePc.tsx.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-017</td><td class="desc">Filtrar recetas FE — botón "Filtros" pinado junto a la barra de búsqueda (patrón YouTube/Instagram, nunca se corta). DrawerFiltros.tsx con 3 secciones: Dieta (10 ops de DIETAS_OPCIONES), Dificultad (Fácil/Media/Difícil), Excluir alérgenos (14 ops de ALERGENOS_OPCIONES). Badge naranja con total de filtros activos. Duplicados sinLactosa y sinGluten eliminados de DIETAS_OPCIONES. FiltrosAvanzados { dietas, alergenos, dificultad } como tipo único.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DEV-001</td><td class="desc">scripts/dev.sh — arranca Next.js (:3000) + Express (:4000) en paralelo con prefijos coloreados [FE]/[BE]. Sin dependencias externas. Ctrl+C mata ambos. Verificado: BE tsc --noEmit ✅ · FE next lint ✅. También creados scripts/lint.sh y scripts/build.sh. BE package.json actualizado con script "lint": "tsc --noEmit".</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">ARCH-002</td><td class="desc">BE renombrado con nomenclatura BD-explícita — usuario.model.ts → usuarioMongo.ts, token.model.ts → tokenMongo.ts. Types: usuario.types.ts → usuario.ts, token.types.ts → token.ts (sin sufijo por estar dentro de types/). Todos los imports actualizados en repositories. Archivos antiguos eliminados. Regla añadida a docs/historico/rules.md secciones 4 y 6. HTML explicativo creado en docs/arquitectura-backend-tipos.html.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DOCS-004</td><td class="desc">Mapa de navegación — esquema visual de conexiones entre vistas de la app: qué ruta lleva a cuál, con qué acción (tap tarjeta, botón, redirect post-login…). Creado y referenciado desde docs/.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-019</td><td class="desc">NavBar inferior — añadida ruta Colección (/coleccion) con icono BookMarked, reemplazando Discover (sin contenido aún). Sidebar PC actualizado en espejo. 5 ítems: Inicio · Despensa · Cookr IA (central) · Colección · Perfil.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-020</td><td class="desc">Vista /coleccion — página con dos subpestañas: "Guardadas" (posts donde guardado === true) y "Mis recetas" (mock). Estado vacío con CTA en "Mis recetas". Desktop: sidebar + max-w-2xl centrado. Mobile: columna única de TarjetaPost. Lint ✅.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">UI-023</td><td class="desc">Homogeneizar estética auth — fondo fondo-auth.webp + overlay + título Cookr amber italic replicado en /recuperar-contrasena, /nueva-contrasena (split-screen) y /verificar-email/pendiente, /recuperar-contrasena/pendiente, /verificar-email (tarjeta centrada sobre imagen).</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">DEBT-007</td><td class="desc">Flujo post-registro a /completar-perfil — formularioLogin usa getSession() tras signIn() para redirigir a /home o /completar-perfil según perfilCompleto. middleware.ts fuerza /completar-perfil si perfilCompleto=false en cualquier ruta protegida.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-003</td><td class="desc">Variables de entorno Vercel — NEXTAUTH_SECRET, NEXTAUTH_URL, NEXT_PUBLIC_API_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET configuradas en All Environments.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-006</td><td class="desc">Deploy completo — FE live en Vercel (https://tfg-alejandro-hernandez-gonzalez.vercel.app) · BE live en Render (https://tfg-alejandrohernandezgonzalez.onrender.com) · MongoDB Atlas conectado · Gmail SMTP operativo · CI/CD verificado.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-007 / API-003</td><td class="desc">OAuth Google producción — URI de redireccionamiento y origen Vercel añadidos en Google Cloud Console. NEXTAUTH_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app en Vercel. Google OAuth funcional en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">API-002</td><td class="desc">CORS producción — FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app configurada en Render. El backend acepta requests solo desde la URL de Vercel en producción.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">COMP-001</td><td class="desc">FormularioCompletarPerfil conectado al BE — formularioCompletarPerfil.tsx llama a authService.completarPerfil({ alergias, preferencias }, token) que hace POST /auth/completar-perfil. Tras éxito: update({ perfilCompleto: true }) en NextAuth y router.push("/home"). No era una tarea pendiente: ya estaba implementado desde el Sprint 3 como parte del flujo Google OAuth.</td><td><span class="status done">✅ Verificado · Sprint 5 (ya implementado en Sprint 3)</span></td></tr>
+        <tr><td class="id">DEV-002</td><td class="desc">Script keep-alive — scripts/keep-alive.sh operativo. URL real: https://tfg-alejandrohernandezgonzalez.onrender.com. Ping cada 4 min, máx 2h, auto-stop, Ctrl+C limpio.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+        <tr><td class="id">SETUP-008</td><td class="desc">CI/CD GitHub Actions — .github/workflows/ci-cd.yml creado. CI: lint + tsc --noEmit en FE y BE en cada push a develop y PR a main. CD: deploy automático a Vercel (npx vercel --cwd frontend --prod) + Render Deploy Hook en cada push a main, condicionado a que el CI pase. Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, RENDER_DEPLOY_HOOK_URL, RENDER_APP_URL añadidos en GitHub. Branch protection activada en main (PR obligatoria + status checks). Vercel y Render ya conectados al repo.</td><td><span class="status done">✅ Completado · Sprint 3</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="legend">
+      <div class="legend-item"><span style="color:#22c55e">✅</span> Aprobado por el autor en el navegador</div>
+      <div class="legend-item"><span style="color:#f97316">👁️</span> Implementado, pendiente revisión visual del autor</div>
+      <div class="legend-item"><span style="color:#737373">⏳</span> Pendiente de implementar</div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

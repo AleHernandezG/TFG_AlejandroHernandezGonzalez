@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vista Despensa — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-size: 0.78rem; color: #737373; margin-left: auto; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; margin-top: 1.25rem; }
+    h3:first-child { margin-top: 0; }
+
+    p { font-size: 0.85rem; color: #a3a3a3; margin-bottom: 0.75rem; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    .path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #60a5fa; }
+    .id   { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.76rem; color: #d4d4d4; overflow-x: auto; margin: 0.75rem 0; line-height: 1.8; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #1f1f1f; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.3rem; white-space: nowrap; }
+    .tag.done    { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+    .tag.review  { background: #f9731622; color: #fb923c;  border: 1px solid #f9731633; }
+    .tag.pending { background: #3b82f622; color: #60a5fa;  border: 1px solid #3b82f633; }
+    .tag.mock    { background: #eab30822; color: #fbbf24;  border: 1px solid #eab30833; }
+    .tag.fase5   { background: #8b5cf622; color: #c084fc;  border: 1px solid #8b5cf633; }
+    .tag.reuse   { background: #06b6d422; color: #22d3ee;  border: 1px solid #06b6d433; }
+
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .tree .new     { color: #4ade80; }
+    .tree .exists  { color: #737373; }
+    .tree .comment { color: #525252; font-style: italic; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { font-size: 0.72rem; font-weight: 700; color: #f97316; background: #f9731622; border: 1px solid #f9731633; border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; }
+    .step-txt { font-size: 0.84rem; color: #d4d4d4; }
+    .step-txt small { display: block; margin-top: 0.2rem; font-size: 0.76rem; color: #525252; }
+
+    .comp-list { display: flex; flex-direction: column; gap: 0; }
+    .comp-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid #1f1f1f; }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-name { font-family: monospace; font-size: 0.76rem; color: #60a5fa; min-width: 270px; }
+    .comp-desc { font-size: 0.8rem; color: #a3a3a3; flex: 1; }
+
+    .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; margin-top: 0.75rem; }
+    .emoji-chip { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.45rem 0.6rem; font-size: 0.75rem; color: #a3a3a3; display: flex; align-items: center; gap: 0.4rem; }
+    .emoji-chip .em { font-size: 1rem; }
+
+    .layer-row { display: flex; align-items: center; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid #1f1f1f; }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-label { font-size: 0.75rem; font-weight: 700; color: #f97316; min-width: 120px; }
+    .layer-detail { font-size: 0.8rem; color: #a3a3a3; }
+
+    .callout { background: #111; border-left: 3px solid #f97316; border-radius: 0 8px 8px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; font-size: 0.82rem; color: #a3a3a3; line-height: 1.7; }
+    .callout strong { color: #d4d4d4; }
+
+    .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .stat { background: #111; border: 1px solid #2a2a2a; border-radius: 10px; padding: 0.75rem 1.1rem; min-width: 110px; }
+    .stat .val { font-size: 1.4rem; font-weight: 800; color: #f97316; }
+    .stat .lbl { font-size: 0.7rem; color: #525252; text-transform: uppercase; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Vista Despensa — FE Mock</h1>
+  </div>
+  <span class="badge">DESP-001</span>
+  <div class="meta">Sprint 4 · 2026-05-08 · Fase 4 de 7</div>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#ficheros">Ficheros</a>
+  <a href="#datos">Datos y Emojis</a>
+  <a href="#store">Store Zustand</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#stitch">Diseño / Stitch</a>
+  <a href="#fase5">Fase 5</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen</h2>
+    </div>
+    <div class="section-body">
+      <div class="stat-row">
+        <div class="stat"><div class="val">12</div><div class="lbl">Ficheros creados</div></div>
+        <div class="stat"><div class="val">8</div><div class="lbl">Componentes</div></div>
+        <div class="stat"><div class="val">1</div><div class="lbl">Store Zustand</div></div>
+        <div class="stat"><div class="val">~50</div><div class="lbl">Emojis mapeados</div></div>
+      </div>
+      <p>
+        Implementación completa del FE mock de la vista <code>/despensa</code>. En Sprint 4 la pantalla
+        es totalmente funcional en memoria: los ingredientes persisten mientras la sesión del navegador
+        está abierta pero no se comunica con el backend. La integración real con la API se realizará en
+        <strong>Fase 5</strong> (Sprint 5+).
+      </p>
+      <p>
+        La vista permite al usuario ver su despensa, añadir nuevos ingredientes con autocompletado,
+        editar cantidad/unidad de los existentes y eliminarlos con animación de salida.
+      </p>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header">
+      <span class="section-icon">🏗️</span>
+      <h2>Arquitectura de capas</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        El flujo sigue la regla del proyecto: <strong>Componente → Store</strong>. No hay servicios HTTP
+        en Sprint 4. La página <code>despensa/page.tsx</code> es un Server Component que solo decide el
+        layout; toda la lógica vive en el Client Component <code>ContenidoDespensa</code>.
+      </p>
+
+      <div style="margin: 1rem 0;">
+        <div class="layer-row">
+          <span class="layer-label">Page (SC)</span>
+          <span class="layer-detail"><code>app/(main)/despensa/page.tsx</code> — layout mobile / desktop con <code>SidebarNavPc</code></span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Orquestador (CC)</span>
+          <span class="layer-detail"><code>ContenidoDespensa</code> — consume store, gestiona <code>sheetAbierto</code> e <code>itemEditando</code></span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Store</span>
+          <span class="layer-detail"><code>useDespensaStore</code> (Zustand) — ingredientes[], añadir, editar, eliminar</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Datos mock</span>
+          <span class="layer-detail"><code>datosDespensa.ts</code> — 12 ítems iniciales, mapa de emojis, helper</span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Tipos</span>
+          <span class="layer-detail"><code>despensa.types.ts</code> — interfaz <code>ItemDespensa</code></span>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">Reutilizados</span>
+          <span class="layer-detail"><code>useAutocompletadoIngredientes</code> (recetas) · <code>UNIDADES_INGREDIENTE</code> (recetas)</span>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Reutilización deliberada:</strong> El hook <code>useAutocompletadoIngredientes</code> ya
+        combina la base de datos local de ingredientes, el store de ingredientes custom y el fallback
+        Edamam. No se duplicó nada — la despensa lo importa directamente desde
+        <code>features/recetas/hooks</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHEROS -->
+  <section id="ficheros">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Estructura de ficheros creados</h2>
+    </div>
+    <div class="section-body">
+      <div class="tree">
+        <div><span class="exists">frontend/src/</span></div>
+        <div style="padding-left:1.2rem"><span class="exists">app/(main)/despensa/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">page.tsx</span> <span class="comment">— reemplaza placeholder "Próximamente"</span></div>
+        <div style="padding-left:1.2rem"><span class="new">features/despensa/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">types/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">despensa.types.ts</span> <span class="comment">— ItemDespensa</span></div>
+        <div style="padding-left:2.4rem"><span class="new">data/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">datosDespensa.ts</span> <span class="comment">— mock + emoji map + helper</span></div>
+        <div style="padding-left:2.4rem"><span class="new">components/</span></div>
+        <div style="padding-left:3.6rem"><span class="new">index.ts</span> <span class="comment">— barrel exports</span></div>
+        <div style="padding-left:3.6rem"><span class="new">contenidoDespensa.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">headerDespensa.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">barraAnadirIngrediente.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">listaIngredientes.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">tarjetaIngrediente.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">estadoVacioDespensa.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">sheetAnadirIngrediente.tsx</span></div>
+        <div style="padding-left:3.6rem"><span class="new">dialogEditarIngrediente.tsx</span></div>
+        <div style="padding-left:1.2rem"><span class="new">stores/</span></div>
+        <div style="padding-left:2.4rem"><span class="new">despensaStore.ts</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATOS Y EMOJIS -->
+  <section id="datos">
+    <div class="section-header">
+      <span class="section-icon">🗄️</span>
+      <h2>Datos mock y sistema de emojis</h2>
+    </div>
+    <div class="section-body">
+      <h3>Mock inicial (12 ítems)</h3>
+      <p>
+        El store arranca con 12 ingredientes predefinidos que reproducen fielmente el diseño del stitch
+        (que muestra el texto "12 ingredientes guardados" en el header). Cada ítem tiene el emoji ya
+        asignado directamente en el objeto.
+      </p>
+      <pre>
+export const DATOS_DESPENSA_MOCK: ItemDespensa[] = [
+  { id: '1',  nombre: 'Tomates',         cantidad: 4,   unidad: 'unidad', emoji: '🍅' },
+  { id: '2',  nombre: 'Cebolla',         cantidad: 2,   unidad: 'unidad', emoji: '🧅' },
+  { id: '3',  nombre: 'Ajo',             cantidad: 1,   unidad: 'cabeza', emoji: '🧄' },
+  { id: '4',  nombre: 'Zanahorias',      cantidad: 500, unidad: 'g',      emoji: '🥕' },
+  { id: '5',  nombre: 'Arroz blanco',    cantidad: 1,   unidad: 'kg',     emoji: '🍚' },
+  { id: '6',  nombre: 'Huevos',          cantidad: 12,  unidad: 'unidad', emoji: '🥚' },
+  { id: '7',  nombre: 'Aceite de oliva', cantidad: 500, unidad: 'ml',     emoji: '🫒' },
+  { id: '8',  nombre: 'Queso parmesano', cantidad: 200, unidad: 'g',      emoji: '🧀' },
+  { id: '9',  nombre: 'Leche',           cantidad: 1,   unidad: 'l',      emoji: '🥛' },
+  { id: '10', nombre: 'Mantequilla',     cantidad: 250, unidad: 'g',      emoji: '🧈' },
+  { id: '11', nombre: 'Perejil',         cantidad: 1,   unidad: 'rama',   emoji: '🌿' },
+  { id: '12', nombre: 'Limón',           cantidad: 3,   unidad: 'unidad', emoji: '🍋' },
+]</pre>
+
+      <h3>¿De dónde vienen los emojis?</h3>
+      <p>
+        Los emojis son <strong>completamente estáticos</strong>: no hay API, no hay LLM, no hay
+        librería externa. Se mantiene un <code>Record&lt;string, string&gt;</code> de ~50 entradas
+        con nombres de ingredientes comunes como clave y su emoji Unicode como valor. El helper
+        <code>getEmojiIngrediente</code> normaliza a minúsculas y devuelve <code>'🥘'</code> si no hay
+        coincidencia.
+      </p>
+      <pre>
+export function getEmojiIngrediente(nombre: string): string {
+  return EMOJIS_INGREDIENTES[nombre.toLowerCase()] ?? '🥘'
+}</pre>
+
+      <p>Esta estrategia es intencionada para Sprint 4 (mock). Posibles mejoras en Sprint 5+:</p>
+      <ul style="font-size:0.82rem; color:#a3a3a3; padding-left:1.2rem; margin-bottom:0.75rem; line-height:2;">
+        <li>El backend puede devolver el campo <code>emoji</code> desde la BD junto al resto del ítem.</li>
+        <li>Usar una librería como <code>node-emoji</code> para mapeo automático por nombre.</li>
+        <li>Eliminar la dependencia del frontend cuando el campo venga del BE.</li>
+      </ul>
+
+      <h3>Emojis mapeados</h3>
+      <div class="emoji-grid">
+        <div class="emoji-chip"><span class="em">🍅</span> tomate</div>
+        <div class="emoji-chip"><span class="em">🧅</span> cebolla</div>
+        <div class="emoji-chip"><span class="em">🧄</span> ajo</div>
+        <div class="emoji-chip"><span class="em">🥕</span> zanahoria</div>
+        <div class="emoji-chip"><span class="em">🍚</span> arroz</div>
+        <div class="emoji-chip"><span class="em">🥚</span> huevo</div>
+        <div class="emoji-chip"><span class="em">🫒</span> aceite oliva</div>
+        <div class="emoji-chip"><span class="em">🧀</span> queso</div>
+        <div class="emoji-chip"><span class="em">🥛</span> leche / nata</div>
+        <div class="emoji-chip"><span class="em">🧈</span> mantequilla</div>
+        <div class="emoji-chip"><span class="em">🌿</span> hierbas</div>
+        <div class="emoji-chip"><span class="em">🍋</span> limón</div>
+        <div class="emoji-chip"><span class="em">🥔</span> patata</div>
+        <div class="emoji-chip"><span class="em">🫑</span> pimiento</div>
+        <div class="emoji-chip"><span class="em">🍗</span> pollo</div>
+        <div class="emoji-chip"><span class="em">🥩</span> carne</div>
+        <div class="emoji-chip"><span class="em">🐟</span> pescado</div>
+        <div class="emoji-chip"><span class="em">🦐</span> gambas</div>
+        <div class="emoji-chip"><span class="em">🍝</span> pasta</div>
+        <div class="emoji-chip"><span class="em">🌾</span> harina / pan</div>
+        <div class="emoji-chip"><span class="em">🧂</span> sal</div>
+        <div class="emoji-chip"><span class="em">🍬</span> azúcar</div>
+        <div class="emoji-chip"><span class="em">🍯</span> miel</div>
+        <div class="emoji-chip"><span class="em">🥦</span> brócoli</div>
+        <div class="emoji-chip"><span class="em">🥬</span> lechuga</div>
+        <div class="emoji-chip"><span class="em">🥒</span> pepino</div>
+        <div class="emoji-chip"><span class="em">🥑</span> aguacate</div>
+        <div class="emoji-chip"><span class="em">🌽</span> maíz</div>
+        <div class="emoji-chip"><span class="em">🍄</span> champiñón</div>
+        <div class="emoji-chip"><span class="em">🍎</span> manzana</div>
+        <div class="emoji-chip"><span class="em">🍐</span> pera</div>
+        <div class="emoji-chip"><span class="em">🍌</span> plátano</div>
+        <div class="emoji-chip"><span class="em">🍓</span> fresa</div>
+        <div class="emoji-chip"><span class="em">🍊</span> naranja</div>
+        <div class="emoji-chip"><span class="em">🥘</span> fallback</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORE ZUSTAND -->
+  <section id="store">
+    <div class="section-header">
+      <span class="section-icon">🗃️</span>
+      <h2>Store Zustand — despensaStore</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Store Zustand sin persistencia (sin <code>persist</code> middleware). En Sprint 4 la intención
+        es que el estado se resetee al recargar la página — es un mock. Sprint 5 añadirá la integración
+        real con la API.
+      </p>
+
+      <h3>Shape del estado</h3>
+      <pre>
+interface DespensaState {
+  ingredientes: ItemDespensa[]
+  añadir:  (item: Omit&lt;ItemDespensa, 'id'&gt;) => void
+  editar:  (id: string, cambios: Partial&lt;Omit&lt;ItemDespensa, 'id'&gt;&gt;) => void
+  eliminar:(id: string) => void
+}</pre>
+
+      <h3>Generación de IDs</h3>
+      <p>
+        Al añadir un ítem se genera un ID único combinando timestamp + 4 chars random en base 36.
+        No se usa <code>crypto.randomUUID()</code> para evitar dependencia de contexto seguro en tests.
+      </p>
+      <pre>id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`</pre>
+
+      <h3>Decisiones de diseño</h3>
+      <table>
+        <thead>
+          <tr><th>Decisión</th><th>Alternativa descartada</th><th>Por qué</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Zustand sin <code>persist</code></td>
+            <td>LocalStorage / <code>persist</code> middleware</td>
+            <td>Sprint 4 es mock puro. Persistencia vendría del BE en Fase 5, no del localStorage</td>
+          </tr>
+          <tr>
+            <td>Estado inicializado con mock</td>
+            <td>Estado vacío</td>
+            <td>Permite revisar la UI completa sin tener que añadir ingredientes manualmente</td>
+          </tr>
+          <tr>
+            <td>Store en <code>stores/despensaStore.ts</code></td>
+            <td>Dentro de <code>features/despensa/</code></td>
+            <td>Convención del proyecto: stores globales van en <code>src/stores/</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header">
+      <span class="section-icon">🧩</span>
+      <h2>Componentes</h2>
+    </div>
+    <div class="section-body">
+      <div class="comp-list">
+        <div class="comp-row">
+          <span class="comp-name">contenidoDespensa.tsx<br/><span style="color:#525252; font-size:0.68rem;">Client Component</span></span>
+          <span class="comp-desc">
+            Orquestador principal. Consume <code>useDespensaStore</code> y gestiona los dos
+            estados locales: <code>sheetAbierto</code> (boolean) e <code>itemEditando</code>
+            (ItemDespensa | null). Es el único componente que conoce el store; el resto solo
+            recibe props. Renderiza todos los demás subcomponentes.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">headerDespensa.tsx</span>
+          <span class="comp-desc">
+            Header editorial al estilo "The Digital Gourmet": "¡Bienvenido a tu <em>Despensa</em>!".
+            La palabra "Despensa" va en <code>font-black italic text-brand</code>. Muestra el total
+            de ingredientes con la construcción "<em>N</em> ingrediente/s guardado/s".
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">barraAnadirIngrediente.tsx</span>
+          <span class="comp-desc">
+            Pill CTA siempre visible bajo el header. Texto "¿Quieres añadir algún alimento?" + botón
+            circular <code>+</code> en color brand. Toda la fila es clickable (abre el Sheet).
+            No tiene estado propio — llama a <code>onAbrir()</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">estadoVacioDespensa.tsx</span>
+          <span class="comp-desc">
+            Estado vacío: icono <code>ShoppingBasket</code> de Lucide, texto "Tu despensa está vacía"
+            y botón brand "Añadir primer ingrediente". Se muestra cuando <code>ingredientes.length === 0</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">listaIngredientes.tsx</span>
+          <span class="comp-desc">
+            Wrapper de animaciones. Usa <code>AnimatePresence initial={false}</code> de Framer Motion
+            para que las tarjetas salientes tengan animación de exit sin que las entradas se animen
+            en la carga inicial. Renderiza una <code>TarjetaIngrediente</code> por ítem.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">tarjetaIngrediente.tsx</span>
+          <span class="comp-desc">
+            <code>motion.div</code> con <code>layout</code> (reflow suave al eliminar vecinos) +
+            <code>exit={{ opacity: 0, x: 32 }}</code> (desliza a la derecha al eliminar).
+            Muestra: emoji en círculo <code>bg-[var(--warm-bg-accent)]</code>, nombre en negrita,
+            cantidad + unidad, botón lápiz (editar) y botón papelera (eliminar).
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">sheetAnadirIngrediente.tsx</span>
+          <span class="comp-desc">
+            shadcn <code>Sheet side="bottom"</code> con <code>rounded-t-3xl</code>. Contiene: (1)
+            input de búsqueda con <code>useAutocompletadoIngredientes</code> y dropdown de hasta 5
+            sugerencias, (2) chips de sugerencias rápidas cuando el input está vacío [Tomate, Cebolla,
+            Ajo, Zanahoria, Patata, Huevos], (3) campo de cantidad + select de unidad reutilizando
+            <code>UNIDADES_INGREDIENTE</code> de recetas. El <code>onBlur</code> cierra el dropdown
+            con un <code>setTimeout(150ms)</code> para que el tap en una sugerencia se registre antes.
+            <br/><br/>
+            <strong>Detección de duplicados:</strong> al pulsar "Añadir", <code>handleAnadir()</code>
+            lee <code>useDespensaStore(s =&gt; s.ingredientes)</code> y busca por nombre
+            case-insensitive. Si el ingrediente ya existe, en lugar de añadirlo abre un
+            shadcn <code>Dialog</code> con el estado <code>nombreDuplicado</code>. El Dialog muestra
+            icono <code>AlertCircle</code> y el mensaje <em>"«nombre» ya está en tu despensa.
+            Si quieres modificarlo, edítalo o elimínalo directamente desde la lista."</em>
+            El botón "Entendido" cierra el Dialog. El store permanece sin cambios.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">dialogEditarIngrediente.tsx</span>
+          <span class="comp-desc">
+            shadcn <code>Dialog</code> (modal centrado, no Sheet) para editar un ítem ya existente.
+            Pre-rellena nombre, cantidad y unidad desde el prop <code>item</code>. Muestra el emoji
+            del ítem en el título del dialog. No permite cambiar el nombre — solo cantidad y unidad.
+          </span>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Sheet vs Dialog:</strong> se usa Sheet (bottom slide-up) para "añadir" porque
+        es un flujo con más contenido y se siente más como una tarea. Se usa Dialog (modal centrado)
+        para "editar" porque es una acción rápida sobre un ítem que el usuario ya conoce.
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJOS -->
+  <section id="flujos">
+    <div class="section-header">
+      <span class="section-icon">↔️</span>
+      <h2>Flujos de interacción</h2>
+    </div>
+    <div class="section-body">
+
+      <h3>Añadir ingrediente</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa la barra CTA o el <code>+</code> circular
+          <small>ContenidoDespensa → setSheetAbierto(true)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">SheetAnadirIngrediente se abre desde abajo
+          <small>shadcn Sheet con side="bottom" y rounded-t-3xl</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">Usuario escribe el nombre — aparecen sugerencias del autocompletado
+          <small>useAutocompletadoIngredientes(nombre) → BD local + custom + Edamam fallback</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">Usuario selecciona una sugerencia (o escribe libre) y rellena cantidad + unidad</div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">5</span>
+        <div class="step-txt">Pulsa "Añadir" — se llama <code>onAnadir(item)</code>
+          <small>handleAnadir() → getEmojiIngrediente(nombre) → store.añadir(item)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">6</span>
+        <div class="step-txt">Sheet se cierra, estado se resetea, nueva tarjeta aparece en la lista</div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Ingrediente duplicado</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario rellena nombre + cantidad y pulsa "Añadir"
+          <small>handleAnadir() — nombre ≥2 chars, cantidad > 0</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">El componente compara el nombre contra el store (case-insensitive)
+          <small>ingredientes.some(ing =&gt; ing.nombre.toLowerCase() === nombreTrimmed.toLowerCase())</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">El nombre ya existe → <code>setNombreDuplicado(nombreTrimmed)</code>
+          <small>El Sheet permanece abierto. No se modifica el store.</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">Dialog superpuesto (shadcn <code>Dialog</code>) aparece con icono <code>AlertCircle</code>
+          <small>"«{nombre}» ya está en tu despensa. Si quieres modificarlo, edítalo o elimínalo directamente desde la lista."</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">5</span>
+        <div class="step-txt">Usuario pulsa "Entendido" → <code>setNombreDuplicado(null)</code> — Dialog se cierra, Sheet sigue abierto</div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Editar ingrediente</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa el icono lápiz en TarjetaIngrediente
+          <small>onEditar(item) → ContenidoDespensa → setItemEditando(item)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">DialogEditarIngrediente aparece pre-rellenado con los datos del ítem</div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">Usuario modifica cantidad y/o unidad → pulsa "Guardar"
+          <small>onGuardar(cambios) → store.editar(id, cambios) → setItemEditando(null)</small></div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">Eliminar ingrediente</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">Usuario pulsa icono papelera en TarjetaIngrediente
+          <small>onEliminar(item.id) → store.eliminar(id)</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">Framer Motion anima la salida: <code>opacity: 0, x: 32</code> en 180ms
+          <small>AnimatePresence en ListaIngredientes → exit en motion.div</small></div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">La propiedad <code>layout</code> hace que las tarjetas restantes se reposicionen suavemente</div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">Si era el último ítem, aparece <code>EstadoVacioDespensa</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISEÑO / STITCH -->
+  <section id="stitch">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <h2>Diseño — referencia Stitch</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        El diseño sigue el sistema editorial <strong>"The Digital Gourmet"</strong> definido en
+        <code>docs/diseno/stitch/</code>. Las reglas más relevantes aplicadas en la despensa:
+      </p>
+      <table>
+        <thead>
+          <tr><th>Regla Stitch</th><th>Aplicación en /despensa</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>No-Line Rule</strong></td>
+            <td>Las secciones se separan por diferencia de fondo (<code>bg-background</code> → <code>var(--warm-bg)</code>), nunca con bordes de 1px entre secciones</td>
+          </tr>
+          <tr>
+            <td><strong>Header editorial</strong></td>
+            <td>"¡Bienvenido a tu <em>Despensa</em>!" — palabra clave en <code>font-black italic text-brand</code>, mismo patrón que ColecciónHeader y Mis Recetas</td>
+          </tr>
+          <tr>
+            <td><strong>CTA primario</strong></td>
+            <td>Botón <code>bg-brand text-brand-foreground</code> redondeado (<code>rounded-2xl</code>), tamaño full-width en contexto Sheet/Dialog</td>
+          </tr>
+          <tr>
+            <td><strong>Emoji avatar</strong></td>
+            <td>Círculo <code>bg-[var(--warm-bg-accent)]</code> en tarjeta, sin imagen real — warm palette del sistema de diseño</td>
+          </tr>
+          <tr>
+            <td><strong>Input fields</strong></td>
+            <td>Fondo <code>var(--warm-bg)</code>, <code>rounded-2xl</code>, sin borde visible — tonal layering en lugar de líneas</td>
+          </tr>
+          <tr>
+            <td><strong>Chips de sugerencia</strong></td>
+            <td><code>bg-[var(--warm-bg)]</code> en reposo, <code>bg-[var(--warm-bg-accent)]</code> en hover — temperatura cálida coherente</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FASE 5 -->
+  <section id="fase5">
+    <div class="section-header">
+      <span class="section-icon">🔌</span>
+      <h2>Integración BE — Fase 5</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Todo lo que hay que cambiar cuando el backend de despensa esté disponible. El FE mock está
+        estructurado para que la migración sea mínima.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Fichero</th><th>Cambio necesario</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="path">stores/despensaStore.ts</td>
+            <td>Reemplazar estado inicial con llamada a <code>despensaService.getMiDespensa()</code>. Convertir acciones a llamadas HTTP + actualización optimista.</td>
+          </tr>
+          <tr>
+            <td class="path">services/despensaService.ts</td>
+            <td>Crear este fichero con <code>getMiDespensa()</code>, <code>añadirItem()</code>, <code>editarItem()</code>, <code>eliminarItem()</code> usando <code>apiClient</code>.</td>
+          </tr>
+          <tr>
+            <td class="path">features/despensa/hooks/</td>
+            <td>Opcionalmente crear <code>useMiDespensa.ts</code> con TanStack Query (igual que <code>useMisRecetas</code> y <code>useRecetasGuardadas</code>).</td>
+          </tr>
+          <tr>
+            <td class="path">data/datosDespensa.ts</td>
+            <td>El mock de 12 ítems puede quedar como fallback de desarrollo. <code>getEmojiIngrediente</code> puede mantenerse o eliminarse si el BE devuelve el campo <code>emoji</code>.</td>
+          </tr>
+          <tr>
+            <td class="path">types/despensa.types.ts</td>
+            <td>Posiblemente añadir <code>updatedAt</code>, <code>userId</code> u otros campos que devuelva la API.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Actualización optimista:</strong> dado que eliminar y editar tienen animaciones visibles,
+        la UX esperada en Fase 5 es actualización optimista (el estado local cambia inmediatamente)
+        con rollback en caso de error de red — mismo patrón que el bookmark de recetas (COL-005).
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

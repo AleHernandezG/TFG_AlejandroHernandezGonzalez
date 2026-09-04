@@ -70,7 +70,9 @@ Cada `push` a `main` dispara el flujo de GitHub Actions: comprueba el cliente y 
 
 ## Documentación
 
-La memoria completa y los anexos (manual de usuario, plan de proyecto, plan de seguridad y documentación técnica) están en [`documentacion/`](documentacion/).
+La documentación de desarrollo está en [`docs/`](docs/): auditoría, plan de trabajo, referencia técnica y material de diseño.
+
+La memoria del TFG y los anexos (manual de usuario, plan de proyecto, plan de seguridad y documentación técnica) se llevan en un repositorio aparte, fuera de este. No son código de Cookr y no se versionan con él.
 
 ## Autor
 

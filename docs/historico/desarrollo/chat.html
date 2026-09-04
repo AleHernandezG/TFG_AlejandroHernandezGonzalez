@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat IA — Documentación Técnica · Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-size: 0.78rem; color: #737373; margin-left: auto; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; margin-top: 1.25rem; }
+    h3:first-child { margin-top: 0; }
+
+    p { font-size: 0.85rem; color: #a3a3a3; margin-bottom: 0.75rem; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+
+    .path { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #60a5fa; }
+    .id { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.76rem; color: #d4d4d4; overflow-x: auto; margin: 0.75rem 0; line-height: 1.8; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #1f1f1f; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.3rem; white-space: nowrap; }
+    .tag.done    { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+    .tag.review  { background: #f9731622; color: #fb923c;  border: 1px solid #f9731633; }
+    .tag.pending { background: #3b82f622; color: #60a5fa;  border: 1px solid #3b82f633; }
+    .tag.mock    { background: #eab30822; color: #fbbf24;  border: 1px solid #eab30833; }
+    .tag.fase6   { background: #6b728022; color: #9ca3af;  border: 1px solid #6b728044; }
+
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .tree .new { color: #4ade80; }
+    .tree .exists { color: #737373; }
+    .tree .comment { color: #525252; font-style: italic; }
+
+    .comp-list { display: flex; flex-direction: column; gap: 0; }
+    .comp-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid #1f1f1f; }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-name { font-family: monospace; font-size: 0.76rem; color: #60a5fa; min-width: 240px; flex-shrink: 0; }
+    .comp-desc { font-size: 0.8rem; color: #a3a3a3; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { font-size: 0.72rem; font-weight: 700; color: #f97316; background: #f9731622; border: 1px solid #f9731633; border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; }
+    .step-txt { font-size: 0.84rem; color: #d4d4d4; }
+    .step-txt small { display: block; margin-top: 0.2rem; font-size: 0.76rem; color: #525252; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .stat { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.85rem; text-align: center; }
+    .stat .num { font-size: 1.6rem; font-weight: 800; color: #f97316; line-height: 1; }
+    .stat .lbl { font-size: 0.7rem; color: #737373; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .screen-mock { background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .mock-header { background: #1a1a1a; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border: 1px solid #2a2a2a; }
+    .mock-bubble-user { background: #f97316; color: #fff; border-radius: 12px 12px 2px 12px; padding: 0.5rem 0.85rem; max-width: 70%; margin-left: auto; font-size: 0.78rem; margin-bottom: 0.5rem; }
+    .mock-bubble-ia { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px 12px 12px 2px; padding: 0.5rem 0.85rem; max-width: 80%; font-size: 0.78rem; margin-bottom: 0.5rem; }
+    .mock-input { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .mock-dots { display: flex; gap: 0.25rem; }
+    .mock-dot { width: 6px; height: 6px; border-radius: 50%; background: #f97316; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Vista /chat — Chat IA Cookr · Documentación Técnica</h1>
+  </div>
+  <span class="badge">CHAT-001</span>
+  <div class="meta">Sprint 4-6 · 2026-06-01 · Chat Gemini real activo (C1+C2)</div>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#ficheros">Ficheros</a>
+  <a href="#store">Store Zustand</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#stitch">Stitch → Cookr</a>
+  <a href="#fase6">Fase 6</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen</h2>
+    </div>
+    <div class="section-body">
+      <div class="stats-grid">
+        <div class="stat"><div class="num">10</div><div class="lbl">Ficheros nuevos</div></div>
+        <div class="stat"><div class="num">7</div><div class="lbl">Componentes</div></div>
+        <div class="stat"><div class="num">1</div><div class="lbl">Store Zustand</div></div>
+        <div class="stat"><div class="num">3</div><div class="lbl">Chips sugeridos</div></div>
+        <div class="stat"><div class="num">1.4s</div><div class="lbl">Delay mock IA</div></div>
+      </div>
+
+      <p>
+        Vista <code>/chat</code> FE mock completa. Chat IA full-screen sin NavBar inferior —
+        <code>ContenidoChat</code> usa <code>fixed inset-0 z-[60]</code> como overlay que cubre
+        toda la pantalla (incluyendo la NavBar). El store Zustand simula la respuesta IA con un
+        delay de 1.4 s. La vista replica el Stitch de <code>docs/diseno/stitch/chat/</code> traducido
+        100% a variables Cookr.
+      </p>
+
+      <table style="margin-top:1rem">
+        <thead><tr><th>Fichero</th><th>Tipo</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td class="path">features/chat/types/chat.types.ts</td><td>Types</td><td>RolMensaje, Mensaje, ChipSugerido</td></tr>
+          <tr><td class="path">features/chat/data/datosChat.ts</td><td>Mock data</td><td>CHIPS_SUGERIDOS (3) + getMockRespuesta()</td></tr>
+          <tr><td class="path">stores/chatStore.ts</td><td>Zustand</td><td>mensajes, cargando, enviarMensaje, limpiarChat</td></tr>
+          <tr><td class="path">features/chat/components/headerChat.tsx</td><td>Componente</td><td>Header sticky con back + pill "Ver historial" (sin botón top-right)</td></tr>
+          <tr><td class="path">features/chat/components/estadoVacioChat.tsx</td><td>Componente</td><td>Icono Sparkles + chips sugeridos</td></tr>
+          <tr><td class="path">features/chat/components/burbujaUsuario.tsx</td><td>Componente</td><td>Burbuja derecha brand</td></tr>
+          <tr><td class="path">features/chat/components/burbujaIA.tsx</td><td>Componente</td><td>Burbuja izquierda con acciones Copiar/Me gusta</td></tr>
+          <tr><td class="path">features/chat/components/indicadorPensando.tsx</td><td>Componente</td><td>3 puntos animados Framer Motion</td></tr>
+          <tr><td class="path">features/chat/components/barraInputChat.tsx</td><td>Componente</td><td>Textarea auto-resize + send + paperclip</td></tr>
+          <tr><td class="path">features/chat/components/contenidoChat.tsx</td><td>Componente raíz</td><td>Fixed overlay, scroll automático al último mensaje</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header">
+      <span class="section-icon">🏗️</span>
+      <h2>Arquitectura de capas</h2>
+    </div>
+    <div class="section-body">
+      <h3>Flujo de datos (Sprint 4 — mock)</h3>
+      <pre>ContenidoChat ('use client')
+  └── useChatStore()          ← Zustand store
+        └── enviarMensaje(texto)
+              ├── Añade Mensaje{rol: 'usuario'} al array
+              ├── cargando = true
+              └── setTimeout(1400ms) → getMockRespuesta(texto)
+                    └── Añade Mensaje{rol: 'ia'} + cargando = false</pre>
+
+      <h3>Flujo de datos (Fase 6 — real)</h3>
+      <pre>ContenidoChat
+  └── useChatIA (hook TanStack Query)
+        └── chatService.enviarMensaje(texto, contextoDesp)
+              └── POST /api/chat  →  Express → Gemini API
+                    └── Devuelve respuesta IA + guarda historial</pre>
+
+      <h3>Layout sin NavBar</h3>
+      <p>
+        <code>ContenidoChat</code> usa <code>fixed inset-0 z-[60]</code>. Esto crea un overlay
+        de viewport completo que oculta visualmente la NavBar (z-40) y el FAB (z-50).
+        Además, <code>'/chat'</code> se añadió a <code>RUTAS_SIN_NAVBAR</code> en
+        <code>navBarInferior.tsx</code> para que el componente directamente no renderice
+        en esta ruta.
+      </p>
+
+      <h3>Mockups de pantalla</h3>
+      <div class="screen-mock">
+        <div class="mock-header">
+          ← &nbsp;&nbsp;&nbsp;<strong>Cookr IA</strong> / ASISTENTE CULINARIO &nbsp;&nbsp;&nbsp; [spacer]<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[🕐 Ver historial de chats]
+        </div>
+        <div style="padding: 1rem 0; text-align: center; color: #737373;">
+          ✨<br/><strong>¿En qué te puedo ayudar?</strong><br/><br/>
+          [🍽️ ¿Qué cocino hoy?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br/>
+          [🧺 Receta con lo que tengo]<br/>
+          [🚫 Dieta sin gluten&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
+        </div>
+        <div class="mock-input">
+          📎 <span style="color:#525252; flex:1">¿En qué estás pensando?</span> <span style="background:#f97316; color:#fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;">→</span>
+        </div>
+      </div>
+
+      <div class="screen-mock" style="margin-top:0.75rem">
+        <div class="mock-header">← &nbsp;&nbsp;&nbsp;<strong>Cookr IA</strong> / ASISTENTE CULINARIO &nbsp;&nbsp;&nbsp; [spacer]</div>
+        <div style="padding: 1rem 0;">
+          <div class="mock-bubble-user">¿Qué cocino hoy?</div>
+          <div style="display:flex; gap:0.5rem; align-items:flex-end;">
+            <span style="font-size:0.8rem">👨‍🍳</span>
+            <div class="mock-bubble-ia">Con los ingredientes típicos te recomiendo una Tortilla de Patata Cremosa...</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:flex-end; margin-top:0.5rem;">
+            <span style="font-size:0.8rem">👨‍🍳</span>
+            <div class="mock-bubble-ia">
+              <div style="color:#737373; font-size:0.72rem">Pensando
+                <span class="mock-dots"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-input">📎 <span style="flex:1; color:#525252">¿En qué estás pensando?</span> <span style="background:#525252; color:#fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;">→</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FICHEROS -->
+  <section id="ficheros">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h2>Árbol de ficheros</h2>
+    </div>
+    <div class="section-body">
+      <pre class="tree">frontend/src/
+├── features/
+│   └── chat/
+│       ├── types/
+│       │   └── <span class="new">chat.types.ts</span>              <span class="comment">← RolMensaje · Mensaje · ChipSugerido</span>
+│       ├── data/
+│       │   └── <span class="new">datosChat.ts</span>               <span class="comment">← CHIPS_SUGERIDOS(3) + getMockRespuesta()</span>
+│       └── components/
+│           ├── <span class="new">headerChat.tsx</span>             <span class="comment">← sticky, back button, historial</span>
+│           ├── <span class="new">estadoVacioChat.tsx</span>        <span class="comment">← Sparkles icon + 3 chips</span>
+│           ├── <span class="new">burbujaUsuario.tsx</span>         <span class="comment">← burbuja derecha bg-brand</span>
+│           ├── <span class="new">burbujaIA.tsx</span>              <span class="comment">← burbuja izquierda + Copiar/Me gusta</span>
+│           ├── <span class="new">indicadorPensando.tsx</span>      <span class="comment">← 3 puntos Framer Motion</span>
+│           ├── <span class="new">barraInputChat.tsx</span>         <span class="comment">← textarea auto-resize + send</span>
+│           ├── <span class="new">contenidoChat.tsx</span>          <span class="comment">← 'use client' · fixed inset-0 z-[60]</span>
+│           └── <span class="new">index.ts</span>                   <span class="comment">← barrel 7 exports</span>
+│
+├── stores/
+│   └── <span class="new">chatStore.ts</span>                   <span class="comment">← Zustand: mensajes[], cargando, enviarMensaje, limpiarChat</span>
+│
+└── app/(main)/chat/
+    └── <span class="new">page.tsx</span>                       <span class="comment">← Suspense wrapper → ContenidoChat</span>
+
+components/common/
+└── <span class="exists">navBarInferior.tsx</span>             <span class="comment">← RUTAS_SIN_NAVBAR añadido '/chat'</span></pre>
+    </div>
+  </section>
+
+  <!-- STORE ZUSTAND -->
+  <section id="store">
+    <div class="section-header">
+      <span class="section-icon">🗄️</span>
+      <h2>Store Zustand — chatStore.ts</h2>
+    </div>
+    <div class="section-body">
+      <h3>Interface</h3>
+      <pre>interface ChatStore {
+  mensajes:       Mensaje[]     // Array de mensajes en orden cronológico
+  cargando:       boolean       // true mientras IA "procesa" (mock 1.4s)
+  enviarMensaje:  (texto) => void
+  limpiarChat:    () => void
+}</pre>
+
+      <h3>Tipo Mensaje</h3>
+      <pre>interface Mensaje {
+  id:         string     // timestamp-u / timestamp-ia
+  rol:        'usuario' | 'ia'
+  contenido:  string
+  timestamp:  Date
+}</pre>
+
+      <h3>Flujo de enviarMensaje</h3>
+      <pre>1. Crea {id, rol:'usuario', contenido, timestamp: new Date()}
+2. set: mensajes = [...prev, mensajeUsuario], cargando = true
+3. setTimeout(1400ms):
+   getMockRespuesta(texto) → string
+4. Crea {id, rol:'ia', contenido: respuesta, timestamp}
+5. set: mensajes = [...prev, respuestaIA], cargando = false</pre>
+
+      <h3>getMockRespuesta — tabla de respuestas</h3>
+      <table>
+        <thead><tr><th>Input</th><th>Respuesta mock</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>¿Qué cocino hoy?</td>
+            <td>Tortilla de Patata Cremosa — rápida y nutritiva</td>
+          </tr>
+          <tr>
+            <td>Receta con lo que tengo</td>
+            <td>Cuéntame qué tienes + sugerencia de usar la despensa</td>
+          </tr>
+          <tr>
+            <td>Dieta sin gluten</td>
+            <td>Opciones sin gluten — ¿rápido o especial?</td>
+          </tr>
+          <tr>
+            <td>Cualquier otro texto</td>
+            <td>Mensaje de bienvenida genérico de Cookr IA</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="margin-top:1rem">
+        <strong style="color:#d4d4d4">Sin persistencia:</strong> el store no usa <code>persist</code>
+        de Zustand. Al recargar la página los mensajes desaparecen. En Fase 6, el historial
+        vendrá del backend (<code>GET /api/chat/historial</code>).
+      </p>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header">
+      <span class="section-icon">🧩</span>
+      <h2>Componentes</h2>
+    </div>
+    <div class="section-body">
+      <div class="comp-list">
+
+        <div class="comp-row">
+          <span class="comp-name">contenidoChat.tsx</span>
+          <span class="comp-desc">
+            <strong>'use client'</strong> · Componente raíz. <code>fixed inset-0 z-[60] flex flex-col bg-background</code> — overlay viewport completo.
+            Lee <code>mensajes</code> y <code>cargando</code> del store. Si <code>mensajes.length === 0</code>
+            renderiza <code>EstadoVacioChat</code>, si no renderiza la lista de burbujas.
+            <code>useEffect</code> + <code>bottomRef.scrollIntoView(smooth)</code> tras cada cambio en mensajes/cargando.
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">headerChat.tsx</span>
+          <span class="comp-desc">
+            <strong>'use client'</strong> · Header sticky con glassmorphism
+            <code>bg-background/80 backdrop-blur-xl</code> + ambient shadow.
+            Fila 1: tres columnas — botón ← (<code>router.back()</code>) · título "Cookr IA" + subtítulo
+            "Asistente Culinario" (centrados) · <code>&lt;div className="h-10 w-10" /&gt;</code>
+            espaciador invisible (mantiene el título centrado sin botón de acción a la derecha).
+            El botón "Historial" top-right fue eliminado.
+            Fila 2: pill "Ver historial de chats" con icono <code>History</code>, centrado — no-op en el mock, se implementa en Fase 6.
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">estadoVacioChat.tsx</span>
+          <span class="comp-desc">
+            Pantalla vacía mostrada cuando <code>mensajes.length === 0</code>.
+            Icono <code>Sparkles</code> en círculo <code>bg-[var(--brand-subtle)]</code> con ambient shadow.
+            H2 con texto normal + <code>italic text-brand</code> en "ayudar?".
+            3 chips verticales con emoji + texto, <code>bg-[var(--warm-bg)] hover:bg-[var(--warm-bg-accent)]</code>.
+            Al hacer click → <code>onChipClick(texto)</code> → <code>enviarMensaje()</code> en el store.
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">burbujaUsuario.tsx</span>
+          <span class="comp-desc">
+            Burbuja del usuario. Alineada a la derecha (<code>flex justify-end</code>).
+            Fondo <code>bg-brand</code>, texto <code>text-brand-foreground</code>.
+            <code>rounded-2xl rounded-tr-sm</code> (esquina superior derecha aplastada — patrón WhatsApp/iMessage).
+            Timestamp debajo con <code>suppressHydrationWarning</code>.
+            Puramente presentacional — no tiene <code>'use client'</code> explícito.
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">burbujaIA.tsx</span>
+          <span class="comp-desc">
+            <strong>'use client'</strong> · Burbuja de Cookr IA. Alineada a la izquierda con avatar ChefHat
+            <code>bg-[var(--brand-subtle)]</code> a su izquierda.
+            Fondo <code>bg-card border border-border/15</code>, <code>rounded-2xl rounded-tl-sm</code>.
+            Fila de acciones: timestamp + botón Copiar (cambia a Check 2s) + botón Me gusta (toggle, activo = <code>text-brand</code>).
+            <code>navigator.clipboard.writeText()</code> para copiar.
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">indicadorPensando.tsx</span>
+          <span class="comp-desc">
+            <strong>'use client'</strong> · Burbuja IA especial con "Pensando" + 3 puntos animados.
+            Usa Framer Motion <code>motion.span</code> con variantes typed (<code>Variants</code>).
+            Animación: <code>scale: [1, 1.6, 1]</code> · duración 0.8s · repeat Infinity · stagger 0.2s entre puntos.
+            Mismo layout que BurbujaIA (avatar ChefHat a la izquierda).
+          </span>
+        </div>
+
+        <div class="comp-row">
+          <span class="comp-name">barraInputChat.tsx</span>
+          <span class="comp-desc">
+            <strong>'use client'</strong> · Barra de input fija en la parte inferior de la vista.
+            <code>border-t border-border/20 bg-background/90 backdrop-blur-xl</code> + safe-area padding bottom.
+            Interior: rounded-3xl con border, conteniendo paperclip + textarea + send.
+            Textarea: auto-resize mediante <code>el.style.height = el.scrollHeight</code> con max 128px (32px por defecto).
+            Send: <code>bg-brand</code> cuando hay texto / <code>bg-muted</code> vacío. Enter sin Shift envía.
+            Deshabilitado mientras <code>cargando === true</code>.
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FLUJOS -->
+  <section id="flujos">
+    <div class="section-header">
+      <span class="section-icon">🔄</span>
+      <h2>Flujos de usuario</h2>
+    </div>
+    <div class="section-body">
+
+      <h3>Flujo 1 — Chip sugerido</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">
+          Usuario ve <code>EstadoVacioChat</code> (mensajes vacíos)
+          <small>3 chips: "¿Qué cocino hoy?" · "Receta con lo que tengo" · "Dieta sin gluten"</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">
+          Click en chip → <code>onChipClick(chip.texto)</code> → <code>useChatStore.enviarMensaje(texto)</code>
+          <small>El chip.texto se usa como contenido del mensaje de usuario</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">
+          Store añade <code>BurbujaUsuario</code> + activa <code>cargando = true</code> → aparece <code>IndicadorPensando</code>
+          <small>El scroll automático lleva la vista al final del chat</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">4</span>
+        <div class="step-txt">
+          Tras 1.4s: store añade <code>BurbujaIA</code> con respuesta mock + <code>cargando = false</code>
+          <small>IndicadorPensando desaparece, scroll al final de nuevo</small>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Flujo 2 — Mensaje libre</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">
+          Usuario escribe en <code>BarraInputChat</code>, botón Send activa (brand)
+          <small>La textarea se expande automáticamente hasta max 4 líneas</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">
+          Pulsa Send o Enter (sin Shift) → mismo flujo que chip
+          <small>Si el texto no está en RESPUESTAS_MOCK → se usa RESPUESTA_DEFAULT genérica</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">3</span>
+        <div class="step-txt">
+          Textarea se vacía + altura reset a <code>auto</code> tras enviar
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Flujo 3 — Copiar respuesta IA</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">
+          Usuario hace click en "Copiar" en las acciones de una <code>BurbujaIA</code>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">
+          <code>navigator.clipboard.writeText(contenido)</code> → botón cambia a Check "Copiado"
+          <small>Vuelve a "Copiar" tras 2 segundos con setTimeout</small>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Flujo 4 — Volver desde el chat</h3>
+      <div class="flow-step">
+        <span class="step-num">1</span>
+        <div class="step-txt">
+          Usuario hace click en ← del <code>HeaderChat</code> → <code>router.back()</code>
+          <small>ContenidoChat (fixed inset-0) se desmonta, la ruta anterior vuelve a ser visible</small>
+        </div>
+      </div>
+      <div class="flow-step">
+        <span class="step-num">2</span>
+        <div class="step-txt">
+          Los mensajes del store persisten mientras la app esté abierta (sin persistencia a localStorage)
+          <small>Al volver al chat, el historial de la sesión sigue visible</small>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STITCH → COOKR -->
+  <section id="stitch">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <h2>Traducción Stitch → Cookr</h2>
+    </div>
+    <div class="section-body">
+      <p>Stitch usa tokens de Material Design. La traducción a variables Cookr es:</p>
+      <table>
+        <thead><tr><th>Stitch</th><th>Valor Stitch</th><th>Cookr CSS var / Tailwind</th></tr></thead>
+        <tbody>
+          <tr><td><code>bg-primary</code></td><td>#855400</td><td><code>bg-brand</code></td></tr>
+          <tr><td><code>text-on-primary</code></td><td>#ffffff</td><td><code>text-brand-foreground</code></td></tr>
+          <tr><td><code>bg-primary-fixed</code></td><td>#ffddb7</td><td><code>bg-[var(--brand-subtle)]</code></td></tr>
+          <tr><td><code>bg-surface-container-low</code></td><td>#f4f4f0</td><td><code>bg-[var(--warm-bg)]</code></td></tr>
+          <tr><td><code>bg-surface-container-highest</code></td><td>#e3e2df</td><td><code>bg-[var(--warm-bg-accent)]</code></td></tr>
+          <tr><td><code>bg-surface-container-lowest</code></td><td>#ffffff</td><td><code>bg-card</code></td></tr>
+          <tr><td><code>bg-background</code></td><td>#faf9f5</td><td><code>bg-background</code></td></tr>
+          <tr><td><code>text-secondary</code></td><td>#5f5e5e</td><td><code>text-muted-foreground</code></td></tr>
+          <tr><td><code>text-on-background</code></td><td>#1b1c1a</td><td><code>text-foreground</code></td></tr>
+          <tr><td><code>border-outline-variant/15</code></td><td>rgba(213,196,178,0.15)</td><td><code>border-border/20</code></td></tr>
+          <tr><td><code>shadow rgba(27,28,26,0.06)</code></td><td>tonal ambient</td><td><code>shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]</code></td></tr>
+          <tr><td><code>bg-[#faf9f5]/80 backdrop-blur-xl</code></td><td>glassmorphism header</td><td><code>bg-background/80 backdrop-blur-xl</code></td></tr>
+          <tr><td><code>rounded-2xl rounded-tr-none</code></td><td>burbuja usuario</td><td><code>rounded-2xl rounded-tr-sm</code></td></tr>
+          <tr><td><code>rounded-2xl rounded-tl-none</code></td><td>burbuja IA</td><td><code>rounded-2xl rounded-tl-sm</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Cambios de diseño respecto al Stitch</h3>
+      <table style="margin-top:0.5rem">
+        <thead><tr><th>Stitch original</th><th>Implementación Cookr</th><th>Motivo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Material Symbols (Google Fonts)</td>
+            <td>Lucide React (ArrowLeft, Sparkles, ChefHat…)</td>
+            <td>Librería ya instalada en el proyecto</td>
+          </tr>
+          <tr>
+            <td>Plus Jakarta Sans</td>
+            <td>Geist (variable del proyecto)</td>
+            <td>Tipografía oficial Cookr</td>
+          </tr>
+          <tr>
+            <td>Gradient send button (from-primary to-primary-container)</td>
+            <td>Sólido <code>bg-brand</code> con ambient shadow</td>
+            <td>Consistencia con otros CTAs del proyecto</td>
+          </tr>
+          <tr>
+            <td>Historia de chats funcional en header</td>
+            <td>No-op (mock) — Fase 6</td>
+            <td>Requiere BE + endpoint historial</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FASE 6 -->
+  <section id="fase6">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <h2>Plan Fase 6 — Integración real con Gemini</h2>
+    </div>
+    <div class="section-body">
+      <div class="comp-list">
+        <div class="comp-row">
+          <span class="comp-name">chatService.ts</span>
+          <span class="comp-desc">Nuevo servicio en <code>src/services/chatService.ts</code>. Método <code>enviarMensaje(texto, contexto)</code> → <code>POST /api/chat</code>. El contexto incluye alérgenos del perfilStore y top-3 items del despensaStore para enriquecer el prompt.</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">useChatIA.ts</span>
+          <span class="comp-desc">Hook en <code>features/chat/hooks/useChatIA.ts</code> con TanStack Query mutation. Sustituye la llamada directa al store. El store solo almacena mensajes; la mutación HTTP llama a chatService.</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">BE: POST /api/chat</span>
+          <span class="comp-desc">Endpoint Express autenticado. Recibe <code>{mensaje, contexto}</code>. Construye prompt enriquecido con despensa + alérgenos. Llama a Google Gemini API (<code>gemini-1.5-flash</code>). Persiste en historial MongoDB.</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">BE: GET /api/chat/historial</span>
+          <span class="comp-desc">Devuelve las últimas N conversaciones del usuario. Permite restaurar el historial en el dropdown del header. chatStore usará <code>cargarHistorial()</code>.</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">Streaming Gemini</span>
+          <span class="comp-desc">Opcionalmente usar streaming (<code>streamGenerateContent</code>) para mostrar la respuesta palabra a palabra, igual que ChatGPT/Claude. Requiere SSE o WebSocket en el frontend.</span>
+        </div>
+      </div>
+
+      <h3>Qué NO cambia en Fase 6</h3>
+      <table>
+        <thead><tr><th>Fichero</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td class="path">contenidoChat.tsx</td><td>Sin cambios — solo cambia el hook que usa</td></tr>
+          <tr><td class="path">headerChat.tsx</td><td>Sin cambios — historial conecta a useChatIA</td></tr>
+          <tr><td class="path">burbujaUsuario.tsx</td><td>Sin cambios</td></tr>
+          <tr><td class="path">burbujaIA.tsx</td><td>Sin cambios (quizá añadir render markdown)</td></tr>
+          <tr><td class="path">indicadorPensando.tsx</td><td>Sin cambios</td></tr>
+          <tr><td class="path">barraInputChat.tsx</td><td>Sin cambios</td></tr>
+          <tr><td class="path">chat.types.ts</td><td>Añadir <code>conversacionId?: string</code> a Mensaje</td></tr>
+          <tr><td class="path">chatStore.ts</td><td>Sustituir <code>enviarMensaje</code> mock por llamada real desde el hook</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Sprint 6: implementación real ── -->
+  <section id="sprint6-real">
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Sprint 6 — Integración Gemini real (C1 + C2)</h2>
+    </div>
+    <div class="section-body">
+      <h3>Archivos nuevos/modificados</h3>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;font-size:0.7rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;font-size:0.7rem;color:#525252;text-transform:uppercase">Cambio</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/services/chatService.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>responderChat(mensajes[], usuarioId)</code>: carga preferencias + alergias + despensa del usuario, construye system prompt, llama a Gemini 1.5 Flash con historial. También exporta <code>generarRecetaDesdeTexto()</code> y <code>escanearTicket()</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/routes/chat.routes.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>POST /api/chat</code> (requerirAuth). Valida array <code>mensajes</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">backend/src/app.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Registrado <code>/api/chat</code>.</td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">frontend/src/services/chatService.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Nuevo. <code>chatService.enviarMensaje(mensajes[], token)</code> → POST /api/chat.</td></tr>
+          <tr><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.78rem;color:#3b82f6">frontend/src/stores/chatStore.ts</td><td style="padding:0.6rem 1rem;font-size:0.83rem">Reemplazado <code>getMockRespuesta + setTimeout</code> por llamada real a <code>chatService.enviarMensaje()</code>. En error → mensaje de error en la burbuja de IA.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:1.25rem">System prompt con contexto (C2)</h3>
+      <pre style="background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.76rem;color:#d4d4d4;line-height:1.5">Eres el asistente culinario de Cookr...
+- Dietas: [preferencias del usuario]
+- Alergias: [alergias del usuario]
+- En su despensa: [lista de items]
+
+Responde siempre en español. Sin asteriscos para formato.</pre>
+
+      <h3 style="margin-top:1.25rem">Dependencia</h3>
+      <p style="font-size:0.85rem;color:#fbbf24;background:#eab30811;border:1px solid #eab30833;border-radius:8px;padding:0.75rem 1rem">⚠️ Requiere <code>GEMINI_API_KEY</code> en <code>backend/.env</code>. Sin clave, el asistente responde con un mensaje informativo. Obtener gratis en aistudio.google.com (15 RPM, 1M tokens/día con gemini-1.5-flash).</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

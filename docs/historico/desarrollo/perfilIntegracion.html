@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integración Perfil — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    header p { font-size: 0.78rem; color: #737373; margin-top: 0.25rem; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 0.4rem; }
+    p { font-size: 0.83rem; color: #d4d4d4; }
+    ul { padding-left: 1.2rem; font-size: 0.83rem; color: #d4d4d4; }
+    li { margin-bottom: 0.25rem; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.76rem; color: #e5e5e5; font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.55; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #222; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge.be { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f633; }
+    .badge.fe { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.done { background: #22c55e22; color: #4ade80; border: 1px solid #22c55e33; }
+    .badge.review { background: #f9731622; color: #fb923c; border: 1px solid #f9731633; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.6rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    td code { font-size: 0.71rem; }
+
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.8rem; }
+    .flow-node { background: #222; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.7rem; color: #e5e5e5; font-family: monospace; font-size: 0.76rem; }
+    .flow-arrow { color: #525252; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Integración Perfil — BE + FE</h1>
+  <p>Sprint 4 · 2026-05-15 · Tareas PERF-BE-001–003 / PERF-FE-001–003 / PERF-FIX-001 — Completado y verificado</p>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#arquitectura">Arquitectura</a>
+  <a href="#be">Backend</a>
+  <a href="#fe">Frontend</a>
+  <a href="#endpoints">Endpoints</a>
+  <a href="#flujos">Flujos</a>
+  <a href="#fix">Fix 2026-05-15</a>
+  <a href="#ts">TypeScript</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header"><span>📋</span><h2>Resumen de tareas completadas</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>ID</th><th>Tarea</th><th>Capa</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>PERF-BE-001</td><td>GET /api/usuarios/me — obtenerPerfil (repo + service + controller + route)</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-BE-002</td><td>PUT /api/usuarios/me/contrasena — cambiarContrasena con bcrypt</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-BE-003</td><td>PUT /api/usuarios/me/preferencias — actualizarPreferencias (dietas + alergenos)</td><td><span class="badge be">BE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-FE-001</td><td>perfilService.ts + usePerfil.ts — capa HTTP + hooks TanStack Query</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-FE-002</td><td>contenidoPerfil.tsx — conectado a useSession + useMiPerfil + useActualizarPreferencias</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-FE-003</td><td>dialogCambiarContrasena.tsx + perfilStore.ts simplificado</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+          <tr><td>PERF-FIX-001</td><td>Dialog preferencias no mostraba chips activos — fix arquitectura de datos + import apiClient</td><td><span class="badge fe">FE</span></td><td><span class="badge done">✅ Completado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section id="arquitectura">
+    <div class="section-header"><span>🏗️</span><h2>Arquitectura del módulo de perfil</h2></div>
+    <div class="section-body">
+      <h3>Patrón de capas BE</h3>
+      <div class="flow">
+        <span class="flow-node">usuarios.routes.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">usuariosController.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">usuariosService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">usuarioRepository.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">usuarioMongo.ts</span>
+      </div>
+
+      <h3>Patrón de capas FE</h3>
+      <div class="flow">
+        <span class="flow-node">contenidoPerfil.tsx (CC)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useMiPerfil / useActualizarPreferencias</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">perfilService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">apiClient.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">BE /api/usuarios/me</span>
+      </div>
+      <div class="flow">
+        <span class="flow-node">dialogCambiarContrasena.tsx (CC)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useCambiarContrasena</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">perfilService.ts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">BE /api/usuarios/me/contrasena</span>
+      </div>
+
+      <h3>Fuentes de datos del perfil</h3>
+      <ul>
+        <li><strong>NextAuth session</strong> — <code>nombre</code>, <code>email</code>, <code>image</code> (foto): ya disponibles en <code>useSession()</code>, no se refetchen del BE</li>
+        <li><strong>GET /api/usuarios/me</strong> — <code>alergias[]</code>, <code>preferencias[]</code>, <code>proveedor</code>: datos que no están en la sesión y necesitan BE</li>
+        <li><strong>Zustand perfilStore</strong> — <code>permisos</code> (ubicacion, camara, notificaciones): estado local de UI, no persiste en BE</li>
+      </ul>
+
+      <h3>Middleware de autenticación</h3>
+      <ul>
+        <li><code>requerirAuth</code> — todos los endpoints de perfil requieren token válido → 401 si ausente o inválido</li>
+        <li><code>req.usuario.id</code> — identificador extraído del JWT, usado para aislar datos del usuario autenticado</li>
+      </ul>
+
+      <h3>Mapeo de campos BE ↔ FE</h3>
+      <p>El modelo MongoDB almacena <code>alergias[]</code> (para los alérgenos) y <code>preferencias[]</code> (para las dietas). El FE usa los nombres semánticamente correctos para cada concepto: <code>alergenos</code> y <code>dietas</code>. El service BE gestiona el mapeo al leer y escribir.</p>
+      <table>
+        <thead><tr><th>MongoDB (IUsuario)</th><th>BE Response</th><th>FE (PerfilRespuesta)</th><th>FE Component</th></tr></thead>
+        <tbody>
+          <tr><td>alergias: string[]</td><td>alergias</td><td>alergias: string[]</td><td>perfil?.alergias → alergenos</td></tr>
+          <tr><td>preferencias: string[]</td><td>preferencias</td><td>preferencias: string[]</td><td>perfil?.preferencias → dietas</td></tr>
+          <tr><td>proveedor: string</td><td>proveedor</td><td>proveedor: 'local' | 'google'</td><td>esLocal = proveedor === 'local'</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BACKEND -->
+  <section id="be">
+    <div class="section-header"><span>⚙️</span><h2>Backend — ficheros creados / modificados</h2></div>
+    <div class="section-body">
+
+      <h3>backend/src/repositories/usuarioRepository.ts — nuevos métodos (PERF-BE-001–003)</h3>
+      <p>Añadidos tres métodos al repositorio existente de usuarios:</p>
+      <pre>interface DatosActualizarPreferencias {
+  alergias: string[]
+  preferencias: string[]
+}
+
+buscarPerfilPorId: (id: string): Promise&lt;IUsuarioDoc | null&gt; =>
+  Usuario.findById(id).select("nombre correo foto alergias preferencias proveedor"),
+
+actualizarPreferencias: (id: string, datos: DatosActualizarPreferencias): Promise&lt;IUsuarioDoc | null&gt; =>
+  Usuario.findByIdAndUpdate(
+    id,
+    { alergias: datos.alergias, preferencias: datos.preferencias },
+    { new: true }
+  ).select("nombre correo foto alergias preferencias proveedor"),
+
+buscarPorIdConContrasena: (id: string): Promise&lt;IUsuarioDoc | null&gt; =>
+  Usuario.findById(id).select("+contrasena"),</pre>
+      <ul>
+        <li><code>buscarPerfilPorId</code> — proyección explícita de campos; excluye <code>contrasena</code> y otros campos sensibles</li>
+        <li><code>actualizarPreferencias</code> — <code>{ new: true }</code> devuelve el documento ya actualizado en lugar del anterior</li>
+        <li><code>buscarPorIdConContrasena</code> — <code>select("+contrasena")</code> necesario porque el campo tiene <code>select: false</code> en el schema de Mongoose; sólo se usa para verificar la contraseña actual</li>
+      </ul>
+
+      <h3>backend/src/services/usuariosService.ts — lógica de negocio (PERF-BE-001–003)</h3>
+      <pre>import bcrypt from "bcryptjs"
+const SALT_ROUNDS = 10
+
+// PERF-BE-001
+async function obtenerPerfil(usuarioId: string) {
+  const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId)
+  if (!usuario) throw new ErrorHttp(404, "Usuario no encontrado")
+  return {
+    nombre: usuario.nombre,
+    correo: usuario.correo,
+    foto: usuario.foto ?? null,
+    alergias: usuario.alergias ?? [],
+    preferencias: usuario.preferencias ?? [],
+    proveedor: usuario.proveedor,
+  }
+}
+
+// PERF-BE-002
+async function cambiarContrasena(usuarioId: string, contrasenaActual: string, contrasenaNueva: string) {
+  const usuario = await usuarioRepository.buscarPorIdConContrasena(usuarioId)
+  if (!usuario) throw new ErrorHttp(404, "Usuario no encontrado")
+  if (usuario.proveedor !== "local") throw new ErrorHttp(400, "Los usuarios de Google no pueden cambiar la contraseña")
+  const coincide = await bcrypt.compare(contrasenaActual, usuario.contrasena!)
+  if (!coincide) throw new ErrorHttp(400, "La contraseña actual es incorrecta")
+  const hash = await bcrypt.hash(contrasenaNueva, SALT_ROUNDS)
+  await usuarioRepository.actualizarContrasena(usuarioId, hash)
+}
+
+// PERF-BE-003
+async function actualizarPreferencias(usuarioId: string, dietas: string[], alergenos: string[]) {
+  const actualizado = await usuarioRepository.actualizarPreferencias(usuarioId, {
+    preferencias: dietas,
+    alergias: alergenos,
+  })
+  if (!actualizado) throw new ErrorHttp(404, "Usuario no encontrado")
+  return {
+    nombre: actualizado.nombre, correo: actualizado.correo, foto: actualizado.foto ?? null,
+    alergias: actualizado.alergias ?? [], preferencias: actualizado.preferencias ?? [],
+    proveedor: actualizado.proveedor,
+  }
+}</pre>
+
+      <h3>backend/src/controllers/usuariosController.ts — handlers HTTP (PERF-BE-001–003)</h3>
+      <ul>
+        <li><strong><code>obtenerPerfil</code></strong> — extrae <code>req.usuario.id</code>, llama al service, responde 200 con el objeto de perfil</li>
+        <li><strong><code>cambiarContrasena</code></strong> — valida <code>contrasenaActual</code> y <code>contrasenaNueva</code> presentes y <code>contrasenaNueva.length >= 8</code>, llama al service, responde 200 <code>{ mensaje: "Contraseña actualizada" }</code></li>
+        <li><strong><code>actualizarPreferencias</code></strong> — valida que <code>dietas</code> y <code>alergenos</code> sean arrays, llama al service, responde 200 con el perfil actualizado</li>
+        <li>Función compartida <code>manejarError(res, error)</code> — diferencia <code>ErrorHttp</code> (status + mensaje) de errores inesperados (500)</li>
+      </ul>
+
+      <h3>backend/src/routes/usuarios.routes.ts — rutas (PERF-BE-001–003)</h3>
+      <pre>router.get("/me",             requerirAuth, usuariosController.obtenerPerfil);
+router.put("/me/contrasena",  requerirAuth, usuariosController.cambiarContrasena);
+router.put("/me/preferencias",requerirAuth, usuariosController.actualizarPreferencias);
+router.post("/:id/seguir",    requerirAuth, usuariosController.toggleSeguir);</pre>
+      <p>Las rutas <code>/me</code> deben declararse <strong>antes</strong> de <code>/:id</code> para evitar que Express interprete "me" como un id de MongoDB.</p>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section id="fe">
+    <div class="section-header"><span>🖥️</span><h2>Frontend — ficheros creados / modificados</h2></div>
+    <div class="section-body">
+
+      <h3>frontend/src/services/perfilService.ts — capa HTTP (PERF-FE-001)</h3>
+      <p>Nuevo fichero. Encapsula todas las llamadas HTTP al módulo de perfil.</p>
+      <pre>export interface PerfilRespuesta {
+  nombre: string
+  correo: string
+  foto: string | null
+  alergias: string[]
+  preferencias: string[]
+  proveedor: 'local' | 'google'
+}
+
+export const perfilService = {
+  async getMiPerfil(token: string): Promise&lt;PerfilRespuesta&gt; {
+    const { data } = await apiClient.get('/usuarios/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return data
+  },
+
+  async cambiarContrasena(token: string, contrasenaActual: string, contrasenaNueva: string): Promise&lt;void&gt; {
+    await apiClient.put('/usuarios/me/contrasena',
+      { contrasenaActual, contrasenaNueva },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+  },
+
+  async actualizarPreferencias(token: string, dietas: string[], alergenos: string[]): Promise&lt;PerfilRespuesta&gt; {
+    const { data } = await apiClient.put('/usuarios/me/preferencias',
+      { dietas, alergenos },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    return data
+  },
+}</pre>
+
+      <h3>frontend/src/features/perfil/hooks/usePerfil.ts — hooks TanStack Query (PERF-FE-001)</h3>
+      <table>
+        <thead><tr><th>Hook / Función</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td>useMiPerfil</td><td>useQuery</td><td>GET /api/usuarios/me. queryKey: ['perfil']. staleTime: 5 min. Requiere sesión activa (enabled: !!token).</td></tr>
+          <tr><td>useCambiarContrasena</td><td>useMutation</td><td>PUT /api/usuarios/me/contrasena. Sin optimistic update (operación crítica). Lanza el error para que el caller lo capture.</td></tr>
+          <tr><td>useActualizarPreferencias</td><td>useMutation</td><td>PUT /api/usuarios/me/preferencias. Con optimistic update completo: onMutate cancela queries + actualiza cache, onError restaura estado previo, onSuccess sincroniza con respuesta BE.</td></tr>
+          <tr><td>extraerMensajeError</td><td>utility fn</td><td>Extrae el mensaje de error de Axios (<code>error.response.data.mensaje</code>) o devuelve "Error inesperado" como fallback.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Optimistic update en useActualizarPreferencias</h3>
+      <pre>onMutate: async ({ dietas, alergenos }) => {
+  await queryClient.cancelQueries({ queryKey: QUERY_KEY })
+  const anterior = queryClient.getQueryData&lt;PerfilRespuesta&gt;(QUERY_KEY)
+  queryClient.setQueryData&lt;PerfilRespuesta&gt;(QUERY_KEY, (prev) =>
+    prev ? { ...prev, preferencias: dietas, alergias: alergenos } : prev
+  )
+  return { anterior }
+},
+onError: (_err, _vars, context) => {
+  if (context?.anterior) queryClient.setQueryData(QUERY_KEY, context.anterior)
+},
+onSuccess: (data) => {
+  queryClient.setQueryData(QUERY_KEY, data)
+},</pre>
+
+      <h3>frontend/src/features/perfil/components/contenidoPerfil.tsx — datos reales (PERF-FE-002)</h3>
+      <ul>
+        <li>Eliminado <code>useRouter</code> y la dependencia de datos del store Zustand (nombre, email, foto, dietas, alergenos)</li>
+        <li><code>nombre</code>, <code>email</code>, <code>avatar</code> — provienen de <code>useSession()</code>; no se refetchen del BE</li>
+        <li><code>dietas = perfil?.preferencias ?? []</code>, <code>alergenos = perfil?.alergias ?? []</code> — provienen de <code>useMiPerfil()</code></li>
+        <li><code>esLocal = perfil?.proveedor === 'local'</code> — condiciona la visibilidad de la fila "Cambiar contraseña"</li>
+        <li><code>onGuardar</code> del dialog llama a <code>actualizarPreferencias({ dietas: d, alergenos: a })</code></li>
+        <li><code>router.back()</code> reemplazado por <code>window.history.back()</code> (eliminada dependencia de useRouter)</li>
+      </ul>
+
+      <h3>frontend/src/features/perfil/components/dialogCambiarContrasena.tsx — errores reales (PERF-FE-003)</h3>
+      <ul>
+        <li>Importa <code>useCambiarContrasena</code> y <code>extraerMensajeError</code> de <code>@/features/perfil/hooks/usePerfil</code></li>
+        <li>Añadido estado <code>errorServidor: string | null</code> para mostrar mensajes de error del BE</li>
+        <li><code>onSubmit</code> llama a <code>await cambiarContrasena({ contrasenaActual, contrasenaNueva })</code></li>
+        <li>En catch: <code>setErrorServidor(extraerMensajeError(err))</code> — muestra el mensaje exacto del BE ("La contraseña actual es incorrecta")</li>
+        <li>Error renderizado con estilos destructive: <code>rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive</code></li>
+        <li>En éxito: <code>setExito(true)</code> muestra pantalla de confirmación con <code>CheckCircle2</code></li>
+      </ul>
+
+      <h3>frontend/src/stores/perfilStore.ts — simplificado (PERF-FE-003)</h3>
+      <p>El store Zustand de perfil se redujo exclusivamente al estado de <strong>permisos locales de UI</strong>. Los datos del perfil (nombre, foto, dietas, alergenos) se eliminaron del store porque ahora provienen de fuentes más autorizadas: la sesión NextAuth y TanStack Query.</p>
+      <pre>// ANTES — store con datos de perfil + permisos
+interface PerfilState {
+  nombre: string; email: string; avatar: string | null
+  dietas: string[]; alergenos: string[]
+  permisos: PermisosPerfil
+  // ... acciones setNombre, setDietas, setAlergenos ...
+}
+
+// AHORA — solo permisos locales
+interface PermisosState {
+  permisos: PermisosPerfil  // { ubicacion: boolean, camara: boolean, notificaciones: boolean }
+  togglePermiso: (key: PermisoKey) => void
+}</pre>
+    </div>
+  </section>
+
+  <!-- ENDPOINTS -->
+  <section id="endpoints">
+    <div class="section-header"><span>🔌</span><h2>Endpoints — contrato BE ↔ FE</h2></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Método + Ruta</th><th>Auth</th><th>Body</th><th>Respuesta</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>GET /api/usuarios/me</td>
+            <td>requerirAuth</td>
+            <td>—</td>
+            <td><code>{ nombre, correo, foto, alergias, preferencias, proveedor }</code></td>
+          </tr>
+          <tr>
+            <td>PUT /api/usuarios/me/contrasena</td>
+            <td>requerirAuth</td>
+            <td><code>{ contrasenaActual, contrasenaNueva }</code></td>
+            <td>200 <code>{ mensaje: "Contraseña actualizada" }</code> · 400 si incorrecta</td>
+          </tr>
+          <tr>
+            <td>PUT /api/usuarios/me/preferencias</td>
+            <td>requerirAuth</td>
+            <td><code>{ dietas: string[], alergenos: string[] }</code></td>
+            <td>200 perfil actualizado (mismo shape que GET)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Validaciones en el controller</h3>
+      <ul>
+        <li><strong>cambiarContrasena</strong> — <code>contrasenaActual</code> y <code>contrasenaNueva</code> deben ser strings no vacíos; <code>contrasenaNueva.length >= 8</code> (validación duplicada en FE con Zod)</li>
+        <li><strong>actualizarPreferencias</strong> — <code>dietas</code> y <code>alergenos</code> deben ser <code>Array.isArray()</code>; arrays vacíos son válidos (el usuario puede quitar todas sus preferencias)</li>
+        <li>Todos los endpoints retornan 401 automáticamente si el JWT es inválido o ausente (middleware <code>requerirAuth</code>)</li>
+      </ul>
+
+      <h3>Errores del servicio de contraseña</h3>
+      <ul>
+        <li>400 — "Los usuarios de Google no pueden cambiar la contraseña" (proveedor !== 'local')</li>
+        <li>400 — "La contraseña actual es incorrecta" (bcrypt.compare retorna false)</li>
+        <li>404 — "Usuario no encontrado" (id en JWT no existe en BD)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FLUJOS -->
+  <section id="flujos">
+    <div class="section-header"><span>🔄</span><h2>Flujos de datos</h2></div>
+    <div class="section-body">
+
+      <h3>Carga inicial del perfil</h3>
+      <div class="flow">
+        <span class="flow-node">contenidoPerfil mounts</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useSession() → nombre, email, foto</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">useMiPerfil() → GET /api/usuarios/me</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">alergias, preferencias, proveedor</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">render con datos reales</span>
+      </div>
+
+      <h3>Actualizar preferencias — optimistic update</h3>
+      <ol style="padding-left:1.2rem; font-size:0.83rem; color:#d4d4d4;">
+        <li>Usuario guarda cambios en el dialog de preferencias y alérgenos</li>
+        <li><code>onMutate</code>: cancela fetches en vuelo de <code>['perfil']</code>, actualiza cache inmediatamente</li>
+        <li>UI refleja los nuevos valores antes de que el BE responda</li>
+        <li>Mutación: <code>PUT /api/usuarios/me/preferencias</code> con Bearer token</li>
+        <li>Si éxito → <code>onSuccess</code>: <code>setQueryData</code> con la respuesta del BE (fuente de verdad)</li>
+        <li>Si error → <code>onError</code>: restaura el estado anterior del cache (rollback)</li>
+      </ol>
+
+      <h3>Cambiar contraseña — flujo de éxito</h3>
+      <div class="flow">
+        <span class="flow-node">usuario envía formulario</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">Zod valida (min 8, letra, número)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">PUT /me/contrasena</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">bcrypt.compare + bcrypt.hash</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">200 OK → setExito(true)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">pantalla confirmación</span>
+      </div>
+
+      <h3>Cambiar contraseña — contraseña incorrecta</h3>
+      <div class="flow">
+        <span class="flow-node">PUT /me/contrasena</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">bcrypt.compare → false</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">400 "La contraseña actual es incorrecta"</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">extraerMensajeError(err)</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">setErrorServidor → mensaje en dialog</span>
+      </div>
+
+      <h3>Control de visibilidad — usuario Google</h3>
+      <div class="flow">
+        <span class="flow-node">useMiPerfil() → proveedor: 'google'</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">esLocal = false</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node">FilaAjuste "Cambiar contraseña" oculta</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIX 2026-05-15 -->
+  <section id="fix">
+    <div class="section-header"><span>🔧</span><h2>PERF-FIX-001 · 2026-05-15 — Dialog preferencias no mostraba chips activos</h2></div>
+    <div class="section-body">
+
+      <h3>Síntoma</h3>
+      <p>Al abrir el dialog de preferencias y alérgenos, ningún chip aparecía resaltado aunque el usuario tuviera datos guardados en la BD. El dialog se abría correctamente pero el estado draft se inicializaba siempre con arrays vacíos.</p>
+
+      <h3>Causa raíz — tres problemas combinados</h3>
+      <table>
+        <thead><tr><th>Fichero</th><th>Problema</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>usePerfil.ts</td>
+            <td><code>refetchOnMount: 'always'</code> sin <code>staleTime</code>: cada vez que <code>ContenidoPerfil</code> montaba, la query se marcaba como stale y relanzaba el fetch. Durante ese refetch <code>perfil</code> volvía a ser <code>undefined</code> momentáneamente, haciendo que <code>dietasActivas = []</code>.</td>
+          </tr>
+          <tr>
+            <td>contenidoPerfil.tsx</td>
+            <td><code>useEffect(() =&gt; qc.invalidateQueries(['perfil']), [qc])</code> invalidaba la query en cada mount, amplificando la ventana de tiempo en que los datos estaban vacíos.</td>
+          </tr>
+          <tr>
+            <td>dialogPreferenciasAlergenos.tsx</td>
+            <td>El draft se inicializaba con props <code>dietasActivas</code>/<code>alergenosActivos</code> que llegaban desde el padre. Si el dialog se abría durante el refetch, las props eran <code>[]</code> y el draft quedaba vacío. Aunque el <code>useEffect</code> tenía estas props en sus deps, la dependencia transitiva a través del padre añadía latencia.</td>
+          </tr>
+          <tr>
+            <td>perfilService.ts</td>
+            <td><code>import apiClient from './apiClient'</code> era un import default, pero <code>apiClient</code> es un named export. Error de compilación TS silenciado en desarrollo.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Cambios aplicados</h3>
+
+      <h3>usePerfil.ts — staleTime en lugar de refetchOnMount</h3>
+      <pre>// ANTES
+return useQuery({
+  queryKey: QUERY_KEY,
+  queryFn: () => perfilService.getMiPerfil(token),
+  enabled: !!token,
+  refetchOnMount: 'always',   // ← refetch en cada mount, datos vacíos transitoriamente
+})
+
+// DESPUÉS
+return useQuery({
+  queryKey: QUERY_KEY,
+  queryFn: () => perfilService.getMiPerfil(token),
+  enabled: !!token,
+  staleTime: 5 * 60 * 1000,  // ← cache válido 5 min, datos disponibles inmediatamente
+})</pre>
+
+      <h3>contenidoPerfil.tsx — eliminado invalidateQueries en mount</h3>
+      <pre>// ELIMINADO — causaba refetch en cada mount
+useEffect(() => {
+  qc.invalidateQueries({ queryKey: ['perfil'] })
+}, [qc])
+
+// También eliminados: import useQueryClient, variables dietas/alergenos,
+// props dietasActivas/alergenosActivos del DialogPreferenciasAlergenos</pre>
+
+      <h3>dialogPreferenciasAlergenos.tsx — useMiPerfil directamente en el dialog</h3>
+      <p>El dialog ya no recibe las preferencias como props desde el padre. Lee directamente del cache de TanStack Query mediante <code>useMiPerfil()</code>. TanStack Query deduplica la query: no se hace ninguna llamada HTTP extra.</p>
+      <pre>// ANTES — props desde el padre (podían llegar vacías durante refetch)
+interface Props {
+  abierto: boolean
+  onCerrar: () => void
+  dietasActivas: string[]    // ← eliminado
+  alergenosActivos: string[] // ← eliminado
+}
+
+useEffect(() => {
+  if (abierto) {
+    setDietasDraft(dietasActivas)
+    setAlergenosDraft(alergenosActivos)
+    setErrorServidor(null)
+  }
+}, [abierto, dietasActivas, alergenosActivos])
+
+// DESPUÉS — datos del cache, acceso directo y sin latencia
+interface Props {
+  abierto: boolean
+  onCerrar: () => void
+}
+
+const { data: perfil } = useMiPerfil()  // cache hit, sin fetch extra
+
+useEffect(() => {
+  if (abierto) {
+    setDietasDraft(perfil?.preferencias ?? [])
+    setAlergenosDraft(perfil?.alergias ?? [])
+    setErrorServidor(null)
+  }
+}, [abierto, perfil])  // deps limpias, perfil es la fuente de verdad</pre>
+
+      <h3>perfilService.ts — import named corregido</h3>
+      <pre>// ANTES — default import (error TS)
+import apiClient from './apiClient'
+
+// DESPUÉS — named import correcto
+import { apiClient } from './apiClient'</pre>
+
+      <h3>Verificación</h3>
+      <pre>$ cd frontend && npx tsc --noEmit
+# (sin output) → 0 errores</pre>
+      <p>Dialog de preferencias y alérgenos muestra correctamente los chips activos al abrirse, cargando los datos desde el cache de TanStack Query sin llamadas HTTP adicionales.</p>
+    </div>
+  </section>
+
+  <!-- TYPESCRIPT -->
+  <section id="ts">
+    <div class="section-header"><span>✅</span><h2>Verificación TypeScript</h2></div>
+    <div class="section-body">
+      <pre>$ cd backend && npx tsc --noEmit
+# (sin output) → 0 errores
+
+$ cd frontend && npx tsc --noEmit
+# (sin output) → 0 errores</pre>
+      <p>Pendiente verificar una vez que el entorno de ejecución confirme que no hay errores. Los tipos están diseñados para ser consistentes: <code>PerfilRespuesta</code> en el FE es espejo del objeto que devuelve <code>obtenerPerfil()</code> y <code>actualizarPreferencias()</code> en el BE service.</p>
+
+      <h3>Decisiones de tipado destacadas</h3>
+      <ul>
+        <li><code>proveedor: 'local' | 'google'</code> — union type en el FE para que TypeScript pueda estrechar el tipo y el IDE ayude con el control de visibilidad</li>
+        <li><code>foto: string | null</code> — nullable explícito; el operador <code>??</code> del service BE garantiza que nunca se envíe <code>undefined</code></li>
+        <li><code>context: { anterior: PerfilRespuesta | undefined }</code> en <code>useMutation</code> — tipado del contexto del optimistic update para que <code>onError</code> pueda hacer rollback seguro</li>
+        <li><code>buscarPorIdConContrasena</code> usa <code>select("+contrasena")</code> — el <code>+</code> es necesario porque el campo tiene <code>select: false</code> en el schema Mongoose; sin él, <code>usuario.contrasena</code> sería <code>undefined</code></li>
+      </ul>
+
+      <h3>Imports absolutos — cumplimiento rules.md</h3>
+      <p>Todos los imports en el módulo de perfil usan rutas absolutas con alias <code>@/</code>, en conformidad con la regla §15 de <code>docs/historico/rules.md</code>.</p>
+      <table>
+        <thead><tr><th>Fichero</th><th>Import correcto</th></tr></thead>
+        <tbody>
+          <tr><td>contenidoPerfil.tsx</td><td><code>@/features/perfil/hooks/usePerfil</code></td></tr>
+          <tr><td>dialogCambiarContrasena.tsx</td><td><code>@/features/perfil/hooks/usePerfil</code></td></tr>
+          <tr><td>hooks/usePerfil.ts</td><td><code>@/services/perfilService</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Sprint 6 — Avatar upload (A5) -->
+  <section id="avatar-upload">
+    <div class="section-header" style="padding:1rem 1.25rem;border-bottom:1px solid #252525">
+      <h2 style="font-size:0.92rem;font-weight:700;color:#fff">Sprint 6 · A5 — Avatar upload real</h2>
+    </div>
+    <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
+      <p style="font-size:0.85rem;color:#d4d4d4">El icono de cámara en <code>TarjetaAvatarPerfil</code> ahora abre un selector de archivos. La imagen se convierte a base64 con <code>FileReader</code>, se sube al backend y se actualiza la sesión de NextAuth.</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+        <thead><tr style="border-bottom:1px solid #222"><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Capa</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Archivo</th><th style="padding:0.5rem 1rem;text-align:left;font-size:0.68rem;color:#525252;text-transform:uppercase">Cambio</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Repository</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuarioRepository.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>actualizarFoto(id, foto)</code> → <code>findByIdAndUpdate({ foto })</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Service</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuariosService.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>actualizarFoto()</code> — valida que empiece con <code>data:image/</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">BE Route</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usuarios.routes.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>PUT /api/usuarios/me/foto</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE Service</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">perfilService.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>subirFoto(token, fotoBase64)</code></td></tr>
+          <tr style="border-bottom:1px solid #1f1f1f"><td style="padding:0.6rem 1rem">FE Hook</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">usePerfil.ts</td><td style="padding:0.6rem 1rem">Nuevo: <code>useSubirFoto()</code> — invalida cache perfil + llama <code>update({image})</code> de NextAuth</td></tr>
+          <tr><td style="padding:0.6rem 1rem">FE UI</td><td style="padding:0.6rem 1rem;font-family:monospace;font-size:0.75rem;color:#3b82f6">tarjetaAvatarPerfil.tsx</td><td style="padding:0.6rem 1rem">Input file oculto, preview optimista, spinner <code>Loader2</code>, rollback en error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

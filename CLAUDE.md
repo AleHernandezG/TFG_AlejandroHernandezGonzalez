@@ -14,7 +14,9 @@ Monorepo con **tres unidades desplegables independientes**:
 | `backend/` | API REST Express + TypeScript | Render |
 | `gemini-proxy/` | Cloudflare Worker que hace de proxy hacia la API de Gemini | Cloudflare |
 
-`documentacion/` y `overleaf/` son la memoria en LaTeX. `presentacion/` es la defensa. `docs/` es documentación de desarrollo.
+`docs/` es la documentación de desarrollo. Empieza siempre por `docs/README.md`, que es el índice.
+
+La memoria en LaTeX, la presentación de la defensa y los documentos oficiales del TFG **no están en este repositorio**: viven un nivel por encima, en `4 Curso/`. No son código de Cookr y el `.gitignore` de la raíz los bloquea por si vuelven a aparecer aquí dentro.
 
 ## Comandos
 
