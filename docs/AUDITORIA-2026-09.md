@@ -494,6 +494,19 @@ historial que este repositorio conozca.
 `TFG-DOcumenatacion`, `.gitignore` para `ODCUTGF/` (documentos personales firmados, no código) y
 Git LFS o `.gitignore` para el `.pptx`.
 
+**Cerrado el 4 de septiembre de 2026.** Los tres se movieron un nivel por encima, a `4 Curso/`,
+sin borrar nada. `TFG-DOcumenatacion/` sigue siendo su propio repositorio, con su historial
+intacto (`e9849a1`, rama `main`) y sus cambios sin commitear tal y como estaban.
+
+No se hizo ni submódulo ni Git LFS. La memoria en LaTeX, los documentos oficiales firmados y el
+`.pptx` no son código de Cookr: no tienen por qué vivir dentro de este repositorio ni versionarse
+con él, y un submódulo solo habría cambiado tres líneas de ruido por una más difícil de explicar.
+El `.gitignore` de la raíz lleva las tres rutas como red de seguridad, por si alguna vuelve a
+aparecer aquí dentro.
+
+Queda un cabo suelto que no es de este hallazgo: `README.md:73` sigue enlazando a
+`documentacion/`, que ya no existe aquí y no va a volver. Es B3 y se arregla en F10.1.
+
 ---
 
 ### B7 · `REVISION_DESPLIEGUE.md` sin verificar

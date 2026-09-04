@@ -17,6 +17,7 @@ del TFG y explica cómo se llegó hasta aquí. Pero no se usa para tomar decisio
 | Trabajar en cualquier cosa | `../CLAUDE.md` primero. Es el contrato del repositorio |
 | Saber qué está roto ahora mismo | `AUDITORIA-2026-09.md` |
 | Saber qué toca hacer y en qué orden | `PLAN-2026-09.md` |
+| Tener un rato libre y querer comprobar algo a mano | `PRUEBAS-MANUALES.md` |
 | Desplegar o revisar producción | `../REVISION_DESPLIEGUE.md` |
 | Entender la infraestructura y los servicios externos | `infraestructura.md` |
 | Montar el entorno o entender dónde va cada fichero del frontend | `folderStructure.md` |
@@ -34,6 +35,7 @@ hace falta.
 | `AUDITORIA-2026-09.md` | Auditoría del 4 de septiembre. Hallazgos con fichero, línea y arreglo |
 | `PLAN-2026-09.md` | Plan de trabajo que sale de esa auditoría. Bloques F0 y F6 a F12 |
 | `changes/f6-seguridad.md` | Qué se tocó al cerrar el bloque F6, las decisiones que costaron y lo que quedó a medias |
+| `PRUEBAS-MANUALES.md` | Lo que los tests no pueden comprobar. Checklist con pasos y síntomas de fallo |
 | `METODO-COOKR.md` | Qué se adopta del método de DietMetric y qué no |
 | `METODO-DE-TRABAJO.md` | El método de DietMetric, tal cual. Material de referencia, no aplica a Cookr sin adaptar |
 | `infraestructura.md` | Stack, servicios externos, variables. Junio, sigue siendo correcto en lo esencial |

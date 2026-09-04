@@ -68,8 +68,8 @@ víctima con su correo exacto. Es un riesgo aceptado, no un descuido.
 - **El pre-hijack sigue abierto.** La mitigación barata sería exigir `cuentaVerificada: true`
   antes de vincular. Está descartada a propósito, no pendiente.
 - **El login con Google real no se ha probado contra Google.** Los tests mockean
-  `lib/googleAuth`, que es lo que mandan las reglas de la casa. Falta la comprobación manual en
-  local y en producción que pide el plan.
+  `lib/googleAuth`, que es lo que mandan las reglas de la casa. La comprobación manual, con los
+  pasos y los síntomas de cada fallo, está en `docs/PRUEBAS-MANUALES.md`.
 
 ### Tests
 
