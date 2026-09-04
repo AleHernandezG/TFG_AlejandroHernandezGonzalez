@@ -3,8 +3,8 @@
 Lo que los tests automáticos no pueden comprobar, con los pasos exactos para hacerlo en un rato
 libre. Cada bloque dice qué ejecutar, qué tiene que pasar y cómo se ve el fallo.
 
-Los 123 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
-cuota de Google, Mailjet, Gemini ni Pexels. El precio de esa regla es esta lista.
+Los 128 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
+cuota de Google, Mailjet, Gemini, Pexels ni Cloudinary. El precio de esa regla es esta lista.
 
 Cuando compruebes algo, marca la casilla y pon la fecha. Si falla, apunta el síntoma aquí mismo
 antes de arreglarlo.
@@ -92,7 +92,7 @@ ojo.
 
 ---
 
-## 5. Los índices y los planes de consulta en Atlas · F7, PERF-001
+## 5. Atlas, Cloudinary y las imágenes · F7, PERF-001, A5
 
 Todas las mediciones de F7 se hicieron contra `mongodb-memory-server`, que es un Mongo de verdad
 pero con datos sintéticos y una sola máquina. Nada de esto vale como comprobación de producción.
@@ -137,8 +137,50 @@ parece.
 - [ ] En Atlas, el *profiler* no marca esa agregación con `hasSortStage` volcando a disco de forma
       continua. Si vuelca siempre, hay que proyectar antes de ordenar o esperar a F7.4.
 
-Esta comprobación se puede tachar entera cuando F7.4 saque las imágenes a Cloudinary: el motivo de
-la duda desaparece con ellas.
+El `$sort` de la despensa deja de ser una duda en cuanto se aplique en producción la migración de
+F7.4 que viene aquí abajo: hoy la agregación mueve documentos de hasta 1,9 MB y después moverá unos
+3 KB. Repásala **después** de migrar, no antes.
+
+**Sacar las imágenes de Mongo · F7.4, A5.** El código está entero y los tests pasan, pero nada de
+esto se ha ejecutado contra Atlas ni contra una cuenta de Cloudinary de verdad: en este equipo
+`CLOUDINARY_URL` no existe en `backend/.env`. Medido el 04/09/2026 contra producción, hay 6,47 MB de
+base64 repartidos así: 2,80 MB en `usuarios.foto`, 1,61 MB en `recetas.imagenUrl` y 2,07 MB en
+`recetas.listaComentarios[].avatarUrl`.
+
+1. Crear la cuenta de Cloudinary y poner `CLOUDINARY_URL` en `backend/.env` y en Render, con el
+   formato `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
+2. `cd backend && npm run migrar:imagenes` — modo seco, no escribe nada. Tiene que listar 4
+   avatares, 4 fotos de receta y 3 avatares dentro de comentarios, y sumar 6,47 MB.
+3. `npm run migrar:imagenes -- --apply`. Se puede repetir sin duplicar subidas: el selector es
+   siempre `/^data:/`, así que lo ya migrado se salta solo, y los `public_id` son deterministas con
+   `overwrite: true`.
+
+- [ ] El resumen del `--apply` no lista ningún documento en el apartado de fallos. Si lista alguno,
+      vuelve a ejecutarlo: sigue con los demás y los apunta al final en vez de caerse a la mitad.
+- [ ] Un segundo `npm run migrar:imagenes` en seco no encuentra nada. Ese es el criterio de que
+      terminó, no el primer resumen.
+- [ ] `db.recetas.stats().size` y `db.usuarios.stats().size` bajan de 3,90 MB y 2,82 MB a menos de
+      0,5 MB cada una.
+- [ ] Las 4 recetas migradas, los 4 avatares y los 3 comentarios con avatar se siguen viendo igual
+      en la web. Esto es lo único que prueba que la migración no perdió nada.
+
+**Que la subida desde el navegador funcione · F7.4.** Es lo único que no se puede probar sin un
+navegador de verdad: el fichero va del navegador a Cloudinary directamente y el backend solo firma.
+
+- [ ] Crear una receta con foto propia. `POST /api/subidas/firma` devuelve 200 y la petición a
+      `api.cloudinary.com` también.
+- [ ] La receta recién creada pesa menos de 5 KB en Mongo (con `mongodb-memory-server` son 0,64 KB)
+      y su `imagenUrl` empieza por `https://res.cloudinary.com`.
+- [ ] Editar esa receta sin tocar la foto la deja como estaba: ni la borra ni la reenvía.
+- [ ] Cambiar el avatar en `/perfil` dos veces. La segunda **sobrescribe** la primera en Cloudinary
+      en vez de acumular: el `public_id` es `cookr/avatares/<id>` a propósito.
+- [ ] Cerrar sesión y volver a entrar. Ahora la foto sí viaja dentro de la sesión de NextAuth,
+      porque el filtro de `frontend/src/lib/auth.ts` solo descartaba los `data:`. La cookie tiene
+      que seguir funcionando y el avatar salir en la cabecera.
+- [ ] Lo mismo con una cuenta de Google, que trae la foto de Google y no pasa por Cloudinary.
+- [ ] Escanear un ticket de verdad desde el móvil. El límite de cuerpo bajó de 10 MB a 8 MB y esa
+      ruta sigue mandando base64: una foto de cámara tiene que entrar, y una demasiado grande dar el
+      400 con mensaje, no un 413 seco.
 
 ---
 

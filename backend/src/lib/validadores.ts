@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+export const esquemaUrlImagen = z
+  .string()
+  .regex(/^https:\/\//, "La imagen debe ser una URL https, no una imagen incrustada");
+
+export const esquemaFirmaSubida = z.object({
+  tipo: z.enum(["receta", "avatar"]),
+});
+
+export const esquemaFotoUsuario = z.object({
+  fotoUrl: esquemaUrlImagen,
+});
+
 export const esquemaRegistro = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(50).trim(),
   correo: z.string().trim().toLowerCase().email("Correo no válido"),
@@ -81,7 +93,7 @@ export const esquemaCrearRecetaBody = z.object({
   pasos: z
     .array(z.object({ texto: z.string().min(10, "El paso debe tener al menos 10 caracteres") }))
     .min(1, "Añade al menos un paso"),
-  imagenBase64: z.string().optional(),
+  imagenUrl: esquemaUrlImagen.optional(),
   fotoFuente: z.enum(["usuario", "pexels"]).optional(),
   fotoCredito: z
     .object({

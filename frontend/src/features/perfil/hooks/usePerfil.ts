@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
 import { perfilService } from '@/services/perfilService'
+import { subidasService } from '@/services/subidasService'
 
 const QUERY_KEY = ['perfil'] as const
 
@@ -78,7 +79,10 @@ export function useSubirFoto() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: (fotoBase64: string) => perfilService.subirFoto(token, fotoBase64),
+    mutationFn: async (fichero: File) => {
+      const url = await subidasService.subirImagen(fichero, 'avatar', token)
+      return perfilService.subirFoto(token, url)
+    },
     onSuccess: async (data) => {
       qc.setQueryData(QUERY_KEY, (old: ReturnType<typeof useMiPerfil>['data']) => {
         if (!old) return old

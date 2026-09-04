@@ -120,7 +120,7 @@ export interface DatosCrearRecetaBody {
   alergenos: string[]
   ingredientes: { nombre: string; cantidad: string; unidad: string }[]
   pasos: { texto: string }[]
-  imagenBase64?: string
+  imagenUrl?: string
   fotoFuente?: 'usuario' | 'pexels'
   fotoCredito?: IFotoCredito | null
 }

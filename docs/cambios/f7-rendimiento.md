@@ -3,8 +3,8 @@
 Registro de lo que se tocó en el bloque F7 de `docs/estado/plan-2026-09.md`, con las decisiones que
 costaron y lo que queda a medias.
 
-F7.4 (sacar las imágenes de Mongo a Cloudinary) **no entra aquí**. Toca frontend, backend y datos
-ya guardados, y va en su propia sesión.
+F7.4 se hizo después, en su propia sesión, y está al final. Toca frontend, backend y datos ya
+guardados, y es el único apartado del bloque que **no se ha ejecutado contra producción**.
 
 ---
 
@@ -234,6 +234,113 @@ hay transacción que los cubra.
 
 ---
 
+## [PERF-004] Las imágenes fuera de Mongo · A5
+
+Fecha: 2026-09-04 | Estado: ✅ Código completo, ⚠️ sin aplicar en producción | Afecta: BE + FE + datos | Bloque: F7.4
+
+### Qué se midió antes de tocar nada
+
+Contra Atlas, en solo lectura:
+
+| Colección | Docs | Tamaño | De eso, base64 |
+|---|---|---|---|
+| `recetas` | 145 | 3,90 MB | 3,68 MB |
+| `usuarios` | 39 | 2,82 MB | 2,80 MB |
+
+Una receta con foto propia ocupa **412 KB de media** y la peor 1191 KB. Las 141 que tiran de una URL
+de Pexels se quedan en 16,6 KB. La receta más gorda de la colección **sin** nada incrustado son
+3,2 KB, y el usuario más gordo sin avatar incrustado, 0,6 KB. Ese es el suelo real del contenido.
+
+**La auditoría se queda corta y eso cambió el plan.** A5 habla de `imagenUrl`, pero desglosando
+`recetas` por campo aparece que `imagenUrl` son 1,61 MB y `listaComentarios` **2,07 MB**: los
+comentarios pesan más que las fotos. `comentarioSchema.avatarUrl` guarda una copia del avatar del
+autor dentro de cada comentario, así que un único comentario mete 1967,6 KB dentro de la receta donde
+se escribió. La receta más pesada de toda la base (1969,5 KB) tiene una `imagenUrl` de Pexels de
+0,1 KB: todo su peso es el avatar de otra persona. Tres comentarios sumaban 2,07 MB.
+
+De los 6,72 MB de las dos colecciones, 6,47 MB son base64 y unos 250 KB son contenido de verdad. Una
+migración que solo tocara `imagenUrl` habría dejado dentro más de la mitad del problema.
+
+### Qué se hizo
+
+La foto ya no pasa por el backend. El navegador pide una firma, sube el fichero directamente a
+Cloudinary y manda a la API solo la URL que le devuelven.
+
+- `lib/cloudinary.ts`: lee `CLOUDINARY_URL`, firma con SHA-1 y sube desde el servidor cuando hace
+  falta, que es solo en la migración. Sin SDK.
+- `POST /api/subidas/firma`: devuelve la URL de subida y los campos ya firmados. El `public_id` del
+  avatar es `cookr/avatares/<id>`, determinista a propósito, para que cambiar de foto sobrescriba en
+  vez de acumular. El de receta lleva marca de tiempo y azar, porque un usuario tiene muchas.
+- `imagenBase64` pasa a llamarse `imagenUrl` en el esquema de crear receta, en los tipos y en los dos
+  formularios del frontend, y se valida contra `^https://` con un regex.
+- `usuariosService.actualizarFoto` recibe `fotoUrl` y rechaza lo que no sea `https`.
+- `scripts/migrarImagenes.ts`: sube lo que ya está guardado y lo sustituye. Modo seco por defecto,
+  `--apply` para escribir.
+- El límite de cuerpo baja: `/api/recetas` y `/api/usuarios` pasan de 10 MB a los 100 KB del
+  `jsonEstandar` que ya existía, y `/api/chat` y `/api/despensa` a 8 MB.
+
+Una receta nueva con foto ocupa ahora **0,64 KB**, medidos con `$bsonSize` en
+`tests/imagenes.test.ts`, contra los 412 KB de media de antes.
+
+### Decisiones que costaron
+
+**Cloudinary o R2, y quién sube el fichero.** Las dos las decidió Alejandro y las dos cambiaban todo
+lo demás, así que se pararon y se preguntaron con los números delante. Cloudinary por el plan
+gratuito y las transformaciones por URL. Subida directa desde el navegador con firma del backend, que
+es más trabajo que reenviar el base64 pero es lo único que quita el problema de raíz: si el fichero
+no atraviesa Render, el límite de cuerpo puede bajar de verdad.
+
+**Sin dependencia nueva.** La firma son cuatro líneas de `crypto` y la subida un `POST` con `axios`.
+Es el mismo criterio que ya se sigue en `lib/email.ts`, que habla con la API REST de Mailjet en vez
+de arrastrar un SDK.
+
+**`z.string().url()` no vale.** `new URL("data:image/png;base64,...")` es una URL perfectamente
+válida, así que ese validador aceptaría justo lo que hay que prohibir. De ahí el regex explícito.
+
+**Los dos formularios tenían que ir juntos.** Si crear manda URL y editar manda base64, el campo se
+llena de las dos cosas y ya no hay forma de saber qué hay dentro. Editar además tenía un fallo
+latente: inicializaba `fotoUrl` con la imagen existente si no empezaba por `http`, o sea que reenviaba
+el base64 viejo en cada guardado. Con el validador nuevo eso habría sido un 400 en cada edición de
+receta antigua. Ahora arranca en `null` y solo se manda foto si el usuario elige una.
+
+**Dejar que el avatar entre en la sesión de NextAuth.** Los tres filtros de `frontend/src/lib/auth.ts`
+que descartan `data:` se han dejado tal cual, como red para las filas viejas, pero en cuanto la foto
+sea `https` dejan de descartar y el avatar empieza a viajar en la cookie. Se comprobó que no rompe
+nada: `session.user.image` solo se pinta con `<img>` y con el `AvatarImage` de shadcn, nunca con
+`next/image`, y `res.cloudinary.com` ya estaba en los `remotePatterns` de `next.config.mjs`.
+
+**El 413 no era el que dice CLAUDE.md.** El plan pedía un test de que un cuerpo pasado de tamaño dé
+413 y no 500. CLAUDE.md afirma que `middlewares/errores.ts` nunca llega a ejecutarse y que descarta
+`err.status` devolviendo siempre 500; las dos cosas son falsas hoy. `manejadorErrores` delega en
+`manejarError`, que sí lee `err.status`, y los errores de `body-parser` no los captura nadie antes,
+así que llegan ahí y salen como 413. Esa nota de CLAUDE.md está vieja y conviene corregirla.
+
+### Qué queda a medias
+
+**Nada de esto se ha ejecutado de verdad.** En este equipo `CLOUDINARY_URL` no está en
+`backend/.env`, así que la migración solo se ha corrido en seco y ninguna subida real ha salido de un
+navegador. Los 6,47 MB siguen dentro de Atlas mientras nadie ejecute `--apply`. Los pasos están en
+`docs/estado/pruebas-manuales.md`, apartado 5, y hasta que se marquen esto no está cerrado.
+
+**Los avatares de los comentarios se siguen copiando.** La migración reescribe los que ya están,
+pero `recetaRepository.agregarComentario` sigue metiendo `usuario.foto` dentro de cada comentario.
+Con URLs eso son unos 100 bytes y deja de doler, así que se ha dejado como está: quitar la
+desnormalización obliga a un `$lookup` en el detalle de receta y eso es otra tarea. El día que alguien
+cambie de avatar, sus comentarios viejos seguirán enseñando el anterior.
+
+**Nadie borra nada en Cloudinary.** Al eliminar una receta su imagen se queda subida para siempre.
+Con el volumen actual da igual, pero es deuda con nombre.
+
+**El chat y la despensa siguen mandando base64.** Va a Gemini como imagen en línea y no se guarda en
+ningún sitio, por eso se han dejado igual y por eso su límite se queda en 8 MB y no baja más. Las dos
+rutas ya cortaban por su cuenta en 7.000.000 de caracteres y ese tope no se ha tocado.
+
+**Los scripts de seed no se han tocado**, y se comprobó antes de darlo por bueno: `seedMasivo.ts` y
+`updateSeedImages.ts` ya guardaban URLs de picsum, Pexels y ui-avatars, y además escriben directos a
+Mongo sin pasar por la validación de la ruta.
+
+---
+
 ## Lo que hay que comprobar a mano
 
 Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
@@ -243,6 +350,8 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 - Que el `explain()` elija los mismos planes con los datos reales, que no están repartidos como los
   sintéticos de las mediciones.
 - Que el `$sort` de la despensa aguante con las imágenes en base64 dentro de los documentos.
+- **Todo F7.4.** Poner `CLOUDINARY_URL`, correr la migración en seco, aplicarla, y subir una foto y
+  un avatar desde un navegador de verdad. Hasta que eso pase, los 6,47 MB siguen en Atlas.
 
 ---
 
@@ -258,9 +367,23 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 | `backend/tests/feed.orden.test.ts` | Nuevo. El orden de `score` y de `likes` |
 | `backend/tests/escrituras.concurrentes.test.ts` | Nuevo. Likes, guardados y comentarios a la vez |
 | `backend/tests/helpers/factories.ts` | `crearReceta` acepta likes, comentarios y fecha |
+| `backend/src/lib/cloudinary.ts` | Nuevo. Firma y subida, sin SDK |
+| `backend/src/services/subidasService.ts` | Nuevo. Decide el `public_id` según el tipo |
+| `backend/src/controllers/subidasController.ts` | Nuevo |
+| `backend/src/routes/subidas.routes.ts` | Nuevo. `POST /api/subidas/firma` |
+| `backend/src/scripts/migrarImagenes.ts` | Nuevo. Migración repetible, seca por defecto |
+| `backend/src/lib/validadores.ts` | `esquemaUrlImagen`, `esquemaFirmaSubida`, `esquemaFotoUsuario` |
+| `backend/src/types/receta.ts` | `imagenBase64` → `imagenUrl` |
+| `backend/src/app.ts` | Límites de cuerpo y la ruta de subidas |
+| `backend/src/services/usuariosService.ts` | La foto tiene que ser `https` |
+| `backend/tests/imagenes.test.ts` | Nuevo. 413, URL contra `data:` y el peso del documento |
+| `frontend/src/services/subidasService.ts` | Nuevo. Pide firma y sube al almacén |
+| `frontend/src/features/recetas/components/**/formulario*.tsx` | Suben la foto y enseñan el estado |
+| `frontend/src/features/perfil/components/tarjetaAvatarPerfil.tsx` | Sin `FileReader` |
 
-Backend: 123 tests en verde (eran 102). `npm run lint` y `npx tsc --noEmit -p tsconfig.test.json` en
-verde. Frontend: `npx tsc --noEmit` en verde, no se ha tocado nada suyo.
+Backend: 128 tests en verde (eran 102, y 123 al cerrar F7.3). `npm run lint` y
+`npx tsc --noEmit -p tsconfig.test.json` en verde. Frontend: `npm run lint` y `npx tsc --noEmit` en
+verde, con los avisos de `no-img-element` que ya estaban antes.
 
 `tests/feed.alergenos.test.ts` y `resolverAlergenos` no se han tocado: siguen en verde tal cual, que
 es la prueba de que la agregación no se ha comido el filtro del perfil.

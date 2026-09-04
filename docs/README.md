@@ -1,6 +1,6 @@
 # Documentación de Cookr
 
-136 ficheros. La mayoría son de marzo a junio de 2026 y describen decisiones de sprints que ya se
+141 ficheros. La mayoría son de marzo a junio de 2026 y describen decisiones de sprints que ya se
 cerraron. Este índice existe para que no haya que abrir ninguno para saber cuál sirve.
 
 Cada carpeta responde a una pregunta distinta. Si dudas de dónde va algo nuevo, la pregunta te lo
@@ -14,6 +14,9 @@ docs/
 ├── diseno/       ¿cómo tiene que verse?
 └── historico/    fue cierto y ya no lo es. No se consulta para decidir
 ```
+
+Sueltos en la raíz de `docs/` hay tres ficheros más que no salieron de aquí: los generó otra
+herramienta el 4 de septiembre y se leen con cuidado. Están descritos abajo, en su propio apartado.
 
 Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del repositorio. Es lo
 único que se lee siempre. En la raíz también viven `../README.md`, `../REVISION_DESPLIEGUE.md` y
@@ -29,6 +32,7 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | Tocar cualquier cosa | `../CLAUDE.md` |
 | Saber qué está roto ahora mismo | `estado/auditoria-2026-09.md` |
 | Saber qué toca hacer y en qué orden | `estado/plan-2026-09.md` |
+| Ver el catálogo de producto que viene después | `informe_auditoria_mejoras.md`, y el plan a partir de F12 |
 | Comprobar algo a mano en un rato libre | `estado/pruebas-manuales.md` |
 | Entender por qué el código es como es | `cambios/` y `historico/fases/tech-debt.md` |
 | Desplegar o revisar producción | `../REVISION_DESPLIEGUE.md` |
@@ -49,6 +53,24 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | `diario.md` | Una entrada por sesión de trabajo |
 
 Estos cuatro se actualizan. El resto de la carpeta `docs/`, no.
+
+---
+
+## Los tres ficheros sueltos de la raíz
+
+Del 4 de septiembre, generados con otra herramienta a partir del código y de la auditoría.
+
+| Documento | Qué es |
+|---|---|
+| `informe_auditoria_mejoras.md` | Informe técnico y catálogo de producto: diagnóstico, tabla de escalabilidad, once funcionalidades nuevas y un cronograma con fechas |
+| `presentacion_cookr.html` | Lo mismo como presentación de seis pantallas, para enseñarlo sin leer el informe |
+| `video_auditoria_cookr.webp` | La animación que acompaña al informe |
+
+**Cómo se leen.** Sirven para decidir qué construir, no para saber qué hay construido. Hablan en
+pasado de cuatro cosas que no existen (streaming por SSE, búsqueda difusa, caché de IA en Redis y
+normalización de unidades) y dan cifras viejas: 80 tests, cuando hay 123. Lo que faltaba de ellos ya
+está volcado en `estado/plan-2026-09.md`, con el estado real de cada cosa, en los bloques F7.5,
+F7.6, F13, F14, F15 y F12.
 
 ---
 
@@ -74,7 +96,7 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 | Documento | Qué es |
 |---|---|
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
-| `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas |
+| `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, a falta de aplicarla en producción) |
 
 ---
 

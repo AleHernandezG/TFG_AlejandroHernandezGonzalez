@@ -14,7 +14,7 @@ export function useEditarReceta(recetaId: string) {
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function guardar(datos: DatosCrearReceta, fotoPreview: string | null) {
+  async function guardar(datos: DatosCrearReceta, fotoSubida: string | null) {
     const token = session?.user?.backendToken ?? ''
     const alergenos = detectarAlergenos(datos.ingredientes.map((i) => i.nombre))
 
@@ -34,7 +34,7 @@ export function useEditarReceta(recetaId: string) {
           alergenos,
           ingredientes: datos.ingredientes,
           pasos: datos.pasos,
-          imagenBase64: fotoPreview ?? undefined,
+          imagenUrl: fotoSubida ?? undefined,
         },
         token,
       )

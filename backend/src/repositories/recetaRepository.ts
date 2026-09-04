@@ -550,7 +550,7 @@ export const recetaRepository = {
     const tiempoStr = `${datos.tiempo} ${datos.unidadTiempo}`;
     const dificultad = MAPA_DIFICULTAD[datos.dificultad];
 
-    let imagenUrl = datos.imagenBase64 ?? "";
+    let imagenUrl = datos.imagenUrl ?? "";
     let fotoFuente: "usuario" | "pexels" = datos.fotoFuente ?? "usuario";
     let fotoCredito: IFotoCredito | null = datos.fotoCredito ?? null;
 
@@ -665,8 +665,8 @@ export const recetaRepository = {
       }));
     }
     if (datos.pasos !== undefined) update.pasos = datos.pasos.map((p) => p.texto);
-    if (datos.imagenBase64 !== undefined) {
-      update.imagenUrl = datos.imagenBase64;
+    if (datos.imagenUrl !== undefined) {
+      update.imagenUrl = datos.imagenUrl;
       update.fotoFuente = datos.fotoFuente ?? "usuario";
       update.fotoCredito = datos.fotoCredito ?? null;
     }

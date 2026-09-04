@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cookr — Auditoría, Escalabilidad y Hoja de Ruta</title>
+  <title>Cookr — Hoja de Ruta de Producto e Innovaciones</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -26,7 +26,6 @@
       --purple: #a855f7;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --text-dim: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -167,7 +166,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .hero-desc { font-size: 16px; color: var(--text-muted); max-width: 880px; line-height: 1.6; }
+    .hero-desc { font-size: 16px; color: var(--text-muted); max-width: 900px; line-height: 1.6; }
 
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -228,22 +227,11 @@
       font-size: 12px;
       color: #93c5fd;
       margin-top: 10px;
-      overflow-x: auto;
     }
 
     .feature-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #e2e8f0; }
     .feature-item .check { color: var(--emerald); font-weight: bold; }
-
-    .metric-card {
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
-      border: 1px solid var(--border-color);
-      border-radius: 18px;
-      padding: 20px;
-      text-align: center;
-    }
-    .metric-value { font-size: 34px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
-    .metric-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 
     .timeline { display: flex; flex-direction: column; gap: 16px; position: relative; padding-left: 28px; }
     .timeline::before {
@@ -275,7 +263,6 @@
       box-shadow: 0 0 10px var(--primary-glow);
     }
     .timeline-node.priority::after { background: var(--rose); box-shadow: 0 0 10px var(--rose-glow); }
-    .timeline-node.done::after { background: var(--emerald); box-shadow: 0 0 10px var(--emerald-glow); }
 
     footer {
       display: flex;
@@ -317,17 +304,17 @@
       <div class="brand">
         <div class="brand-logo">🍳</div>
         <div class="brand-text">
-          <h1>Cookr — Auditoría, Escalabilidad y Hoja de Ruta</h1>
-          <p>Proyecto de Producción · Alejandro Hernández González</p>
+          <h1>Cookr — Hoja de Ruta de Producto & Arquitectura</h1>
+          <p>Innovaciones y Mejoras de Accesibilidad · Alejandro Hernández González</p>
         </div>
       </div>
       <div class="nav-tabs">
-        <button class="tab-btn active" onclick="goToSlide(0)" id="tab-0">1. Resumen Ejecutivo</button>
-        <button class="tab-btn" onclick="goToSlide(1)" id="tab-1">2. Seguridad & Fixes</button>
-        <button class="tab-btn" onclick="goToSlide(2)" id="tab-2">3. Escalabilidad & Redis</button>
-        <button class="tab-btn" onclick="goToSlide(3)" id="tab-3">4. Nuevas Features <span class="badge-pill">Top</span></button>
-        <button class="tab-btn" onclick="goToSlide(4)" id="tab-4">5. Pruebas & Usabilidad SUS</button>
-        <button class="tab-btn" onclick="goToSlide(5)" id="tab-5">6. Plan de Acción</button>
+        <button class="tab-btn active" onclick="goToSlide(0)" id="tab-0">1. Resumen</button>
+        <button class="tab-btn" onclick="goToSlide(1)" id="tab-1">2. Importador & Streaming</button>
+        <button class="tab-btn" onclick="goToSlide(2)" id="tab-2">3. Despensa & Raciones</button>
+        <button class="tab-btn" onclick="goToSlide(3)" id="tab-3">4. Rendimiento & Redis</button>
+        <button class="tab-btn" onclick="goToSlide(4)" id="tab-4">5. Planificador & Menús</button>
+        <button class="tab-btn" onclick="goToSlide(5)" id="tab-5">6. Roadmap</button>
       </div>
     </header>
 
@@ -335,74 +322,58 @@
       <!-- SLIDE 0 -->
       <div class="slide-view active" id="slide-0">
         <div class="hero-banner">
-          <div class="hero-tag">✨ Visión de Producto</div>
-          <h2 class="hero-title">Evolución y Escalabilidad de <span>Cookr</span></h2>
+          <div class="hero-tag">✨ Visión Integral de Cookr</div>
+          <h2 class="hero-title">Arquitectura Moderna y <span>Experiencia de Usuario</span></h2>
           <p class="hero-desc">
-            Cookr posee una base arquitectónica robusta (Next.js 14, Express por capas, Gemini AI, 80 tests backend). La hoja de ruta se enfoca en resolver la seguridad inmediata, optimizar base de datos con índices y Redis, y lanzar funciones de alto impacto como el sistema de recomendación inteligente, el planificador semanal con PDF y el modo cocina manos libres.
+            Ampliamos la plataforma con <strong>Streaming SSE</strong> en tiempo real, un <strong>Importador Universal de Recetas con atribución de créditos y enlace original</strong>, escalador dinámico de raciones, búsqueda difusa (fuzzy search) y normalización matemática de la despensa.
           </p>
-        </div>
-        <div class="grid-4">
-          <div class="metric-card">
-            <div class="metric-value" style="color: #10b981;">80 / 80</div>
-            <div class="metric-label">Tests en Verde</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value" style="color: #f43f5e;">1 Crítico</div>
-            <div class="metric-label">Seguridad (F6.1 Google ID)</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value" style="color: #06b6d4;">Caché</div>
-            <div class="metric-label">Redis / Upstash</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value" style="color: #818cf8;">5 Features</div>
-            <div class="metric-label">Nuevas Innovaciones</div>
-          </div>
         </div>
         <div class="grid-3">
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-emerald">🛡️</div><span class="card-badge badge-success">Sólido</span></div>
-            <h3 class="card-title">Capa Backend & CI/CD</h3>
-            <p class="card-desc">Separación estricta (repositorios / servicios / controladores) y pipeline de GitHub Actions que bloquea fallos antes del deploy.</p>
+            <div class="card-header"><div class="card-icon icon-indigo">🔗</div><span class="card-badge badge-info">Top Feature</span></div>
+            <h3 class="card-title">Importador Universal con Créditos</h3>
+            <p class="card-desc">Extracción con IA desde URLs de blogs, TikTok, Reels o YouTube, con foto del creador, créditos y enlace directo al contenido original.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-cyan">⚡</div><span class="card-badge badge-info">Rendimiento</span></div>
-            <h3 class="card-title">Base de Datos & Redis</h3>
-            <p class="card-desc">Implementar índices en MongoDB, desacoplar imágenes a Cloudinary e incorporar Redis para feeds y cuotas de IA.</p>
+            <div class="card-header"><div class="card-icon icon-emerald">⚡</div><span class="card-badge badge-success">Latencia Sub-500ms</span></div>
+            <h3 class="card-title">Generación SSE en Streaming</h3>
+            <p class="card-desc">Server-Sent Events para mostrar texto e ingredientes formándose en vivo sin esperas de 6 segundos bloqueantes.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-purple">🎯</div><span class="card-badge badge-info">Producto</span></div>
-            <h3 class="card-title">Recomendación & Menús</h3>
-            <p class="card-desc">Filtrado colaborativo híbrido, menú semanal con exportación en PDF y modo cocina manos libres con temporizadores.</p>
+            <div class="card-header"><div class="card-icon icon-amber">⚖️</div><span class="card-badge badge-high">Despensa Viva</span></div>
+            <h3 class="card-title">Normalización & Resta Exacta</h3>
+            <p class="card-desc">Conversor de unidades (g, ml, ud) que descuenta automáticamente ingredientes de la despensa al cocinar un plato.</p>
           </div>
         </div>
       </div>
 
       <!-- SLIDE 1 -->
       <div class="slide-view" id="slide-1">
-        <div class="hero-banner" style="border-color: rgba(244, 63, 94, 0.3);">
-          <div class="hero-tag" style="background: rgba(244, 63, 94, 0.15); color: #fda4af;">🚨 Seguridad en Producción (Fase F6)</div>
-          <h2 class="hero-title">Vulnerabilidades y <span>Solución Inmediata</span></h2>
-          <p class="hero-desc">Corrección de puntos críticos para garantizar que las sesiones, los proxies y los endpoints estén blindados.</p>
+        <div class="hero-banner">
+          <div class="hero-tag">🚀 IA & Extracción Inteligente</div>
+          <h2 class="hero-title">Importador Universal & <span>Streaming SSE</span></h2>
+          <p class="hero-desc">Eliminamos la fricción de entrada y la lentitud percibida al interactuar con Gemini.</p>
         </div>
-        <div class="grid-3">
+        <div class="grid-2">
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-rose">🔑</div><span class="card-badge badge-critical">C1 · Crítico</span></div>
-            <h3 class="card-title">Validación Google OAuth</h3>
-            <p class="card-desc">Validar <code>account.id_token</code> criptográficamente con <code>google-auth-library</code> en el backend.</p>
-            <div class="code-box">verifyIdToken({ idToken, audience })</div>
+            <div class="card-header"><div class="card-icon icon-indigo">🌐</div><span class="card-badge badge-info">Scraper IA</span></div>
+            <h3 class="card-title">Importador Universal con Enlace y Autor</h3>
+            <p class="card-desc">Pega cualquier enlace de cocina y obtén la receta lista:</p>
+            <ul class="feature-list">
+              <li class="feature-item"><span class="check">✓</span> <strong>Atribución de Créditos:</strong> Guarda el autor original y su canal/red.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Enlace Directo:</strong> Botón "Ver vídeo/receta original" en el detalle.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Normalización:</strong> Ingredientes, pasos y tiempos adaptados a Cookr.</li>
+            </ul>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-amber">🌐</div><span class="card-badge badge-high">A1 · Alto</span></div>
-            <h3 class="card-title">Blindaje Proxy Gemini</h3>
-            <p class="card-desc">Política *Fail-Closed* si falta <code>PROXY_TOKEN</code> y limitar rutas a <code>/v1beta/models/</code>.</p>
-            <div class="code-box">if (!env.PROXY_TOKEN) return 500;</div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-amber">🔍</div><span class="card-badge badge-high">A2 · Alto</span></div>
-            <h3 class="card-title">ReDoS & Validación Zod</h3>
-            <p class="card-desc">Escapar regex en búsquedas y conectar <code>validarBody</code> con Zod en los 5 routers pendientes.</p>
-            <div class="code-box">router.post('/', validarBody(schema))</div>
+            <div class="card-header"><div class="card-icon icon-cyan">🌊</div><span class="card-badge badge-success">Tiempo Real</span></div>
+            <h3 class="card-title">Server-Sent Events (SSE)</h3>
+            <p class="card-desc">Flujo continuo de tokens desde Gemini al cliente:</p>
+            <ul class="feature-list">
+              <li class="feature-item"><span class="check">✓</span> <strong>Latencia inicial &lt;500ms:</strong> El usuario ve la respuesta al instante.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Chat Fluido:</strong> Sensación de conversación natural con el asistente.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Recetas en Vivo:</strong> Ingredientes y pasos aparecen progresivamente.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -410,37 +381,25 @@
       <!-- SLIDE 2 -->
       <div class="slide-view" id="slide-2">
         <div class="hero-banner">
-          <div class="hero-tag">⚡ Base de Datos & Caché (Fase F7)</div>
-          <h2 class="hero-title">Escalabilidad de BD, <span>Colecciones y Redis</span></h2>
-          <p class="hero-desc">Transformaciones de datos para lograr tiempos de respuesta sub-100ms y soportar alto volumen de tráfico.</p>
+          <div class="hero-tag">🍽️ Cocina Práctica & Despensa</div>
+          <h2 class="hero-title">Raciones Dinámicas, <span>Sustitutos y Barcodes</span></h2>
+          <p class="hero-desc">Herramientas que adaptan cualquier receta a tus comensales y a lo que tienes en la cocina.</p>
         </div>
         <div class="grid-3">
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-cyan">📊</div><span class="card-badge badge-high">A4 · Índices</span></div>
-            <h3 class="card-title">Índices Compuestos Mongo</h3>
-            <p class="card-desc">Eliminar <code>COLLSCAN</code> en feed mediante índices en fecha, categorías, alérgenos y texto.</p>
+            <div class="card-header"><div class="card-icon icon-rose">⚖️</div><span class="card-badge badge-critical">Raciones</span></div>
+            <h3 class="card-title">Escalador de Comensales</h3>
+            <p class="card-desc">Ajusta de 1 a 10 comensales y recalcula cantidades exactas y conversiones de unidades (g, ml, tazas).</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-indigo">📈</div><span class="card-badge badge-high">A3 · Agregaciones</span></div>
-            <h3 class="card-title">Aggregation Pipelines</h3>
-            <p class="card-desc">Calcular score y popularidad dentro de MongoDB evitando cargar colecciones a la RAM de Node.</p>
+            <div class="card-header"><div class="card-icon icon-amber">🔄</div><span class="card-badge badge-high">Sustituto</span></div>
+            <h3 class="card-title">Sustituto Inteligente</h3>
+            <p class="card-desc">¿Te falta un ingrediente? Cookr sugiere reemplazos automáticos con lo que ya tienes en la despensa.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-purple">🖼️</div><span class="card-badge badge-high">A5 · Media</span></div>
-            <h3 class="card-title">Cloudinary / Object Storage</h3>
-            <p class="card-desc">Desacoplar imágenes de MongoDB guardando solo la URL, reduciendo los documentos de ~5MB a &lt;5KB.</p>
-          </div>
-        </div>
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-emerald">🗄️</div><span class="card-badge badge-info">Estructura</span></div>
-            <h3 class="card-title">Colecciones Independientes</h3>
-            <p class="card-desc">Extraer <code>comentarios</code> a una colección propia con paginación real para no inflar el documento de receta.</p>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-amber">⚡</div><span class="card-badge badge-info">Caché</span></div>
-            <h3 class="card-title">Caché con Redis (Upstash)</h3>
-            <p class="card-desc">Almacenar en caché el feed principal, categorías y contadores diarios de peticiones a Gemini.</p>
+            <div class="card-header"><div class="card-icon icon-emerald">📷</div><span class="card-badge badge-success">Open Food Facts</span></div>
+            <h3 class="card-title">Escáner de Código de Barras</h3>
+            <p class="card-desc">Escaneo instantáneo de paquetes a coste cero de IA, con alérgenos oficiales y Nutri-Score.</p>
           </div>
         </div>
       </div>
@@ -448,42 +407,25 @@
       <!-- SLIDE 3 -->
       <div class="slide-view" id="slide-3">
         <div class="hero-banner">
-          <div class="hero-tag">🌟 Nuevas Funcionalidades</div>
-          <h2 class="hero-title">Innovaciones y <span>Experiencia de Producto</span></h2>
-          <p class="hero-desc">Funcionalidades diferenciales para convertir Cookr en la plataforma gastronómica definitiva.</p>
+          <div class="hero-tag">⚡ Escalabilidad & Rendimiento</div>
+          <h2 class="hero-title">Búsqueda Fuzzy, <span>Redis y Cloudinary</span></h2>
+          <p class="hero-desc">Accesibilidad y rendimiento extremo para millones de consultas.</p>
         </div>
         <div class="grid-3">
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-indigo">🧠</div><span class="card-badge badge-info">IA & Algoritmos</span></div>
-            <h3 class="card-title">1. Recomendación Inteligente</h3>
-            <p class="card-desc">Filtrado híbrido: afinidad por ingredientes de despensa + colaborativo por historial de likes y guardados.</p>
+            <div class="card-header"><div class="card-icon icon-indigo">🔍</div><span class="card-badge badge-info">Fuzzy Search</span></div>
+            <h3 class="card-title">Búsqueda Tolerante a Errores</h3>
+            <p class="card-desc">Encuentra recetas aunque escribas "spageti" o "brocoli" sin tilde gracias al matching difuso.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-emerald">📅</div><span class="card-badge badge-success">Planificación</span></div>
-            <h3 class="card-title">2. Menú Semanal & PDF</h3>
-            <p class="card-desc">Planificador con macros calóricos, cálculo de lista de compra diferencial y exportación en PDF listo para imprimir.</p>
+            <div class="card-header"><div class="card-icon icon-purple">🧠</div><span class="card-badge badge-info">Caché Semántica</span></div>
+            <h3 class="card-title">Caché de IA con Redis</h3>
+            <p class="card-desc">Dudas culinarias frecuentes responden en 5ms desde Redis sin gastar llamadas de API.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-rose">👨‍🍳</div><span class="card-badge badge-critical">Cocina</span></div>
-            <h3 class="card-title">3. Modo Manos Libres</h3>
-            <p class="card-desc">Vista para encimera con fuentes gigantes, temporizadores automáticos por paso y lectura por voz (Web Speech API).</p>
-          </div>
-        </div>
-        <div class="grid-3">
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-amber">♻️</div><span class="card-badge badge-high">Sostenibilidad</span></div>
-            <h3 class="card-title">4. Desperdicio Cero</h3>
-            <p class="card-desc">Alertas de caducidad en despensa y sugerencia proactiva de recetas prioritarias para consumir productos a punto de expirar.</p>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-purple">📱</div><span class="card-badge badge-info">Móvil</span></div>
-            <h3 class="card-title">5. PWA & Offline</h3>
-            <p class="card-desc">Instalación nativa con Service Worker para consultar recetas y despensa sin conexión a internet.</p>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-icon icon-cyan">👨‍👩‍👧‍👦</div><span class="card-badge badge-info">Colaborativo</span></div>
-            <h3 class="card-title">6. Despensa Compartida</h3>
-            <p class="card-desc">Espacios compartidos sincronizados en tiempo real para familias o compañeros de piso.</p>
+            <div class="card-header"><div class="card-icon icon-cyan">🖼️</div><span class="card-badge badge-info">Cloudinary / R2</span></div>
+            <h3 class="card-title">Desacople de Imágenes</h3>
+            <p class="card-desc">Documentos de MongoDB reducidos de 5 MB a &lt;5 KB con CDN global para carga instantánea.</p>
           </div>
         </div>
       </div>
@@ -491,30 +433,25 @@
       <!-- SLIDE 4 -->
       <div class="slide-view" id="slide-4">
         <div class="hero-banner">
-          <div class="hero-tag">🧪 Calidad & Analítica</div>
-          <h2 class="hero-title">Pruebas Automatizadas y <span>Evaluación SUS</span></h2>
-          <p class="hero-desc">Estrategia para garantizar fiabilidad continua del software y medir la satisfacción de los usuarios.</p>
+          <div class="hero-tag">📅 Planificación & Sostenibilidad</div>
+          <h2 class="hero-title">Menú Semanal en PDF, <span>Manos Libres & Desperdicio Cero</span></h2>
+          <p class="hero-desc">Funcionalidades de alto valor para el día a día en el hogar.</p>
         </div>
-        <div class="grid-2">
+        <div class="grid-3">
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-emerald">🤖</div><span class="card-badge badge-success">CI/CD Suite</span></div>
-            <h3 class="card-title">Pruebas Automatizadas Integrales</h3>
-            <p class="card-desc">Extender la suite de pruebas a toda la aplicación:</p>
-            <ul class="feature-list">
-              <li class="feature-item"><span class="check">✓</span> <strong>Backend (Jest + Supertest):</strong> Cobertura >60% en controladores, rate limiting y repositorios.</li>
-              <li class="feature-item"><span class="check">✓</span> <strong>Frontend (Playwright E2E):</strong> Flujos de registro, escaneo de tickets OCR, recetas y despensa.</li>
-              <li class="feature-item"><span class="check">✓</span> <strong>Barreras Arquitectónicas:</strong> Tests que impiden importar modelos en servicios o saltarse validaciones Zod.</li>
-            </ul>
+            <div class="card-header"><div class="card-icon icon-emerald">📅</div><span class="card-badge badge-success">Menú Semanal</span></div>
+            <h3 class="card-title">Planificador & PDF</h3>
+            <p class="card-desc">Organizador Lunes-Domingo con macros calóricos, lista diferencial con despensa y exportación en PDF.</p>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-icon icon-indigo">📊</div><span class="card-badge badge-info">UX Metrics</span></div>
-            <h3 class="card-title">Evaluación de Usabilidad & Métricas SUS</h3>
-            <p class="card-desc">Medición continua de la experiencia de usuario:</p>
-            <ul class="feature-list">
-              <li class="feature-item"><span class="check">✓</span> <strong>Métricas SUS (System Usability Scale):</strong> Módulo integrado de micro-encuestas de facilidad de uso.</li>
-              <li class="feature-item"><span class="check">✓</span> <strong>Telemetría de UX:</strong> Detección de cuellos de botella en la generación de recetas y uso de la despensa.</li>
-              <li class="feature-item"><span class="check">✓</span> <strong>Feedback Directo:</strong> Botón rápido de reporte de incidencias o sugerencias.</li>
-            </ul>
+            <div class="card-header"><div class="card-icon icon-rose">👨‍🍳</div><span class="card-badge badge-critical">Encimera</span></div>
+            <h3 class="card-title">Modo Cocina Manos Libres</h3>
+            <p class="card-desc">Fuentes ampliadas, temporizadores automáticos por paso y lectura en voz alta para no manchar la pantalla.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-amber">♻️</div><span class="card-badge badge-high">Ahorro</span></div>
+            <h3 class="card-title">Desperdicio Cero & Costes</h3>
+            <p class="card-desc">Avisos de caducidad en despensa y cálculo de coste por ración ("comidas por menos de 2,50 €").</p>
           </div>
         </div>
       </div>
@@ -522,26 +459,26 @@
       <!-- SLIDE 5 -->
       <div class="slide-view" id="slide-5">
         <div class="hero-banner">
-          <div class="hero-tag">🚀 Hoja de Ruta</div>
-          <h2 class="hero-title">Plan de Ejecución <span>Priorizado</span></h2>
-          <p class="hero-desc">Calendario estructurado por fases técnicas y de producto.</p>
+          <div class="hero-tag">🚀 Plan de Trabajo</div>
+          <h2 class="hero-title">Hoja de Ruta de <span>Implementación</span></h2>
+          <p class="hero-desc">Plan ordenado para desplegar todas las mejoras de forma segura y continua.</p>
         </div>
         <div class="timeline">
           <div class="timeline-node priority">
-            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 1: Seguridad Crítica Inmediata</h4>
-            <p style="font-size: 14px; color: var(--text-muted);">Validar <code>id_token</code> de Google en backend, asegurar proxy de Gemini, sanitizar regex y aplicar Zod en todos los routers.</p>
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 1: Seguridad Inmediata & Streaming SSE</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Verificación Google OAuth C1, proxy Gemini A1, Zod en todos los routers y Streaming SSE en chat y recetas.</p>
           </div>
           <div class="timeline-node">
-            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 2: Rendimiento, MongoDB & Redis</h4>
-            <p style="font-size: 14px; color: var(--text-muted);">Índices compuestos, agregaciones en Mongo, desacople de imágenes a Cloudinary y caché con Redis.</p>
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 2: Rendimiento, MongoDB, Redis & Despensa Normalizada</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Índices en Mongo, Cloudinary, conversor de unidades en despensa y caché semántica con Redis.</p>
           </div>
           <div class="timeline-node">
-            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 3: Menús, Recomendación & Modo Cocina</h4>
-            <p style="font-size: 14px; color: var(--text-muted);">Planificador semanal con PDF, algoritmo de recomendación híbrido y modo manos libres con voz.</p>
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 3: Importador Universal, Raciones & Menú en PDF</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Importador por URL con créditos y link original, escalador de comensales, sustituto inteligente y planificador semanal en PDF.</p>
           </div>
-          <div class="timeline-node done">
-            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 4: Pruebas Automatizadas & Métricas SUS</h4>
-            <p style="font-size: 14px; color: var(--text-muted);">Ampliación de tests Jest y Playwright E2E en CI/CD y módulo de analítica de usabilidad SUS.</p>
+          <div class="timeline-node">
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 4: Open Food Facts, Modo Cocina Manos Libres & Métricas SUS</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Escáner de código de barras, modo encimera por voz, búsqueda fuzzy y evaluación de usabilidad SUS.</p>
           </div>
         </div>
       </div>

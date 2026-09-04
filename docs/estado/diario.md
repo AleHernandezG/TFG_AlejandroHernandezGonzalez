@@ -6,6 +6,34 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-04 · El informe de mejoras entra en el plan
+
+**Qué se hizo.** Llegaron a `docs/` tres ficheros generados con otra herramienta:
+`informe_auditoria_mejoras.md`, `presentacion_cookr.html` y el `.webp` que los acompaña. Traen un
+catálogo de once funcionalidades y cinco mejoras técnicas. Se cruzó todo con el código y con
+`plan-2026-09.md` para quedarse solo con lo que faltaba.
+
+Al plan se le añadieron seis bloques: F7.5 (comentarios a su propia colección, hallazgo M7), F7.6
+(cuota de Gemini y caché de IA en Redis, hallazgo A6), F13 (streaming SSE), F14 (normalización de
+unidades y resta de despensa), F15 (búsqueda difusa) y el F12 de producto reescrito entero en tres
+tandas. M7 y A6 estaban en la auditoría desde el principio y se habían quedado fuera del plan.
+
+**Qué decisión costó.** Qué hacer con el tono del informe. Da por implementadas cuatro cosas que no
+existen (SSE, fuzzy, caché de IA en Redis, unidades) y dice 80 tests cuando hay 123. No se reescribe
+el documento: se deja como catálogo de producto, que es para lo que sirve, y el aviso queda en la
+cabecera del plan y en `docs/README.md`. Lo único que se tocó de él es el enlace de la animación,
+que apuntaba a una ruta absoluta de otra máquina.
+
+La otra: el orden. El informe trae un cronograma con fechas del 5 al 30 de septiembre que no
+respeta las dependencias entre bloques (mete features encima de la despensa sin normalizar). Manda
+la tabla del final del plan; las fechas no se copian.
+
+**Qué queda a medias.** Nada de este trabajo. F7.4 (Cloudinary) se estaba haciendo en otra sesión en
+paralelo y no se tocó ni un fichero de `backend/`. De lo que entra nuevo, F14 es lo que más tapona:
+casi todo F12 lo necesita.
+
+---
+
 ## 2026-09-04 · Hito: Fin de defensa de TFG y transición a Producto Personal
 
 **Qué se definió.** La defensa académica del TFG ha concluido con éxito. El proyecto Cookr deja de tratarse como un trabajo académico/TFG y pasa a ser oficialmente un **proyecto personal / producto de producción independiente**. 
