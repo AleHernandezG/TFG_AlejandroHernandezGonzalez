@@ -162,8 +162,11 @@ lleva correos y hashes; al lado hay un `restaurar.js` que hace `replaceOne` con 
 - [x] 04/09/2026 · Las 8 URL responden 200 con su `content-type` correcto. Los bytes servidos son
       tres cuartas partes de lo que ocupaba el base64 (196,9 → 147,6 KB, 1967,6 → 1475,7 KB), que es
       justo el inflado de base64: la imagen es la misma, no se ha recodificado.
-- [ ] Verlas en la web con los ojos. Lo de arriba prueba que el fichero está y se sirve, no que la
-      página lo pinte donde toca.
+- [x] 05/09/2026 · Verlas en la web con los ojos, con Playwright contra el Atlas de producción.
+      Las cuatro recetas migradas y los cuatro avatares se pintan donde toca. Las fotos pasan por
+      `/_next/image` con 200: el `unoptimized={imagenUrl.startsWith('data:')}` de
+      `tarjetaColeccion.tsx` y `formularioEditarReceta.tsx` ya evalúa a false, así que Next las
+      optimiza en vez de servirlas crudas.
 
 Si hace falta deshacerlo:
 
@@ -171,25 +174,37 @@ Si hace falta deshacerlo:
 node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f74/restaurar.js"
 ```
 
-**Que la subida desde el navegador funcione · F7.4.** Es lo único que no se puede probar sin un
-navegador de verdad: el fichero va del navegador a Cloudinary directamente y el backend solo firma.
+**Que la subida desde el navegador funcione · F7.4 — hecho el 05/09/2026 con Playwright.** El
+fichero va del navegador a Cloudinary directamente y el backend solo firma, así que esto no lo cubre
+ningún test unitario. Se hizo contra los servidores locales, que apuntan al Atlas y al Cloudinary de
+producción, con un usuario temporal (`prueba-f74@cookr.dev`) borrado al terminar junto con sus
+recetas y sus ficheros de Cloudinary. El recuento de Cloudinary volvió a las 8 imágenes migradas.
 
-- [ ] Crear una receta con foto propia. `POST /api/subidas/firma` devuelve 200 y la petición a
-      `api.cloudinary.com` también.
-- [ ] La receta recién creada pesa menos de 5 KB en Mongo (con `mongodb-memory-server` son 0,64 KB)
-      y su `imagenUrl` empieza por `https://res.cloudinary.com`.
-- [ ] Editar esa receta sin tocar la foto la deja como estaba: ni la borra ni la reenvía.
-- [ ] Cambiar el avatar en `/perfil` dos veces. La segunda **sobrescribe** la primera en Cloudinary
-      en vez de acumular: el `public_id` es `cookr/avatares/<id>` a propósito.
-- [ ] Cerrar sesión y volver a entrar. Ahora la foto sí viaja dentro de la sesión de NextAuth,
-      porque el filtro de `frontend/src/lib/auth.ts` solo descartaba los `data:`. La cookie tiene
-      que seguir funcionando y el avatar salir en la cabecera.
-- [ ] Lo mismo con una cuenta de Google, que trae la foto de Google y no pasa por Cloudinary.
+- [x] 05/09/2026 · Crear una receta con foto propia. La subida ocurre al elegir el fichero, no al
+      publicar: `POST /api/subidas/firma` → 200 y `POST api.cloudinary.com/v1_1/lphsxuxk/image/upload`
+      → 200.
+- [x] 05/09/2026 · La receta recién creada pesa **0,76 KB** en el Atlas de producción, su
+      `imagenUrl` empieza por `https://res.cloudinary.com` y en el documento entero no aparece la
+      cadena `data:`.
+- [x] 05/09/2026 · Editar esa receta cambiando solo el título deja la `imagenUrl` idéntica, misma
+      versión y mismo `public_id`, y no dispara ninguna petición de firma. En Cloudinary no aparece
+      un segundo fichero.
+- [x] 05/09/2026 · Cambiar el avatar en `/perfil` dos veces seguidas deja **un** fichero en
+      `cookr/avatares/<id>`, con los bytes del segundo. El `public_id` determinista funciona: no
+      acumula.
+- [x] 05/09/2026 · Cerrar sesión y volver a entrar. La cookie `next-auth.session-token` mide
+      **845 bytes**, una sola, sin trocear, y `session.user.image` llega con la URL de Cloudinary.
+      Antes el filtro de `frontend/src/lib/auth.ts` tiraba la foto por ser `data:`; ahora la deja
+      pasar y el avatar sale en la cabecera y en la caja de comentarios.
+- [ ] Lo mismo con una cuenta de Google, que trae la foto de Google y no pasa por Cloudinary. Hace
+      falta una cuenta real, no se puede automatizar.
 - [ ] Escanear un ticket de verdad desde el móvil. El límite de cuerpo bajó de 10 MB a 8 MB y esa
       ruta sigue mandando base64: una foto de cámara tiene que entrar, y una demasiado grande dar el
-      400 con mensaje, no un 413 seco.
-- [ ] Antes de nada, `CLOUDINARY_URL` en Render. En local ya está; en producción, sin ella,
-      `POST /api/subidas/firma` responde 503 y no se puede subir ninguna foto.
+      400 con mensaje, no un 413 seco. La frontera 413 la fija `tests/imagenes.test.ts`; lo que falta
+      aquí es una foto de cámara de verdad.
+- [ ] `CLOUDINARY_URL` en Render. En local ya está y por eso se pudo probar todo lo de arriba; en
+      producción, sin ella, `POST /api/subidas/firma` responde 503 y no se puede subir ninguna foto.
+      **Es lo único que queda para cerrar F7.4.**
 
 ---
 
@@ -213,4 +228,9 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 | 04/09/2026 | Credenciales de Cloudinary (`ping` de la Admin API) | `{"status":"ok"}` contra el cloud `lphsxuxk` |
 | 04/09/2026 | Migración F7.4 aplicada contra Atlas | 6,47 MB fuera, 0 fallos, segunda pasada en seco vacía |
 | 04/09/2026 | Las 8 imágenes migradas se sirven | 200 en todas, bytes coherentes con el base64 original |
+| 05/09/2026 | Las recetas y avatares migrados se ven en la web | Se pintan bien; las fotos pasan por `/_next/image` con 200 |
+| 05/09/2026 | Subida directa al crear receta (Playwright) | Firma 200 + Cloudinary 200; documento de 0,76 KB en Atlas |
+| 05/09/2026 | Editar sin tocar la foto | `imagenUrl` idéntica, sin petición de firma, sin fichero duplicado |
+| 05/09/2026 | Avatar cambiado dos veces seguidas | Un solo fichero en `cookr/avatares/<id>`, el segundo sobrescribe |
+| 05/09/2026 | Cierre y reapertura de sesión con avatar de Cloudinary | Cookie de 845 bytes sin trocear, `session.user.image` con la URL |
 | | | |

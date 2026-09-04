@@ -331,12 +331,22 @@ así que llegan ahí y salen como 413. Esa nota de CLAUDE.md está vieja y convi
 
 ### Qué queda a medias
 
-**Falta `CLOUDINARY_URL` en Render y falta un navegador.** En local está puesta y la migración ya
-corrió, pero en producción el backend todavía no tiene la variable, y sin ella
-`POST /api/subidas/firma` responde 503 y no se puede subir ninguna foto. Tampoco ha salido aún
-ninguna subida de un navegador de verdad: que las 8 imágenes migradas respondan 200 prueba que el
-fichero está y se sirve, no que la página lo pinte donde toca ni que el camino
-navegador → Cloudinary funcione. Las casillas están en `docs/estado/pruebas-manuales.md`, apartado 5.
+**Falta `CLOUDINARY_URL` en Render.** En local está puesta, la migración corrió y el camino
+completo desde el navegador quedó probado el 5 de septiembre. En producción el backend todavía no
+tiene la variable, y sin ella `POST /api/subidas/firma` responde 503 y no se puede subir ninguna
+foto. Es lo único que separa a F7.4 de estar cerrada.
+
+**El navegador ya no es una duda.** Se condujo Chromium con Playwright contra los servidores locales,
+que apuntan al Atlas y al Cloudinary de producción, con un usuario temporal borrado al terminar junto
+con sus recetas y sus ficheros. Salió todo: la firma y la subida a `api.cloudinary.com` responden 200
+y ocurren al **elegir** el fichero, no al publicar; el documento resultante pesa 0,76 KB; editar sin
+tocar la foto no dispara ninguna firma nueva ni duplica el fichero; el avatar cambiado dos veces deja
+uno solo, porque su `public_id` sí es determinista; y la cookie de NextAuth mide 845 bytes, una sola,
+sin trocear, llevando la URL dentro. Lo único que enseñó algo que no esperaba es que las fotos de
+receta ahora pasan por `/_next/image`: el `unoptimized={imagenUrl.startsWith('data:')}` evalúa a
+false y Next las optimiza, que es lo que queríamos, pero nadie lo había escrito en ningún sitio.
+Quedan dos casillas que necesitan manos: una cuenta de Google real y una foto de cámara para el
+escaneo de tickets. Las casillas están en `docs/estado/pruebas-manuales.md`, apartado 5.
 
 **Hay copia de seguridad.** Antes del `--apply` se volcaron `recetas`, `usuarios` y `tokens` a
 `4 Curso/backup-antes-de-f74/`, con un `restaurar.js` al lado. Está fuera del repositorio a
@@ -370,8 +380,8 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 - Que el `explain()` elija los mismos planes con los datos reales, que no están repartidos como los
   sintéticos de las mediciones.
 - Que el `$sort` de la despensa aguante con las imágenes en base64 dentro de los documentos.
-- **Lo que queda de F7.4.** La migración ya está aplicada, pero falta `CLOUDINARY_URL` en Render y
-  falta subir una foto y un avatar desde un navegador de verdad.
+- **Lo que queda de F7.4.** La migración está aplicada y el navegador probado; falta
+  `CLOUDINARY_URL` en Render, más una cuenta de Google real y un escaneo de ticket desde el móvil.
 
 ---
 
