@@ -141,28 +141,35 @@ El `$sort` de la despensa deja de ser una duda en cuanto se aplique en producci�
 F7.4 que viene aquí abajo: hoy la agregación mueve documentos de hasta 1,9 MB y después moverá unos
 3 KB. Repásala **después** de migrar, no antes.
 
-**Sacar las imágenes de Mongo · F7.4, A5.** El código está entero y los tests pasan, pero nada de
-esto se ha ejecutado contra Atlas ni contra una cuenta de Cloudinary de verdad: en este equipo
-`CLOUDINARY_URL` no existe en `backend/.env`. Medido el 04/09/2026 contra producción, hay 6,47 MB de
-base64 repartidos así: 2,80 MB en `usuarios.foto`, 1,61 MB en `recetas.imagenUrl` y 2,07 MB en
-`recetas.listaComentarios[].avatarUrl`.
+**Sacar las imágenes de Mongo · F7.4, A5 — hecho el 04/09/2026.** La migración se aplicó contra el
+Atlas de producción con el cloud `lphsxuxk`. Se movieron 6,47 MB en 8 subidas (once referencias, pero
+los tres avatares de comentarios reutilizaron la URL del usuario ya migrado). Antes de aplicarla se
+volcó `recetas`, `usuarios` y `tokens` a `4 Curso/backup-antes-de-f74/`, fuera del repositorio porque
+lleva correos y hashes; al lado hay un `restaurar.js` que hace `replaceOne` con `upsert` por `_id`.
 
-1. Crear la cuenta de Cloudinary y poner `CLOUDINARY_URL` en `backend/.env` y en Render, con el
-   formato `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
-2. `cd backend && npm run migrar:imagenes` — modo seco, no escribe nada. Tiene que listar 4
-   avatares, 4 fotos de receta y 3 avatares dentro de comentarios, y sumar 6,47 MB.
-3. `npm run migrar:imagenes -- --apply`. Se puede repetir sin duplicar subidas: el selector es
-   siempre `/^data:/`, así que lo ya migrado se salta solo, y los `public_id` son deterministas con
-   `overwrite: true`.
+| | Antes | Después |
+|---|---|---|
+| `recetas` | 3,90 MB | **0,22 MB** |
+| `usuarios` | 2,82 MB | **0,02 MB** |
+| Receta más pesada | 1969,5 KB | **3,4 KB** |
+| Usuario más pesado | 1967,6 KB | **2,7 KB** |
 
-- [ ] El resumen del `--apply` no lista ningún documento en el apartado de fallos. Si lista alguno,
-      vuelve a ejecutarlo: sigue con los demás y los apunta al final en vez de caerse a la mitad.
-- [ ] Un segundo `npm run migrar:imagenes` en seco no encuentra nada. Ese es el criterio de que
-      terminó, no el primer resumen.
-- [ ] `db.recetas.stats().size` y `db.usuarios.stats().size` bajan de 3,90 MB y 2,82 MB a menos de
-      0,5 MB cada una.
-- [ ] Las 4 recetas migradas, los 4 avatares y los 3 comentarios con avatar se siguen viendo igual
-      en la web. Esto es lo único que prueba que la migración no perdió nada.
+- [x] 04/09/2026 · El `--apply` no lista ningún documento en el apartado de fallos.
+- [x] 04/09/2026 · La segunda pasada en seco encuentra 0 avatares, 0 fotos y 0 comentarios. Ese es
+      el criterio de que terminó, no el primer resumen.
+- [x] 04/09/2026 · Las dos colecciones bajan a 0,22 MB y 0,02 MB, y no queda ningún `data:` en
+      ninguna de las tres rutas. Ninguna receta se quedó sin `imagenUrl`.
+- [x] 04/09/2026 · Las 8 URL responden 200 con su `content-type` correcto. Los bytes servidos son
+      tres cuartas partes de lo que ocupaba el base64 (196,9 → 147,6 KB, 1967,6 → 1475,7 KB), que es
+      justo el inflado de base64: la imagen es la misma, no se ha recodificado.
+- [ ] Verlas en la web con los ojos. Lo de arriba prueba que el fichero está y se sirve, no que la
+      página lo pinte donde toca.
+
+Si hace falta deshacerlo:
+
+```bash
+node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f74/restaurar.js"
+```
 
 **Que la subida desde el navegador funcione · F7.4.** Es lo único que no se puede probar sin un
 navegador de verdad: el fichero va del navegador a Cloudinary directamente y el backend solo firma.
@@ -181,6 +188,8 @@ navegador de verdad: el fichero va del navegador a Cloudinary directamente y el 
 - [ ] Escanear un ticket de verdad desde el móvil. El límite de cuerpo bajó de 10 MB a 8 MB y esa
       ruta sigue mandando base64: una foto de cámara tiene que entrar, y una demasiado grande dar el
       400 con mensaje, no un 413 seco.
+- [ ] Antes de nada, `CLOUDINARY_URL` en Render. En local ya está; en producción, sin ella,
+      `POST /api/subidas/firma` responde 503 y no se puede subir ninguna foto.
 
 ---
 
@@ -201,4 +210,7 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 
 | Fecha | Qué se probó | Resultado |
 |---|---|---|
+| 04/09/2026 | Credenciales de Cloudinary (`ping` de la Admin API) | `{"status":"ok"}` contra el cloud `lphsxuxk` |
+| 04/09/2026 | Migración F7.4 aplicada contra Atlas | 6,47 MB fuera, 0 fallos, segunda pasada en seco vacía |
+| 04/09/2026 | Las 8 imágenes migradas se sirven | 200 en todas, bytes coherentes con el base64 original |
 | | | |

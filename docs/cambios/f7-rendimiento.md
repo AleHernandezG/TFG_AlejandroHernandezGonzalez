@@ -236,7 +236,7 @@ hay transacción que los cubra.
 
 ## [PERF-004] Las imágenes fuera de Mongo · A5
 
-Fecha: 2026-09-04 | Estado: ✅ Código completo, ⚠️ sin aplicar en producción | Afecta: BE + FE + datos | Bloque: F7.4
+Fecha: 2026-09-04 | Estado: ✅ Completado y migrado | Afecta: BE + FE + datos | Bloque: F7.4
 
 ### Qué se midió antes de tocar nada
 
@@ -282,6 +282,20 @@ Cloudinary y manda a la API solo la URL que le devuelven.
 Una receta nueva con foto ocupa ahora **0,64 KB**, medidos con `$bsonSize` en
 `tests/imagenes.test.ts`, contra los 412 KB de media de antes.
 
+La migración se aplicó el mismo día contra el Atlas de producción:
+
+| | Antes | Después |
+|---|---|---|
+| `recetas` | 3,90 MB | 0,22 MB |
+| `usuarios` | 2,82 MB | 0,02 MB |
+| Receta más pesada | 1969,5 KB | 3,4 KB |
+
+Once referencias con solo 8 subidas: los tres avatares de comentarios reutilizaron la URL del usuario
+ya migrado, que es para lo que existe el mapa `urlPorUsuario`. Ningún documento falló y la segunda
+pasada en seco no encuentra nada. Las 8 URL responden 200 y los bytes servidos son tres cuartas
+partes de lo que ocupaba el base64, o sea exactamente el inflado que mete base64: la imagen es la
+misma, no se recodificó.
+
 ### Decisiones que costaron
 
 **Cloudinary o R2, y quién sube el fichero.** Las dos las decidió Alejandro y las dos cambiaban todo
@@ -317,10 +331,16 @@ así que llegan ahí y salen como 413. Esa nota de CLAUDE.md está vieja y convi
 
 ### Qué queda a medias
 
-**Nada de esto se ha ejecutado de verdad.** En este equipo `CLOUDINARY_URL` no está en
-`backend/.env`, así que la migración solo se ha corrido en seco y ninguna subida real ha salido de un
-navegador. Los 6,47 MB siguen dentro de Atlas mientras nadie ejecute `--apply`. Los pasos están en
-`docs/estado/pruebas-manuales.md`, apartado 5, y hasta que se marquen esto no está cerrado.
+**Falta `CLOUDINARY_URL` en Render y falta un navegador.** En local está puesta y la migración ya
+corrió, pero en producción el backend todavía no tiene la variable, y sin ella
+`POST /api/subidas/firma` responde 503 y no se puede subir ninguna foto. Tampoco ha salido aún
+ninguna subida de un navegador de verdad: que las 8 imágenes migradas respondan 200 prueba que el
+fichero está y se sirve, no que la página lo pinte donde toca ni que el camino
+navegador → Cloudinary funcione. Las casillas están en `docs/estado/pruebas-manuales.md`, apartado 5.
+
+**Hay copia de seguridad.** Antes del `--apply` se volcaron `recetas`, `usuarios` y `tokens` a
+`4 Curso/backup-antes-de-f74/`, con un `restaurar.js` al lado. Está fuera del repositorio a
+propósito, porque lleva correos y contraseñas hasheadas.
 
 **Los avatares de los comentarios se siguen copiando.** La migración reescribe los que ya están,
 pero `recetaRepository.agregarComentario` sigue metiendo `usuario.foto` dentro de cada comentario.
@@ -350,8 +370,8 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 - Que el `explain()` elija los mismos planes con los datos reales, que no están repartidos como los
   sintéticos de las mediciones.
 - Que el `$sort` de la despensa aguante con las imágenes en base64 dentro de los documentos.
-- **Todo F7.4.** Poner `CLOUDINARY_URL`, correr la migración en seco, aplicarla, y subir una foto y
-  un avatar desde un navegador de verdad. Hasta que eso pase, los 6,47 MB siguen en Atlas.
+- **Lo que queda de F7.4.** La migración ya está aplicada, pero falta `CLOUDINARY_URL` en Render y
+  falta subir una foto y un avatar desde un navegador de verdad.
 
 ---
 

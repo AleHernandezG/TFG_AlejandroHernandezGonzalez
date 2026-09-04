@@ -96,7 +96,7 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 | Documento | Qué es |
 |---|---|
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
-| `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, a falta de aplicarla en producción) |
+| `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, migrado: 6,72 MB → 0,24 MB) |
 
 ---
 
