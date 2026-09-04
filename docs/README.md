@@ -59,6 +59,7 @@ Estos cuatro se actualizan. El resto de la carpeta `docs/`, no.
 | `infraestructura.md` | Stack, servicios externos, variables de entorno. De junio, correcto en lo esencial |
 | `estructura-frontend.md` | Estructura de carpetas del cliente y convenciones de nombres |
 | `metodo-cookr.md` | Qué se adopta del método de DietMetric y qué no, con el porqué |
+| `sinergias-proyectos.md` | Análisis de proyectos en `Desktop/Proyectos` y módulos reutilizables para Cookr |
 
 Falta el contrato de la API: los 37 endpoints solo se conocen leyendo `backend/src/routes/`. Es la
 tarea F10.3 del plan, y cuando se escriba vive aquí.
@@ -73,6 +74,7 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 | Documento | Qué es |
 |---|---|
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
+| `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas |
 
 ---
 

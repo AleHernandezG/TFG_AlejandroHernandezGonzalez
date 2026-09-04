@@ -3,7 +3,7 @@
 Lo que los tests automáticos no pueden comprobar, con los pasos exactos para hacerlo en un rato
 libre. Cada bloque dice qué ejecutar, qué tiene que pasar y cómo se ve el fallo.
 
-Los 102 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
+Los 123 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
 cuota de Google, Mailjet, Gemini ni Pexels. El precio de esa regla es esta lista.
 
 Cuando compruebes algo, marca la casilla y pon la fecha. Si falla, apunta el síntoma aquí mismo
@@ -92,7 +92,57 @@ ojo.
 
 ---
 
-## 5. Lo que no se va a poder automatizar nunca
+## 5. Los índices y los planes de consulta en Atlas · F7, PERF-001
+
+Todas las mediciones de F7 se hicieron contra `mongodb-memory-server`, que es un Mongo de verdad
+pero con datos sintéticos y una sola máquina. Nada de esto vale como comprobación de producción.
+
+**Que los índices existan.** Se declaran en el esquema y Mongoose los crea al conectar porque nadie
+toca `autoIndex`, pero en Atlas la construcción puede quedarse a medias sin que el proceso se entere.
+Desde `mongosh` contra la base de producción:
+
+```js
+db.recetas.getIndexes()   // esperados: _id_, fechaPublicacion_-1,
+                          // autorId_1_fechaPublicacion_-1,
+                          // categorias_1_fechaPublicacion_-1,
+                          // esEvento_1_fechaPublicacion_-1
+db.usuarios.getIndexes()  // esperados: _id_, correo_1, googleId_1 (sparse: true)
+db.recetas.stats().indexSizes
+```
+
+- [ ] Los cuatro índices de `recetas` están, con esos nombres exactos.
+- [ ] `googleId_1` está en `usuarios` y es `sparse`.
+- [ ] La suma de `indexSizes` cabe holgada en la RAM del plan de Atlas. Si no cabe, el índice se lee
+      de disco y deja de ser una mejora.
+
+**Que el planificador los elija con los datos reales.** El reparto de categorías en producción no es
+el de las mediciones, y un índice poco selectivo se descarta. Con datos de verdad:
+
+```js
+db.recetas.find({}).sort({ fechaPublicacion: -1 }).limit(20).explain("executionStats")
+db.recetas.find({ categorias: "postre" }).sort({ fechaPublicacion: -1 }).limit(20).explain("executionStats")
+```
+
+- [ ] `winningPlan` lleva `IXSCAN`, no `COLLSCAN`.
+- [ ] No aparece una etapa `SORT`: el orden lo tiene que dar el índice.
+- [ ] `totalDocsExamined` está cerca de 20, no cerca del total de la colección.
+
+**Que la ordenación de la despensa no reviente.** `buscarCandidatasParaDespensa` ordena sin `$limit`
+y lleva `allowDiskUse(true)`. En memoria el corpus de pruebas es pequeño; en producción los
+documentos arrastran la imagen en base64 dentro (A5), así que el `$sort` mueve mucho más de lo que
+parece.
+
+- [ ] Pídele al chat una receta con la despensa llena, con la base de producción. Responde sin
+      timeout.
+- [ ] En Atlas, el *profiler* no marca esa agregación con `hasSortStage` volcando a disco de forma
+      continua. Si vuelca siempre, hay que proyectar antes de ordenar o esperar a F7.4.
+
+Esta comprobación se puede tachar entera cuando F7.4 saque las imágenes a Cloudinary: el motivo de
+la duda desaparece con ellas.
+
+---
+
+## 6. Lo que no se va a poder automatizar nunca
 
 Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las manos.
 

@@ -69,4 +69,9 @@ const recetaSchema = new Schema<IRecetaDoc>({
   fechaPublicacion: { type: Date, default: Date.now },
 });
 
+recetaSchema.index({ fechaPublicacion: -1 });
+recetaSchema.index({ autorId: 1, fechaPublicacion: -1 });
+recetaSchema.index({ categorias: 1, fechaPublicacion: -1 });
+recetaSchema.index({ esEvento: 1, fechaPublicacion: -1 });
+
 export const Receta = mongoose.model<IRecetaDoc>("Receta", recetaSchema);

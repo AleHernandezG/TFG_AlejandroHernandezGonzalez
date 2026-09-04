@@ -2,8 +2,6 @@
 
 Aplicación web para cocinar con lo que tienes. Cookr guarda tus recetas, conoce tus alergias y usa un asistente de IA para generar recetas, escanear el ticket de la compra y resolver dudas mientras cocinas.
 
-Proyecto de Fin de Grado del Grado en Ingeniería Informática.
-
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)

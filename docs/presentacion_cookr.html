@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookr — Auditoría, Escalabilidad y Hoja de Ruta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(28, 36, 56, 0.9);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.3);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.3);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.3);
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.3);
+      --cyan: #06b6d4;
+      --purple: #a855f7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+    .brand-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-text p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.3);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .badge-pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      font-weight: 700;
+    }
+
+    .content-area { flex: 1; position: relative; }
+    .slide-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .slide-view.active {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+      border: 1px solid var(--border-highlight);
+      border-radius: 24px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 999px;
+      color: #a5b4fc;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .hero-title { font-size: 34px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .hero-title span {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc { font-size: 16px; color: var(--text-muted); max-width: 880px; line-height: 1.6; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      background: var(--bg-card-hover);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .icon-indigo { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .icon-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .icon-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .icon-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+    .icon-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .icon-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    .card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .badge-critical { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+    .badge-high { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #a7f3d0; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-info { background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.4); }
+
+    .card-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+
+    .code-box {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #93c5fd;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #e2e8f0; }
+    .feature-item .check { color: var(--emerald); font-weight: bold; }
+
+    .metric-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-value { font-size: 34px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
+    .metric-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+    .timeline { display: flex; flex-direction: column; gap: 16px; position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--primary), var(--emerald), var(--cyan));
+    }
+    .timeline-node {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 22px;
+    }
+    .timeline-node::after {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 24px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--bg-dark);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+    .timeline-node.priority::after { background: var(--rose); box-shadow: 0 0 10px var(--rose-glow); }
+    .timeline-node.done::after { background: var(--emerald); box-shadow: 0 0 10px var(--emerald-glow); }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      margin-top: auto;
+    }
+    .progress-bar-container {
+      flex: 1;
+      max-width: 500px;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0 20px;
+    }
+    .progress-fill { height: 100%; width: 16%; background: linear-gradient(90deg, #6366f1, #10b981); transition: width 0.3s ease; }
+    .nav-arrow-btn {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .nav-arrow-btn:hover { background: rgba(255,255,255,0.15); }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">🍳</div>
+        <div class="brand-text">
+          <h1>Cookr — Auditoría, Escalabilidad y Hoja de Ruta</h1>
+          <p>Proyecto de Producción · Alejandro Hernández González</p>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="goToSlide(0)" id="tab-0">1. Resumen Ejecutivo</button>
+        <button class="tab-btn" onclick="goToSlide(1)" id="tab-1">2. Seguridad & Fixes</button>
+        <button class="tab-btn" onclick="goToSlide(2)" id="tab-2">3. Escalabilidad & Redis</button>
+        <button class="tab-btn" onclick="goToSlide(3)" id="tab-3">4. Nuevas Features <span class="badge-pill">Top</span></button>
+        <button class="tab-btn" onclick="goToSlide(4)" id="tab-4">5. Pruebas & Usabilidad SUS</button>
+        <button class="tab-btn" onclick="goToSlide(5)" id="tab-5">6. Plan de Acción</button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- SLIDE 0 -->
+      <div class="slide-view active" id="slide-0">
+        <div class="hero-banner">
+          <div class="hero-tag">✨ Visión de Producto</div>
+          <h2 class="hero-title">Evolución y Escalabilidad de <span>Cookr</span></h2>
+          <p class="hero-desc">
+            Cookr posee una base arquitectónica robusta (Next.js 14, Express por capas, Gemini AI, 80 tests backend). La hoja de ruta se enfoca en resolver la seguridad inmediata, optimizar base de datos con índices y Redis, y lanzar funciones de alto impacto como el sistema de recomendación inteligente, el planificador semanal con PDF y el modo cocina manos libres.
+          </p>
+        </div>
+        <div class="grid-4">
+          <div class="metric-card">
+            <div class="metric-value" style="color: #10b981;">80 / 80</div>
+            <div class="metric-label">Tests en Verde</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="color: #f43f5e;">1 Crítico</div>
+            <div class="metric-label">Seguridad (F6.1 Google ID)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="color: #06b6d4;">Caché</div>
+            <div class="metric-label">Redis / Upstash</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" style="color: #818cf8;">5 Features</div>
+            <div class="metric-label">Nuevas Innovaciones</div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-emerald">🛡️</div><span class="card-badge badge-success">Sólido</span></div>
+            <h3 class="card-title">Capa Backend & CI/CD</h3>
+            <p class="card-desc">Separación estricta (repositorios / servicios / controladores) y pipeline de GitHub Actions que bloquea fallos antes del deploy.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-cyan">⚡</div><span class="card-badge badge-info">Rendimiento</span></div>
+            <h3 class="card-title">Base de Datos & Redis</h3>
+            <p class="card-desc">Implementar índices en MongoDB, desacoplar imágenes a Cloudinary e incorporar Redis para feeds y cuotas de IA.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-purple">🎯</div><span class="card-badge badge-info">Producto</span></div>
+            <h3 class="card-title">Recomendación & Menús</h3>
+            <p class="card-desc">Filtrado colaborativo híbrido, menú semanal con exportación en PDF y modo cocina manos libres con temporizadores.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 1 -->
+      <div class="slide-view" id="slide-1">
+        <div class="hero-banner" style="border-color: rgba(244, 63, 94, 0.3);">
+          <div class="hero-tag" style="background: rgba(244, 63, 94, 0.15); color: #fda4af;">🚨 Seguridad en Producción (Fase F6)</div>
+          <h2 class="hero-title">Vulnerabilidades y <span>Solución Inmediata</span></h2>
+          <p class="hero-desc">Corrección de puntos críticos para garantizar que las sesiones, los proxies y los endpoints estén blindados.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-rose">🔑</div><span class="card-badge badge-critical">C1 · Crítico</span></div>
+            <h3 class="card-title">Validación Google OAuth</h3>
+            <p class="card-desc">Validar <code>account.id_token</code> criptográficamente con <code>google-auth-library</code> en el backend.</p>
+            <div class="code-box">verifyIdToken({ idToken, audience })</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-amber">🌐</div><span class="card-badge badge-high">A1 · Alto</span></div>
+            <h3 class="card-title">Blindaje Proxy Gemini</h3>
+            <p class="card-desc">Política *Fail-Closed* si falta <code>PROXY_TOKEN</code> y limitar rutas a <code>/v1beta/models/</code>.</p>
+            <div class="code-box">if (!env.PROXY_TOKEN) return 500;</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-amber">🔍</div><span class="card-badge badge-high">A2 · Alto</span></div>
+            <h3 class="card-title">ReDoS & Validación Zod</h3>
+            <p class="card-desc">Escapar regex en búsquedas y conectar <code>validarBody</code> con Zod en los 5 routers pendientes.</p>
+            <div class="code-box">router.post('/', validarBody(schema))</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide-view" id="slide-2">
+        <div class="hero-banner">
+          <div class="hero-tag">⚡ Base de Datos & Caché (Fase F7)</div>
+          <h2 class="hero-title">Escalabilidad de BD, <span>Colecciones y Redis</span></h2>
+          <p class="hero-desc">Transformaciones de datos para lograr tiempos de respuesta sub-100ms y soportar alto volumen de tráfico.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-cyan">📊</div><span class="card-badge badge-high">A4 · Índices</span></div>
+            <h3 class="card-title">Índices Compuestos Mongo</h3>
+            <p class="card-desc">Eliminar <code>COLLSCAN</code> en feed mediante índices en fecha, categorías, alérgenos y texto.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-indigo">📈</div><span class="card-badge badge-high">A3 · Agregaciones</span></div>
+            <h3 class="card-title">Aggregation Pipelines</h3>
+            <p class="card-desc">Calcular score y popularidad dentro de MongoDB evitando cargar colecciones a la RAM de Node.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-purple">🖼️</div><span class="card-badge badge-high">A5 · Media</span></div>
+            <h3 class="card-title">Cloudinary / Object Storage</h3>
+            <p class="card-desc">Desacoplar imágenes de MongoDB guardando solo la URL, reduciendo los documentos de ~5MB a &lt;5KB.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-emerald">🗄️</div><span class="card-badge badge-info">Estructura</span></div>
+            <h3 class="card-title">Colecciones Independientes</h3>
+            <p class="card-desc">Extraer <code>comentarios</code> a una colección propia con paginación real para no inflar el documento de receta.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-amber">⚡</div><span class="card-badge badge-info">Caché</span></div>
+            <h3 class="card-title">Caché con Redis (Upstash)</h3>
+            <p class="card-desc">Almacenar en caché el feed principal, categorías y contadores diarios de peticiones a Gemini.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide-view" id="slide-3">
+        <div class="hero-banner">
+          <div class="hero-tag">🌟 Nuevas Funcionalidades</div>
+          <h2 class="hero-title">Innovaciones y <span>Experiencia de Producto</span></h2>
+          <p class="hero-desc">Funcionalidades diferenciales para convertir Cookr en la plataforma gastronómica definitiva.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-indigo">🧠</div><span class="card-badge badge-info">IA & Algoritmos</span></div>
+            <h3 class="card-title">1. Recomendación Inteligente</h3>
+            <p class="card-desc">Filtrado híbrido: afinidad por ingredientes de despensa + colaborativo por historial de likes y guardados.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-emerald">📅</div><span class="card-badge badge-success">Planificación</span></div>
+            <h3 class="card-title">2. Menú Semanal & PDF</h3>
+            <p class="card-desc">Planificador con macros calóricos, cálculo de lista de compra diferencial y exportación en PDF listo para imprimir.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-rose">👨‍🍳</div><span class="card-badge badge-critical">Cocina</span></div>
+            <h3 class="card-title">3. Modo Manos Libres</h3>
+            <p class="card-desc">Vista para encimera con fuentes gigantes, temporizadores automáticos por paso y lectura por voz (Web Speech API).</p>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-amber">♻️</div><span class="card-badge badge-high">Sostenibilidad</span></div>
+            <h3 class="card-title">4. Desperdicio Cero</h3>
+            <p class="card-desc">Alertas de caducidad en despensa y sugerencia proactiva de recetas prioritarias para consumir productos a punto de expirar.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-purple">📱</div><span class="card-badge badge-info">Móvil</span></div>
+            <h3 class="card-title">5. PWA & Offline</h3>
+            <p class="card-desc">Instalación nativa con Service Worker para consultar recetas y despensa sin conexión a internet.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-cyan">👨‍👩‍👧‍👦</div><span class="card-badge badge-info">Colaborativo</span></div>
+            <h3 class="card-title">6. Despensa Compartida</h3>
+            <p class="card-desc">Espacios compartidos sincronizados en tiempo real para familias o compañeros de piso.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide-view" id="slide-4">
+        <div class="hero-banner">
+          <div class="hero-tag">🧪 Calidad & Analítica</div>
+          <h2 class="hero-title">Pruebas Automatizadas y <span>Evaluación SUS</span></h2>
+          <p class="hero-desc">Estrategia para garantizar fiabilidad continua del software y medir la satisfacción de los usuarios.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-emerald">🤖</div><span class="card-badge badge-success">CI/CD Suite</span></div>
+            <h3 class="card-title">Pruebas Automatizadas Integrales</h3>
+            <p class="card-desc">Extender la suite de pruebas a toda la aplicación:</p>
+            <ul class="feature-list">
+              <li class="feature-item"><span class="check">✓</span> <strong>Backend (Jest + Supertest):</strong> Cobertura >60% en controladores, rate limiting y repositorios.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Frontend (Playwright E2E):</strong> Flujos de registro, escaneo de tickets OCR, recetas y despensa.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Barreras Arquitectónicas:</strong> Tests que impiden importar modelos en servicios o saltarse validaciones Zod.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-icon icon-indigo">📊</div><span class="card-badge badge-info">UX Metrics</span></div>
+            <h3 class="card-title">Evaluación de Usabilidad & Métricas SUS</h3>
+            <p class="card-desc">Medición continua de la experiencia de usuario:</p>
+            <ul class="feature-list">
+              <li class="feature-item"><span class="check">✓</span> <strong>Métricas SUS (System Usability Scale):</strong> Módulo integrado de micro-encuestas de facilidad de uso.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Telemetría de UX:</strong> Detección de cuellos de botella en la generación de recetas y uso de la despensa.</li>
+              <li class="feature-item"><span class="check">✓</span> <strong>Feedback Directo:</strong> Botón rápido de reporte de incidencias o sugerencias.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide-view" id="slide-5">
+        <div class="hero-banner">
+          <div class="hero-tag">🚀 Hoja de Ruta</div>
+          <h2 class="hero-title">Plan de Ejecución <span>Priorizado</span></h2>
+          <p class="hero-desc">Calendario estructurado por fases técnicas y de producto.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-node priority">
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 1: Seguridad Crítica Inmediata</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Validar <code>id_token</code> de Google en backend, asegurar proxy de Gemini, sanitizar regex y aplicar Zod en todos los routers.</p>
+          </div>
+          <div class="timeline-node">
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 2: Rendimiento, MongoDB & Redis</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Índices compuestos, agregaciones en Mongo, desacople de imágenes a Cloudinary y caché con Redis.</p>
+          </div>
+          <div class="timeline-node">
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 3: Menús, Recomendación & Modo Cocina</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Planificador semanal con PDF, algoritmo de recomendación híbrido y modo manos libres con voz.</p>
+          </div>
+          <div class="timeline-node done">
+            <h4 style="font-size: 16px; color: #fff; margin-bottom: 4px;">Fase 4: Pruebas Automatizadas & Métricas SUS</h4>
+            <p style="font-size: 14px; color: var(--text-muted);">Ampliación de tests Jest y Playwright E2E en CI/CD y módulo de analítica de usabilidad SUS.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span style="font-size: 13px; font-weight: 600; color: #cbd5e1;">Cookr — Hoja de Ruta de Producto</span>
+      <div class="progress-bar-container"><div class="progress-fill" id="progressFill"></div></div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 13px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" id="slideCounter">1 / 6</span>
+        <button class="nav-arrow-btn" onclick="prevSlide()">◀ Anterior</button>
+        <button class="nav-arrow-btn" onclick="nextSlide()">Siguiente ▶</button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 6;
+    function updateView() {
+      for (let i = 0; i < totalSlides; i++) {
+        const slide = document.getElementById('slide-' + i);
+        const tab = document.getElementById('tab-' + i);
+        if (slide) slide.classList.toggle('active', i === currentSlide);
+        if (tab) tab.classList.toggle('active', i === currentSlide);
+      }
+      document.getElementById('progressFill').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+      document.getElementById('slideCounter').innerText = (currentSlide + 1) + ' / ' + totalSlides;
+    }
+    function goToSlide(i) { currentSlide = i; updateView(); }
+    function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateView(); }
+    function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateView(); }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+      else if (e.key === 'ArrowLeft') prevSlide();
+    });
+    updateView();
+  </script>
+</body>
+</html>

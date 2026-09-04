@@ -354,23 +354,12 @@ function ingredienteCoincide(itemDespensa: string, ingredientesReceta: string[])
 function elegirMejorReceta(
   candidatas: RecetaCandidataDespensa[],
   ingredientesDespensa: string[],
-  preferencias: string[],
 ): RecetaCandidataDespensa | null {
-  const completas = candidatas.filter((receta) =>
+  const mejor = candidatas.find((receta) =>
     ingredientesDespensa.every((item) => ingredienteCoincide(item, receta.ingredientes)),
   );
 
-  if (completas.length === 0) return null;
-
-  const prefs = new Set(preferencias);
-  completas.sort((a, b) => {
-    const prefA = a.categorias.filter((c) => prefs.has(c)).length;
-    const prefB = b.categorias.filter((c) => prefs.has(c)).length;
-    if (prefB !== prefA) return prefB - prefA;
-    return b.likes - a.likes;
-  });
-
-  return completas[0];
+  return mejor ?? null;
 }
 
 function construirRespuestaBBDD(receta: RecetaCandidataDespensa): string {
@@ -450,8 +439,8 @@ export async function recetaConDespensa(usuarioId: string): Promise<RespuestaRec
   const alergias = perfil?.alergias ?? [];
   const preferencias = perfil?.preferencias ?? [];
 
-  const candidatas = await recetaRepository.buscarCandidatasParaDespensa(alergias);
-  const mejor = elegirMejorReceta(candidatas, ingredientes, preferencias);
+  const candidatas = await recetaRepository.buscarCandidatasParaDespensa(alergias, preferencias);
+  const mejor = elegirMejorReceta(candidatas, ingredientes);
 
   if (mejor) {
     return {

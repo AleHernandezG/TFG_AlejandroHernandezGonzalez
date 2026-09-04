@@ -6,6 +6,18 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-04 · Hito: Fin de defensa de TFG y transición a Producto Personal
+
+**Qué se definió.** La defensa académica del TFG ha concluido con éxito. El proyecto Cookr deja de tratarse como un trabajo académico/TFG y pasa a ser oficialmente un **proyecto personal / producto de producción independiente**. 
+
+Ya no hay tribunal ni compromisos académicos que condicionen las decisiones. Todo el enfoque pasa a centrarse en:
+- **Seguridad en producción y fiabilidad real** (resolución inmediata de C1, A1, A2).
+- **Rendimiento y arquitectura escalable** (índices MongoDB, consultas agregadas y almacenamiento externo de medios en Cloudinary/R2).
+- **Experiencia de usuario y valor de producto real** (planificador semanal, lista de compra inteligente, modo cocina manos libres, PWA).
+- **Costes y cuotas eficientes** (gestión del proxy de Gemini y límites en Redis).
+
+---
+
 ## 2026-09-04 · Auditoría completa y plan de trabajo
 
 **Qué se hizo.** Auditoría del repositorio entero antes de seguir tocando nada. Se comprobó

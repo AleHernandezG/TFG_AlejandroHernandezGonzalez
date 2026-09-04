@@ -45,6 +45,9 @@ export async function crearReceta(datos: Partial<{
   alergenos: string[];
   categorias: string[];
   dificultad: "Fácil" | "Media" | "Difícil";
+  likes: Types.ObjectId[];
+  comentarios: number;
+  fechaPublicacion: Date;
 }> = {}) {
   const autorId = datos.autorId ?? (await crearUsuario())._id as Types.ObjectId;
   return Receta.create({
@@ -60,9 +63,15 @@ export async function crearReceta(datos: Partial<{
     pasos: ["Un paso lo bastante largo como para valer."],
     alergenos: datos.alergenos ?? [],
     macros: { calorias: 100, proteinas: 1, carbos: 1, grasas: 1 },
-    likes: [],
-    listaComentarios: [],
-    fechaPublicacion: new Date(),
+    likes: datos.likes ?? [],
+    listaComentarios: Array.from({ length: datos.comentarios ?? 0 }, () => ({
+      autorId: autorId,
+      autorNombre: "Comentarista",
+      avatarUrl: null,
+      texto: "Qué buena pinta.",
+      fecha: new Date(),
+    })),
+    fechaPublicacion: datos.fechaPublicacion ?? new Date(),
   });
 }
 
