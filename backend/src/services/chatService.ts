@@ -1,6 +1,8 @@
+import { createHash } from "crypto";
 import { GoogleGenAI } from "@google/genai";
 import { usuarioRepository } from "../repositories/usuarioRepository";
 import { recetaRepository, type RecetaCandidataDespensa } from "../repositories/recetaRepository";
+import { almacenIA, almacenIAEnRedis } from "../lib/almacenIA";
 
 interface MensajeChat {
   rol: "user" | "model";
@@ -32,56 +34,57 @@ const MAX_LLAMADAS_DIA = Number(process.env.GEMINI_MAX_LLAMADAS_DIA ?? 1000);
 // sin aportar nada en un chat culinario. Lo desactivamos.
 const GENERATION_CONFIG = { thinkingConfig: { thinkingBudget: 0 } };
 
-let llamadasHoy = 0;
-let diaActual = new Date().toISOString().slice(0, 10);
+const CLAVE_LLAMADAS = "ia:gemini:llamadas";
+const TTL_LLAMADAS_SEGUNDOS = 48 * 60 * 60;
 
-function registrarLlamadaGemini(): void {
-  const hoy = new Date().toISOString().slice(0, 10);
-  if (hoy !== diaActual) {
-    diaActual = hoy;
-    llamadasHoy = 0;
-  }
-  if (llamadasHoy >= MAX_LLAMADAS_DIA) {
-    console.warn(`[Gemini guard] Tope diario alcanzado (${MAX_LLAMADAS_DIA}). Bloqueando llamadas hasta mañana.`);
+function hoyISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function registrar(mensaje: string): void {
+  if (process.env.NODE_ENV !== "test") console.log(mensaje);
+}
+
+function advertir(mensaje: string): void {
+  if (process.env.NODE_ENV !== "test") console.warn(mensaje);
+}
+
+async function registrarLlamadaGemini(): Promise<void> {
+  const total = await almacenIA.incrementar(`${CLAVE_LLAMADAS}:${hoyISO()}`, TTL_LLAMADAS_SEGUNDOS);
+
+  if (total > MAX_LLAMADAS_DIA) {
+    advertir(`[Gemini guard] Tope diario alcanzado (${MAX_LLAMADAS_DIA}). Bloqueando llamadas hasta mañana.`);
     throw Object.assign(
       new Error("El asistente ha alcanzado el límite diario de uso. Inténtalo de nuevo mañana."),
       { status: 503 },
     );
   }
-  llamadasHoy++;
+
+  registrar(`[Gemini guard] llamada ${total}/${MAX_LLAMADAS_DIA} de hoy (${almacenIAEnRedis() ? "redis" : "memoria"})`);
 }
 
 // ── Caché de contexto de usuario ─────────────────────────────────────────────
-interface EntradaContexto {
-  contexto: string;
-  expira: number;
+const CLAVE_CONTEXTO = "ia:contexto";
+const TTL_CONTEXTO_SEGUNDOS = 5 * 60;
+
+function huella(texto: string): string {
+  return createHash("sha256").update(texto).digest("hex").slice(0, 32);
 }
 
-const cacheContexto = new Map<string, EntradaContexto>();
-const TTL_CONTEXTO_MS = 5 * 60 * 1000;
-const MAX_ENTRADAS_CONTEXTO = 100;
-
-function limpiarContextosExpirados() {
-  const ahora = Date.now();
-  for (const [key, entrada] of cacheContexto.entries()) {
-    if (entrada.expira < ahora) cacheContexto.delete(key);
-  }
-}
-
-export function invalidarContextoUsuario(usuarioId: string): void {
-  cacheContexto.delete(usuarioId);
+export async function invalidarContextoUsuario(usuarioId: string): Promise<void> {
+  await almacenIA.borrar(`${CLAVE_CONTEXTO}:${usuarioId}`);
 }
 
 async function obtenerContextoUsuario(usuarioId: string): Promise<string> {
-  const ahora = Date.now();
-  const entrada = cacheContexto.get(usuarioId);
+  const clave = `${CLAVE_CONTEXTO}:${usuarioId}`;
+  const guardado = await almacenIA.leer<string>(clave);
 
-  if (entrada && entrada.expira > ahora) {
-    console.log(`[Gemini cache] HIT contexto usuario ${usuarioId.slice(-6)}`);
-    return entrada.contexto;
+  if (guardado !== null) {
+    registrar(`[Gemini cache] HIT contexto usuario ${usuarioId.slice(-6)}`);
+    return guardado;
   }
 
-  console.log(`[Gemini cache] MISS contexto usuario ${usuarioId.slice(-6)} — consultando MongoDB`);
+  registrar(`[Gemini cache] MISS contexto usuario ${usuarioId.slice(-6)} — consultando MongoDB`);
   const usuario = await usuarioRepository.buscarPerfilPorId(usuarioId);
   const despensa = usuario ? await usuarioRepository.obtenerDespensa(usuarioId) ?? [] : [];
 
@@ -99,20 +102,14 @@ async function obtenerContextoUsuario(usuarioId: string): Promise<string> {
 
   const contexto = lineas.join("\n");
 
-  if (cacheContexto.size >= MAX_ENTRADAS_CONTEXTO) limpiarContextosExpirados();
-  cacheContexto.set(usuarioId, { contexto, expira: ahora + TTL_CONTEXTO_MS });
+  await almacenIA.guardar(clave, contexto, TTL_CONTEXTO_SEGUNDOS);
 
   return contexto;
 }
 
 // ── Caché de generación desde texto ──────────────────────────────────────────
-interface EntradaRecetaGenerada {
-  resultado: unknown;
-  expira: number;
-}
-
-const cacheRecetaGenerada = new Map<string, EntradaRecetaGenerada>();
-const TTL_RECETA_MS = 2 * 60 * 1000;
+const CLAVE_RECETA = "ia:receta";
+const TTL_RECETA_SEGUNDOS = 2 * 60;
 
 function normalizarDescripcion(desc: string): string {
   return desc.trim().toLowerCase().replace(/\s+/g, " ");
@@ -161,6 +158,41 @@ function validarEsquemaIngredientes(arr: unknown): boolean {
   );
 }
 
+// ── Caché semántica de dudas de cocina ───────────────────────────────────────
+const VERSION_PROMPT = "v1";
+const CLAVE_CHAT = `ia:chat:${VERSION_PROMPT}`;
+const TTL_CHAT_SEGUNDOS = 7 * 24 * 60 * 60;
+const MAX_CHARS_PREGUNTA_CACHEABLE = 200;
+
+const CLAVE_ACIERTOS = "ia:cache:aciertos";
+const CLAVE_FALLOS = "ia:cache:fallos";
+const TTL_METRICAS_SEGUNDOS = 30 * 24 * 60 * 60;
+
+function normalizarPregunta(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[¿?¡!]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function preguntaSuelta(mensajes: MensajeChat[], imagenBase64?: string): string | null {
+  if (imagenBase64) return null;
+  if (mensajes.length !== 1) return null;
+
+  const unico = mensajes[0];
+  if (unico.rol !== "user") return null;
+  if (unico.texto.length > MAX_CHARS_PREGUNTA_CACHEABLE) return null;
+
+  return unico.texto;
+}
+
+function claveDePregunta(contexto: string, pregunta: string): string {
+  return `${CLAVE_CHAT}:${huella(`${contexto}||${normalizarPregunta(pregunta)}`)}`;
+}
+
 // ── System prompt ─────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = (contexto: string) => `Eres el asistente culinario de Cookr, una app de recetas y gastronomía social.
 Responde siempre en español. Sé conciso, útil y con personalidad.
@@ -180,11 +212,30 @@ export async function responderChat(
     return "El asistente no está disponible en este momento. Configura GEMINI_API_KEY para activarlo.";
   }
 
-  registrarLlamadaGemini();
+  let contexto: string;
+  try {
+    contexto = await obtenerContextoUsuario(usuarioId);
+  } catch (err) {
+    console.error("[Gemini chat] Error:", (err as Error).message);
+    throw Object.assign(new Error("El asistente no está disponible en este momento"), { status: 503 });
+  }
+
+  const pregunta = preguntaSuelta(mensajes, imagenBase64);
+  const clave = pregunta === null ? null : claveDePregunta(contexto, pregunta);
+
+  if (clave) {
+    const cacheada = await almacenIA.leer<string>(clave);
+    if (cacheada !== null) {
+      await almacenIA.incrementar(`${CLAVE_ACIERTOS}:${hoyISO()}`, TTL_METRICAS_SEGUNDOS);
+      registrar(`[Gemini cache] HIT pregunta ${clave.slice(-8)} — sin llamar a Gemini`);
+      return cacheada;
+    }
+    await almacenIA.incrementar(`${CLAVE_FALLOS}:${hoyISO()}`, TTL_METRICAS_SEGUNDOS);
+  }
+
+  await registrarLlamadaGemini();
 
   try {
-    const contexto = await obtenerContextoUsuario(usuarioId);
-
     const historial = mensajes.slice(0, -1).map((m) => ({
       role: m.rol,
       parts: [{ text: m.texto }],
@@ -215,7 +266,12 @@ export async function responderChat(
       result = await chat.sendMessage({ message: ultimo.texto });
     }
 
-    return result.text ?? "";
+    const respuesta = result.text ?? "";
+    if (clave && respuesta.length > 0) {
+      await almacenIA.guardar(clave, respuesta, TTL_CHAT_SEGUNDOS);
+    }
+
+    return respuesta;
   } catch (err) {
     const error = err as Error;
     console.error("[Gemini chat] Error:", error.message);
@@ -234,15 +290,12 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
     throw Object.assign(new Error("Gemini no está configurado"), { status: 503 });
   }
 
-  const clave = normalizarDescripcion(descripcion);
-  const ahora = Date.now();
-  const entrada = cacheRecetaGenerada.get(clave);
+  const clave = `${CLAVE_RECETA}:${huella(normalizarDescripcion(descripcion))}`;
+  const guardada = await almacenIA.leer<unknown>(clave);
 
-  if (entrada && entrada.expira > ahora) {
-    return entrada.resultado;
-  }
+  if (guardada !== null) return guardada;
 
-  registrarLlamadaGemini();
+  await registrarLlamadaGemini();
 
   try {
     const descripcionSegura = sanitizarTextoUsuario(descripcion);
@@ -276,7 +329,7 @@ Solo responde con el JSON, sin markdown, sin explicaciones.`;
       throw new Error("La respuesta de Gemini no tiene el formato esperado");
     }
 
-    cacheRecetaGenerada.set(clave, { resultado: receta, expira: ahora + TTL_RECETA_MS });
+    await almacenIA.guardar(clave, receta, TTL_RECETA_SEGUNDOS);
 
     return receta;
   } catch (err) {
@@ -291,7 +344,7 @@ export async function escanearTicket(imagenBase64: string): Promise<Array<{ nomb
     throw Object.assign(new Error("Gemini no está configurado"), { status: 503 });
   }
 
-  registrarLlamadaGemini();
+  await registrarLlamadaGemini();
 
   try {
     const partes = imagenBase64.split(",");
@@ -384,7 +437,7 @@ async function sugerirRecetaConGemini(
     return "Ahora mismo no tengo ninguna receta guardada que use justo lo que tienes. Configura el asistente para que pueda inventarte una a medida.";
   }
 
-  registrarLlamadaGemini();
+  await registrarLlamadaGemini();
 
   const restricciones = alergias.length > 0
     ? `Alergias e intolerancias que debes respetar SÍ o SÍ (no incluyas estos ingredientes ni derivados): ${alergias.join(", ")}.`

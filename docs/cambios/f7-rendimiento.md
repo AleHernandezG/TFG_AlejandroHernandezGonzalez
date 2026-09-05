@@ -371,6 +371,123 @@ Mongo sin pasar por la validación de la ruta.
 
 ---
 
+## [PERF-005] La cuota de Gemini y las cachés de IA, a Redis · A6
+
+Fecha: 2026-09-05 | Estado: ✅ Completado en código, ⏳ sin efecto en producción | Afecta: BE | Bloque: F7.6
+
+### Qué estaba mal
+
+Tres estados globales dentro de `chatService.ts`, los tres en variables de módulo:
+
+- `llamadasHoy` con `diaActual` al lado, que es el tope diario de Gemini. Un `let`. Render reinicia
+  el contenedor al desplegar y al despertar del sueño del plan gratuito, así que el contador volvía
+  a cero varias veces al día y el tope de 1000 no protegía de nada.
+- `cacheContexto`, un `Map` con el perfil, las alergias y la despensa de cada usuario. TTL de cinco
+  minutos, y una consulta a Mongo por cada fallo.
+- `cacheRecetaGenerada`, otro `Map` con dos minutos de TTL para las recetas generadas.
+
+Los dos `Map` tampoco se comparten entre instancias, aunque hoy solo haya una.
+
+### Qué se midió antes de tocar nada
+
+**Nada, y hay que decirlo tal cual.** El plan pide bajar la factura de Gemini cacheando las
+preguntas repetidas, y no existe ningún dato en ningún sitio que diga cuántas se repiten:
+
+- `llamadasHoy` es local al proceso y no se expone por ninguna ruta. El único sitio donde aparece es
+  un `console.log`.
+- Render en plan gratuito duerme el servicio cada ~15 minutos y no tiene *log drain*, así que los
+  logs viejos no están.
+- `morgan` escribe la línea de petición, no el cuerpo. `POST /api/chat 200` no dice qué se preguntó.
+- No hay colección de conversaciones en Mongo: el historial del chat vive en el `localStorage` del
+  navegador y muere ahí. No hay Sentry ni analítica.
+
+Lo único que sí se puede afirmar leyendo el código: las cuatro llamadas a Gemini pasan por
+`registrarLlamadaGemini`, la proporción es una acción del usuario por llamada, y los topes son 30
+por minuto y usuario (`rateLimitIA`) y 1000 al día en total.
+
+Por eso el trabajo incluye dos contadores nuevos, `ia:cache:aciertos:AAAA-MM-DD` y
+`ia:cache:fallos:AAAA-MM-DD`, con 30 días de TTL. La próxima vez que alguien se haga esta pregunta,
+la respuesta estará en el *data browser* de Upstash en vez de ser una estimación.
+
+### Qué se hizo
+
+`lib/almacenIA.ts`, nuevo, con el mismo criterio que ya usaba `lib/rateLimitStore.ts`: Upstash si
+están `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN`, memoria si no. Cuatro operaciones
+(`incrementar`, `leer`, `guardar`, `borrar`) y un `reiniciarAlmacenIA()` para los tests, al lado del
+`reiniciarLimitesAuth()` que ya existía.
+
+| Estado | Antes | Ahora |
+|---|---|---|
+| Tope diario | `let llamadasHoy` + `diaActual` | `ia:gemini:llamadas:AAAA-MM-DD`, TTL 48 h |
+| Contexto de usuario | `Map`, TTL 5 min | `ia:contexto:<usuarioId>`, TTL 5 min |
+| Receta generada | `Map`, TTL 2 min | `ia:receta:<huella>`, TTL 2 min |
+| Dudas de cocina | no existía | `ia:chat:v1:<huella>`, TTL 7 días |
+| Aciertos y fallos | no existía | `ia:cache:aciertos:...` y `ia:cache:fallos:...`, TTL 30 días |
+
+La caché semántica solo entra si la pregunta va sola: un único mensaje con `rol: "user"`, sin imagen
+y de menos de 200 caracteres. Una conversación con historial no se cachea, porque la respuesta
+depende de lo anterior y la clave no lo recogería.
+
+El `v1` de `ia:chat:v1` es la versión del *system prompt*. Si alguien lo cambia y no toca esa
+constante, la caché sigue devolviendo respuestas escritas con las instrucciones viejas durante una
+semana. Subirla invalida todo de golpe sin tener que borrar nada a mano.
+
+### Decisiones que costaron
+
+**La clave lleva dentro el contexto del usuario, no solo la pregunta.** Es lo que más se pensó.
+`responderChat` mete las dietas, las alergias y la despensa en el `systemInstruction`, así que la
+misma pregunta con dos perfiles distintos tiene dos respuestas distintas, y una de ellas puede
+mencionar un alimento al que el otro es alérgico. Cachear por pregunta a secas habría servido la
+respuesta de un usuario a otro. Es el mismo tipo de problema que el filtro de alérgenos del feed y
+se ha resuelto igual: la clave es `sha256(contexto || pregunta normalizada)`. El precio es que la
+despensa cambia a menudo y cada cambio invalida las respuestas cacheadas de ese usuario, así que la
+caché acertará menos de lo que dice el informe original. Se prefiere eso a servir una respuesta
+ajena.
+
+**Normalización conservadora.** Minúsculas, tildes fuera, signos de interrogación y admiración
+fuera, espacios colapsados. Nada más: ni quitar palabras vacías, ni ordenar los términos, ni
+lematizar. Confundir dos preguntas es mucho peor que fallar la caché, y ordenando términos
+«¿puedo sustituir mantequilla por aceite?» y «¿puedo sustituir aceite por mantequilla?» darían la
+misma clave siendo preguntas contrarias. Hay un test que fija justo ese par.
+
+**Si Upstash se cae, la llamada pasa.** Bloquearla protege la factura, pero rompe la función
+principal de la aplicación por un fallo de infraestructura ajena. Se deja pasar, con suelo: el
+almacén en memoria sigue debajo y recoge lo que Redis no pudo, así que una caída degrada al
+comportamiento de antes de F7.6, no a «sin tope». El aviso se imprime una sola vez para no llenar
+el log.
+
+**El cupo se cobra después de mirar la caché.** El orden en `responderChat` es contexto, caché, y
+solo si hay fallo se llama a `registrarLlamadaGemini()`. Un acierto no consume cupo del tope diario,
+que es justo lo que hace que el tope aguante más. Hay un test que lo comprueba leyendo el contador.
+
+**El envoltorio `{ v: valor }`.** `@upstash/redis` parsea JSON al leer. Una respuesta que fuese
+`"10"` volvía como el número `10` y rompía el tipo. Se guarda envuelto y se desenvuelve al leer.
+
+### Qué queda a medias
+
+**Esto no arregla nada en producción todavía.** `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` no están
+en Render, así que hoy el contador y las tres cachés siguen en memoria exactamente igual que antes.
+El código elige solo; falta crear la base en Upstash y pegar las dos variables. Los pasos están en
+`docs/estado/pruebas-manuales.md`, apartado 6.
+
+**La comprobación que pide el plan no se ha hecho.** «El contador sobrevive a un redeploy» exige
+reiniciar un proceso con Upstash delante y leer el número, y eso no se puede hacer desde los tests.
+Lo que sí está probado sin tocar Redis de verdad: `tests/almacenIA.redis.test.ts` mockea el cliente
+y comprueba que un contador que ya vale 417 sigue en 418 tras el arranque, que es el mecanismo, y
+que una caída del cliente no propaga el error. La prueba de verdad, con el botón de reinicio de
+Render, queda pendiente.
+
+**Nadie llama a `invalidarContextoUsuario`.** Está exportada y funciona, pero no hay ninguna llamada
+en `src/`: cambiar la despensa o las alergias no borra el contexto cacheado, solo se espera a que
+caduque a los cinco minutos. Antes pasaba lo mismo con el `Map`, así que no es una regresión, pero
+ahora que la clave se puede borrar desde fuera del proceso tiene arreglo barato.
+
+**El ahorro sigue sin número.** Los contadores de aciertos y fallos están puestos, pero vacíos.
+Hasta que haya días de uso real con Upstash conectado, cuánto baja la factura de Gemini es una
+suposición.
+
+---
+
 ## Lo que hay que comprobar a mano
 
 Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
@@ -382,6 +499,8 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 - Que el `$sort` de la despensa aguante con las imágenes en base64 dentro de los documentos.
 - **Lo que queda de F7.4.** La migración está aplicada y el navegador probado; falta
   `CLOUDINARY_URL` en Render, más una cuenta de Google real y un escaneo de ticket desde el móvil.
+- **Todo F7.6 en producción.** Las variables de Upstash en Render, y después reiniciar el servicio
+  y leer `ia:gemini:llamadas:AAAA-MM-DD` para ver que el contador no vuelve a 1. Apartado 6.
 
 ---
 
@@ -410,8 +529,15 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 | `frontend/src/services/subidasService.ts` | Nuevo. Pide firma y sube al almacén |
 | `frontend/src/features/recetas/components/**/formulario*.tsx` | Suben la foto y enseñan el estado |
 | `frontend/src/features/perfil/components/tarjetaAvatarPerfil.tsx` | Sin `FileReader` |
+| `backend/src/lib/almacenIA.ts` | Nuevo. Upstash o memoria, con suelo si Redis se cae |
+| `backend/src/services/chatService.ts` | Contador y cachés al almacén, más la caché semántica |
+| `backend/tests/setup.ts` | `reiniciarAlmacenIA()` junto al `reiniciarLimitesAuth()` que ya estaba |
+| `backend/tests/almacenIA.test.ts` | Nuevo. El almacén sin variables de Upstash |
+| `backend/tests/almacenIA.redis.test.ts` | Nuevo. El camino de Redis con el cliente mockeado |
+| `backend/tests/chat.cacheIA.test.ts` | Nuevo. La segunda pregunta idéntica no llama a Gemini |
 
-Backend: 128 tests en verde (eran 102, y 123 al cerrar F7.3). `npm run lint` y
+Backend: 155 tests en verde (eran 102, 123 al cerrar F7.3 y 128 al cerrar F7.4). Los 128
+anteriores siguen tal cual: no se ha editado ninguno para que pase F7.6. `npm run lint` y
 `npx tsc --noEmit -p tsconfig.test.json` en verde. Frontend: `npm run lint` y `npx tsc --noEmit` en
 verde, con los avisos de `no-img-element` que ya estaban antes.
 

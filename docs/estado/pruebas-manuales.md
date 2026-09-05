@@ -3,8 +3,9 @@
 Lo que los tests automáticos no pueden comprobar, con los pasos exactos para hacerlo en un rato
 libre. Cada bloque dice qué ejecutar, qué tiene que pasar y cómo se ve el fallo.
 
-Los 128 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
-cuota de Google, Mailjet, Gemini, Pexels ni Cloudinary. El precio de esa regla es esta lista.
+Los 155 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
+cuota de Google, Mailjet, Gemini, Pexels ni Cloudinary, y ninguna habla con Upstash de verdad. El
+precio de esa regla es esta lista.
 
 Cuando compruebes algo, marca la casilla y pon la fecha. Si falla, apunta el síntoma aquí mismo
 antes de arreglarlo.
@@ -215,8 +216,26 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 - [ ] **El correo llega de verdad.** Registro y recuperación de contraseña, con una cuenta de
       Outlook o Hotmail, que son las que descartan en silencio. Mailjet devuelve 200 aunque el
       correo se pierda por DMARC, así que el 200 no prueba nada: hay que abrir la bandeja.
-- [ ] **El tope diario de Gemini.** `GEMINI_MAX_LLAMADAS_DIA` es una variable en memoria del
-      proceso y Render reinicia el contenedor al desplegar y al despertar. Es A6 en la auditoría.
+- [ ] **`UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` en Render.** Sin ellas, F7.6 no arregla nada en
+      producción: el contador y las cachés siguen en memoria y se pierden en cada reinicio,
+      exactamente igual que antes. Es lo único que queda para cerrar F7.6. La URL que hay que copiar
+      es la **REST**, la que empieza por `https://`, no la `rediss://`.
+- [ ] **El tope diario de Gemini sobrevive a un reinicio · F7.6, A6.** Esto es lo que no se puede
+      demostrar con un test, porque hace falta matar el proceso de verdad. Con las variables ya
+      puestas en Render, en este orden: pregúntale algo al chat, abre el *data browser* de Upstash y
+      apunta `ia:gemini:llamadas:AAAA-MM-DD`, reinicia el servicio a mano (**Manual Deploy** →
+      **Restart service**), vuelve a preguntar y mira el número otra vez. Tiene que **seguir donde
+      estaba** y subir de uno en uno, no volver a 1. La clave caduca sola a las 48 h.
+- [ ] **El log dice de dónde sale el contador.** En los logs de Render, cada llamada imprime
+      `[Gemini guard] llamada N/1000 de hoy (redis)`. Si pone `(memoria)` con las variables puestas,
+      no están llegando al proceso; míralas antes de dar por buena la comprobación de arriba.
+- [ ] **La caché de preguntas acierta con usuarios de verdad.** `ia:cache:aciertos:AAAA-MM-DD` y
+      `ia:cache:fallos:AAAA-MM-DD` en Upstash. Es el dato que no existía cuando se hizo F7.6: cuántas
+      preguntas se repiten era una suposición y ahora se puede contar. Hasta que haya varios días de
+      uso real, el ahorro de cuota de Gemini es una estimación, no una medición.
+- [ ] **Que una caída de Upstash no tumbe el chat.** Cambia el token a uno inválido y pregunta algo:
+      el chat tiene que responder igual, con `⚠️  Upstash no respondió a ...` una sola vez en el log.
+      La decisión es dejar pasar la llamada con suelo en memoria, no bloquearla.
 - [ ] **Las imágenes de Pexels en el seed.** `npm run seed:masivo` gasta cuota real.
 
 ---
@@ -233,4 +252,5 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 | 05/09/2026 | Editar sin tocar la foto | `imagenUrl` idéntica, sin petición de firma, sin fichero duplicado |
 | 05/09/2026 | Avatar cambiado dos veces seguidas | Un solo fichero en `cookr/avatares/<id>`, el segundo sobrescribe |
 | 05/09/2026 | Cierre y reapertura de sesión con avatar de Cloudinary | Cookie de 845 bytes sin trocear, `session.user.image` con la URL |
+| 05/09/2026 | F7.6 sin variables de Upstash (`npm test`) | 155 en verde; `almacenIAEnRedis()` es `false` y todo tira de memoria |
 | | | |
