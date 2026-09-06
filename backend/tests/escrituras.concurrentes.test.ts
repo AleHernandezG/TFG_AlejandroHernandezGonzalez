@@ -9,6 +9,7 @@ import request from "supertest";
 import { Types } from "mongoose";
 import app from "../src/app";
 import { Receta } from "../src/models/recetaMongo";
+import { Comentario } from "../src/models/comentarioMongo";
 import { Usuario } from "../src/models/usuarioMongo";
 import { crearUsuario, crearReceta, tokenDe } from "./helpers/factories";
 
@@ -131,10 +132,11 @@ describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
       postear(`/api/recetas/${id}/comentarios`, tokenDe(bruno as never), { texto: "El de Bruno" }),
     ]);
 
-    const doc = await Receta.findById(id).select("listaComentarios").lean().exec();
-    const textos = (doc?.listaComentarios as Array<{ texto: string }>).map((c) => c.texto);
+    const guardados = await Comentario.find({ recetaId: receta._id }).lean().exec();
+    const doc = await Receta.findById(id).select("numComentarios").lean().exec();
 
-    expect(textos.sort()).toEqual(["El de Ana", "El de Bruno"]);
+    expect(guardados.map((c) => c.texto).sort()).toEqual(["El de Ana", "El de Bruno"]);
+    expect(doc?.numComentarios).toBe(2);
   });
 
   it("el comentario guardado conserva autor, texto y fecha", async () => {
@@ -152,13 +154,8 @@ describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
       texto: "Me ha salido buenísima",
     });
 
-    const doc = await Receta.findById(id).select("listaComentarios").lean().exec();
-    const guardado = (doc?.listaComentarios as Array<{
-      autorId: Types.ObjectId;
-      autorNombre: string;
-      texto: string;
-      fecha: Date;
-    }>)[0];
+    const guardado = await Comentario.findOne({ recetaId: receta._id }).lean().exec();
+    if (!guardado) throw new Error("no se guardó el comentario");
 
     expect(guardado.autorId.toString()).toBe(String(usuario._id));
     expect(guardado.autorNombre).toBe("Carla Soto");

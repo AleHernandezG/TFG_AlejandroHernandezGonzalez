@@ -25,7 +25,8 @@
     "limpiar:test": "ts-node --transpile-only src/scripts/limpiarDatosTest.ts",
     "avatares:seed": "ts-node --transpile-only src/scripts/actualizarAvataresSeed.ts",
     "normalizar:categorias": "ts-node --transpile-only src/scripts/normalizarCategorias.ts",
-    "migrar:imagenes": "ts-node --transpile-only src/scripts/migrarImagenes.ts"
+    "migrar:imagenes": "ts-node --transpile-only src/scripts/migrarImagenes.ts",
+    "migrar:comentarios": "ts-node --transpile-only src/scripts/migrarComentarios.ts"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

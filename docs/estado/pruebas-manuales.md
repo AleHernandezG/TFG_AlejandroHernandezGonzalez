@@ -3,7 +3,7 @@
 Lo que los tests automáticos no pueden comprobar, con los pasos exactos para hacerlo en un rato
 libre. Cada bloque dice qué ejecutar, qué tiene que pasar y cómo se ve el fallo.
 
-Los 155 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
+Los 169 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
 cuota de Google, Mailjet, Gemini, Pexels ni Cloudinary, y ninguna habla con Upstash de verdad. El
 precio de esa regla es esta lista.
 
@@ -240,6 +240,85 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 
 ---
 
+## 7. La migración de comentarios · F7.5, PERF-006, M7
+
+Los comentarios ya no van dentro de la receta: viven en la colección `comentarios` y la receta solo
+guarda `numComentarios`. El código nuevo escribe así desde el primer despliegue, pero **los
+comentarios que ya están guardados en Atlas siguen dentro del array hasta que se ejecute la
+migración**, y mientras tanto no se ven en ninguna parte: `findComentarios` consulta la colección
+nueva, que está vacía, así que el detalle enseñará 0 comentarios en recetas que sí los tienen.
+
+Nada de esto lo he ejecutado yo. Está probado contra un Mongo local efímero y contra el seed
+completo, sin tocar producción.
+
+**Antes de nada, la copia.** El script hace `$unset` del array: si algo sale mal, lo que había
+dentro no se recupera del propio documento. El volcado de `recetas` de F7.4 vale como plantilla:
+
+```bash
+mongodump --uri="<MONGODB_URI de producción>" --collection=recetas --out="C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+```
+
+**El comando exacto.** Desde `backend/`, con el `.env` de producción cargado (el script lee
+`MONGODB_URI` igual que el resto de scripts). Primero en seco, que es lo que hace por defecto:
+
+```bash
+cd backend
+npm run migrar:comentarios
+```
+
+Léelo entero antes de seguir. Dice cuántas recetas llevan el array, cuántos comentarios hay dentro,
+cuánto ocupa `recetas` ahora mismo y, si hay comentarios ilegibles (sin `autorId` o sin `texto`),
+los lista uno a uno bajo un `⚠️`. Esos no se mueven: **si aparece alguno, míralo en Atlas antes de
+aplicar**, porque al aplicar se pierde.
+
+Y después, a escribir:
+
+```bash
+npm run migrar:comentarios -- --apply
+```
+
+El `--` es obligatorio, o npm se come el argumento y vuelve a hacer la pasada en seco sin avisar.
+
+- [ ] La pasada en seco lista las recetas con array y **no escribe nada**. Compruébalo:
+      `db.comentarios.countDocuments({})` sigue en 0 después de ejecutarla.
+- [ ] El `--apply` termina con `✅ Ninguna receta conserva listaComentarios.` Si sale el aviso de
+      que quedan N recetas, vuelve a ejecutarlo: es repetible a propósito.
+- [ ] «movidos» coincide con los comentarios que decía la pasada en seco, menos los descartados.
+- [ ] Los contadores cuadran con los documentos. Es la comprobación que importa, porque si estos dos
+      números no coinciden el feed miente:
+
+```js
+db.recetas.aggregate([{ $group: { _id: null, n: { $sum: "$numComentarios" } } }])
+db.comentarios.countDocuments({})
+```
+
+- [ ] No queda ni un array y ningún comentario se quedó sin receta:
+
+```js
+db.recetas.countDocuments({ listaComentarios: { $exists: true } })   // 0
+db.comentarios.getIndexes()   // _id_ y recetaId_1_fecha_-1__id_-1
+```
+
+- [ ] **Ejecutarlo dos veces seguidas con `--apply`.** La segunda pasada tiene que decir 0 movidos y
+      dejar los mismos números. En local se comprobó; en Atlas es la prueba de que el `_id`
+      determinista funciona también con los `_id` reales de las recetas.
+- [ ] Abrir una receta que tuviera comentarios y verlos con los ojos: los tres de la vista previa,
+      el total al lado del icono, y el *sheet* trayendo más al bajar. Comentar algo nuevo y que
+      aparezca arriba del todo sin recargar.
+- [ ] El feed enseña el mismo número de comentarios en la tarjeta que el detalle. Si una tarjeta
+      dice 0 y el detalle dice 4, el contador no se reescribió: vuelve a pasar el `--apply`, que
+      recalcula todos los contadores desde la colección aunque ya no quede ningún array.
+
+Si hay que deshacerlo, el volcado de arriba se restaura con `mongorestore --drop`, y hay que
+**borrar también la colección nueva** o al volver atrás quedan duplicados:
+
+```bash
+mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+# y en mongosh: db.comentarios.drop()
+```
+
+---
+
 ## Registro
 
 | Fecha | Qué se probó | Resultado |
@@ -253,4 +332,7 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 | 05/09/2026 | Avatar cambiado dos veces seguidas | Un solo fichero en `cookr/avatares/<id>`, el segundo sobrescribe |
 | 05/09/2026 | Cierre y reapertura de sesión con avatar de Cloudinary | Cookie de 845 bytes sin trocear, `session.user.image` con la URL |
 | 05/09/2026 | F7.6 sin variables de Upstash (`npm test`) | 155 en verde; `almacenIAEnRedis()` es `false` y todo tira de memoria |
+| 05/09/2026 | Migración de comentarios en local, seco y `--apply` | 44 de 45 movidos (1 ilegible), 5 recetas sin array, receta de 40: 5,2 → 0,5 KB |
+| 05/09/2026 | Segunda pasada con `--apply` en local | 0 movidos, 0 contadores reescritos, mismos números: no duplica |
+| 05/09/2026 | Seeds y `limpiarDatosTest` con la colección nueva | Contadores = documentos en los tres, 0 arrays y 0 huérfanos |
 | | | |

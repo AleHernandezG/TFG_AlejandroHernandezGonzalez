@@ -3,8 +3,10 @@
 Registro de lo que se tocó en el bloque F7 de `docs/estado/plan-2026-09.md`, con las decisiones que
 costaron y lo que queda a medias.
 
-F7.4 se hizo después, en su propia sesión, y está al final. Toca frontend, backend y datos ya
-guardados, y es el único apartado del bloque que **no se ha ejecutado contra producción**.
+Los apartados no van en orden de numeración, sino en el orden en que se hicieron: F7.4, F7.6 y F7.5
+son sesiones aparte y están al final. Los tres tocan datos ya guardados, y de los tres **queda algo
+sin ejecutar contra producción**: lo que falta de cada uno está en su «qué queda a medias» y los
+pasos, en `docs/estado/pruebas-manuales.md`.
 
 ---
 
@@ -488,6 +490,201 @@ suposición.
 
 ---
 
+## [PERF-006] Los comentarios, a su propia colección · M7
+
+Fecha: 2026-09-05 | Estado: ✅ Completado en código, ⏳ sin migrar en producción | Afecta: BE + FE | Bloque: F7.5
+
+### Qué estaba mal
+
+`listaComentarios` era un array de subdocumentos dentro de la receta. De ahí salían cuatro
+problemas distintos que se suelen contar como uno solo:
+
+- **El documento crece sin techo.** Nada limita el array. Mongo corta en 16 MB y el documento
+  entero se reescribe en cada `$push`.
+- **Se leía entero siempre.** `findById` devolvía el array completo en el detalle, aunque la vista
+  solo pinta tres comentarios en la vista previa.
+- **La paginación era decorado.** `findComentarios` hacía
+  `findById().select("listaComentarios")` y después `slice(inicio, fin)` en JavaScript. Pedir la
+  página 3 de una receta con 200 comentarios traía los 200 y tiraba 192.
+- **Se contaba en cada lectura.** `docAPostFeed` hacía `listaComentarios.length` y `etapasScore`
+  hacía `{ $size: "$listaComentarios" }` dentro de la agregación del feed, por cada receta y por
+  cada petición.
+
+### Qué se midió antes de tocar nada
+
+Contra `mongodb-memory-server`, con una receta realista (nueve ingredientes, seis pasos, cuarenta
+likes) y comentarios de 120 caracteres con avatar en Cloudinary, medido con `$bsonSize`:
+
+| Comentarios dentro | Documento | Techo antes de los 16 MB |
+|---|---|---|
+| 0 | 2,5 KB | — |
+| 3 | 3,4 KB | ~214.000 |
+| 8 | 4,8 KB | ~78.000 |
+| 40 | 14,1 KB | ~59.000 |
+| 200 | **61,1 KB** | ~56.600 |
+| 1000 | **296,2 KB** | ~55.900 |
+
+Cada comentario cuesta unos 296 bytes, así que el límite duro está en torno a los **56.000
+comentarios en una sola receta**. Eso no lo va a alcanzar nadie: el problema real no es el 16 MB,
+es que el feed lee documentos de 61 KB para pintar una tarjeta que enseña un número.
+
+La lectura de una página de 8 comentarios de una receta que tiene 200:
+
+| | Se trae de Mongo |
+|---|---|
+| Antes · `select("listaComentarios")` + `slice` en JS | **58,6 KB** |
+| Ahora · `find().sort().skip().limit(8)` | **3,1 KB** |
+
+Diecinueve veces menos, y sin depender de cuántos comentarios tenga la receta.
+
+El plan de la consulta nueva, con `explain("executionStats")`:
+
+```
+LIMIT 8 → FETCH → IXSCAN recetaId_1_fecha_-1__id_-1
+docs examinados: 8 · claves: 8 · devueltos: 8
+```
+
+Sin `COLLSCAN` y sin etapa `SORT`: el orden lo da el índice.
+
+### Qué se hizo
+
+`models/comentarioMongo.ts` y `types/comentario.ts`, nuevos. La receta cambia
+`listaComentarios: [comentarioSchema]` por `numComentarios: Number`, y el subesquema desaparece.
+
+| Sitio | Antes | Ahora |
+|---|---|---|
+| `docAPostFeed` | `doc.listaComentarios.length` | `doc.numComentarios ?? 0` |
+| `etapasScore` | `{ $size: "$listaComentarios" }` | `{ $ifNull: ["$numComentarios", 0] }` |
+| `agregarComentario` | `$push` al array | `$inc` del contador + `Comentario.create` |
+| `findComentarios` | array entero + `slice` en JS | `find().sort().skip().limit()` + `countDocuments` |
+| `findById` | devolvía `listaComentarios` | no lo devuelve |
+| `eliminar` | solo la receta | receta y después `Comentario.deleteMany` |
+
+El `$ifNull` no es decorativo: una receta creada antes de la migración no tiene el campo, y sin él
+la multiplicación devuelve `null` y la receta cae al fondo del feed.
+
+La validación se movió a la ruta, que es donde va en este repositorio.
+`esquemaComentario` en `lib/validadores.ts` con `.trim()`, `min(1)` y `max(500)`, y
+`validarBody(esquemaComentario)` en `POST /:id/comentarios`. El servicio, que hacía dos
+comprobaciones de longitud a mano, pasa a ser una línea.
+
+De paso, el controlador ya no puede mandar `NaN` a Mongo. `Math.min(20, Number(req.query.limite))`
+con `?limite=abc` daba `NaN`; `Array.slice(NaN)` lo toleraba y `.skip(NaN)` habría dado un 500 en
+producción. Ahora es `Number(...) || 8` con suelo y techo, y hay un test que pide `?limite=abc`.
+
+`scripts/migrarComentarios.ts`, con el mismo patrón que `migrarImagenes.ts`: seco por defecto,
+`--apply` para escribir, `$bsonSize` antes y después, y lista de lo que no se pudo mover.
+
+### Decisiones que costaron
+
+**`autorNombre` y `avatarUrl` se quedan copiados dentro del comentario.** Era la pregunta abierta
+del encargo y tiene argumentos por los dos lados.
+
+A favor de la referencia a `usuarios`: hoy, si alguien se cambia el nombre o la foto, sus
+comentarios viejos siguen mostrando los datos antiguos. Eso ya pasa y no lo arregla esta tarea.
+
+A favor de copiar, que es lo que se hizo:
+
+1. Leer una página de comentarios es el camino caliente, y es justo lo que F7.5 venía a abaratar.
+   Un `populate` o un `$lookup` añade una consulta por página para recuperar datos que ya están
+   escritos. Cambiar 3,1 KB por 3,1 KB más un `$lookup` es ir hacia atrás.
+2. Un comentario es un registro histórico de quién lo escribió y cuándo. Que diga el nombre que
+   tenía esa persona entonces no es un error, es la semántica normal de un comentario.
+3. **La objeción de los datos rancios ahora tiene arreglo barato, y antes no lo tenía.** Con los
+   comentarios dentro de la receta, propagar un cambio de nombre exigía reescribir elementos por
+   posición dentro de cada documento de receta. Con una colección propia es una línea:
+   `Comentario.updateMany({ autorId }, { $set: { autorNombre, avatarUrl } })`. Sacarlos fuera
+   convierte el problema en trivial en vez de resolverlo con un `$lookup` en cada lectura.
+
+Esa línea **no está escrita**. Está abajo, en lo que queda a medias, con su sitio exacto.
+
+**El índice es `{ recetaId: 1, fecha: -1, _id: -1 }`, no `{ recetaId: 1, fecha: -1 }`.** El plan
+pedía dos campos. Ordenar solo por `fecha` no es un orden total: dos comentarios del mismo
+milisegundo pueden salir en cualquier orden, y `skip`/`limit` sobre un orden inestable repite filas
+en una página y se salta otras. No es teórico: los seeds y las factorías crean varios comentarios
+con el mismo `new Date()`. El `_id` de cola desempata y además deja el `sort` cubierto por el
+índice, sin etapa `SORT` bloqueante. Hay un test que pide tres páginas seguidas y comprueba que
+salen los 24 comentarios distintos.
+
+**El `$inc` va antes de la inserción, no después.** `agregarComentario` hace
+`findByIdAndUpdate($inc: +1)` primero, que sirve a la vez de comprobación de existencia y de
+incremento en un solo viaje, y solo después inserta el comentario. Si la inserción falla, un
+`$inc: -1` compensa. El orden importa: así una caída deja el contador **por encima** de la realidad
+(el feed dice 5 y hay 4), nunca por debajo. Un contador corto esconde comentarios que sí existen;
+uno largo solo enseña un número optimista. Entre las dos mentiras, esta es la barata.
+
+**Al borrar, primero la receta y después sus comentarios.** El orden inverso dejaría, durante un
+instante, una receta viva sin sus comentarios. Así, si el proceso se cae en medio, quedan
+comentarios huérfanos que nadie puede ver porque su receta ya no existe, y la siguiente pasada de
+`migrarComentarios.ts` no los toca. Es basura invisible, no datos rotos.
+
+**Los `_id` de la migración son deterministas.** `ObjectId(sha1(recetaId + ":" + índice))`, con
+`bulkWrite` de upserts y `$setOnInsert`. Lo que se pedía era que ejecutarla dos veces no duplicara
+nada, y con `_id` aleatorios eso solo se cumple si el `$unset` del array llega a ejecutarse. Si el
+proceso se cae entre la inserción y el `$unset`, la segunda pasada volvería a insertar los mismos
+comentarios con otros `_id`. Con el `_id` derivado del contenido, el upsert reconoce lo que ya está
+y no escribe. Se probó: segunda pasada con `--apply`, 0 movidos y 0 modificados.
+
+**El recuento final no confía en lo que acaba de mover.** La última fase recalcula
+`numComentarios` de **todas** las recetas agrupando la colección `comentarios`, no solo de las que
+tenían array. Así una receta a la que ya se le hubiera comentado con el código nuevo, o una a medio
+migrar de un intento anterior, acaba con el número correcto.
+
+**El `$unset` va por el driver nativo.** `Receta.collection.bulkWrite`, no `Receta.bulkWrite`.
+Mongoose en modo estricto tira las rutas que no están en el esquema, y `listaComentarios` ya no
+está: la actualización se habría enviado vacía y el array se habría quedado dentro para siempre.
+
+**Las funciones de comentarios se quedan en `recetaRepository`.** No se creó un
+`comentarioRepository`. El repositorio ya toca `Usuario` para los conjuntos de guardadas y
+seguidos, así que tocar dos modelos no es nuevo, y partirlo obligaba a que uno de los dos llamase
+al otro para mantener el contador junto a la inserción, que es justo lo que no puede separarse.
+
+**La vista previa del detalle ya no viene del servidor.** `ComentariosReceta` recibía el array
+entero por props desde el componente de servidor. Ahora recibe solo el total y saca los tres de la
+vista previa de la primera página de `useComentarios`, el mismo `useInfiniteQuery` que ya alimentaba
+el *sheet*. El comentario optimista se borra **después** de que `await invalidar()` termine, no
+antes: si se borrase al lanzar la invalidación, entre la respuesta y el refetch habría un parpadeo
+en el que el comentario recién escrito desaparece de la lista.
+
+### Qué queda a medias
+
+**La migración no se ha aplicado en producción, a propósito.** Está escrita, probada contra un
+Mongo local efímero y lista. El comando está en `docs/estado/pruebas-manuales.md`, apartado 7, y lo
+ejecuta el dueño del Atlas, no yo.
+
+**Nadie propaga el cambio de nombre o de avatar a los comentarios.** Es la contrapartida aceptada
+de copiar `autorNombre` y `avatarUrl`. El sitio es `usuariosService.actualizarPerfil`, y son dos
+líneas:
+
+```ts
+await Comentario.updateMany({ autorId: usuarioId }, { $set: { autorNombre: nombre, avatarUrl: foto ?? null } });
+```
+
+Con la salvedad de que el repositorio es quien toca Mongoose, así que la línea va en un método
+nuevo del repositorio y el servicio lo llama. No está hecho porque no formaba parte del encargo y
+porque el comportamiento de hoy (comentarios con el nombre de entonces) es el mismo que había
+antes: no es una regresión.
+
+**El contador puede quedarse largo y nadie lo repara solo.** Si un proceso muere entre el `$inc` y
+el `Comentario.create`, la receta dice un comentario más de los que hay. `migrarComentarios.ts`
+recalcula todos los contadores desde la colección, así que **ejecutarlo en seco no arregla nada
+pero ejecutarlo con `--apply` sí**: hoy es también la herramienta de reparación del contador. No
+hay una tarea programada que lo haga sola, y no debería hacer falta.
+
+**No hay borrado de comentarios.** No lo había antes tampoco: no existe `DELETE` de un comentario
+en ninguna ruta. Cuando se añada, el `$inc: -1` tiene que ir pegado al borrado igual que el `+1` va
+pegado a la inserción, o el contador se desincroniza en la dirección mala.
+
+**El `total` que pinta el detalle sale del servidor y se corrige después.** La primera pintura usa
+`numComentarios` que vino con el SSR, y cuando resuelve la primera página se sustituye por el
+`total` de la consulta, que es un `countDocuments` de verdad. Si el contador estuviera largo, el
+número parpadea una vez al cargar. Es visible y es correcto: el que manda es el conteo real.
+
+**El techo de 500 caracteres estaba en el servicio y ahora está en Zod y en el esquema.** Los
+comentarios que ya estén guardados por encima de esa longitud (no debería haberlos) pasan la
+migración tal cual, porque el `bulkWrite` va por el driver nativo y no valida.
+---
+
 ## Lo que hay que comprobar a mano
 
 Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
@@ -501,6 +698,8 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
   `CLOUDINARY_URL` en Render, más una cuenta de Google real y un escaneo de ticket desde el móvil.
 - **Todo F7.6 en producción.** Las variables de Upstash en Render, y después reiniciar el servicio
   y leer `ia:gemini:llamadas:AAAA-MM-DD` para ver que el contador no vuelve a 1. Apartado 6.
+- **La migración de comentarios de F7.5.** Escrita y probada en local, sin aplicar. El comando y la
+  comprobación de después están en el apartado 7, y los ejecuta el dueño del Atlas.
 
 ---
 
@@ -535,9 +734,26 @@ Nada de esto se puede dar por bueno contra `mongodb-memory-server`. Está en
 | `backend/tests/almacenIA.test.ts` | Nuevo. El almacén sin variables de Upstash |
 | `backend/tests/almacenIA.redis.test.ts` | Nuevo. El camino de Redis con el cliente mockeado |
 | `backend/tests/chat.cacheIA.test.ts` | Nuevo. La segunda pregunta idéntica no llama a Gemini |
+| `backend/src/models/comentarioMongo.ts` | Nuevo. Colección propia e índice `recetaId + fecha + _id` |
+| `backend/src/types/comentario.ts` | Nuevo. `IComentarioDoc` y la respuesta paginada |
+| `backend/src/models/recetaMongo.ts` | `listaComentarios` fuera, `numComentarios` dentro |
+| `backend/src/repositories/recetaRepository.ts` | Inserción con `$inc`, página real y borrado en cascada |
+| `backend/src/services/recetasService.ts` | Sin la validación a mano del texto |
+| `backend/src/controllers/recetasController.ts` | `pagina` y `limite` sin `NaN` |
+| `backend/src/routes/recetas.routes.ts` | `validarBody(esquemaComentario)` |
+| `backend/src/lib/validadores.ts` | `esquemaComentario` |
+| `backend/src/scripts/migrarComentarios.ts` | Nuevo. Seca por defecto, repetible, con `$bsonSize` |
+| `backend/src/scripts/{seed,seedCompleto,seedMasivo}.ts` | Crean comentarios en su colección |
+| `backend/src/scripts/limpiarDatosTest.ts` | Borra comentarios y corrige contadores |
+| `backend/src/scripts/migrarImagenes.ts` | Los avatares base64 se buscan en `comentarios` |
+| `backend/tests/comentarios.test.ts` | Nuevo. Colección, paginación, huérfanos y validación |
+| `frontend/src/features/recetas/components/detalleReceta/comentariosReceta.tsx` | La vista previa sale del hook |
+| `frontend/src/features/recetas/types/receta.types.ts` | `RecetaDetalle` sin `listaComentarios` |
 
-Backend: 155 tests en verde (eran 102, 123 al cerrar F7.3 y 128 al cerrar F7.4). Los 128
-anteriores siguen tal cual: no se ha editado ninguno para que pase F7.6. `npm run lint` y
+Backend: 169 tests en verde (eran 102, 123 al cerrar F7.3, 128 al cerrar F7.4 y 155 al cerrar F7.6).
+Los 155 anteriores siguen pasando; de F7.5 se han tocado cuatro
+(`escrituras.concurrentes`, `feed.orden`, `feed.indices` y las factorías) porque leían el array que
+ya no existe, no para taparle nada al código nuevo. `npm run lint` y
 `npx tsc --noEmit -p tsconfig.test.json` en verde. Frontend: `npm run lint` y `npx tsc --noEmit` en
 verde, con los avisos de `no-img-element` que ya estaban antes.
 

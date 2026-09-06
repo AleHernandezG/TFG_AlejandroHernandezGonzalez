@@ -1,15 +1,16 @@
 import { PipelineStage, Types } from "mongoose";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 import { Usuario } from "../models/usuarioMongo";
 import {
   DatosCrearRecetaBody,
   FiltrosFeed,
-  IComentarioReceta,
   IFotoCredito,
   PostFeedRespuesta,
   RecetaColeccion,
   RecetaDetalleRespuesta,
 } from "../types/receta";
+import { ComentarioRespuesta, PaginaComentarios } from "../types/comentario";
 import { buscarFotoPexelsCascada } from "../services/imagenService";
 import { calcularMacros } from "../services/nutritionService";
 
@@ -53,7 +54,6 @@ function docAPostFeed(
   const id = (doc._id as Types.ObjectId).toString();
   const autorId = autor?._id?.toString() ?? "";
   const likesArr = doc.likes as Types.ObjectId[];
-  const comentariosArr = doc.listaComentarios as unknown[];
 
   const liked = usuarioId
     ? likesArr.some((lid) => lid.toString() === usuarioId)
@@ -81,7 +81,7 @@ function docAPostFeed(
       alergenos: (doc.alergenos as string[]) ?? [],
     },
     likes: likesArr.length,
-    comentarios: comentariosArr.length,
+    comentarios: (doc.numComentarios as number | undefined) ?? 0,
     guardado,
     liked,
     sigueAlAutor,
@@ -129,7 +129,7 @@ function etapasScore(
   const popularidad = {
     $add: [
       { $multiply: [{ $size: "$likes" }, 2] },
-      { $multiply: [{ $size: "$listaComentarios" }, 3] },
+      { $multiply: [{ $ifNull: ["$numComentarios", 0] }, 3] },
     ],
   };
 
@@ -326,13 +326,6 @@ export const recetaRepository = {
       docAPostFeed(s as Record<string, unknown>, usuarioId, guardadasSet, seguidosSet),
     );
 
-    type ComentarioLean = {
-      autorNombre: string;
-      avatarUrl: string | null;
-      texto: string;
-      fecha: Date;
-    };
-
     return {
       ...base,
       categorias: doc.categorias as string[],
@@ -349,12 +342,6 @@ export const recetaRepository = {
         carbos: number;
         grasas: number;
       },
-      listaComentarios: (doc.listaComentarios as ComentarioLean[]).map((c) => ({
-        autorNombre: c.autorNombre,
-        avatarUrl: c.avatarUrl,
-        texto: c.texto,
-        fecha: c.fecha.toISOString(),
-      })),
       similares,
       porciones: doc.porciones as number,
     };
@@ -430,42 +417,45 @@ export const recetaRepository = {
     recetaId: string,
     usuarioId: string,
     texto: string,
-  ): Promise<{ autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }> {
+  ): Promise<ComentarioRespuesta> {
     if (!Types.ObjectId.isValid(recetaId)) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const [existeReceta, usuario] = await Promise.all([
-      Receta.exists({ _id: recetaId }),
-      Usuario.findById(usuarioId).select("nombre foto").lean().exec(),
-    ]);
-
-    if (!existeReceta) throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    const usuario = await Usuario.findById(usuarioId).select("nombre foto").lean().exec();
     if (!usuario) throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
 
-    const fecha = new Date();
-    const comentario: IComentarioReceta = {
+    const contado = await Receta.findByIdAndUpdate(
+      recetaId,
+      { $inc: { numComentarios: 1 } },
+      { new: true, projection: { _id: 1 } },
+    )
+      .lean()
+      .exec();
+
+    if (!contado) throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+
+    const comentario = {
+      recetaId: new Types.ObjectId(recetaId),
       autorId: new Types.ObjectId(usuarioId),
       autorNombre: usuario.nombre,
       avatarUrl: usuario.foto ?? null,
       texto: texto.trim(),
-      fecha,
-    } as IComentarioReceta;
+      fecha: new Date(),
+    };
 
-    const { matchedCount } = await Receta.updateOne(
-      { _id: recetaId },
-      { $push: { listaComentarios: comentario } },
-    );
-
-    if (matchedCount === 0) {
-      throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    try {
+      await Comentario.create(comentario);
+    } catch (error) {
+      await Receta.updateOne({ _id: recetaId }, { $inc: { numComentarios: -1 } });
+      throw error;
     }
 
     return {
       autorNombre: comentario.autorNombre,
       avatarUrl: comentario.avatarUrl,
       texto: comentario.texto,
-      fecha: fecha.toISOString(),
+      fecha: comentario.fecha.toISOString(),
     };
   },
 
@@ -593,7 +583,7 @@ export const recetaRepository = {
         })),
       ),
       likes: [],
-      listaComentarios: [],
+      numComentarios: 0,
       fechaPublicacion: new Date(),
     });
 
@@ -604,28 +594,32 @@ export const recetaRepository = {
     id: string,
     pagina: number,
     limite: number,
-  ): Promise<{
-    comentarios: { autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }[];
-    total: number;
-    hayMas: boolean;
-  }> {
+  ): Promise<PaginaComentarios> {
     if (!Types.ObjectId.isValid(id)) return { comentarios: [], total: 0, hayMas: false };
 
-    const receta = await Receta.findById(id).select("listaComentarios").lean().exec();
-    if (!receta) return { comentarios: [], total: 0, hayMas: false };
-
-    type ComentarioLean = { autorNombre: string; avatarUrl: string | null; texto: string; fecha: Date };
-    const todos = (receta.listaComentarios as ComentarioLean[]).slice().reverse();
-    const total = todos.length;
+    const recetaId = new Types.ObjectId(id);
     const skip = (pagina - 1) * limite;
-    const comentarios = todos.slice(skip, skip + limite).map((c) => ({
-      autorNombre: c.autorNombre,
-      avatarUrl: c.avatarUrl,
-      texto: c.texto,
-      fecha: c.fecha.toISOString(),
-    }));
 
-    return { comentarios, total, hayMas: skip + limite < total };
+    const [docs, total] = await Promise.all([
+      Comentario.find({ recetaId })
+        .sort({ fecha: -1, _id: -1 })
+        .skip(skip)
+        .limit(limite)
+        .lean()
+        .exec(),
+      Comentario.countDocuments({ recetaId }),
+    ]);
+
+    return {
+      comentarios: docs.map((c) => ({
+        autorNombre: c.autorNombre,
+        avatarUrl: c.avatarUrl,
+        texto: c.texto,
+        fecha: c.fecha.toISOString(),
+      })),
+      total,
+      hayMas: skip + docs.length < total,
+    };
   },
 
   async actualizar(
@@ -690,6 +684,7 @@ export const recetaRepository = {
     }
 
     await Receta.deleteOne({ _id: recetaId });
+    await Comentario.deleteMany({ recetaId: new Types.ObjectId(recetaId) });
   },
 
   async buscarCandidatasParaDespensa(

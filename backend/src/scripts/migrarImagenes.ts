@@ -2,6 +2,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { conectarDB } from "../lib/db";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 import { Usuario } from "../models/usuarioMongo";
 import { cloudinaryConfigurado, subirImagen } from "../lib/cloudinary";
 
@@ -92,58 +93,41 @@ async function migrarFotosDeRecetas(): Promise<number> {
 }
 
 async function migrarAvataresDeComentarios(urlPorUsuario: Map<string, string>): Promise<number> {
-  const recetas = await Receta.find({ "listaComentarios.avatarUrl": /^data:/ })
-    .select("titulo listaComentarios")
+  const comentarios = await Comentario.find({ avatarUrl: /^data:/ })
+    .select("autorId autorNombre avatarUrl")
     .exec();
   let bytes = 0;
-  let total = 0;
 
-  console.log(`\n── Avatares dentro de comentarios: en ${recetas.length} receta(s) ──`);
+  console.log(`
+── Avatares dentro de comentarios: ${comentarios.length} ──`);
 
-  for (const receta of recetas) {
-    const comentarios = receta.listaComentarios as {
-      autorId: mongoose.Types.ObjectId;
-      autorNombre: string;
-      avatarUrl: string | null;
-    }[];
+  for (const comentario of comentarios) {
+    if (!esIncrustada(comentario.avatarUrl)) continue;
 
-    for (const [indice, comentario] of comentarios.entries()) {
-      if (!esIncrustada(comentario.avatarUrl)) continue;
+    const id = comentario._id.toString();
+    const autorId = comentario.autorId?.toString() ?? "";
+    const peso = Buffer.byteLength(comentario.avatarUrl, "utf8");
+    console.log(`  comentario de ${comentario.autorNombre} · ${kb(peso)}`);
 
-      total++;
-      const recetaId = receta._id.toString();
-      const autorId = comentario.autorId?.toString() ?? "";
-      const peso = Buffer.byteLength(comentario.avatarUrl, "utf8");
-      console.log(`  ${receta.titulo} · comentario de ${comentario.autorNombre} · ${kb(peso)}`);
+    if (!aplicar) {
+      bytes += peso;
+      continue;
+    }
 
-      if (!aplicar) {
-        bytes += peso;
-        continue;
-      }
+    try {
+      const url =
+        urlPorUsuario.get(autorId) ??
+        (await subirImagen(comentario.avatarUrl, `cookr/avatares-comentarios/${id}`));
 
-      try {
-        const url =
-          urlPorUsuario.get(autorId) ??
-          (await subirImagen(comentario.avatarUrl, `cookr/avatares-comentarios/${recetaId}-${indice}`));
-
-        await Receta.updateOne(
-          { _id: receta._id },
-          { $set: { [`listaComentarios.${indice}.avatarUrl`]: url } },
-        );
-        bytes += peso;
-        console.log(`    → ${url}`);
-      } catch (error) {
-        fallos.push({
-          donde: `recetas.listaComentarios.${indice}.avatarUrl`,
-          id: recetaId,
-          motivo: (error as Error).message,
-        });
-        console.log(`    ✗ ${(error as Error).message}`);
-      }
+      await Comentario.updateOne({ _id: comentario._id }, { $set: { avatarUrl: url } });
+      bytes += peso;
+      console.log(`    → ${url}`);
+    } catch (error) {
+      fallos.push({ donde: "comentarios.avatarUrl", id, motivo: (error as Error).message });
+      console.log(`    ✗ ${(error as Error).message}`);
     }
   }
 
-  console.log(`  total: ${total} comentario(s)`);
   return bytes;
 }
 
@@ -170,7 +154,7 @@ async function run(): Promise<void> {
   console.log("\n📊 Resumen");
   console.log(`   usuarios.foto                  ${mb(avatares.bytes)}`);
   console.log(`   recetas.imagenUrl              ${mb(fotos)}`);
-  console.log(`   recetas.listaComentarios       ${mb(comentarios)}`);
+  console.log(`   comentarios.avatarUrl          ${mb(comentarios)}`);
   console.log(`   ${aplicar ? "sacado de Mongo" : "pendiente de sacar"}                ${mb(liberado)}`);
 
   if (fallos.length > 0) {

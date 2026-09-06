@@ -15,14 +15,6 @@ export interface IMacrosReceta {
   grasas: number;
 }
 
-export interface IComentarioReceta {
-  autorId: Types.ObjectId;
-  autorNombre: string;
-  avatarUrl: string | null;
-  texto: string;
-  fecha: Date;
-}
-
 export interface IFotoCredito {
   fotografo: string;
   urlFoto: string;
@@ -45,7 +37,7 @@ export interface IReceta {
   alergenos: string[];
   macros: IMacrosReceta;
   likes: Types.ObjectId[];
-  listaComentarios: IComentarioReceta[];
+  numComentarios: number;
   fechaPublicacion: Date;
   esEvento?: boolean;
 }
@@ -136,12 +128,6 @@ export interface RecetaDetalleRespuesta extends PostFeedRespuesta {
     carbos: number;
     grasas: number;
   };
-  listaComentarios: {
-    autorNombre: string;
-    avatarUrl: string | null;
-    texto: string;
-    fecha: string;
-  }[];
   similares: PostFeedRespuesta[];
   porciones: number;
 }

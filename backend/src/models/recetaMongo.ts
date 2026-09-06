@@ -3,7 +3,6 @@ import {
   IReceta,
   IIngredienteReceta,
   IMacrosReceta,
-  IComentarioReceta,
 } from "../types/receta";
 
 export interface IRecetaDoc extends IReceta, Document {}
@@ -26,14 +25,6 @@ const macrosSchema = new Schema<IMacrosReceta>(
   },
   { _id: false }
 );
-
-const comentarioSchema = new Schema<IComentarioReceta>({
-  autorId: { type: Schema.Types.ObjectId, ref: "Usuario", required: true },
-  autorNombre: { type: String, required: true, trim: true },
-  avatarUrl: { type: String, default: null },
-  texto: { type: String, required: true, trim: true, maxlength: 500 },
-  fecha: { type: Date, default: Date.now },
-});
 
 const fotoCreditoSchema = new Schema(
   {
@@ -64,7 +55,7 @@ const recetaSchema = new Schema<IRecetaDoc>({
   alergenos: { type: [String], default: [] },
   macros: { type: macrosSchema, required: true },
   likes: { type: [Schema.Types.ObjectId], ref: "Usuario", default: [] },
-  listaComentarios: { type: [comentarioSchema], default: [] },
+  numComentarios: { type: Number, default: 0, min: 0 },
   esEvento: { type: Boolean, default: false },
   fechaPublicacion: { type: Date, default: Date.now },
 });

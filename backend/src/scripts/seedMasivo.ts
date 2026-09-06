@@ -18,6 +18,7 @@ import bcrypt from "bcryptjs";
 import { conectarDB } from "../lib/db";
 import { Usuario } from "../models/usuarioMongo";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 import { buscarFotoPexelsCascada } from "../services/imagenService";
 
 const SIN_IMAGENES = process.argv.includes("--sin-imagenes");
@@ -2716,15 +2717,20 @@ async function run(): Promise<void> {
       macros: receta.macros,
       esEvento: receta.esEvento ?? false,
       likes: [],
-      listaComentarios: (receta.comentarios ?? []).map((c) => ({
-        autorId: usuarios[c.autorIndex]._id,
-        autorNombre: usuarios[c.autorIndex].nombre,
-        avatarUrl: usuarios[c.autorIndex].foto ?? null,
-        texto: c.texto,
-        fecha: new Date(),
-      })),
+      numComentarios: (receta.comentarios ?? []).length,
       fechaPublicacion: new Date(Date.now() - randomInt(0, 90) * 24 * 60 * 60 * 1000),
     });
+
+    const comentarios = (receta.comentarios ?? []).map((c) => ({
+      recetaId: doc._id as mongoose.Types.ObjectId,
+      autorId: usuarios[c.autorIndex]._id,
+      autorNombre: usuarios[c.autorIndex].nombre,
+      avatarUrl: usuarios[c.autorIndex].foto ?? null,
+      texto: c.texto,
+      fecha: new Date(),
+    }));
+
+    if (comentarios.length > 0) await Comentario.insertMany(comentarios);
 
     idsRecetasNuevas.push(doc._id as mongoose.Types.ObjectId);
     creadas++;

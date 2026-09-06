@@ -14,6 +14,7 @@ import bcrypt from "bcryptjs";
 import { conectarDB } from "../lib/db";
 import { Usuario } from "../models/usuarioMongo";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 
 const FORCE = process.argv.includes("--force");
 
@@ -113,7 +114,7 @@ const RECETAS_SEED = [
       "Agregar agua de cocción poco a poco hasta obtener una crema sedosa.",
       "Servir inmediatamente con más pecorino y pimienta.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "¡La mejor carbonara! El truco del fuego apagado es clave." },
     ],
   },
@@ -146,7 +147,7 @@ const RECETAS_SEED = [
       "Incorporar la pasta y las gambas. Ajustar con agua de cocción.",
       "Servir con perejil picado y más parmesano.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 0,
@@ -180,7 +181,7 @@ const RECETAS_SEED = [
       "Hornear a 180°C durante 35-40 min hasta gratinar.",
       "Reposar 10 min antes de servir.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 4, texto: "Espectacular, la hago cada domingo. El reposo es fundamental." },
     ],
   },
@@ -212,7 +213,7 @@ const RECETAS_SEED = [
       "Preparar aliño: tahini + zumo de limón + agua + sal.",
       "Montar el bowl por secciones. Aliñar al servir.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Lo hago todas las semanas. El aliño de tahini es adictivo." },
     ],
   },
@@ -245,7 +246,7 @@ const RECETAS_SEED = [
       "Añadir los garbanzos y la leche de coco. Cocer 10 min.",
       "Incorporar las espinacas y remover hasta que se integren.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 2,
@@ -272,7 +273,7 @@ const RECETAS_SEED = [
       "Añadir el aceite en hilo fino con la batidora en marcha.",
       "Colar, salpimentar y refrigerar mínimo 2 horas.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   // ── Desayuno ─────────────────────────────────────────────────────────────
   {
@@ -302,7 +303,7 @@ const RECETAS_SEED = [
       "Hervir agua con vinagre. Crear un remolino y cascar el huevo en el centro. Cocer 3 min.",
       "Colocar el huevo poché sobre el aguacate. Espolvorear sésamo y sal en escamas.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 2, texto: "El huevo poché parece difícil pero con el truco del remolino sale perfecto." },
     ],
   },
@@ -337,7 +338,7 @@ const RECETAS_SEED = [
       "Cocinar en sartén antiadherente a fuego medio-bajo, 2 min por lado.",
       "Servir con sirope de arce y más arándanos frescos.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   // ── Proteínas / Carne ────────────────────────────────────────────────────
   {
@@ -367,7 +368,7 @@ const RECETAS_SEED = [
       "Sellar 3 min por lado. Añadir el resto de la salsa y lacear.",
       "Servir sobre arroz con sésamo y cebolleta.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 1,
@@ -395,7 +396,7 @@ const RECETAS_SEED = [
       "Incorporar el pollo, el romero y 100 ml de agua. Tapar y cocer 20 min.",
       "Destapar y reducir la salsa.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 3,
@@ -427,7 +428,7 @@ const RECETAS_SEED = [
       "Cocer la salsa 15 min. Triturar si se desea más suave.",
       "Añadir el pollo y la nata. Cocer 10 min más.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 0, texto: "El marinado hace toda la diferencia. Lo preparo desde el día anterior." },
     ],
   },
@@ -460,7 +461,7 @@ const RECETAS_SEED = [
       "Incorporar el caldo cazo a cazo, 18-20 min.",
       "Fuera del fuego, añadir mantequilla y parmesano. Mantecato enérgico.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Quedó cremosísimo siguiendo los pasos al pie de la letra." },
     ],
   },
@@ -493,7 +494,7 @@ const RECETAS_SEED = [
       "Añadir el arroz uniformemente. Cocer sin remover 18 min.",
       "Subir el fuego los últimos 2 min para el socarrat.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "El socarrat quedó perfecto." },
     ],
   },
@@ -526,7 +527,7 @@ const RECETAS_SEED = [
       "Hornear a 160°C 55-60 min. Dejar en horno apagado 1 hora.",
       "Refrigerar mínimo 8 horas antes de desmoldar.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Sin grietas gracias al truco del horno apagado. Bestial." },
     ],
   },
@@ -556,7 +557,7 @@ const RECETAS_SEED = [
       "Incorporar la nata y después las claras con movimientos envolventes.",
       "Distribuir en copas. Refrigerar mínimo 2 horas.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 4,
@@ -586,7 +587,7 @@ const RECETAS_SEED = [
       "Montar en fuente: capa de bizcochos, crema, bizcochos, crema.",
       "Refrigerar mínimo 4 horas. Espolvorear cacao antes de servir.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 0, texto: "El amaretto marca la diferencia. Auténtico sabor italiano." },
     ],
   },
@@ -617,7 +618,7 @@ const RECETAS_SEED = [
       "Cocinar el pollo a la plancha 4 min por lado. Cortar en tiras.",
       "Mezclar la lechuga con el aderezo. Añadir pollo, crutones y parmesano.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 3,
@@ -649,7 +650,7 @@ const RECETAS_SEED = [
       "Montar el bowl: arroz, atún, aguacate y pepino en secciones.",
       "Aliñar con la mayonesa picante y más sésamo.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 4, texto: "Mucho más fácil que hacer sushi y igual de rico. Mi receta favorita." },
     ],
   },
@@ -680,7 +681,7 @@ const RECETAS_SEED = [
       "Añadir lechuga, tomate, pepino y el pavo.",
       "Enrollar firmemente y cortar en diagonal.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
 ];
 
@@ -701,6 +702,7 @@ async function seed(): Promise<void> {
     console.log("🗑️  Borrando datos existentes...");
     await Promise.all([
       Receta.deleteMany({}),
+      Comentario.deleteMany({}),
       Usuario.deleteMany({ correo: { $in: USUARIOS_SEED.map((u) => u.correo) } }),
     ]);
   }
@@ -720,19 +722,13 @@ async function seed(): Promise<void> {
 
   console.log("\n🍳 Creando recetas seed...");
 
-  const recetasParaInsertar = RECETAS_SEED.map(({ autorIndex, listaComentarios, ...receta }) => {
+  const recetasParaInsertar = RECETAS_SEED.map(({ autorIndex, comentarios, ...receta }) => {
     const autor = usuariosCreados[autorIndex];
     return {
       ...receta,
       autorId: autor._id,
       likes: [],
-      listaComentarios: listaComentarios.map(({ autorIndex: ci, texto }) => ({
-        autorId: usuariosCreados[ci]._id,
-        autorNombre: usuariosCreados[ci].nombre,
-        avatarUrl: (usuariosCreados[ci] as { foto?: string }).foto ?? null,
-        texto,
-        fecha: new Date(),
-      })),
+      numComentarios: comentarios.length,
       fechaPublicacion: new Date(
         Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000
       ),
@@ -742,6 +738,22 @@ async function seed(): Promise<void> {
   const recetasCreadas = await Receta.insertMany(recetasParaInsertar);
   console.log(`   ✅ ${recetasCreadas.length} recetas insertadas`);
   recetasCreadas.forEach((r) => console.log(`      · ${r.titulo}`));
+
+  const comentariosParaInsertar = RECETAS_SEED.flatMap((receta, indice) =>
+    receta.comentarios.map(({ autorIndex: ci, texto }) => ({
+      recetaId: recetasCreadas[indice]._id,
+      autorId: usuariosCreados[ci]._id,
+      autorNombre: usuariosCreados[ci].nombre,
+      avatarUrl: (usuariosCreados[ci] as { foto?: string }).foto ?? null,
+      texto,
+      fecha: new Date(),
+    }))
+  );
+
+  if (comentariosParaInsertar.length > 0) {
+    await Comentario.insertMany(comentariosParaInsertar);
+  }
+  console.log(`   ✅ ${comentariosParaInsertar.length} comentarios insertados`);
 
   // ── Relaciones de seguimiento ─────────────────────────────────────────────
   // María (0) sigue a Carlos (1) y Lucía (2)

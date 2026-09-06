@@ -57,30 +57,6 @@ export const RECETA_DETALLE_MOCK: RecetaDetalle = {
     grasas: 20,
   },
 
-  listaComentarios: [
-    {
-      autorNombre: 'Laura Vidal',
-      avatarUrl: 'https://picsum.photos/seed/comentario1/80/80',
-      texto:
-        'He probado muchas versiones de pollo al limón pero esta salsa con alcaparras es otra dimensión. He añadido un poco de vino blanco al caldo y quedó espectacular.',
-      fecha: '2026-04-10T09:00:00.000Z',
-    },
-    {
-      autorNombre: 'Marcos Iglesias',
-      avatarUrl: 'https://picsum.photos/seed/comentario2/80/80',
-      texto:
-        'Perfecto para una cena entre semana. Rápido, ligero y con ingredientes que suelo tener siempre. Lo hago casi cada semana ahora.',
-      fecha: '2026-04-10T04:00:00.000Z',
-    },
-    {
-      autorNombre: 'Cristina Molina',
-      avatarUrl: null,
-      texto:
-        'La técnica de aplanar el pollo antes de dorar es un cambio de juego. Se cocina mucho más uniformemente y queda jugosísimo por dentro.',
-      fecha: '2026-04-09T16:00:00.000Z',
-    },
-  ],
-
   // Reutiliza posts del feed como recetas similares
   similares: [POSTS_MOCK[3], POSTS_MOCK[2], POSTS_MOCK[6]],
 }

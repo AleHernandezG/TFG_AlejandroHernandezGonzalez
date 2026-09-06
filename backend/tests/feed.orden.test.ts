@@ -25,7 +25,7 @@ const titulos = (body: { recetas: PostFeed[] }) => body.recetas.map((p) => p.rec
 
 type DocParaScore = {
   likes: unknown[];
-  listaComentarios: unknown[];
+  numComentarios: number;
   fechaPublicacion: Date;
   autorId: Types.ObjectId;
   categorias: string[];
@@ -38,7 +38,7 @@ function scoreDeReferencia(
   preferencias: string[],
 ): number {
   const diasAntiguo = (ahora.getTime() - doc.fechaPublicacion.getTime()) / (1000 * 60 * 60 * 24);
-  const popularidad = doc.likes.length * 2 + doc.listaComentarios.length * 3;
+  const popularidad = doc.likes.length * 2 + doc.numComentarios * 3;
   const decay = 1 / (1 + Math.sqrt(Math.max(0, diasAntiguo)));
   const followBoost = seguidos.has(doc.autorId.toString()) ? 1.5 : 0;
   const prefBoost = doc.categorias.filter((c) => preferencias.includes(c)).length * 0.5;

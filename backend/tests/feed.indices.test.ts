@@ -30,7 +30,7 @@ async function sembrarRecetas(cuantas: number) {
       alergenos: [],
       macros: { calorias: 1, proteinas: 1, carbos: 1, grasas: 1 },
       likes: [],
-      listaComentarios: [],
+      numComentarios: 0,
       fechaPublicacion: new Date(Date.now() - i * 3_600_000),
     })),
   );

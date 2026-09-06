@@ -15,6 +15,7 @@ import bcrypt from "bcryptjs";
 import { conectarDB } from "../lib/db";
 import { Usuario } from "../models/usuarioMongo";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 
 const FORCE = process.argv.includes("--force");
 
@@ -81,7 +82,7 @@ const RECETAS_SEED = [
       "Añadir la mezcla de yemas fuera del fuego, moviendo rápido y añadiendo agua de cocción poco a poco hasta obtener una crema sedosa.",
       "Servir inmediatamente con más pecorino y pimienta.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "¡La mejor carbonara que he probado! El truco del fuego apagado es clave." },
     ],
   },
@@ -116,7 +117,7 @@ const RECETAS_SEED = [
       "Añadir el resto de la salsa y lacear el salmón a fuego medio hasta que caramelice.",
       "Servir sobre el arroz, espolvorear sésamo y cebolleta cortada en diagonal.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 0,
@@ -149,7 +150,7 @@ const RECETAS_SEED = [
       "Montar el bowl: quinoa de base, secciones de aguacate, edamame, zanahoria, remolacha y garbanzos.",
       "Aliñar con la salsa de tahini y espolvorear sésamo.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Me encanta este bowl, lo hago todas las semanas. El aliño de tahini es adictivo." },
     ],
   },
@@ -181,7 +182,7 @@ const RECETAS_SEED = [
       "Incorporar el pollo, el romero y 100 ml de agua. Tapar y cocer a fuego medio-bajo 20 min.",
       "Destapar, subir el fuego y reducir la salsa hasta que esté brillante.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 0,
@@ -216,7 +217,7 @@ const RECETAS_SEED = [
       "Fuera del fuego, añadir la mantequilla fría y el parmesano. Mantecato: mezclar enérgicamente para emulsionar.",
       "Servir inmediatamente con perejil picado.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Perfecto para una cena especial. Seguí los pasos al pie de la letra y quedó cremosísimo." },
     ],
   },
@@ -250,7 +251,7 @@ const RECETAS_SEED = [
       "Salpimentar al gusto. Refrigerar mínimo 2 horas antes de servir.",
       "Servir muy frío con guarnición de daditos de tomate, pepino y cebolleta.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 0,
@@ -286,7 +287,7 @@ const RECETAS_SEED = [
       "Añadir el arroz distribuyéndolo uniformemente. Cocer a fuego fuerte 8 min, luego medio-bajo 10 min más SIN remover.",
       "Los últimos 2 min, subir el fuego para crear el socarrat (fondo crujiente). Reposar 5 min tapado con papel de periódico.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "¡Menuda paella! El socarrat quedó perfecto." },
     ],
   },
@@ -324,7 +325,7 @@ const RECETAS_SEED = [
       "Añadir las espinacas, remover hasta que se integren (2 min).",
       "Ajustar de sal. Servir con arroz basmati y naan.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
   {
     autorIndex: 0,
@@ -357,7 +358,7 @@ const RECETAS_SEED = [
       "Verter sobre la base de galleta. Hornear 55-60 min — el centro debe temblar ligeramente.",
       "Apagar el horno, entreabrirlo y dejar la tarta dentro 1 hora. Refrigerar mínimo 8 horas antes de desmoldar.",
     ],
-    listaComentarios: [
+    comentarios: [
       { autorIndex: 1, texto: "Bestial. El truco del horno apagado es lo que marca la diferencia, sin grietas." },
     ],
   },
@@ -391,7 +392,7 @@ const RECETAS_SEED = [
       "Trocear la lechuga romana y mezclar con la mitad del aderezo.",
       "Montar el plato: lechuga, pollo, crutones y parmesano. Aliñar con el resto del aderezo.",
     ],
-    listaComentarios: [],
+    comentarios: [],
   },
 ];
 
@@ -413,6 +414,7 @@ async function seed(): Promise<void> {
     console.log("🗑️  Borrando datos existentes...");
     await Promise.all([
       Receta.deleteMany({}),
+      Comentario.deleteMany({}),
       Usuario.deleteMany({ correo: { $in: USUARIOS_SEED.map((u) => u.correo) } }),
     ]);
   }
@@ -437,30 +439,38 @@ async function seed(): Promise<void> {
   // ── Crear recetas seed ────────────────────────────────────────────────────
   console.log("\n🍳 Creando recetas seed...");
 
-  const recetasParaInsertar = RECETAS_SEED.map(
-    ({ autorIndex, listaComentarios, ...receta }) => {
-      const autor = usuariosCreados[autorIndex];
-      return {
-        ...receta,
-        autorId: autor._id,
-        likes: [],
-        listaComentarios: listaComentarios.map(({ autorIndex: ci, texto }) => ({
-          autorId: usuariosCreados[ci]._id,
-          autorNombre: usuariosCreados[ci].nombre,
-          avatarUrl: (usuariosCreados[ci] as { foto?: string }).foto ?? null,
-          texto,
-          fecha: new Date(),
-        })),
-        fechaPublicacion: new Date(
-          Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
-        ),
-      };
-    }
-  );
+  const recetasParaInsertar = RECETAS_SEED.map(({ autorIndex, comentarios, ...receta }) => {
+    const autor = usuariosCreados[autorIndex];
+    return {
+      ...receta,
+      autorId: autor._id,
+      likes: [],
+      numComentarios: comentarios.length,
+      fechaPublicacion: new Date(
+        Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+      ),
+    };
+  });
 
   const recetasCreadas = await Receta.insertMany(recetasParaInsertar);
   console.log(`   ✅ ${recetasCreadas.length} recetas insertadas`);
   recetasCreadas.forEach((r) => console.log(`      · ${r.titulo}`));
+
+  const comentariosParaInsertar = RECETAS_SEED.flatMap((receta, indice) =>
+    receta.comentarios.map(({ autorIndex: ci, texto }) => ({
+      recetaId: recetasCreadas[indice]._id,
+      autorId: usuariosCreados[ci]._id,
+      autorNombre: usuariosCreados[ci].nombre,
+      avatarUrl: (usuariosCreados[ci] as { foto?: string }).foto ?? null,
+      texto,
+      fecha: new Date(),
+    }))
+  );
+
+  if (comentariosParaInsertar.length > 0) {
+    await Comentario.insertMany(comentariosParaInsertar);
+  }
+  console.log(`   ✅ ${comentariosParaInsertar.length} comentarios insertados`);
 
   // ── Resumen ───────────────────────────────────────────────────────────────
   console.log("\n🎉 Seed completado:");

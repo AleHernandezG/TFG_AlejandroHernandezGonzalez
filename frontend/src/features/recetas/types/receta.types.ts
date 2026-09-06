@@ -73,7 +73,6 @@ export type RecetaDetalle = PostFeed & {
   ingredientes: Ingrediente[]
   alergenos: string[] // ids del map ALERGENOS en chipAlergeno
   macros: MacrosReceta
-  listaComentarios: Comentario[] // diferente de PostFeed.comentarios (number)
   similares: PostFeed[]
   porciones: number // porciones base para escalar ingredientes
 }

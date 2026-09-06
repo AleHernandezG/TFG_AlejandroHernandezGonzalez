@@ -72,6 +72,14 @@ export const esquemaReenviarVerificacion = z.object({
   correo: z.string().trim().toLowerCase().email("Correo no válido"),
 });
 
+export const esquemaComentario = z.object({
+  texto: z
+    .string({ required_error: "El campo texto es obligatorio" })
+    .trim()
+    .min(1, "El comentario no puede estar vacío")
+    .max(500, "El comentario no puede superar 500 caracteres"),
+});
+
 export const esquemaCrearRecetaBody = z.object({
   titulo:       z.string().min(3, "El título debe tener al menos 3 caracteres").max(100),
   descripcion:  z.string().min(10, "La descripción debe tener al menos 10 caracteres").max(300),

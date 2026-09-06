@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
 import { Usuario } from "../../src/models/usuarioMongo";
 import { Receta } from "../../src/models/recetaMongo";
+import { Comentario } from "../../src/models/comentarioMongo";
 import { Token } from "../../src/models/tokenMongo";
 import { firmarToken } from "../../src/lib/jwt";
 
@@ -50,7 +51,7 @@ export async function crearReceta(datos: Partial<{
   fechaPublicacion: Date;
 }> = {}) {
   const autorId = datos.autorId ?? (await crearUsuario())._id as Types.ObjectId;
-  return Receta.create({
+  const receta = await Receta.create({
     autorId,
     titulo: datos.titulo ?? "Receta de prueba",
     descripcion: datos.descripcion ?? "Una descripción suficientemente larga para el esquema.",
@@ -64,15 +65,24 @@ export async function crearReceta(datos: Partial<{
     alergenos: datos.alergenos ?? [],
     macros: { calorias: 100, proteinas: 1, carbos: 1, grasas: 1 },
     likes: datos.likes ?? [],
-    listaComentarios: Array.from({ length: datos.comentarios ?? 0 }, () => ({
-      autorId: autorId,
-      autorNombre: "Comentarista",
-      avatarUrl: null,
-      texto: "Qué buena pinta.",
-      fecha: new Date(),
-    })),
+    numComentarios: datos.comentarios ?? 0,
     fechaPublicacion: datos.fechaPublicacion ?? new Date(),
   });
+
+  if (datos.comentarios) {
+    await Comentario.insertMany(
+      Array.from({ length: datos.comentarios }, (_, i) => ({
+        recetaId: receta._id,
+        autorId,
+        autorNombre: "Comentarista",
+        avatarUrl: null,
+        texto: `Qué buena pinta (${i + 1}).`,
+        fecha: new Date(Date.now() - i * 1000),
+      })),
+    );
+  }
+
+  return receta;
 }
 
 export function crearTokenVerificacion(userId: Types.ObjectId, opciones: { expira?: Date } = {}) {

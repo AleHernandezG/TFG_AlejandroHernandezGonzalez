@@ -53,7 +53,7 @@ cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
 ```
 
-**Hay 155 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 169 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
