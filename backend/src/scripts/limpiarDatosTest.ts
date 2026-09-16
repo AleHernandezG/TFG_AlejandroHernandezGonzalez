@@ -14,6 +14,7 @@ import mongoose from "mongoose";
 import { conectarDB } from "../lib/db";
 import { Usuario } from "../models/usuarioMongo";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 
 const INCLUIR_MANUALES = process.argv.includes("--incluir-manuales");
 
@@ -39,12 +40,29 @@ async function run(): Promise<void> {
 
   const ids = objetivo.map((u) => u._id);
 
+  const recetasSuyas = await Receta.find({ autorId: { $in: ids } }).select("_id").lean();
+  const comentariosEnSusRecetas = await Comentario.deleteMany({
+    recetaId: { $in: recetasSuyas.map((r) => r._id) },
+  });
   const recetasBorradas = await Receta.deleteMany({ autorId: { $in: ids } });
   const likesLimpiados = await Receta.updateMany({}, { $pull: { likes: { $in: ids } } });
-  const comentariosLimpiados = await Receta.updateMany(
-    {},
-    { $pull: { listaComentarios: { autorId: { $in: ids } } } },
-  );
+
+  const porReceta = await Comentario.aggregate<{ _id: mongoose.Types.ObjectId; n: number }>([
+    { $match: { autorId: { $in: ids } } },
+    { $group: { _id: "$recetaId", n: { $sum: 1 } } },
+  ]);
+  const comentariosLimpiados = await Comentario.deleteMany({ autorId: { $in: ids } });
+
+  if (porReceta.length > 0) {
+    await Receta.bulkWrite(
+      porReceta.map((grupo) => ({
+        updateOne: {
+          filter: { _id: grupo._id },
+          update: { $inc: { numComentarios: -grupo.n } },
+        },
+      })),
+    );
+  }
   const seguimientosLimpiados = await Usuario.updateMany(
     {},
     { $pull: { seguidos: { $in: ids }, seguidores: { $in: ids } } },
@@ -55,7 +73,8 @@ async function run(): Promise<void> {
   console.log(`   Usuarios borrados        : ${usuariosBorrados.deletedCount}`);
   console.log(`   Recetas suyas borradas   : ${recetasBorradas.deletedCount}`);
   console.log(`   Recetas con likes purgados    : ${likesLimpiados.modifiedCount}`);
-  console.log(`   Recetas con comentarios purgados: ${comentariosLimpiados.modifiedCount}`);
+  console.log(`   Comentarios en sus recetas    : ${comentariosEnSusRecetas.deletedCount}`);
+  console.log(`   Comentarios suyos en otras    : ${comentariosLimpiados.deletedCount} (en ${porReceta.length} receta(s))`);
   console.log(`   Usuarios con follows purgados   : ${seguimientosLimpiados.modifiedCount}`);
 
   if (!INCLUIR_MANUALES) {

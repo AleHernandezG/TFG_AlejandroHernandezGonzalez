@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+export const esquemaUrlImagen = z
+  .string()
+  .regex(/^https:\/\//, "La imagen debe ser una URL https, no una imagen incrustada");
+
+export const esquemaFirmaSubida = z.object({
+  tipo: z.enum(["receta", "avatar"]),
+});
+
+export const esquemaFotoUsuario = z.object({
+  fotoUrl: esquemaUrlImagen,
+});
+
 export const esquemaRegistro = z.object({
   nombre: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(50).trim(),
   correo: z.string().trim().toLowerCase().email("Correo no válido"),
@@ -33,11 +45,23 @@ export const esquemaVerificarEmail = z.object({
 });
 
 export const esquemaGoogleOAuth = z.object({
-  googleId: z.string().min(1, "Google ID obligatorio"),
-  correo: z.string().trim().toLowerCase().email("Correo no válido"),
-  nombre: z.string().trim().min(1).catch("Usuario"),
-  foto: z.string().url().optional().catch(undefined),
+  idToken: z.string().trim().min(1, "Falta el id_token de Google"),
 });
+
+export const esquemaEditarDespensa = z
+  .object({
+    nombre: z.string().trim().min(1, "El nombre no puede estar vacío").max(80).optional(),
+    cantidad: z
+      .number({ invalid_type_error: "La cantidad tiene que ser un número" })
+      .finite("La cantidad tiene que ser un número")
+      .min(0, "La cantidad no puede ser negativa")
+      .optional(),
+    unidad: z.string().trim().min(1, "La unidad no puede estar vacía").max(20).optional(),
+    emoji: z.string().trim().min(1, "El emoji no puede estar vacío").max(16).optional(),
+  })
+  .refine((cambios) => Object.keys(cambios).length > 0, {
+    message: "Sin campos a actualizar",
+  });
 
 export const esquemaCompletarPerfil = z.object({
   alergias: z.array(z.string()).default([]),
@@ -46,6 +70,14 @@ export const esquemaCompletarPerfil = z.object({
 
 export const esquemaReenviarVerificacion = z.object({
   correo: z.string().trim().toLowerCase().email("Correo no válido"),
+});
+
+export const esquemaComentario = z.object({
+  texto: z
+    .string({ required_error: "El campo texto es obligatorio" })
+    .trim()
+    .min(1, "El comentario no puede estar vacío")
+    .max(500, "El comentario no puede superar 500 caracteres"),
 });
 
 export const esquemaCrearRecetaBody = z.object({
@@ -69,7 +101,7 @@ export const esquemaCrearRecetaBody = z.object({
   pasos: z
     .array(z.object({ texto: z.string().min(10, "El paso debe tener al menos 10 caracteres") }))
     .min(1, "Añade al menos un paso"),
-  imagenBase64: z.string().optional(),
+  imagenUrl: esquemaUrlImagen.optional(),
   fotoFuente: z.enum(["usuario", "pexels"]).optional(),
   fotoCredito: z
     .object({

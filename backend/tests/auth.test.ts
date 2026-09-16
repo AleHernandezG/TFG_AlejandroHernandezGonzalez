@@ -3,6 +3,10 @@ jest.mock("../src/lib/email", () => ({
   enviarEmailRecuperacion: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock("../src/lib/googleAuth", () => ({
+  verificarIdTokenGoogle: jest.fn(),
+}));
+
 import request from "supertest";
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
@@ -10,6 +14,7 @@ import app from "../src/app";
 import { Usuario } from "../src/models/usuarioMongo";
 import { Token } from "../src/models/tokenMongo";
 import { enviarEmailVerificacion, enviarEmailRecuperacion } from "../src/lib/email";
+import { verificarIdTokenGoogle } from "../src/lib/googleAuth";
 import {
   crearUsuario,
   crearTokenVerificacion,
@@ -19,6 +24,21 @@ import {
 
 const mockVerificacion = enviarEmailVerificacion as jest.Mock;
 const mockRecuperacion = enviarEmailRecuperacion as jest.Mock;
+const mockVerificarGoogle = verificarIdTokenGoogle as jest.Mock;
+
+const identidadGoogle = (parcial: Partial<{
+  googleId: string;
+  correo: string;
+  correoVerificado: boolean;
+  nombre: string;
+  foto: string;
+}> = {}) => ({
+  googleId: "g-1",
+  correo: "ana@gmail.com",
+  correoVerificado: true,
+  nombre: "Ana",
+  ...parcial,
+});
 
 describe("POST /api/auth/registro", () => {
   it("crea el usuario sin verificar y manda el correo de verificación", async () => {
@@ -300,29 +320,90 @@ describe("POST /api/auth/recuperar-contrasena", () => {
 });
 
 describe("POST /api/auth/google", () => {
-  it("crea la cuenta ya verificada la primera vez", async () => {
+  beforeEach(() => {
+    mockVerificarGoogle.mockReset();
+  });
+
+  it("responde 401 con un idToken invalido y no crea ni modifica ningun usuario", async () => {
+    await crearUsuario({ correo: "victima@cookr.dev" });
+    mockVerificarGoogle.mockRejectedValue(new Error("Invalid token signature"));
+
+    const res = await request(app).post("/api/auth/google").send({ idToken: "esto-no-es-un-token" });
+
+    expect(res.status).toBe(401);
+    expect(res.body.token).toBeUndefined();
+
+    expect(await Usuario.countDocuments()).toBe(1);
+    const victima = await Usuario.findOne({ correo: "victima@cookr.dev" });
+    expect(victima!.googleId).toBeUndefined();
+    expect(victima!.proveedor).toBe("local");
+  });
+
+  it("responde 400 si no llega idToken, sin llamar a Google", async () => {
     const res = await request(app).post("/api/auth/google").send({
-      googleId: "g-nuevo",
-      correo: "nuevo-google@cookr.dev",
-      nombre: "Ana",
+      googleId: "g-suplantador",
+      correo: "victima@cookr.dev",
     });
+
+    expect(res.status).toBe(400);
+    expect(mockVerificarGoogle).not.toHaveBeenCalled();
+  });
+
+  it("responde 401 si Google dice que el correo no esta verificado", async () => {
+    mockVerificarGoogle.mockResolvedValue(
+      identidadGoogle({ correo: "sinverificar@gmail.com", correoVerificado: false }),
+    );
+
+    const res = await request(app).post("/api/auth/google").send({ idToken: "token-sin-verificar" });
+
+    expect(res.status).toBe(401);
+    expect(await Usuario.countDocuments()).toBe(0);
+  });
+
+  it("saca la identidad del token verificado y no del cuerpo de la peticion", async () => {
+    await crearUsuario({ correo: "victima@cookr.dev" });
+    mockVerificarGoogle.mockResolvedValue(
+      identidadGoogle({ googleId: "g-real", correo: "ana@gmail.com" }),
+    );
+
+    const res = await request(app).post("/api/auth/google").send({
+      idToken: "token-de-ana",
+      googleId: "g-suplantador",
+      correo: "victima@cookr.dev",
+      nombre: "Suplantador",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.usuario.correo).toBe("ana@gmail.com");
+
+    const victima = await Usuario.findOne({ correo: "victima@cookr.dev" });
+    expect(victima!.googleId).toBeUndefined();
+    expect(victima!.nombre).not.toBe("Suplantador");
+  });
+
+  it("crea la cuenta ya verificada la primera vez", async () => {
+    mockVerificarGoogle.mockResolvedValue(
+      identidadGoogle({ googleId: "g-nuevo", correo: "nuevo-google@gmail.com", nombre: "Ana" }),
+    );
+
+    const res = await request(app).post("/api/auth/google").send({ idToken: "token-nuevo" });
 
     expect(res.status).toBe(200);
     expect(typeof res.body.token).toBe("string");
 
-    const usuario = await Usuario.findOne({ correo: "nuevo-google@cookr.dev" });
+    const usuario = await Usuario.findOne({ correo: "nuevo-google@gmail.com" });
     expect(usuario!.cuentaVerificada).toBe(true);
     expect(usuario!.proveedor).toBe("google");
+    expect(usuario!.nombre).toBe("Ana");
   });
 
   it("vincula el googleId a una cuenta local con el mismo correo, sin duplicarla", async () => {
     await crearUsuario({ correo: "local@cookr.dev" });
+    mockVerificarGoogle.mockResolvedValue(
+      identidadGoogle({ googleId: "g-vinculado", correo: "local@cookr.dev" }),
+    );
 
-    const res = await request(app).post("/api/auth/google").send({
-      googleId: "g-vinculado",
-      correo: "local@cookr.dev",
-      nombre: "Alejandro",
-    });
+    const res = await request(app).post("/api/auth/google").send({ idToken: "token-local" });
 
     expect(res.status).toBe(200);
     expect(await Usuario.countDocuments({ correo: "local@cookr.dev" })).toBe(1);
@@ -330,12 +411,12 @@ describe("POST /api/auth/google", () => {
   });
 
   it("reutiliza la misma cuenta al repetir el login", async () => {
-    await request(app)
-      .post("/api/auth/google")
-      .send({ googleId: "g-repe", correo: "repe-google@cookr.dev", nombre: "Ana" });
-    await request(app)
-      .post("/api/auth/google")
-      .send({ googleId: "g-repe", correo: "repe-google@cookr.dev", nombre: "Ana" });
+    mockVerificarGoogle.mockResolvedValue(
+      identidadGoogle({ googleId: "g-repe", correo: "repe-google@gmail.com" }),
+    );
+
+    await request(app).post("/api/auth/google").send({ idToken: "token-repe" });
+    await request(app).post("/api/auth/google").send({ idToken: "token-repe" });
 
     expect(await Usuario.countDocuments({ googleId: "g-repe" })).toBe(1);
   });

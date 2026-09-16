@@ -90,5 +90,7 @@ const usuarioSchema = new Schema<IUsuarioDoc>({
   },
 });
 
+usuarioSchema.index({ googleId: 1 }, { sparse: true });
+
 export const Usuario = mongoose.model<IUsuarioDoc>("Usuario", usuarioSchema);
 export type { IUsuario };

@@ -94,8 +94,8 @@ export const recetasController = {
 
   async obtenerComentarios(req: Request, res: Response): Promise<void> {
     try {
-      const pagina = req.query.pagina ? Math.max(1, Number(req.query.pagina)) : 1;
-      const limite = req.query.limite ? Math.min(20, Number(req.query.limite)) : 8;
+      const pagina = Math.max(1, Number(req.query.pagina) || 1);
+      const limite = Math.min(20, Math.max(1, Number(req.query.limite) || 8));
       const resultado = await recetasService.obtenerComentarios(req.params.id, pagina, limite);
       res.status(200).json(resultado);
     } catch (error) {
@@ -105,11 +105,7 @@ export const recetasController = {
 
   async agregarComentario(req: Request, res: Response): Promise<void> {
     try {
-      const { texto } = req.body as { texto?: string };
-      if (typeof texto !== "string") {
-        res.status(400).json({ error: "El campo texto es obligatorio" });
-        return;
-      }
+      const { texto } = req.body as { texto: string };
       const resultado = await recetasService.agregarComentario(
         req.params.id,
         req.usuario!.id,

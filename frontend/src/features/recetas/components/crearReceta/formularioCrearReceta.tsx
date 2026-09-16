@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Camera, Trash2, Sparkles, Loader2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { recetasService } from '@/services/recetasService'
+import { subidasService } from '@/services/subidasService'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import {
@@ -76,6 +77,8 @@ export function FormularioCrearReceta() {
   const [textoDescripcion, setTextoDescripcion] = useState('')
   const [generando, setGenerando] = useState(false)
   const [errorGeneracion, setErrorGeneracion] = useState<string | null>(null)
+  const [subiendoFoto, setSubiendoFoto] = useState(false)
+  const [errorFoto, setErrorFoto] = useState<string | null>(null)
 
   useEffect(() => {
     if (!cargandoRecetas && (misRecetas?.length ?? 1) === 0) {
@@ -111,18 +114,26 @@ export function FormularioCrearReceta() {
     ingredientesActuales.map((i) => i.nombre).filter(Boolean)
   )
 
-  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setFotoUrl(url)
-    setValue('foto', file)
 
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setFoto(reader.result as string)
+    setFotoUrl(URL.createObjectURL(file))
+    setValue('foto', file)
+    setErrorFoto(null)
+    setSubiendoFoto(true)
+
+    try {
+      const url = await subidasService.subirImagen(file, 'receta', session?.user?.backendToken ?? '')
+      setFoto(url)
+    } catch {
+      setFotoUrl(null)
+      setFoto(null)
+      setValue('foto', undefined)
+      setErrorFoto('No se pudo subir la foto. Inténtalo de nuevo.')
+    } finally {
+      setSubiendoFoto(false)
     }
-    reader.readAsDataURL(file)
   }
 
   async function handleGenerarDesdeTexto() {
@@ -283,9 +294,14 @@ export function FormularioCrearReceta() {
             {fotoUrl ? (
               <div className="relative h-52 w-full">
                 <Image src={fotoUrl} alt="Preview receta" fill className="object-cover" />
+                {subiendoFoto && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+                    <Loader2 size={28} className="animate-spin text-white" />
+                  </div>
+                )}
                 <button
                   type="button"
-                  onClick={() => { setFotoUrl(null); setFoto(null); setValue('foto', undefined) }}
+                  onClick={() => { setFotoUrl(null); setFoto(null); setValue('foto', undefined); setErrorFoto(null) }}
                   className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg text-white"
                 >
                   <Trash2 size={16} />
@@ -300,6 +316,9 @@ export function FormularioCrearReceta() {
                 <Camera size={32} />
                 <span className="text-sm font-medium">Añadir foto</span>
               </button>
+            )}
+            {errorFoto && (
+              <p className="text-xs text-destructive px-4 pb-3">{errorFoto}</p>
             )}
           </section>
 
@@ -476,9 +495,10 @@ export function FormularioCrearReceta() {
             </Button>
             <Button
               type="submit"
+              disabled={subiendoFoto}
               className="flex-1 h-12 rounded-xl bg-brand text-brand-foreground font-bold"
             >
-              Revisar receta
+              {subiendoFoto ? 'Subiendo foto…' : 'Revisar receta'}
             </Button>
           </div>
         </form>

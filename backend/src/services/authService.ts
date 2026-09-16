@@ -4,6 +4,7 @@ import { usuarioRepository } from "../repositories/usuarioRepository";
 import { tokenRepository } from "../repositories/tokenRepository";
 import { firmarToken } from "../lib/jwt";
 import { enviarEmailVerificacion, enviarEmailRecuperacion } from "../lib/email";
+import { verificarIdTokenGoogle } from "../lib/googleAuth";
 import { Types } from "mongoose";
 
 const SALT_ROUNDS = 10;
@@ -201,31 +202,48 @@ export const authService = {
     };
   },
 
-  async iniciarSesionGoogle(datos: {
-    googleId: string;
-    correo: string;
-    nombre: string;
-    foto?: string;
-  }) {
+  async iniciarSesionGoogle(datos: { idToken: string }) {
+    const identidad = await verificarIdTokenGoogle(datos.idToken).catch((error: unknown) => {
+      if ((error as { status?: number }).status) throw error;
+      const fallo = new Error("No se ha podido verificar el token de Google") as Error & {
+        status: number;
+      };
+      fallo.status = 401;
+      throw fallo;
+    });
+
+    if (!identidad.correoVerificado) {
+      const error = new Error("La cuenta de Google no tiene el correo verificado") as Error & {
+        status: number;
+      };
+      error.status = 401;
+      throw error;
+    }
+
+    const nombre = identidad.nombre ?? identidad.correo.split("@")[0];
+
     // Buscar primero por googleId (usuario ya vinculado), luego por correo (cuenta local preexistente)
     let usuario =
-      await usuarioRepository.buscarPorGoogleId(datos.googleId) ??
-      await usuarioRepository.buscarPorCorreo(datos.correo);
+      await usuarioRepository.buscarPorGoogleId(identidad.googleId) ??
+      await usuarioRepository.buscarPorCorreo(identidad.correo);
 
     if (!usuario) {
       usuario = await usuarioRepository.crear({
-        nombre: datos.nombre,
-        correo: datos.correo,
-        foto: datos.foto,
+        nombre,
+        correo: identidad.correo,
+        foto: identidad.foto,
         proveedor: "google",
-        googleId: datos.googleId,
+        googleId: identidad.googleId,
         cuentaVerificada: true,
       });
     } else if (!usuario.googleId) {
       // Cuenta local que usa el mismo correo → vincular googleId y foto si no tenía
       usuario = (await usuarioRepository.vincularGoogle(
         (usuario._id as Types.ObjectId).toString(),
-        { googleId: datos.googleId, ...(datos.foto && !usuario.foto ? { foto: datos.foto } : {}) },
+        {
+          googleId: identidad.googleId,
+          ...(identidad.foto && !usuario.foto ? { foto: identidad.foto } : {}),
+        },
       ))!;
     }
 

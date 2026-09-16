@@ -62,11 +62,10 @@ function SkeletonComentario() {
 
 type Props = {
   recetaId: string
-  comentarios: Comentario[]
   total: number
 }
 
-export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
+export function ComentariosReceta({ recetaId, total }: Props) {
   const { data: session } = useSession()
   const [texto, setTexto] = useState('')
   const [nuevos, setNuevos] = useState<Comentario[]>([])
@@ -99,11 +98,9 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
     return () => observer.disconnect()
   }, [sheetAbierto, hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  const preview = [...nuevos, ...comentarios].slice(0, 3)
-  const totalMostrado = total + nuevos.length
-
-  // Sheet usa solo datos de la API — sin nuevos para evitar duplicados
   const comentariosSheet = data?.pages.flatMap((p) => p.comentarios) ?? []
+  const preview = [...nuevos, ...(data?.pages[0]?.comentarios ?? [])].slice(0, 3)
+  const totalMostrado = (data?.pages[0]?.total ?? total) + nuevos.length
 
   function handleEnviar() {
     if (!texto.trim()) return
@@ -119,7 +116,10 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
     setTexto('')
 
     enviar(textoTrimmed, {
-      onSuccess: () => invalidar(),
+      onSuccess: async () => {
+        await invalidar()
+        setNuevos((prev) => prev.filter((c) => c !== optimista))
+      },
       onError: () => {
         setNuevos((prev) => prev.filter((c) => c !== optimista))
         setTexto(textoTrimmed)
@@ -185,9 +185,14 @@ export function ComentariosReceta({ recetaId, comentarios, total }: Props) {
         </p>
       ) : (
         <ul className="space-y-4">
-          {preview.map((c, i) => (
-            <ItemComentario key={i} c={c} />
-          ))}
+          {cargandoSheet && preview.length === 0 ? (
+            <>
+              <SkeletonComentario />
+              <SkeletonComentario />
+            </>
+          ) : (
+            preview.map((c, i) => <ItemComentario key={i} c={c} />)
+          )}
         </ul>
       )}
 

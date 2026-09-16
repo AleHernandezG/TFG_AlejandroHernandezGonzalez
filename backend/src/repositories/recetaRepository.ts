@@ -1,15 +1,16 @@
-import { Types } from "mongoose";
+import { PipelineStage, Types } from "mongoose";
 import { Receta } from "../models/recetaMongo";
+import { Comentario } from "../models/comentarioMongo";
 import { Usuario } from "../models/usuarioMongo";
 import {
   DatosCrearRecetaBody,
   FiltrosFeed,
-  IComentarioReceta,
   IFotoCredito,
   PostFeedRespuesta,
   RecetaColeccion,
   RecetaDetalleRespuesta,
 } from "../types/receta";
+import { ComentarioRespuesta, PaginaComentarios } from "../types/comentario";
 import { buscarFotoPexelsCascada } from "../services/imagenService";
 import { calcularMacros } from "../services/nutritionService";
 
@@ -53,7 +54,6 @@ function docAPostFeed(
   const id = (doc._id as Types.ObjectId).toString();
   const autorId = autor?._id?.toString() ?? "";
   const likesArr = doc.likes as Types.ObjectId[];
-  const comentariosArr = doc.listaComentarios as unknown[];
 
   const liked = usuarioId
     ? likesArr.some((lid) => lid.toString() === usuarioId)
@@ -81,7 +81,7 @@ function docAPostFeed(
       alergenos: (doc.alergenos as string[]) ?? [],
     },
     likes: likesArr.length,
-    comentarios: comentariosArr.length,
+    comentarios: (doc.numComentarios as number | undefined) ?? 0,
     guardado,
     liked,
     sigueAlAutor,
@@ -115,28 +115,77 @@ async function obtenerPreferenciasUsuario(usuarioId: string): Promise<string[]> 
   return (usuario?.preferencias as string[] | undefined) ?? [];
 }
 
-function calcularScoreFeed(
-  doc: Record<string, unknown>,
+const MS_POR_DIA = 1000 * 60 * 60 * 24;
+
+function etapasScore(
   ahora: Date,
-  seguidosSet: Set<string>,
+  seguidos: Types.ObjectId[],
   preferencias: string[],
-): number {
-  const likes = (doc.likes as unknown[]).length;
-  const comentarios = (doc.listaComentarios as unknown[]).length;
-  const fecha = doc.fechaPublicacion as Date;
-  const diasAntiguo = (ahora.getTime() - fecha.getTime()) / (1000 * 60 * 60 * 24);
+): PipelineStage[] {
+  const diasAntiguo = {
+    $divide: [{ $subtract: [ahora, "$fechaPublicacion"] }, MS_POR_DIA],
+  };
 
-  const popularidad = likes * 2 + comentarios * 3;
-  const decay = 1 / (1 + Math.sqrt(Math.max(0, diasAntiguo)));
+  const popularidad = {
+    $add: [
+      { $multiply: [{ $size: "$likes" }, 2] },
+      { $multiply: [{ $ifNull: ["$numComentarios", 0] }, 3] },
+    ],
+  };
 
-  const autor = doc.autorId as UsuarioPopulado;
-  const autorIdStr = autor?._id?.toString() ?? "";
-  const followBoost = seguidosSet.has(autorIdStr) ? 1.5 : 0;
+  const decay = {
+    $divide: [1, { $add: [1, { $sqrt: { $max: [0, diasAntiguo] } }] }],
+  };
 
-  const categorias = (doc.categorias as string[]) ?? [];
-  const prefBoost = categorias.filter((c) => preferencias.includes(c)).length * 0.5;
+  const followBoost = { $cond: [{ $in: ["$autorId", seguidos] }, 1.5, 0] };
 
-  return popularidad * decay + followBoost + prefBoost;
+  const prefBoost = {
+    $multiply: [
+      {
+        $size: {
+          $filter: { input: "$categorias", cond: { $in: ["$$this", preferencias] } },
+        },
+      },
+      0.5,
+    ],
+  };
+
+  return [
+    { $addFields: { score: { $add: [{ $multiply: [popularidad, decay] }, followBoost, prefBoost] } } },
+    { $sort: { score: -1, fechaPublicacion: -1 } },
+  ];
+}
+
+function etapasLikes(): PipelineStage[] {
+  return [
+    { $addFields: { numLikes: { $size: "$likes" } } },
+    { $sort: { numLikes: -1, fechaPublicacion: -1 } },
+  ];
+}
+
+async function paginarOrdenado(
+  query: Record<string, unknown>,
+  etapas: PipelineStage[],
+  skip: number,
+  limite: number,
+): Promise<{ docs: unknown[]; total: number }> {
+  const [docs, total] = await Promise.all([
+    Receta.aggregate([
+      { $match: query },
+      ...etapas,
+      { $skip: skip },
+      { $limit: limite },
+    ]).exec(),
+    Receta.countDocuments(query),
+  ]);
+
+  await Receta.populate(docs, { path: "autorId", select: "nombre foto" });
+
+  return { docs, total };
+}
+
+function escaparRegex(texto: string): string {
+  return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export const recetaRepository = {
@@ -152,9 +201,10 @@ export const recetaRepository = {
     const query: Record<string, unknown> = {};
 
     if (q) {
+      const busqueda = escaparRegex(q);
       query["$or"] = [
-        { titulo: { $regex: q, $options: "i" } },
-        { descripcion: { $regex: q, $options: "i" } },
+        { titulo: { $regex: busqueda, $options: "i" } },
+        { descripcion: { $regex: busqueda, $options: "i" } },
       ];
     }
     const categorias: Record<string, unknown> = {};
@@ -201,38 +251,16 @@ export const recetaRepository = {
     let total: number;
 
     if (sort === 'score') {
-      const [todos, preferencias] = await Promise.all([
-        Receta.find(query)
-          .populate("autorId", "nombre foto")
-          .lean()
-          .exec(),
-        usuarioId ? obtenerPreferenciasUsuario(usuarioId) : Promise.resolve<string[]>([]),
-      ]);
-
-      const ahora = new Date();
-      const segSet = seguidosSet ?? new Set<string>();
-
-      todos.sort((a, b) => {
-        const sa = calcularScoreFeed(a as Record<string, unknown>, ahora, segSet, preferencias);
-        const sb = calcularScoreFeed(b as Record<string, unknown>, ahora, segSet, preferencias);
-        return sb - sa;
-      });
-
-      total = todos.length;
-      docs = todos.slice(skip, skip + limite);
+      const preferencias = usuarioId ? await obtenerPreferenciasUsuario(usuarioId) : [];
+      const seguidos = [...(seguidosSet ?? [])].map((id) => new Types.ObjectId(id));
+      ({ docs, total } = await paginarOrdenado(
+        query,
+        etapasScore(new Date(), seguidos, preferencias),
+        skip,
+        limite,
+      ));
     } else if (sort === 'likes') {
-      const todos = await Receta.find(query)
-        .populate("autorId", "nombre foto")
-        .sort({ fechaPublicacion: -1 })
-        .lean()
-        .exec();
-      todos.sort(
-        (a, b) =>
-          ((b as Record<string, unknown>).likes as unknown[]).length -
-          ((a as Record<string, unknown>).likes as unknown[]).length,
-      );
-      total = todos.length;
-      docs = todos.slice(skip, skip + limite);
+      ({ docs, total } = await paginarOrdenado(query, etapasLikes(), skip, limite));
     } else {
       [docs, total] = await Promise.all([
         Receta.find(query)
@@ -298,13 +326,6 @@ export const recetaRepository = {
       docAPostFeed(s as Record<string, unknown>, usuarioId, guardadasSet, seguidosSet),
     );
 
-    type ComentarioLean = {
-      autorNombre: string;
-      avatarUrl: string | null;
-      texto: string;
-      fecha: Date;
-    };
-
     return {
       ...base,
       categorias: doc.categorias as string[],
@@ -321,12 +342,6 @@ export const recetaRepository = {
         carbos: number;
         grasas: number;
       },
-      listaComentarios: (doc.listaComentarios as ComentarioLean[]).map((c) => ({
-        autorNombre: c.autorNombre,
-        avatarUrl: c.avatarUrl,
-        texto: c.texto,
-        fecha: c.fecha.toISOString(),
-      })),
       similares,
       porciones: doc.porciones as number,
     };
@@ -377,58 +392,70 @@ export const recetaRepository = {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const receta = await Receta.findById(recetaId);
-    if (!receta) {
+    const uid = new Types.ObjectId(usuarioId);
+    const yaLiked = (await Receta.exists({ _id: recetaId, likes: uid })) !== null;
+
+    const actualizada = await Receta.findByIdAndUpdate(
+      recetaId,
+      yaLiked ? { $pull: { likes: uid } } : { $addToSet: { likes: uid } },
+      { new: true, projection: { likes: 1 } },
+    )
+      .lean()
+      .exec();
+
+    if (!actualizada) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const uid = new Types.ObjectId(usuarioId);
-    const yaLiked = receta.likes.some((id) => id.equals(uid));
-
-    if (yaLiked) {
-      receta.likes = receta.likes.filter((id) => !id.equals(uid));
-    } else {
-      receta.likes.push(uid);
-    }
-
-    await receta.save();
-    return { liked: !yaLiked, totalLikes: receta.likes.length };
+    return {
+      liked: !yaLiked,
+      totalLikes: (actualizada.likes as Types.ObjectId[]).length,
+    };
   },
 
   async agregarComentario(
     recetaId: string,
     usuarioId: string,
     texto: string,
-  ): Promise<{ autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }> {
+  ): Promise<ComentarioRespuesta> {
     if (!Types.ObjectId.isValid(recetaId)) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const [receta, usuario] = await Promise.all([
-      Receta.findById(recetaId),
-      Usuario.findById(usuarioId).select("nombre foto").lean().exec(),
-    ]);
-
-    if (!receta) throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+    const usuario = await Usuario.findById(usuarioId).select("nombre foto").lean().exec();
     if (!usuario) throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
 
-    const fecha = new Date();
+    const contado = await Receta.findByIdAndUpdate(
+      recetaId,
+      { $inc: { numComentarios: 1 } },
+      { new: true, projection: { _id: 1 } },
+    )
+      .lean()
+      .exec();
+
+    if (!contado) throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
+
     const comentario = {
+      recetaId: new Types.ObjectId(recetaId),
       autorId: new Types.ObjectId(usuarioId),
       autorNombre: usuario.nombre,
       avatarUrl: usuario.foto ?? null,
       texto: texto.trim(),
-      fecha,
+      fecha: new Date(),
     };
 
-    receta.listaComentarios.push(comentario as IComentarioReceta);
-    await receta.save();
+    try {
+      await Comentario.create(comentario);
+    } catch (error) {
+      await Receta.updateOne({ _id: recetaId }, { $inc: { numComentarios: -1 } });
+      throw error;
+    }
 
     return {
       autorNombre: comentario.autorNombre,
       avatarUrl: comentario.avatarUrl,
       texto: comentario.texto,
-      fecha: fecha.toISOString(),
+      fecha: comentario.fecha.toISOString(),
     };
   },
 
@@ -440,22 +467,22 @@ export const recetaRepository = {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const usuario = await Usuario.findById(usuarioId);
-    if (!usuario) {
+    const rid = new Types.ObjectId(recetaId);
+    const yaGuardado =
+      (await Usuario.exists({ _id: usuarioId, recetasGuardadas: rid })) !== null;
+
+    const actualizado = await Usuario.findByIdAndUpdate(
+      usuarioId,
+      yaGuardado ? { $pull: { recetasGuardadas: rid } } : { $addToSet: { recetasGuardadas: rid } },
+      { new: true, projection: { _id: 1 } },
+    )
+      .lean()
+      .exec();
+
+    if (!actualizado) {
       throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
     }
 
-    const rid = new Types.ObjectId(recetaId);
-    const guardadas = usuario.recetasGuardadas ?? [];
-    const yaGuardado = guardadas.some((id) => id.equals(rid));
-
-    if (yaGuardado) {
-      usuario.recetasGuardadas = guardadas.filter((id) => !id.equals(rid));
-    } else {
-      usuario.recetasGuardadas = [...guardadas, rid];
-    }
-
-    await usuario.save();
     return { guardado: !yaGuardado };
   },
 
@@ -513,7 +540,7 @@ export const recetaRepository = {
     const tiempoStr = `${datos.tiempo} ${datos.unidadTiempo}`;
     const dificultad = MAPA_DIFICULTAD[datos.dificultad];
 
-    let imagenUrl = datos.imagenBase64 ?? "";
+    let imagenUrl = datos.imagenUrl ?? "";
     let fotoFuente: "usuario" | "pexels" = datos.fotoFuente ?? "usuario";
     let fotoCredito: IFotoCredito | null = datos.fotoCredito ?? null;
 
@@ -556,7 +583,7 @@ export const recetaRepository = {
         })),
       ),
       likes: [],
-      listaComentarios: [],
+      numComentarios: 0,
       fechaPublicacion: new Date(),
     });
 
@@ -567,28 +594,32 @@ export const recetaRepository = {
     id: string,
     pagina: number,
     limite: number,
-  ): Promise<{
-    comentarios: { autorNombre: string; avatarUrl: string | null; texto: string; fecha: string }[];
-    total: number;
-    hayMas: boolean;
-  }> {
+  ): Promise<PaginaComentarios> {
     if (!Types.ObjectId.isValid(id)) return { comentarios: [], total: 0, hayMas: false };
 
-    const receta = await Receta.findById(id).select("listaComentarios").lean().exec();
-    if (!receta) return { comentarios: [], total: 0, hayMas: false };
-
-    type ComentarioLean = { autorNombre: string; avatarUrl: string | null; texto: string; fecha: Date };
-    const todos = (receta.listaComentarios as ComentarioLean[]).slice().reverse();
-    const total = todos.length;
+    const recetaId = new Types.ObjectId(id);
     const skip = (pagina - 1) * limite;
-    const comentarios = todos.slice(skip, skip + limite).map((c) => ({
-      autorNombre: c.autorNombre,
-      avatarUrl: c.avatarUrl,
-      texto: c.texto,
-      fecha: c.fecha.toISOString(),
-    }));
 
-    return { comentarios, total, hayMas: skip + limite < total };
+    const [docs, total] = await Promise.all([
+      Comentario.find({ recetaId })
+        .sort({ fecha: -1, _id: -1 })
+        .skip(skip)
+        .limit(limite)
+        .lean()
+        .exec(),
+      Comentario.countDocuments({ recetaId }),
+    ]);
+
+    return {
+      comentarios: docs.map((c) => ({
+        autorNombre: c.autorNombre,
+        avatarUrl: c.avatarUrl,
+        texto: c.texto,
+        fecha: c.fecha.toISOString(),
+      })),
+      total,
+      hayMas: skip + docs.length < total,
+    };
   },
 
   async actualizar(
@@ -628,8 +659,8 @@ export const recetaRepository = {
       }));
     }
     if (datos.pasos !== undefined) update.pasos = datos.pasos.map((p) => p.texto);
-    if (datos.imagenBase64 !== undefined) {
-      update.imagenUrl = datos.imagenBase64;
+    if (datos.imagenUrl !== undefined) {
+      update.imagenUrl = datos.imagenUrl;
       update.fotoFuente = datos.fotoFuente ?? "usuario";
       update.fotoCredito = datos.fotoCredito ?? null;
     }
@@ -653,17 +684,39 @@ export const recetaRepository = {
     }
 
     await Receta.deleteOne({ _id: recetaId });
+    await Comentario.deleteMany({ recetaId: new Types.ObjectId(recetaId) });
   },
 
-  async buscarCandidatasParaDespensa(alergias: string[]): Promise<RecetaCandidataDespensa[]> {
+  async buscarCandidatasParaDespensa(
+    alergias: string[],
+    preferencias: string[] = [],
+  ): Promise<RecetaCandidataDespensa[]> {
     const query: Record<string, unknown> = {};
     if (alergias.length > 0) {
       query["alergenos"] = { $nin: alergias };
     }
 
-    const docs = await Receta.find(query)
-      .select("titulo descripcion tiempo dificultad imagenUrl categorias ingredientes likes")
-      .lean()
+    const docs = await Receta.aggregate([
+      { $match: query },
+      {
+        $addFields: {
+          prefBoost: {
+            $size: {
+              $filter: { input: "$categorias", cond: { $in: ["$$this", preferencias] } },
+            },
+          },
+          numLikes: { $size: "$likes" },
+        },
+      },
+      { $sort: { prefBoost: -1, numLikes: -1, fechaPublicacion: -1 } },
+      {
+        $project: {
+          titulo: 1, descripcion: 1, tiempo: 1, dificultad: 1,
+          imagenUrl: 1, categorias: 1, ingredientes: 1, numLikes: 1,
+        },
+      },
+    ])
+      .allowDiskUse(true)
       .exec();
 
     return docs.map((d) => {
@@ -677,7 +730,7 @@ export const recetaRepository = {
         imagenUrl: doc.imagenUrl as string,
         categorias: (doc.categorias as string[]) ?? [],
         ingredientes: ((doc.ingredientes as Array<{ nombre: string }>) ?? []).map((i) => i.nombre),
-        likes: ((doc.likes as unknown[]) ?? []).length,
+        likes: (doc.numLikes as number) ?? 0,
       };
     });
   },

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
 import { Usuario } from "../../src/models/usuarioMongo";
 import { Receta } from "../../src/models/recetaMongo";
+import { Comentario } from "../../src/models/comentarioMongo";
 import { Token } from "../../src/models/tokenMongo";
 import { firmarToken } from "../../src/lib/jwt";
 
@@ -40,16 +41,20 @@ export function tokenDe(usuario: { _id: unknown; correo: string; rol: string }) 
 
 export async function crearReceta(datos: Partial<{
   titulo: string;
+  descripcion: string;
   autorId: Types.ObjectId;
   alergenos: string[];
   categorias: string[];
   dificultad: "Fácil" | "Media" | "Difícil";
+  likes: Types.ObjectId[];
+  comentarios: number;
+  fechaPublicacion: Date;
 }> = {}) {
   const autorId = datos.autorId ?? (await crearUsuario())._id as Types.ObjectId;
-  return Receta.create({
+  const receta = await Receta.create({
     autorId,
     titulo: datos.titulo ?? "Receta de prueba",
-    descripcion: "Una descripción suficientemente larga para el esquema.",
+    descripcion: datos.descripcion ?? "Una descripción suficientemente larga para el esquema.",
     imagenUrl: "https://example.com/foto.jpg",
     tiempo: "20 min",
     dificultad: datos.dificultad ?? "Fácil",
@@ -59,10 +64,25 @@ export async function crearReceta(datos: Partial<{
     pasos: ["Un paso lo bastante largo como para valer."],
     alergenos: datos.alergenos ?? [],
     macros: { calorias: 100, proteinas: 1, carbos: 1, grasas: 1 },
-    likes: [],
-    listaComentarios: [],
-    fechaPublicacion: new Date(),
+    likes: datos.likes ?? [],
+    numComentarios: datos.comentarios ?? 0,
+    fechaPublicacion: datos.fechaPublicacion ?? new Date(),
   });
+
+  if (datos.comentarios) {
+    await Comentario.insertMany(
+      Array.from({ length: datos.comentarios }, (_, i) => ({
+        recetaId: receta._id,
+        autorId,
+        autorNombre: "Comentarista",
+        avatarUrl: null,
+        texto: `Qué buena pinta (${i + 1}).`,
+        fecha: new Date(Date.now() - i * 1000),
+      })),
+    );
+  }
+
+  return receta;
 }
 
 export function crearTokenVerificacion(userId: Types.ObjectId, opciones: { expira?: Date } = {}) {

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Qué es esto
 
-Cookr: red social gastronómica con IA generativa. TFG del Grado en Ingeniería Informática (Universidad de Salamanca).
+Cookr: red social gastronómica con IA generativa y asistente de cocina. Proyecto personal de producción (defensa de TFG completada con éxito).
 
 Monorepo con **tres unidades desplegables independientes**:
 
@@ -14,7 +14,9 @@ Monorepo con **tres unidades desplegables independientes**:
 | `backend/` | API REST Express + TypeScript | Render |
 | `gemini-proxy/` | Cloudflare Worker que hace de proxy hacia la API de Gemini | Cloudflare |
 
-`documentacion/` y `overleaf/` son la memoria en LaTeX. `presentacion/` es la defensa. `docs/` es documentación de desarrollo.
+`docs/` es la documentación de desarrollo. Empieza siempre por `docs/README.md`, que es el índice.
+
+La memoria en LaTeX, la presentación de la defensa y los documentos oficiales del TFG **no están en este repositorio**: viven un nivel por encima, en `4 Curso/`. No son código de Cookr y el `.gitignore` de la raíz los bloquea por si vuelven a aparecer aquí dentro.
 
 ## Comandos
 
@@ -51,7 +53,7 @@ cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
 ```
 
-**Hay 80 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 169 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -178,7 +180,11 @@ Los mensajes de commit sí van en inglés e imperativo.
 
 Plantillas en `backend/.env.example` y `frontend/.env.example`.
 
-Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`.
+Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
+`GOOGLE_CLIENT_ID`.
+
+`GOOGLE_CLIENT_ID` tiene que valer **lo mismo** en el backend y en el frontend: el backend lo usa
+como `audience` al verificar el `id_token` de Google en `lib/googleAuth.ts`. Si falta, `POST /api/auth/google` responde 503 en vez de dejar pasar a nadie.
 
 Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend), `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
 

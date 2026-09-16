@@ -2,9 +2,16 @@ import { Request, Response, NextFunction } from "express";
 
 type ErrorConStatus = Error & { status?: number };
 
+const MENSAJE_GENERICO = "Error interno del servidor";
+
 export function manejarError(res: Response, error: unknown): void {
   const err = error as ErrorConStatus;
-  res.status(err.status ?? 500).json({ error: err.message ?? "Error interno del servidor" });
+  const status = err?.status ?? 500;
+  const esFalloNoControlado = status >= 500 && err?.status === undefined;
+
+  res.status(status).json({
+    error: esFalloNoControlado ? MENSAJE_GENERICO : err?.message ?? MENSAJE_GENERICO,
+  });
 }
 
 export function manejadorErrores(

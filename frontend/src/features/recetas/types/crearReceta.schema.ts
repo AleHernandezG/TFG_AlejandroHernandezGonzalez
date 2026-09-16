@@ -45,7 +45,7 @@ export interface DatosRecetaNueva {
   alergenos: string[]
   ingredientes: { nombre: string; cantidad: string; unidad: string }[]
   pasos: { texto: string }[]
-  imagenBase64?: string
+  imagenUrl?: string
   fotoFuente?: 'usuario' | 'pexels'
   fotoCredito?: {
     fotografo: string

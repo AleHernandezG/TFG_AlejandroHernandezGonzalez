@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colección — Cookr TFG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e5e5e5; line-height: 1.6; }
+
+    header { background: #1a1a1a; border-bottom: 1px solid #2a2a2a; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .badge { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px; background: #f9731622; color: #f97316; border: 1px solid #f9731644; text-transform: uppercase; letter-spacing: 0.05em; }
+    .meta { font-size: 0.78rem; color: #737373; margin-left: auto; }
+
+    nav { background: #141414; border-bottom: 1px solid #222; padding: 0.75rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; color: #a3a3a3; text-decoration: none; }
+    nav a:hover { color: #f97316; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    section { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden; }
+    .section-header { padding: 1rem 1.25rem; border-bottom: 1px solid #252525; display: flex; align-items: center; gap: 0.75rem; }
+    .section-header h2 { font-size: 0.92rem; font-weight: 700; color: #fff; }
+    .section-icon { font-size: 1rem; }
+    .section-body { padding: 1.25rem; }
+
+    h3 { font-size: 0.82rem; font-weight: 700; color: #d4d4d4; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; margin-top: 1.25rem; }
+    h3:first-child { margin-top: 0; }
+
+    p { font-size: 0.85rem; color: #a3a3a3; margin-bottom: 0.75rem; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 0.55rem 1rem; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #525252; border-bottom: 1px solid #222; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1f1f1f; }
+    .id  { font-family: monospace; font-size: 0.72rem; color: #f97316; white-space: nowrap; }
+    .path { font-family: monospace; font-size: 0.72rem; color: #60a5fa; }
+
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 1rem; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.76rem; color: #d4d4d4; overflow-x: auto; margin: 0.75rem 0; line-height: 1.8; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.78rem; background: #1f1f1f; padding: 0.1rem 0.35rem; border-radius: 4px; color: #f97316; }
+
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 999px; margin-right: 0.35rem; }
+    .tag.done    { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+    .tag.review  { background: #f9731622; color: #fb923c;  border: 1px solid #f9731633; }
+    .tag.mock    { background: #eab30822; color: #fbbf24;  border: 1px solid #eab30833; }
+    .tag.fase5   { background: #8b5cf622; color: #c084fc;  border: 1px solid #8b5cf633; }
+    .tag.client  { background: #3b82f622; color: #60a5fa;  border: 1px solid #3b82f633; }
+    .tag.server  { background: #22c55e22; color: #4ade80;  border: 1px solid #22c55e33; }
+
+    .flow { display: flex; flex-direction: column; gap: 0; }
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid #222; }
+    .flow-step:last-child { border-bottom: none; }
+    .step-num { font-family: monospace; font-size: 0.72rem; font-weight: 700; color: #f97316; background: #f9731622; border: 1px solid #f9731633; border-radius: 999px; padding: 0.2rem 0.55rem; white-space: nowrap; margin-top: 0.1rem; }
+    .step-txt { font-size: 0.84rem; color: #d4d4d4; }
+    .step-txt small { display: block; margin-top: 0.2rem; font-size: 0.76rem; color: #525252; }
+
+    .design-row { display: flex; align-items: flex-start; gap: 1rem; padding: 0.65rem 0; border-bottom: 1px solid #1f1f1f; font-size: 0.82rem; }
+    .design-row:last-child { border-bottom: none; }
+    .design-stitch { color: #a3a3a3; min-width: 240px; font-family: monospace; font-size: 0.75rem; }
+    .design-arrow  { color: #525252; font-size: 0.8rem; }
+    .design-cookr  { color: #4ade80; font-family: monospace; font-size: 0.75rem; }
+
+    .comp-list { display: flex; flex-direction: column; gap: 0; }
+    .comp-row  { display: flex; align-items: flex-start; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid #1f1f1f; }
+    .comp-row:last-child { border-bottom: none; }
+    .comp-name { font-family: monospace; font-size: 0.75rem; color: #60a5fa; min-width: 230px; }
+    .comp-desc { font-size: 0.8rem; color: #a3a3a3; }
+    .comp-type { font-size: 0.68rem; font-weight: 700; color: #737373; white-space: nowrap; }
+
+    .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #d4d4d4; line-height: 2; }
+    .tree .new    { color: #4ade80; }
+    .tree .mod    { color: #f97316; }
+    .tree .exists { color: #525252; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Vista /coleccion — Guardadas &amp; Mis Recetas</h1>
+  </div>
+  <span class="badge">Sprint 3</span>
+  <div class="meta">UI-021 · UI-022 · 2026-04-28 · Fase 3 de 7</div>
+</header>
+
+<nav>
+  <a href="#resumen">Resumen</a>
+  <a href="#stitch">Referencia Stitch</a>
+  <a href="#flujo">Flujo usuario</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#datos">Datos mock</a>
+  <a href="#diseno">Diseño → Cookr</a>
+  <a href="#animaciones">Animaciones</a>
+  <a href="#capas">Capas</a>
+  <a href="#todos">TODOs Fase 5</a>
+</nav>
+
+<main>
+
+  <!-- RESUMEN -->
+  <section id="resumen">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h2>Resumen</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Rediseño completo de la vista <code>/coleccion</code> a partir del Stitch aprobado
+        (docs/diseno/stitch/coleccion/). Sustituye la implementación anterior que reutilizaba
+        <code>TarjetaPost</code> del feed. Ahora usa una cuadrícula editorial portrait 2 columnas
+        con cards propias de la feature. FE mock — backend se conecta en Fase 5 sin tocar componentes.
+      </p>
+      <table>
+        <thead><tr><th>Elemento</th><th>Detalle</th></tr></thead>
+        <tbody>
+          <tr><td>Ruta</td><td class="path">/coleccion</td></tr>
+          <tr><td>Pestañas</td><td>Guardadas · Mis Recetas</td></tr>
+          <tr><td>Componentes nuevos</td><td>6 (header, tarjeta, grid, 2 estados vacíos, contenido)</td></tr>
+          <tr><td>Tipos nuevos</td><td class="path">features/coleccion/types/coleccion.types.ts</td></tr>
+          <tr><td>Datos mock</td><td class="path">features/coleccion/data/datosColeccion.ts (4 guardadas + 4 propias)</td></tr>
+          <tr><td>Animaciones</td><td>AnimatePresence fade entre pestañas (Framer Motion)</td></tr>
+          <tr><td>Referencia visual</td><td class="path">docs/diseno/stitch/coleccion/guardadas/ · docs/diseno/stitch/coleccion/misrecetas/</td></tr>
+          <tr><td>TypeScript</td><td>0 errores (<code>tsc --noEmit</code> limpio)</td></tr>
+          <tr><td>Estado</td><td><span class="tag mock">Mock</span> backend se conecta en Fase 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- STITCH -->
+  <section id="stitch">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <h2>Referencia Stitch</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Se usaron dos Stitches como única referencia de layout, jerarquía y composición.
+        Nada del HTML de Stitch se copió directamente al código: colores, fuentes, componentes
+        y estructura siguen exclusivamente el sistema Cookr.
+      </p>
+      <table>
+        <thead><tr><th>Vista</th><th>Archivo Stitch</th><th>Características clave del diseño</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Guardadas</strong></td>
+            <td class="path">docs/diseno/stitch/coleccion/guardadas/code.html</td>
+            <td>Título "¡Mis recetas <em>Guardadas</em>!" · Bookmark filled (glass circular) top-right · Autores de otras personas</td>
+          </tr>
+          <tr>
+            <td><strong>Mis Recetas</strong></td>
+            <td class="path">docs/diseno/stitch/coleccion/misrecetas/code.html</td>
+            <td>Título "¡<em>Mis Recetas</em>!" · MoreHorizontal (···) top-right · Autor "Tú" con avatar propio</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Sistema de diseño del Stitch — The Culinary Editorial</h3>
+      <p>
+        El DESIGN.md adjunto a ambos Stitches define la filosofía "Digital Gourmet Editorial":
+        paleta warm ochre, regla No-Line (separación por color de fondo, no por bordes),
+        sombras ambient (0px 12px 32px rgba muy sutil) y esquinas <code>xl</code> (1.5rem).
+        Todo ello ya es nativo en el sistema Cookr — la traducción fue directa.
+      </p>
+    </div>
+  </section>
+
+  <!-- FLUJO DE USUARIO -->
+  <section id="flujo">
+    <div class="section-header">
+      <span class="section-icon">🔄</span>
+      <h2>Flujo de usuario</h2>
+    </div>
+    <div class="section-body">
+      <div class="flow">
+        <div class="flow-step">
+          <span class="step-num">1</span>
+          <div class="step-txt">
+            Usuario abre <code>/coleccion</code>
+            <small>La vista carga con la pestaña "Guardadas" activa por defecto</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">2</span>
+          <div class="step-txt">
+            Header sticky muestra: título editorial + contador de recetas + segmented control pill
+            <small>"¡Mis recetas <em>Guardadas</em>!" · "4 recetas guardadas"</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">3</span>
+          <div class="step-txt">
+            Si hay recetas → <strong>GridRecetasColeccion</strong>: cuadrícula 2 columnas, cards portrait 3:4
+            <small>Guardadas: bookmark filled top-right · Mis Recetas: ··· top-right</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">4</span>
+          <div class="step-txt">
+            Si no hay recetas → estado vacío específico por pestaña
+            <small>Guardadas: Bookmark icon + CTA "Explorar recetas" → /home · Mis Recetas: ChefHat + CTA "Crear primera receta" → /crear-receta</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">5</span>
+          <div class="step-txt">
+            Usuario toca el segmented control → cambia de pestaña
+            <small>AnimatePresence fade suave (0.22s easeOut entrada, 0.15s easeIn salida). Título y contador se actualizan según la pestaña activa</small>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">6</span>
+          <div class="step-txt">
+            Usuario toca una tarjeta → navega a <code>/recetas/[id]</code>
+            <small>El botón (bookmark o ···) dentro de la tarjeta hace e.preventDefault() + e.stopPropagation() para no navegar</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <div class="section-header">
+      <span class="section-icon">🧩</span>
+      <h2>Componentes</h2>
+    </div>
+    <div class="section-body">
+      <h3>Nuevos — feature/coleccion</h3>
+      <div class="comp-list">
+        <div class="comp-row">
+          <span class="comp-name">headerColeccion.tsx</span>
+          <span class="comp-desc">
+            <span class="tag client">client</span>
+            Header sticky con sombra ambient muy sutil. Título editorial que cambia con la pestaña activa:
+            "¡Mis recetas <em>Guardadas</em>!" o "¡<em>Mis Recetas</em>!". Contador de recetas.
+            Segmented control pill (bg-muted / bg-brand activo).
+            Recibe pestana + onCambiar + total por props.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">tarjetaColeccion.tsx</span>
+          <span class="comp-desc">
+            <span class="tag client">client</span>
+            Card portrait <code>aspect-[3/4]</code> con <code>rounded-xl overflow-hidden</code>.
+            next/image fill + object-cover. Gradient overlay de bottom a top (<code>from-black/80 via-black/20</code>).
+            Título bold + avatar + nombre del autor anclados al bottom. Botón top-right condicional:
+            <code>Bookmark fill-current</code> en "guardadas" (glass circular) o <code>MoreHorizontal</code>
+            en "mis-recetas". Envuelve todo en <code>&lt;Link href="/recetas/[id]"&gt;</code>;
+            los botones hacen preventDefault + stopPropagation.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">gridRecetasColeccion.tsx</span>
+          <span class="comp-desc">
+            <span class="tag server">server</span>
+            Cuadrícula <code>grid-cols-2 gap-4</code>. Mapea las recetas con TarjetaColeccion.
+            Indicador de scroll al final: 4 dots, el segundo más ancho y brand (patrón Stitch).
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">estadoVacioMisRecetas.tsx</span>
+          <span class="comp-desc">
+            <span class="tag server">server</span>
+            Estado vacío para la pestaña "Mis Recetas". Círculo bg-brand/10 con ChefHat brand/60.
+            Texto "Aún no has publicado ninguna receta" + subtítulo muted.
+            CTA pill rounded-full bg-brand → <code>/crear-receta</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">estadoVacioGuardadas.tsx</span>
+          <span class="comp-desc">
+            <span class="tag server">server</span>
+            Estado vacío para la pestaña "Guardadas". Círculo bg-brand/10 con Bookmark brand/60.
+            Texto "Aún no has guardado ninguna receta" + instrucción muted.
+            CTA pill rounded-full bg-brand → <code>/home</code>.
+          </span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">contenidoColeccion.tsx</span>
+          <span class="comp-desc">
+            <span class="tag client">client</span>
+            Client component principal. Gestiona el estado de pestaña con <code>useState</code>.
+            Deriva las recetas del array mock según la pestaña activa. Decide si mostrar grid o estado vacío.
+            Envuelve el contenido en <code>AnimatePresence mode="wait"</code> para el fade entre pestañas.
+          </span>
+        </div>
+      </div>
+
+      <h3>Modificados</h3>
+      <div class="comp-list">
+        <div class="comp-row">
+          <span class="comp-name">components/index.ts</span>
+          <span class="comp-desc">Barrel export actualizado: exporta los 6 componentes nuevos. Antes era solo <code>// Sprint 3+</code>.</span>
+        </div>
+        <div class="comp-row">
+          <span class="comp-name">app/(main)/coleccion/page.tsx</span>
+          <span class="comp-desc">Reemplazado por un Server Component limpio. Mobile: <code>&lt;ContenidoColeccion /&gt;</code> directo. Desktop: <code>&lt;SidebarNavPc /&gt;</code> + <code>&lt;ContenidoColeccion /&gt;</code> en <code>max-w-2xl</code>. Ya no tiene <code>'use client'</code> ni imports de recetas/data.</span>
+        </div>
+      </div>
+
+      <h3>Árbol de archivos</h3>
+      <pre class="tree">frontend/src/
+├── features/
+│   └── coleccion/
+│       ├── components/
+│       │   ├── <span class="new">headerColeccion.tsx</span>        ← NUEVO · 'use client' · sticky header + toggle
+│       │   ├── <span class="new">tarjetaColeccion.tsx</span>       ← NUEVO · 'use client' · card portrait 3/4
+│       │   ├── <span class="new">gridRecetasColeccion.tsx</span>   ← NUEVO · server · grid 2 cols + dots
+│       │   ├── <span class="new">estadoVacioMisRecetas.tsx</span>  ← NUEVO · server · ChefHat + CTA crear
+│       │   ├── <span class="new">estadoVacioGuardadas.tsx</span>   ← NUEVO · server · Bookmark + CTA explorar
+│       │   ├── <span class="new">contenidoColeccion.tsx</span>     ← NUEVO · 'use client' · estado + AnimatePresence
+│       │   └── <span class="mod">index.ts</span>                   ← MODIFICADO · exporta los 6 componentes
+│       ├── data/
+│       │   └── <span class="new">datosColeccion.ts</span>          ← NUEVO · 4 guardadas + 4 propias
+│       └── types/
+│           └── <span class="new">coleccion.types.ts</span>         ← NUEVO · PestanaColeccion + RecetaColeccion
+│
+└── app/
+    └── (main)/
+        └── coleccion/
+            └── <span class="mod">page.tsx</span>               ← REEMPLAZADO · Server Component limpio</pre>
+    </div>
+  </section>
+
+  <!-- DATOS MOCK -->
+  <section id="datos">
+    <div class="section-header">
+      <span class="section-icon">📦</span>
+      <h2>Datos mock</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Ubicación: <code>features/coleccion/data/datosColeccion.ts</code>.
+        Dos arrays tipados con <code>RecetaColeccion</code>. Imágenes de <code>picsum.photos</code>
+        con semillas estables (siempre la misma imagen para la misma seed).
+      </p>
+
+      <h3>Tipo RecetaColeccion</h3>
+      <pre>type RecetaColeccion = {
+  id: string
+  titulo: string
+  imagenUrl: string
+  autor: { nombre: string; avatarUrl: string }
+}</pre>
+
+      <h3>MIS_RECETAS — 4 recetas del usuario</h3>
+      <table>
+        <thead><tr><th>id</th><th>Título</th><th>Autor</th><th>Imagen</th></tr></thead>
+        <tbody>
+          <tr><td class="id">r1</td><td>Pasta al pesto casero</td><td>Tú</td><td class="path">picsum/seed/colr1/400/533</td></tr>
+          <tr><td class="id">r2</td><td>Tarta de limón</td><td>Tú</td><td class="path">picsum/seed/colr2/400/533</td></tr>
+          <tr><td class="id">r3</td><td>Ensalada mediterránea</td><td>Tú</td><td class="path">picsum/seed/colr3/400/533</td></tr>
+          <tr><td class="id">r4</td><td>Brochetas BBQ</td><td>Tú</td><td class="path">picsum/seed/colr4/400/533</td></tr>
+        </tbody>
+      </table>
+
+      <h3>RECETAS_GUARDADAS — 4 recetas de otros</h3>
+      <table>
+        <thead><tr><th>id</th><th>Título</th><th>Autor</th><th>Imagen</th></tr></thead>
+        <tbody>
+          <tr><td class="id">g1</td><td>Buddha Bowl de Verano</td><td>Clara M.</td><td class="path">picsum/seed/colg1/400/533</td></tr>
+          <tr><td class="id">g2</td><td>Pizza Rústica Margarita</td><td>Chef Juan</td><td class="path">picsum/seed/colg2/400/533</td></tr>
+          <tr><td class="id">g3</td><td>Pancakes Esponjosos</td><td>Ana Cocina</td><td class="path">picsum/seed/colg3/400/533</td></tr>
+          <tr><td class="id">g4</td><td>Tostada Avo &amp; Huevo</td><td>Sano y Rico</td><td class="path">picsum/seed/colg4/400/533</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Nota sobre avatares</h3>
+      <p>
+        Todas las recetas propias comparten la seed <code>myavatar</code> para simular el
+        avatar del usuario logueado. Fase 5: sustituir por <code>session.user.image</code>.
+      </p>
+    </div>
+  </section>
+
+  <!-- DISEÑO → COOKR -->
+  <section id="diseno">
+    <div class="section-header">
+      <span class="section-icon">🎯</span>
+      <h2>Traducción Stitch → Sistema Cookr</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        El Stitch usa colores del Material Design 3 (tema warm ochre). Cada token se mapea
+        a las variables CSS de <code>globals.css</code> o a las excepciones documentadas en
+        <code>rules.md §3</code>. Cero colores hardcodeados.
+      </p>
+
+      <div class="design-row" style="font-size:0.72rem;font-weight:700;color:#525252;padding-bottom:0.4rem;">
+        <span class="design-stitch">STITCH</span>
+        <span class="design-arrow"></span>
+        <span class="design-cookr">COOKR</span>
+      </div>
+
+      <div class="design-row">
+        <span class="design-stitch">bg-primary (#855400)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-brand</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">text-on-primary (#ffffff)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">text-brand-foreground</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">bg-surface-container-high (#e9e8e4)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-muted  <span style="color:#525252">(track del toggle)</span></span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">bg-surface-container-lowest (#ffffff)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-card  <span style="color:#525252">(header, botón bookmark)</span></span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">bg-background (#faf9f5)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-background</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">text-secondary (#5f5e5e)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">text-muted-foreground</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">text-on-background (#1b1c1a)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">text-foreground</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">shadow 0px 12px 32px rgba(27,28,26,0.06)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">shadow header 0px 12px 32px rgba(...0.02)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.02)]</span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">bg-gradient-to-t from-black/80 via-black/20</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-gradient-to-t from-black/80 via-black/20 to-transparent  <span style="color:#525252">(excepción permitida)</span></span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">bg-surface-container-lowest/80 backdrop-blur-sm</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">bg-white/80 backdrop-blur-sm  <span style="color:#525252">(excepción sobre foto)</span></span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">font Plus Jakarta Sans</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">Geist (configurada en el proyecto, misma x-height)  <span style="color:#525252">(nunca importar fuente de Stitch)</span></span>
+      </div>
+      <div class="design-row">
+        <span class="design-stitch">rounded-xl (24px del Stitch)</span>
+        <span class="design-arrow">→</span>
+        <span class="design-cookr">rounded-xl  <span style="color:#525252">(mismo valor en Tailwind del proyecto)</span></span>
+      </div>
+
+      <h3>Regla No-Line</h3>
+      <p>
+        El Stitch prohíbe bordes de 1px para separar secciones — usa diferencia de tono de fondo.
+        En /coleccion: el header tiene <code>bg-card</code> (blanco) sobre el <code>bg-background</code>
+        (crema) del contenido. La separación es tonal, no una línea. Alineado con <code>rules.md §9 — No-Line Rule</code>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ANIMACIONES -->
+  <section id="animaciones">
+    <div class="section-header">
+      <span class="section-icon">✨</span>
+      <h2>Animaciones — Framer Motion v12</h2>
+    </div>
+    <div class="section-body">
+      <p>
+        Se usa <code>AnimatePresence mode="wait"</code> en <code>contenidoColeccion.tsx</code>
+        para animar el cambio de pestaña. Las variantes están anotadas con <code>type Variants</code>
+        como exige rules.md §8 (Framer Motion v12 es estricto con los tipos).
+      </p>
+
+      <h3>Variantes declaradas</h3>
+<pre>const variantesContenido: Variants = {
+  oculto: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.22, ease: 'easeOut' }
+  },
+  salir: {
+    opacity: 0,
+    y: -6,
+    transition: { duration: 0.15, ease: 'easeIn' }
+  },
+}</pre>
+
+      <h3>Uso en el componente</h3>
+<pre>&lt;AnimatePresence mode="wait"&gt;
+  &lt;motion.div
+    key={pestana}           {/* key distinta → remonta → anima */}
+    variants={variantesContenido}
+    initial="oculto"
+    animate="visible"
+    exit="salir"
+  &gt;
+    {/* grid o estado vacío */}
+  &lt;/motion.div&gt;
+&lt;/AnimatePresence&gt;</pre>
+
+      <p>
+        El <code>key={pestana}</code> fuerza a React a desmontar y remontar el
+        <code>motion.div</code> cada vez que cambia la pestaña. Sin esa key, AnimatePresence
+        no detectaría el cambio y no animaría la salida del contenido anterior.
+      </p>
+    </div>
+  </section>
+
+  <!-- CAPAS -->
+  <section id="capas">
+    <div class="section-header">
+      <span class="section-icon">🏗️</span>
+      <h2>Arquitectura de capas</h2>
+    </div>
+    <div class="section-body">
+      <pre>page.tsx  (Server Component)
+  ├─ [mobile]   ContenidoColeccion (client)
+  └─ [desktop]  SidebarNavPc (client)  +  ContenidoColeccion (client)
+
+ContenidoColeccion (client · useState · AnimatePresence)
+  ├─ HeaderColeccion     (client · onClick handlers)
+  └─ AnimatePresence
+       ├─ GridRecetasColeccion (server, key=pestana)
+       │    └─ TarjetaColeccion × N  (client · onClick en botones)
+       ├─ EstadoVacioGuardadas  (server, key=pestana)
+       └─ EstadoVacioMisRecetas (server, key=pestana)
+
+datosColeccion.ts  ← fuente única de verdad (hasta Fase 5)
+coleccion.types.ts ← contratos de datos</pre>
+
+      <h3>Motivo de la frontera client/server</h3>
+      <table>
+        <thead><tr><th>Componente</th><th>Client / Server</th><th>Motivo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="path">contenidoColeccion.tsx</td>
+            <td><span class="tag client">client</span></td>
+            <td><code>useState</code> para la pestaña activa + <code>AnimatePresence</code></td>
+          </tr>
+          <tr>
+            <td class="path">headerColeccion.tsx</td>
+            <td><span class="tag client">client</span></td>
+            <td>Handlers <code>onClick</code> en los botones del segmented control</td>
+          </tr>
+          <tr>
+            <td class="path">tarjetaColeccion.tsx</td>
+            <td><span class="tag client">client</span></td>
+            <td>Handlers <code>onClick</code> en bookmark/··· para <code>preventDefault + stopPropagation</code></td>
+          </tr>
+          <tr>
+            <td class="path">gridRecetasColeccion.tsx</td>
+            <td><span class="tag server">server</span></td>
+            <td>Solo mapea y renderiza — sin hooks ni eventos propios</td>
+          </tr>
+          <tr>
+            <td class="path">estadoVacioMisRecetas.tsx</td>
+            <td><span class="tag server">server</span></td>
+            <td>Solo markup + <code>&lt;Link&gt;</code> — sin interactividad propia</td>
+          </tr>
+          <tr>
+            <td class="path">estadoVacioGuardadas.tsx</td>
+            <td><span class="tag server">server</span></td>
+            <td>Solo markup + <code>&lt;Link&gt;</code> — sin interactividad propia</td>
+          </tr>
+          <tr>
+            <td class="path">page.tsx</td>
+            <td><span class="tag server">server</span></td>
+            <td>Server Component puro — delega toda la interactividad a ContenidoColeccion</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Regla de cambio sin efecto cascada</h3>
+      <table>
+        <thead><tr><th>Si quiero cambiar…</th><th>Solo toco…</th></tr></thead>
+        <tbody>
+          <tr><td>Conectar recetas reales al BE</td><td class="path">contenidoColeccion.tsx — sustituir constantes por llamadas al hook useColeccion</td></tr>
+          <tr><td>Ampliar datos de una tarjeta (likes, fecha)</td><td class="path">coleccion.types.ts + datosColeccion.ts + tarjetaColeccion.tsx</td></tr>
+          <tr><td>Añadir acción al botón ···</td><td class="path">tarjetaColeccion.tsx — el handler ya tiene el e.stopPropagation() necesario</td></tr>
+          <tr><td>Cambiar la animación de cambio de pestaña</td><td class="path">contenidoColeccion.tsx — solo variantesContenido</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CORRECCIÓN IMPORTS -->
+  <section id="imports">
+    <div class="section-header">
+      <span class="section-icon">🔧</span>
+      <h2>Corrección imports — rules.md §15 [RULES-001]</h2>
+    </div>
+    <div class="section-body">
+      <p>Detectados imports cross-folder con rutas relativas (<code>../types/</code>, <code>../data/</code>). Corregidos a rutas absolutas <code>@/features/coleccion/...</code> en 4 componentes del módulo para cumplir la regla "todos los imports usan <code>@/</code>".</p>
+      <table>
+        <thead><tr><th>Fichero</th><th>Antes</th><th>Después</th></tr></thead>
+        <tbody>
+          <tr><td>contenidoColeccion.tsx</td><td><code>../data/datosColeccion</code><br><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/data/datosColeccion</code><br><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>tarjetaColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>headerColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+          <tr><td>gridRecetasColeccion.tsx</td><td><code>../types/coleccion.types</code></td><td><code>@/features/coleccion/types/coleccion.types</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TODOS FASE 5 -->
+  <section id="todos">
+    <div class="section-header">
+      <span class="section-icon">📌</span>
+      <h2>TODOs para Fase 5 (conexión backend)</h2>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>ID</th><th>Dónde</th><th>Qué hacer</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="id">TODO-COL-01</td>
+            <td class="path">contenidoColeccion.tsx</td>
+            <td>Sustituir <code>RECETAS_GUARDADAS</code> y <code>MIS_RECETAS</code> por <code>useColeccion(pestana)</code> que llame a <code>coleccionService.obtenerGuardadas()</code> o <code>coleccionService.obtenerMisRecetas()</code></td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-02</td>
+            <td class="path">features/coleccion/hooks/useColeccion.ts</td>
+            <td>Crear hook con TanStack Query: <code>useQuery(['coleccion', pestana], ...)</code> + estados de carga y error</td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-03</td>
+            <td class="path">src/services/coleccionService.ts</td>
+            <td>Crear service con <code>obtenerGuardadas()</code> → <code>GET /api/usuarios/:id/guardadas</code> y <code>obtenerMisRecetas()</code> → <code>GET /api/recetas?autor=me</code></td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-04</td>
+            <td class="path">tarjetaColeccion.tsx · bookmark onClick</td>
+            <td>Conectar el bookmark al toggle <code>POST /api/recetas/:id/guardar</code> con optimistic update (TanStack Query)</td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-05</td>
+            <td class="path">tarjetaColeccion.tsx · avatarUrl</td>
+            <td>En "Mis Recetas" usar <code>session.user.image</code> de NextAuth en lugar del avatar mock</td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-06</td>
+            <td class="path">tarjetaColeccion.tsx · MoreHorizontal onClick</td>
+            <td>Conectar menú ··· a acciones reales: Editar receta → <code>/crear-receta?editar=[id]</code> · Eliminar → <code>DELETE /api/recetas/:id</code> con Dialog de confirmación</td>
+          </tr>
+          <tr>
+            <td class="id">TODO-COL-07</td>
+            <td class="path">contenidoColeccion.tsx · total</td>
+            <td>El contador viene ahora del <code>recetas.length</code> mock. En Fase 5 usar el <code>total</code> paginado que devuelva el endpoint</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

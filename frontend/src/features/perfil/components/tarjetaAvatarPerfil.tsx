@@ -19,15 +19,10 @@ export function TarjetaAvatarPerfil({ nombre, email, avatar }: Props) {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      const base64 = reader.result as string
-      setPreview(base64)
-      subirFoto(base64, {
-        onError: () => setPreview(null),
-      })
-    }
-    reader.readAsDataURL(file)
+    setPreview(URL.createObjectURL(file))
+    subirFoto(file, {
+      onError: () => setPreview(null),
+    })
   }
 
   const fotoMostrada = preview ?? avatar

@@ -34,7 +34,7 @@ export function useCrearReceta() {
           alergenos: alergenosDetectados,
           ingredientes: datos.ingredientes,
           pasos: datos.pasos,
-          imagenBase64: fotoPreview ?? pexelsInfo?.url ?? undefined,
+          imagenUrl: fotoPreview ?? pexelsInfo?.url ?? undefined,
           fotoFuente: fotoPreview ? 'usuario' : pexelsInfo ? 'pexels' : undefined,
           fotoCredito: fotoPreview ? null : pexelsInfo ? {
             fotografo: pexelsInfo.fotografo,

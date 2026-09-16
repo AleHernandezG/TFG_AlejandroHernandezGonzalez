@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { recetasController } from "../controllers/recetasController";
 import { requerirAuth, optionalAuth } from "../middlewares/autenticacion";
+import { validarBody } from "../middlewares/validarBody";
+import { esquemaComentario } from "../lib/validadores";
 import { limitarPorUsuario } from "../middlewares/rateLimitIA";
 import { generarRecetaDesdeTexto } from "../services/chatService";
 
@@ -49,7 +51,12 @@ router.get("/:id/comentarios", optionalAuth, recetasController.obtenerComentario
 router.get("/:id/similares", optionalAuth, recetasController.obtenerSimilares);
 router.post("/:id/like", requerirAuth, recetasController.toggleLike);
 router.post("/:id/guardar", requerirAuth, recetasController.toggleGuardado);
-router.post("/:id/comentarios", requerirAuth, recetasController.agregarComentario);
+router.post(
+  "/:id/comentarios",
+  requerirAuth,
+  validarBody(esquemaComentario),
+  recetasController.agregarComentario,
+);
 
 router.put("/:id", requerirAuth, recetasController.actualizar);
 router.delete("/:id", requerirAuth, recetasController.eliminar);

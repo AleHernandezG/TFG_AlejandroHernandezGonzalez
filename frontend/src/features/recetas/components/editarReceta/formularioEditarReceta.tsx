@@ -3,9 +3,11 @@
 import { useRef, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, Trash2, ArrowLeft } from 'lucide-react'
+import { Camera, Trash2, ArrowLeft, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { subidasService } from '@/services/subidasService'
 import { Button } from '@/components/ui/button'
 import { SelectorChips } from '@/components/common/selectorChips'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
@@ -69,13 +71,14 @@ export function FormularioEditarReceta({ receta }: Props) {
   const { tiempo, unidadTiempo } = parsearTiempo(receta.receta.tiempo)
   const dificultadInterna = MAPA_DIFICULTAD_INVERSO[receta.receta.dificultad] ?? 'media'
 
-  const [fotoUrl, setFotoUrl] = useState<string | null>(
-    receta.receta.imagenUrl && !receta.receta.imagenUrl.startsWith('http') ? receta.receta.imagenUrl : null,
-  )
+  const { data: session } = useSession()
+  const [fotoUrl, setFotoUrl] = useState<string | null>(null)
   const [fotoExistente] = useState<string | null>(
     receta.receta.imagenUrl ?? null,
   )
   const [mostrarError, setMostrarError] = useState(false)
+  const [subiendoFoto, setSubiendoFoto] = useState(false)
+  const [errorFoto, setErrorFoto] = useState<string | null>(null)
   const inputFotoRef = useRef<HTMLInputElement>(null)
 
   const methods = useForm<DatosCrearReceta>({
@@ -102,16 +105,23 @@ export function FormularioEditarReceta({ receta }: Props) {
   const ingredientesActuales = watch('ingredientes') ?? []
   const alergenosDetectados = detectarAlergenos(ingredientesActuales.map((i) => i.nombre).filter(Boolean))
 
-  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setFotoUrl(reader.result as string)
-    }
-    reader.readAsDataURL(file)
     setValue('foto', file)
+    setErrorFoto(null)
+    setSubiendoFoto(true)
+
+    try {
+      setFotoUrl(await subidasService.subirImagen(file, 'receta', session?.user?.backendToken ?? ''))
+    } catch {
+      setFotoUrl(null)
+      setValue('foto', undefined)
+      setErrorFoto('No se pudo subir la foto. Inténtalo de nuevo.')
+    } finally {
+      setSubiendoFoto(false)
+    }
   }
 
   function onSubmitValido(datos: DatosCrearReceta) {
@@ -169,9 +179,14 @@ export function FormularioEditarReceta({ receta }: Props) {
                   className="object-cover"
                   unoptimized={fotoMostrada.startsWith('data:') || fotoMostrada.startsWith('blob:')}
                 />
+                {subiendoFoto && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+                    <Loader2 size={28} className="animate-spin text-white" />
+                  </div>
+                )}
                 <button
                   type="button"
-                  onClick={() => { setFotoUrl(null); setValue('foto', undefined) }}
+                  onClick={() => { setFotoUrl(null); setValue('foto', undefined); setErrorFoto(null) }}
                   className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg text-white"
                 >
                   <Trash2 size={16} />
@@ -193,6 +208,9 @@ export function FormularioEditarReceta({ receta }: Props) {
                 <Camera size={32} />
                 <span className="text-sm font-medium">Añadir foto</span>
               </button>
+            )}
+            {errorFoto && (
+              <p className="text-xs text-destructive px-4 pb-3">{errorFoto}</p>
             )}
           </section>
 

@@ -49,3 +49,8 @@ ehthumbs.db
 # Deployment & Serverless cache
 .vercel
 .wrangler/
+
+# Documentacion y documentos oficiales del TFG: viven en "4 Curso/", fuera de este repo (B6)
+/Cookr_TFG_Presentacion.pptx
+/ODCUTGF/
+/TFG-DOcumenatacion/

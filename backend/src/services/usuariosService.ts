@@ -54,11 +54,14 @@ export const usuariosService = {
     await usuarioRepository.actualizarContrasena(usuarioId, hash);
   },
 
-  async actualizarFoto(usuarioId: string, fotoBase64: string) {
-    if (!fotoBase64.startsWith("data:image/")) {
-      throw Object.assign(new Error("Formato de imagen no válido"), { status: 400 });
+  async actualizarFoto(usuarioId: string, fotoUrl: string) {
+    if (!/^https:\/\//.test(fotoUrl)) {
+      throw Object.assign(
+        new Error("La foto debe ser una URL https, no una imagen incrustada"),
+        { status: 400 },
+      );
     }
-    const usuario = await usuarioRepository.actualizarFoto(usuarioId, fotoBase64);
+    const usuario = await usuarioRepository.actualizarFoto(usuarioId, fotoUrl);
     if (!usuario) {
       throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
     }

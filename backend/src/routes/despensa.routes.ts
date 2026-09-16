@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { despensaController } from "../controllers/despensaController";
 import { requerirAuth } from "../middlewares/autenticacion";
+import { validarBody } from "../middlewares/validarBody";
+import { esquemaEditarDespensa } from "../lib/validadores";
 import { limitarPorUsuario } from "../middlewares/rateLimitIA";
 import { escanearTicket } from "../services/chatService";
 
@@ -39,7 +41,7 @@ router.post(
     }
   },
 );
-router.put("/:id", requerirAuth, despensaController.editar);
+router.put("/:id", requerirAuth, validarBody(esquemaEditarDespensa), despensaController.editar);
 router.delete("/:id", requerirAuth, despensaController.eliminar);
 
 export default router;

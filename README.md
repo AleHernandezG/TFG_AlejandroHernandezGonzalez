@@ -2,8 +2,6 @@
 
 Aplicación web para cocinar con lo que tienes. Cookr guarda tus recetas, conoce tus alergias y usa un asistente de IA para generar recetas, escanear el ticket de la compra y resolver dudas mientras cocinas.
 
-Proyecto de Fin de Grado del Grado en Ingeniería Informática.
-
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)
 ![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -70,7 +68,9 @@ Cada `push` a `main` dispara el flujo de GitHub Actions: comprueba el cliente y 
 
 ## Documentación
 
-La memoria completa y los anexos (manual de usuario, plan de proyecto, plan de seguridad y documentación técnica) están en [`documentacion/`](documentacion/).
+La documentación de desarrollo está en [`docs/`](docs/): auditoría, plan de trabajo, referencia técnica y material de diseño.
+
+La memoria del TFG y los anexos (manual de usuario, plan de proyecto, plan de seguridad y documentación técnica) se llevan en un repositorio aparte, fuera de este. No son código de Cookr y no se versionan con él.
 
 ## Autor
 

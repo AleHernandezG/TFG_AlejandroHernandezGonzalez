@@ -4,6 +4,7 @@ import { validarBody } from "../middlewares/validarBody";
 import { requerirAuth } from "../middlewares/autenticacion";
 import {
   limiteLogin,
+  limiteGoogle,
   limiteRegistro,
   limiteRecuperacion,
   limiteReenvioVerificacion,
@@ -27,7 +28,7 @@ router.post("/verificar-email",          validarBody(esquemaVerificarEmail),    
 router.post("/verificar-email/reenviar", limiteReenvioVerificacion, validarBody(esquemaReenviarVerificacion),  authController.reenviarVerificacion);
 router.post("/recuperar-contrasena", limiteRecuperacion, validarBody(esquemaRecuperar),   authController.recuperarContrasena);
 router.post("/nueva-contrasena",     validarBody(esquemaNuevaContrasena), authController.nuevaContrasena);
-router.post("/google",               validarBody(esquemaGoogleOAuth),     authController.googleOAuth);
+router.post("/google",               limiteGoogle,   validarBody(esquemaGoogleOAuth),     authController.googleOAuth);
 router.post("/completar-perfil",     requerirAuth, validarBody(esquemaCompletarPerfil), authController.completarPerfil);
 
 export default router;
