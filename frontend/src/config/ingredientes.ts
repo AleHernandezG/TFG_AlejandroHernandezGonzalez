@@ -1153,16 +1153,127 @@ export function obtenerIngrediente(
   )
 }
 
+const PALABRAS_VACIAS = new Set([
+  'a', 'al', 'con', 'de', 'del', 'el', 'en', 'la', 'las', 'lo', 'los', 'o', 'para', 'por', 'un', 'una', 'y',
+  'and', 'of', 'the', 'with',
+])
+
+const PALABRAS_CON_ALERGENOS: [string, AlergenoId[]][] = [
+  ['trigo', ['cereales']], ['harina', ['cereales']], ['pan', ['cereales']], ['pasta', ['cereales']],
+  ['espagueti', ['cereales']], ['macarron', ['cereales']], ['fideo', ['cereales']], ['tallarin', ['cereales']],
+  ['lasana', ['cereales']], ['canelon', ['cereales']], ['noqui', ['cereales']], ['gnocchi', ['cereales']],
+  ['cuscus', ['cereales']], ['bulgur', ['cereales']], ['cebada', ['cereales']], ['centeno', ['cereales']],
+  ['espelta', ['cereales']], ['seitan', ['cereales']], ['galleta', ['cereales']], ['bizcocho', ['cereales']],
+  ['hojaldre', ['cereales']], ['masa', ['cereales']], ['pizza', ['cereales']], ['empanada', ['cereales']],
+  ['empanadilla', ['cereales']], ['cerveza', ['cereales']], ['malta', ['cereales']], ['croissant', ['cereales']],
+  ['penne', ['cereales']], ['rigatoni', ['cereales']], ['fettuccine', ['cereales']], ['tagliatelle', ['cereales']],
+  ['fusilli', ['cereales']], ['farfalle', ['cereales']], ['trofie', ['cereales']], ['orzo', ['cereales']],
+  ['udon', ['cereales']], ['ramen', ['cereales']], ['panecillo', ['cereales']], ['bollo', ['cereales']],
+  ['bao', ['cereales']], ['avena', ['cereales']], ['granola', ['cereales']], ['muesli', ['cereales']],
+  ['tortilla', ['cereales']], ['crepe', ['cereales']], ['gofre', ['cereales']],
+  ['tortellini', ['cereales', 'huevo', 'lacteos']], ['ravioli', ['cereales', 'huevo', 'lacteos']],
+  ['bechamel', ['cereales', 'lacteos']],
+  ['leche', ['lacteos']], ['queso', ['lacteos']], ['nata', ['lacteos']], ['mantequilla', ['lacteos']],
+  ['yogur', ['lacteos']], ['yogurt', ['lacteos']], ['requeson', ['lacteos']], ['cuajada', ['lacteos']],
+  ['kefir', ['lacteos']], ['mozzarella', ['lacteos']], ['parmesano', ['lacteos']], ['ricotta', ['lacteos']],
+  ['mascarpone', ['lacteos']], ['ghee', ['lacteos']], ['helado', ['lacteos']],
+  ['cheese', ['lacteos']], ['milk', ['lacteos']], ['butter', ['lacteos']],
+  ['huevo', ['huevo']], ['yema', ['huevo']], ['mayonesa', ['huevo']], ['alioli', ['huevo']],
+  ['merengue', ['huevo']], ['egg', ['huevo']],
+  ['pescado', ['pescado']], ['salmon', ['pescado']], ['atun', ['pescado']], ['bacalao', ['pescado']],
+  ['merluza', ['pescado']], ['anchoa', ['pescado']], ['boqueron', ['pescado']], ['sardina', ['pescado']],
+  ['caballa', ['pescado']], ['dorada', ['pescado']], ['lubina', ['pescado']], ['rape', ['pescado']],
+  ['trucha', ['pescado']], ['lenguado', ['pescado']], ['rodaballo', ['pescado']], ['bonito', ['pescado']],
+  ['emperador', ['pescado']], ['pez', ['pescado']], ['surimi', ['pescado']],
+  ['gamba', ['crustaceos']], ['langostino', ['crustaceos']], ['camaron', ['crustaceos']],
+  ['cangrejo', ['crustaceos']], ['bogavante', ['crustaceos']], ['langosta', ['crustaceos']],
+  ['cigala', ['crustaceos']], ['carabinero', ['crustaceos']], ['marisco', ['crustaceos', 'moluscos']],
+  ['mejillon', ['moluscos']], ['almeja', ['moluscos']], ['calamar', ['moluscos']], ['pulpo', ['moluscos']],
+  ['sepia', ['moluscos']], ['chipiron', ['moluscos']], ['berberecho', ['moluscos']], ['ostra', ['moluscos']],
+  ['vieira', ['moluscos']], ['navaja', ['moluscos']], ['caracol', ['moluscos']],
+  ['almendra', ['frutosSecos']], ['nuez', ['frutosSecos']], ['avellana', ['frutosSecos']],
+  ['pistacho', ['frutosSecos']], ['anacardo', ['frutosSecos']], ['pinon', ['frutosSecos']],
+  ['macadamia', ['frutosSecos']], ['pecana', ['frutosSecos']],
+  ['cacahuete', ['cacahuetes']], ['mani', ['cacahuetes']],
+  ['soja', ['soja']], ['soya', ['soja']], ['tofu', ['soja']], ['edamame', ['soja']], ['tempeh', ['soja']],
+  ['miso', ['soja']],
+  ['sesamo', ['sesamo']], ['tahini', ['sesamo']], ['ajonjoli', ['sesamo']],
+  ['mostaza', ['mostaza']], ['apio', ['apio']], ['altramuz', ['altramuz']], ['vino', ['sulfitos']],
+]
+
+function tokenizar(texto: string): string[] {
+  return texto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .filter(token => token.length > 1 && !PALABRAS_VACIAS.has(token))
+}
+
+function mismaPalabra(a: string, b: string): boolean {
+  if (a === b) return true
+  const [corta, larga] = a.length <= b.length ? [a, b] : [b, a]
+  if (larga === `${corta}s` || larga === `${corta}es`) return true
+  if (corta.endsWith('z') && larga === `${corta.slice(0, -1)}ces`) return true
+  return corta.length >= 5 && larga.length - corta.length <= 2 && larga.startsWith(corta)
+}
+
+const VARIANTES_CATALOGO = INGREDIENTES_COMUNES
+  .flatMap(ingrediente =>
+    [ingrediente.nombre, ...ingrediente.aliases].map(texto => ({
+      tokens: tokenizar(texto),
+      alergenos: ingrediente.alergenos,
+    }))
+  )
+  .filter(variante => variante.tokens.length > 0)
+  .sort((a, b) => b.tokens.length - a.tokens.length)
+
+function posicionesQueCubre(variante: string[], tokens: string[]): number[] | null {
+  const posiciones: number[] = []
+  for (const palabra of variante) {
+    const posicion = tokens.findIndex(token => mismaPalabra(palabra, token))
+    if (posicion === -1) return null
+    posiciones.push(posicion)
+  }
+  return posiciones
+}
+
+function alergenosDeIngrediente(nombre: string): Set<AlergenoId> {
+  const tokens = tokenizar(nombre)
+  const cubiertas = new Set<number>()
+  const alergenos = new Set<AlergenoId>()
+  let cubiertasPorMasEspecificas = new Set<number>()
+  let longitudActual = Infinity
+
+  for (const variante of VARIANTES_CATALOGO) {
+    if (variante.tokens.length < longitudActual) {
+      longitudActual = variante.tokens.length
+      cubiertasPorMasEspecificas = new Set(cubiertas)
+    }
+    const posiciones = posicionesQueCubre(variante.tokens, tokens)
+    if (!posiciones || posiciones.every(posicion => cubiertasPorMasEspecificas.has(posicion))) continue
+    posiciones.forEach(posicion => cubiertas.add(posicion))
+    variante.alergenos.forEach(alergeno => alergenos.add(alergeno))
+  }
+
+  tokens.forEach((token, posicion) => {
+    if (cubiertas.has(posicion)) return
+    for (const [palabra, suyos] of PALABRAS_CON_ALERGENOS) {
+      if (mismaPalabra(palabra, token)) suyos.forEach(alergeno => alergenos.add(alergeno))
+    }
+  })
+
+  return alergenos
+}
+
 export function detectarAlergenos(
   nombresIngredientes: string[]
 ): AlergenoId[] {
   const alergenosSet = new Set<AlergenoId>()
 
   nombresIngredientes.forEach(nombre => {
-    const ingrediente = obtenerIngrediente(nombre)
-    if (ingrediente) {
-      ingrediente.alergenos.forEach(a => alergenosSet.add(a))
-    }
+    alergenosDeIngrediente(nombre).forEach(alergeno => alergenosSet.add(alergeno))
   })
 
   return Array.from(alergenosSet)

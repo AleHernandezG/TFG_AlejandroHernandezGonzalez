@@ -611,3 +611,39 @@ se escribe como ADR con su alternativa descartada. Detalle en `docs/estado/plan-
 
 C1 se arregla esta semana. A1 y A2 son cambios de menos de una hora cada uno. El resto tiene su
 sitio en `docs/estado/plan-2026-09.md`.
+
+---
+
+## 5. Anexo · Revisión de producción del 16 de septiembre
+
+Añadido el 17 de septiembre de 2026. No forma parte de la auditoría original: son los fallos que
+salieron al revisar producción con Playwright después de desplegar F6 y F7. Se apuntan aquí porque
+dos de ellos tocan hallazgos de arriba y uno es tan grave como los altos. El detalle de cada arreglo
+está en `docs/cambios/revision-produccion.md`, con el mismo código.
+
+| Código | Qué | Nivel | Estado |
+|---|---|---|---|
+| REV-001 | Recetas con alérgenos sin etiquetar: el Tortellini al Pesto, con dos quesos, salía a un alérgico a los lácteos. El detector del formulario solo casaba nombres exactos y el backend guardaba los alérgenos que mandara el cliente | Alto | Arreglado en `develop`. Falta el merge y pasar `recalcular:alergenos` contra Atlas |
+| REV-002 | La hoja de comentarios no pedía la página 2 | Medio | Arreglado en `develop` |
+| REV-003 | `GET /api/recetas/foto-preview` sin token: 401 siempre | Bajo | Arreglado en `develop` |
+| REV-004 | El contador de comentarios de la cabecera no subía al comentar | Bajo | Arreglado en `develop` |
+| REV-005 | Borrar una receta o cambiarle la foto dejaba la imagen en Cloudinary | Bajo | Arreglado en `develop`. Las huérfanas anteriores se borran a mano |
+| REV-006 | Detalles: categorías en mayúsculas, avisos de Radix, `PUT /me/foto` sin Zod, mensajes de zod en inglés, `imagenUrl` vacía y `/editar-receta` fuera del `matcher` | Bajo | Arreglado en `develop` |
+| Aparte | La contraseña de la cuenta de pruebas del seed está publicada en el repositorio y entra en producción | Medio | Abierto. Se arregla en Atlas, no en código |
+
+**Cómo quedan los hallazgos de arriba.**
+
+- **A5.** Cerrado con F7.4. Le faltaba borrar: las fotos de recetas borradas o cambiadas se quedaban en
+  Cloudinary, y eso es REV-005.
+- **M1.** `PUT /api/usuarios/me/foto` ya pasa por `validarBody(esquemaFotoUsuario)`. El resto de M1 está
+  en F8.1.
+- **M2.** Sigue abierto. REV-001 hace que las recetas nuevas solo guarden alérgenos de la lista de 14 y
+  deja un test que vigila que el catálogo del backend y el del frontend no se separen, que era parte
+  del arreglo propuesto. Las `alergias` del perfil siguen aceptando cualquier texto.
+- **M5.** A medias. `/editar-receta/:path*` entra en el `matcher`; `/completar-perfil` y la cuestión de
+  `/recetas/:path*` siguen como estaban.
+- **M7.** Cerrado con F7.5, migrado en producción el 16 de septiembre. REV-002 y REV-004 son dos fallos
+  del frontend que entraron con ese cambio.
+
+REV-001 es de la misma familia que M2: un requisito de salud que dependía de que un dato llegara bien
+escrito. La auditoría miró el lado del perfil y no el de la receta, que era por donde fallaba.

@@ -95,3 +95,45 @@ export async function subirImagen(fichero: string, publicId: string): Promise<st
   }
   return data.secure_url;
 }
+
+export function publicIdDeImagenDeReceta(url: string): string | null {
+  const credenciales = leerCredenciales();
+  if (!credenciales) return null;
+
+  const prefijo = `https://res.cloudinary.com/${credenciales.cloudName}/image/upload/`;
+  if (!url.startsWith(prefijo)) return null;
+
+  const ruta = url.slice(prefijo.length).replace(/^v\d+\//, "");
+  if (!ruta.startsWith("cookr/recetas/")) return null;
+
+  return ruta.replace(/\.[a-z0-9]+$/i, "");
+}
+
+export async function eliminarImagen(url: string): Promise<boolean> {
+  const publicId = publicIdDeImagenDeReceta(url);
+  if (!publicId) return false;
+
+  const { cloudName, apiKey, apiSecret } = credencialesOFallo();
+  const parametros = {
+    invalidate: "true",
+    public_id: publicId,
+    timestamp: String(Math.floor(Date.now() / 1000)),
+  };
+
+  const cuerpo = new URLSearchParams({
+    ...parametros,
+    api_key: apiKey,
+    signature: firmar(parametros, apiSecret),
+  });
+
+  const { data } = await axios.post<{ result?: string }>(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`,
+    cuerpo.toString(),
+    {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      timeout: 15000,
+    },
+  );
+
+  return data.result === "ok";
+}

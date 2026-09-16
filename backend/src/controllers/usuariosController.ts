@@ -61,11 +61,7 @@ export const usuariosController = {
 
   async actualizarFoto(req: Request, res: Response): Promise<void> {
     try {
-      const { fotoUrl } = req.body as { fotoUrl?: string };
-      if (!fotoUrl || typeof fotoUrl !== "string") {
-        res.status(400).json({ error: "fotoUrl es obligatorio" });
-        return;
-      }
+      const { fotoUrl } = req.body as { fotoUrl: string };
       const resultado = await usuariosService.actualizarFoto(req.usuario!.id, fotoUrl);
       res.status(200).json(resultado);
     } catch (error) {

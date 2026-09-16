@@ -68,7 +68,7 @@ Del 4 de septiembre, generados con otra herramienta a partir del código y de la
 
 **Cómo se leen.** Sirven para decidir qué construir, no para saber qué hay construido. Hablan en
 pasado de cuatro cosas que no existen (streaming por SSE, búsqueda difusa, caché de IA en Redis y
-normalización de unidades) y dan cifras viejas: 80 tests, cuando hay 123. Lo que faltaba de ellos ya
+normalización de unidades) y dan cifras viejas: 80 tests, cuando hay 215. Lo que faltaba de ellos ya
 está volcado en `estado/plan-2026-09.md`, con el estado real de cada cosa, en los bloques F7.5,
 F7.6, F13, F14, F15 y F12.
 
@@ -97,6 +97,7 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 |---|---|
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
 | `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, migrado: 6,72 MB → 0,24 MB) |
+| `revision-produccion.md` | Revisión de producción del 16 de septiembre y lo que se arregló al día siguiente: alérgenos que el detector no veía, la paginación de comentarios, el 401 de Pexels y las fotos huérfanas en Cloudinary |
 
 ---
 

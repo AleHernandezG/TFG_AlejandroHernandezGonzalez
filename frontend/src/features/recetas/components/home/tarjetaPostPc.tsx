@@ -92,7 +92,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
         <div className="relative h-[400px] overflow-hidden">
           <Image
-            src={post.receta.imagenUrl}
+            src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={post.receta.titulo}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -139,7 +139,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
         <div className="relative w-1/2 overflow-hidden">
           <Image
-            src={post.receta.imagenUrl}
+            src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={post.receta.titulo}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -181,7 +181,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
       <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={post.receta.imagenUrl}
+          src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
           alt={post.receta.titulo}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"

@@ -1,7 +1,7 @@
 'use client'
 
 import { Trash2, MessageSquare, Plus } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useChatStore } from '@/stores/chatStore'
 
 interface Props {
@@ -39,6 +39,7 @@ export function SheetHistorialChat({ abierto, onCerrar }: Props) {
       <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-sm">
         <SheetHeader className="border-b border-border/20 px-5 py-4">
           <SheetTitle className="text-base font-bold">Historial de chats</SheetTitle>
+          <SheetDescription className="sr-only">Abre una conversación anterior con el asistente</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto">

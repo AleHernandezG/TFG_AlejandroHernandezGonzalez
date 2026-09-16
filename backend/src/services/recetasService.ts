@@ -2,6 +2,8 @@ import { recetaRepository } from "../repositories/recetaRepository";
 import { usuarioRepository } from "../repositories/usuarioRepository";
 import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
 import { buscarFotoPexelsCascada } from "./imagenService";
+import { alergenosDeReceta } from "../lib/ingredientes";
+import { eliminarImagen } from "../lib/cloudinary";
 
 async function resolverAlergenos(
   delQuery: string[] | undefined,
@@ -10,6 +12,32 @@ async function resolverAlergenos(
   const delPerfil = usuarioId ? await usuarioRepository.obtenerAlergias(usuarioId) : [];
   const union = [...new Set([...delPerfil, ...(delQuery ?? [])])];
   return union.length > 0 ? union : undefined;
+}
+
+async function alergenosActualizados(
+  recetaId: string,
+  datos: Partial<DatosCrearRecetaBody>,
+): Promise<string[] | undefined> {
+  if (datos.ingredientes === undefined && datos.alergenos === undefined) return undefined;
+
+  const actual =
+    datos.ingredientes !== undefined && datos.alergenos !== undefined
+      ? null
+      : await recetaRepository.obtenerIngredientesYAlergenos(recetaId);
+
+  const ingredientes = datos.ingredientes?.map((ing) => ing.nombre) ?? actual?.ingredientes ?? [];
+  const declarados = datos.alergenos ?? actual?.alergenos ?? [];
+  return alergenosDeReceta(ingredientes, declarados);
+}
+
+async function borrarImagenSiNadieLaUsa(imagenUrl: string | null) {
+  if (!imagenUrl) return;
+  try {
+    if ((await recetaRepository.contarConImagen(imagenUrl)) > 0) return;
+    await eliminarImagen(imagenUrl);
+  } catch (err) {
+    console.error("[Cloudinary] No se pudo borrar la imagen:", (err as Error).message);
+  }
 }
 
 export const recetasService = {
@@ -57,12 +85,21 @@ export const recetasService = {
   },
 
   async crear(datos: DatosCrearRecetaBody, autorId: string) {
-    return recetaRepository.crear(datos, autorId);
+    const alergenos = alergenosDeReceta(
+      datos.ingredientes.map((ing) => ing.nombre),
+      datos.alergenos,
+    );
+    return recetaRepository.crear({ ...datos, alergenos }, autorId);
   },
 
   async actualizar(recetaId: string, usuarioId: string, datos: Partial<DatosCrearRecetaBody>) {
     try {
-      await recetaRepository.actualizar(recetaId, usuarioId, datos);
+      const alergenos = await alergenosActualizados(recetaId, datos);
+      const { imagenAnterior } = await recetaRepository.actualizar(recetaId, usuarioId, {
+        ...datos,
+        alergenos,
+      });
+      await borrarImagenSiNadieLaUsa(imagenAnterior);
     } catch (err) {
       const e = err as Error & { status?: number };
       throw Object.assign(new Error(e.message), { status: e.status ?? 500 });
@@ -71,7 +108,8 @@ export const recetasService = {
 
   async eliminar(recetaId: string, usuarioId: string) {
     try {
-      await recetaRepository.eliminar(recetaId, usuarioId);
+      const { imagenUrl } = await recetaRepository.eliminar(recetaId, usuarioId);
+      await borrarImagenSiNadieLaUsa(imagenUrl);
     } catch (err) {
       const e = err as Error & { status?: number };
       throw Object.assign(new Error(e.message), { status: e.status ?? 500 });

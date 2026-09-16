@@ -6,6 +6,51 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-17 · La revisión de producción y sus arreglos
+
+**Qué se hizo.** F6 y F7 se desplegaron el 16. Ese mismo día se aplicó la migración de comentarios
+(36 comentarios de 26 recetas a su propia colección, con la copia de `respaldar.js` hecha antes) y
+`GEMINI_MODEL` pasó a `gemini-3.6-flash` en Render, porque `gemini-2.5-flash` ya respondía 404. Por la
+tarde, revisión completa de producción con Playwright y la cuenta de pruebas del seed: 18
+comprobaciones bien y 4 fallos.
+
+El 17 se arreglaron los cuatro, los detalles menores y otras tres cosas que salieron al volver a
+probar en local. El fallo serio era de salud. «Tortellini al Pesto Genovese Clásico» lleva dos quesos
+y solo estaba marcada con frutos secos, así que un alérgico a los lácteos la veía en el feed. El
+detector del formulario solo reconocía nombres exactos y el backend guardaba lo que le mandara el
+cliente. Ahora el detector entiende plurales, tildes y nombres largos, el backend recalcula los
+alérgenos al crear y al editar, y `npm run recalcular:alergenos` corrige los que ya están guardados.
+
+Lo demás era de menos riesgo: la hoja de comentarios no pedía la página 2, la vista previa de Pexels
+iba sin token y daba 401, el contador de la cabecera no subía al comentar y borrar una receta dejaba
+su foto en Cloudinary. Los tests pasan de 169 a 215. El detalle de cada arreglo está en
+`docs/cambios/revision-produccion.md`.
+
+**Qué decisión costó.** Dónde vive el detector. El backend lo necesita para no fiarse del cliente, pero
+frontend y backend no comparten código y montar un paquete común por un solo fichero no compensaba.
+Se copia, y `tests/alergenos.deteccion.test.ts` transpila el fichero del frontend y se pone en rojo si
+los dos lados dejan de detectar lo mismo. Una copia vigilada por el CI se puede mantener; una copia a
+secas se desincroniza en dos meses.
+
+La otra, qué hacer con los falsos positivos. «Pan sin gluten» marca cereales, y «Pasta de curry»
+también. Se aceptan: tanto el backend como el script solo suman alérgenos y nunca quitan uno. A un
+alérgico, una receta escondida de más le molesta; una de menos es justo lo que pasó con el Tortellini.
+
+**Qué queda a medias.** Todo está en `develop`. Falta el merge a `main` y, con Render ya Live, pasar el
+script contra Atlas, primero en seco y luego con `-- --apply`. Hasta entonces el Tortellini sigue
+saliendo a quien es alérgico a los lácteos. Contra Atlas no se ha ejecutado nada desde aquí; los pasos
+están en `REVISION_DESPLIEGUE.md`, parte 1.
+
+De la parte 2 de esa checklist quedan cosas que necesitan manos: el login con Google con una cuenta
+real, escanear un ticket con la cámara del móvil, los índices en mongosh, los logs de Gemini en Render,
+editar una receta ajena y borrar de Cloudinary las dos imágenes que dejó la revisión. La contraseña de
+la cuenta de pruebas del seed está publicada en el repositorio y sigue entrando en producción.
+
+F8.2 sigue abierta (las alergias del perfil aceptan cualquier texto) y M5 va por la mitad:
+`/editar-receta` ya está en el `matcher` y `/completar-perfil` no.
+
+---
+
 ## 2026-09-04 · El informe de mejoras entra en el plan
 
 **Qué se hizo.** Llegaron a `docs/` tres ficheros generados con otra herramienta:

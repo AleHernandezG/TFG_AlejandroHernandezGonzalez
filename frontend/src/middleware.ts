@@ -10,6 +10,7 @@ export const config = {
     '/coleccion',
     '/crear-receta',
     '/crear-receta/revisar',
+    '/editar-receta/:path*',
     '/recetas/:path*',
   ],
 };
