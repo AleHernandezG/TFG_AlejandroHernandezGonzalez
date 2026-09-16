@@ -26,7 +26,8 @@
     "avatares:seed": "ts-node --transpile-only src/scripts/actualizarAvataresSeed.ts",
     "normalizar:categorias": "ts-node --transpile-only src/scripts/normalizarCategorias.ts",
     "migrar:imagenes": "ts-node --transpile-only src/scripts/migrarImagenes.ts",
-    "migrar:comentarios": "ts-node --transpile-only src/scripts/migrarComentarios.ts"
+    "migrar:comentarios": "ts-node --transpile-only src/scripts/migrarComentarios.ts",
+    "recalcular:alergenos": "ts-node --transpile-only src/scripts/recalcularAlergenos.ts"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",

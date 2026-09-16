@@ -22,7 +22,7 @@ export function TarjetaDiscover({ receta }: Props) {
     <Link href={`/recetas/${receta.id}`} className="block group">
       <article className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted shadow-[0px_8px_24px_oklch(0.22_0.02_50_/_0.10)]">
         <Image
-          src={receta.imagenUrl ?? '/images/recetas/crearRecetaImagen.webp'}
+          src={receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
           alt={receta.titulo}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"

@@ -23,7 +23,7 @@ export function HeroReceta({ imagenUrl, titulo, guardado, onToggleGuardado, foto
         {/* Imagen de fondo */}
         <div className="absolute inset-0">
           <Image
-            src={imagenUrl}
+            src={imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={titulo}
             fill
             priority

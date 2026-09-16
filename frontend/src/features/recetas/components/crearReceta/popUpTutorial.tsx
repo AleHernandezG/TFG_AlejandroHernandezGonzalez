@@ -4,6 +4,7 @@ import { Camera, ChefHat, Eye, ListOrdered } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -42,9 +43,9 @@ export function PopUpTutorial({ abierto, onAceptar, onSaltar }: Props) {
           <DialogTitle className="text-xl font-extrabold text-foreground">
             ¿Es tu primera receta?
           </DialogTitle>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <DialogDescription className="mt-1">
             Sigue estos pasos y deja a todos con ganas
-          </p>
+          </DialogDescription>
         </div>
 
         {/* Pasos */}

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -76,6 +76,9 @@ export function DialogCambiarContrasena({ abierto, onCerrar }: Props) {
       <DialogContent className="max-w-sm rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg font-extrabold">Cambiar contraseña</DialogTitle>
+          <DialogDescription className="sr-only">
+            Escribe tu contraseña actual y la nueva, de al menos 8 caracteres
+          </DialogDescription>
         </DialogHeader>
 
         {exito ? (

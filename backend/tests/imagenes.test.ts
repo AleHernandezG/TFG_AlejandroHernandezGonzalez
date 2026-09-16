@@ -22,6 +22,7 @@ jest.mock("../src/lib/cloudinary", () => ({
     campos: { api_key: "clave", signature: "firma", timestamp: "1", public_id: "id", overwrite: "true" },
   })),
   subirImagen: jest.fn(),
+  eliminarImagen: jest.fn(),
 }));
 
 import request from "supertest";
@@ -132,5 +133,42 @@ describe("las recetas guardan la URL de la imagen, no la imagen", () => {
 
     console.log(`receta nueva con foto: ${(medida.bytes / 1024).toFixed(2)} KB`);
     expect(medida.bytes).toBeLessThan(5 * 1024);
+  });
+});
+
+describe("la foto de perfil se valida en la ruta", () => {
+  it("rechaza una imagen incrustada con 400 y dice qué campo falla", async () => {
+    const jwt = await token();
+
+    const res = await request(app)
+      .put("/api/usuarios/me/foto")
+      .set("Authorization", `Bearer ${jwt}`)
+      .send({ fotoUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errores[0].campo).toBe("fotoUrl");
+  });
+
+  it("rechaza el cuerpo sin fotoUrl", async () => {
+    const jwt = await token();
+
+    const res = await request(app)
+      .put("/api/usuarios/me/foto")
+      .set("Authorization", `Bearer ${jwt}`)
+      .send({});
+
+    expect(res.status).toBe(400);
+  });
+
+  it("acepta una URL https y la devuelve", async () => {
+    const jwt = await token();
+
+    const res = await request(app)
+      .put("/api/usuarios/me/foto")
+      .set("Authorization", `Bearer ${jwt}`)
+      .send({ fotoUrl: URL_CLOUDINARY });
+
+    expect(res.status).toBe(200);
+    expect(res.body.foto).toBe(URL_CLOUDINARY);
   });
 });

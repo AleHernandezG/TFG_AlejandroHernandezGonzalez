@@ -6,11 +6,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAgregarComentario } from '../../hooks/useAgregarComentario'
 import { useComentarios, useInvalidarComentarios } from '../../hooks/useComentarios'
 import type { Comentario } from '../../types/receta.types'
@@ -70,7 +71,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
   const [texto, setTexto] = useState('')
   const [nuevos, setNuevos] = useState<Comentario[]>([])
   const [sheetAbierto, setSheetAbierto] = useState(false)
-  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [sentinel, setSentinel] = useState<HTMLLIElement | null>(null)
 
   const { mutate: enviar } = useAgregarComentario(recetaId)
   const invalidar = useInvalidarComentarios(recetaId)
@@ -85,7 +86,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
 
   // IntersectionObserver — carga la siguiente página al llegar al sentinel
   useEffect(() => {
-    if (!sheetAbierto || !sentinelRef.current) return
+    if (!sheetAbierto || !sentinel) return
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -94,9 +95,9 @@ export function ComentariosReceta({ recetaId, total }: Props) {
       },
       { threshold: 0.1 },
     )
-    observer.observe(sentinelRef.current)
+    observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [sheetAbierto, hasNextPage, isFetchingNextPage, fetchNextPage])
+  }, [sheetAbierto, sentinel, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const comentariosSheet = data?.pages.flatMap((p) => p.comentarios) ?? []
   const preview = [...nuevos, ...(data?.pages[0]?.comentarios ?? [])].slice(0, 3)
@@ -219,6 +220,9 @@ export function ComentariosReceta({ recetaId, total }: Props) {
             <SheetTitle className="text-base font-bold text-center">
               {totalMostrado} comentarios
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              Todos los comentarios de la receta, del más reciente al más antiguo
+            </SheetDescription>
           </SheetHeader>
 
           {/* Lista con scroll */}
@@ -237,19 +241,19 @@ export function ComentariosReceta({ recetaId, total }: Props) {
               )}
 
               {/* Sentinel para infinite scroll */}
-              <div ref={sentinelRef} className="h-4" />
+              <li ref={setSentinel} aria-hidden className="h-4" />
 
               {isFetchingNextPage && (
-                <div className="space-y-5 pt-1">
+                <>
                   <SkeletonComentario />
                   <SkeletonComentario />
-                </div>
+                </>
               )}
 
               {!hasNextPage && comentariosSheet.length > 0 && (
-                <p className="text-center text-xs text-muted-foreground py-2">
+                <li className="text-center text-xs text-muted-foreground py-2">
                   Has visto todos los comentarios
-                </p>
+                </li>
               )}
             </ul>
           </div>

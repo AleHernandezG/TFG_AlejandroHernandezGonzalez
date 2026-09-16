@@ -4,6 +4,7 @@ import { AlertCircle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -26,6 +27,9 @@ export function PopUpError({ abierto, errores, onCorregir }: Props) {
           <DialogTitle className="text-xl font-extrabold text-foreground">
             Revisa estos campos
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Corrige estos errores antes de publicar la receta
+          </DialogDescription>
         </DialogHeader>
 
         <ul className="space-y-2 mb-6">

@@ -3,7 +3,7 @@
 Lo que los tests automáticos no pueden comprobar, con los pasos exactos para hacerlo en un rato
 libre. Cada bloque dice qué ejecutar, qué tiene que pasar y cómo se ve el fallo.
 
-Los 169 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
+Los 215 tests del backend mockean todos los servicios externos a propósito: ninguna prueba gasta
 cuota de Google, Mailjet, Gemini, Pexels ni Cloudinary, y ninguna habla con Upstash de verdad. El
 precio de esa regla es esta lista.
 
@@ -66,13 +66,13 @@ tiene runner.
 
 ```bash
 # 1. sin cabecera → 403
-curl -i https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash
+curl -i https://TU-WORKER.workers.dev/v1beta/models/gemini-3.6-flash
 
 # 2. con cabecera, ruta que no toca → 404
 curl -i -H "x-proxy-token: EL_TOKEN" https://TU-WORKER.workers.dev/v1/otra-cosa
 
 # 3. con cabecera y ruta buena → 200 (o el error que devuelva Google, pero pasando)
-curl -i -H "x-proxy-token: EL_TOKEN" "https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash?key=LA_API_KEY"
+curl -i -H "x-proxy-token: EL_TOKEN" "https://TU-WORKER.workers.dev/v1beta/models/gemini-3.6-flash?key=LA_API_KEY"
 ```
 
 - [ ] Los tres `curl` dan 403, 404 y 200.
@@ -242,6 +242,11 @@ Esto no es de F6: es la lista permanente de cosas que solo se comprueban con las
 
 ## 7. La migración de comentarios · F7.5, PERF-006, M7
 
+**Aplicada contra Atlas el 16/09/2026**, con la copia hecha antes con `respaldar.js` en lugar de
+`mongodump`. La revisión de ese día vio los comentarios en la web y la paginación de la API bien; la
+hoja del detalle no pasaba de la primera página, arreglado el 17 (REV-002). Las casillas de mongosh
+de abajo siguen sin marcar.
+
 Los comentarios ya no van dentro de la receta: viven en la colección `comentarios` y la receta solo
 guarda `numComentarios`. El código nuevo escribe así desde el primer despliegue, pero **los
 comentarios que ya están guardados en Atlas siguen dentro del array hasta que se ejecute la
@@ -319,6 +324,26 @@ mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/
 
 ---
 
+## 8. Alérgenos de las recetas guardadas y fotos borradas · REV-001, REV-005
+
+Los tests prueban el detector con nombres escritos a mano y la limpieza de Cloudinary con axios
+mockeado. Ninguno ha visto los ingredientes que la gente escribió de verdad en Atlas, ni una llamada
+real a `destroy`. Los pasos completos, con los comandos, están en `REVISION_DESPLIEGUE.md`, parte 1.
+
+- [ ] **La pasada en seco de `npm run recalcular:alergenos` contra Atlas.** Es la única prueba del
+      detector con datos reales. Léela entera: lo que interesa es lo que marca de más (se acepta,
+      como «Pan sin gluten» → cereales) y, sobre todo, recetas con algo obvio que no aparezcan en la
+      lista. Eso sería un fallo del catálogo y va a los dos `ingredientes.ts`.
+- [ ] **El `--apply`, la copia y la segunda pasada a 0.** Apunta la ruta de la copia en el registro.
+- [ ] **El `⚠️` de alérgenos fuera de los 14.** Si sale, apunta cuántas recetas son: es el tamaño
+      real de M2 en las recetas.
+- [ ] **Borrar una receta con foto propia la quita de Cloudinary.** Con la Media Library abierta en
+      `cookr/recetas/`. Si la foto sigue y en Render sale `[Cloudinary] No se pudo borrar la imagen`,
+      el mensaje de detrás dice por qué.
+- [ ] **Cambiar la foto al editar borra la anterior** y deja la nueva.
+
+---
+
 ## Registro
 
 | Fecha | Qué se probó | Resultado |
@@ -335,4 +360,8 @@ mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/
 | 05/09/2026 | Migración de comentarios en local, seco y `--apply` | 44 de 45 movidos (1 ilegible), 5 recetas sin array, receta de 40: 5,2 → 0,5 KB |
 | 05/09/2026 | Segunda pasada con `--apply` en local | 0 movidos, 0 contadores reescritos, mismos números: no duplica |
 | 05/09/2026 | Seeds y `limpiarDatosTest` con la colección nueva | Contadores = documentos en los tres, 0 arrays y 0 huérfanos |
+| 16/09/2026 | Migración de comentarios aplicada contra Atlas, con copia previa | Termina sin recetas con array; la API da 36 comentarios en 26 recetas |
+| 16/09/2026 | Revisión completa de producción con Playwright | 18 comprobaciones bien y 4 fallos: alérgenos sin detectar, hoja de comentarios, 401 de Pexels y contador de la cabecera |
+| 17/09/2026 | Los arreglos de la revisión, en local con Playwright y Mongo en memoria | Los 4 fallos y los detalles, bien; 215 tests en verde |
+| 17/09/2026 | `recalcular:alergenos` contra Mongo en memoria | Seco sin escribir, `--apply` con copia, segunda pasada a 0 y `--restaurar` idéntico |
 | | | |

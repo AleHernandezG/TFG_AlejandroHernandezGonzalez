@@ -92,7 +92,7 @@ export function SidebarTendencias() {
               <Link key={post.id} href={`/recetas/${post.id}`} className="group flex gap-4">
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
                   <Image
-                    src={post.receta.imagenUrl}
+                    src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
                     alt={post.receta.titulo}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"

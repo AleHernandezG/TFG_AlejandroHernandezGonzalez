@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 import { useActualizarPreferencias, useMiPerfil, extraerMensajeError } from '@/features/perfil/hooks/usePerfil'
@@ -58,6 +58,9 @@ export function DialogPreferenciasAlergenos({ abierto, onCerrar }: Props) {
       <DialogContent className="max-w-sm rounded-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-extrabold">Preferencias y alérgenos</DialogTitle>
+          <DialogDescription className="sr-only">
+            Elige tus dietas y los alérgenos que nunca quieres ver en el feed
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 pt-2">

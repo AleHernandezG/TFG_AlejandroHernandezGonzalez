@@ -4,6 +4,7 @@ import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -37,6 +38,7 @@ export function DialogEditarIngrediente({ item, onCerrar, onGuardar }: Props) {
             <span className="text-2xl">{item.emoji}</span>
             Editar ingrediente
           </DialogTitle>
+          <DialogDescription className="sr-only">Cambia el nombre, la cantidad o la unidad de {item.nombre}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 mt-4">

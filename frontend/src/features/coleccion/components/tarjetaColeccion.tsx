@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bookmark, MoreHorizontal, Trash2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -122,6 +122,7 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
             <SheetTitle className="text-left text-sm font-bold truncate">
               {receta.titulo}
             </SheetTitle>
+            <SheetDescription className="sr-only">Editar o eliminar esta receta</SheetDescription>
           </SheetHeader>
 
           <button

@@ -4,8 +4,8 @@ import { useRef, useState } from 'react'
 import { Search, AlertCircle, ScanLine, Loader2, CheckCircle2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { apiClient } from '@/services/apiClient'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useAutocompletadoIngredientes } from '@/features/recetas/hooks/useAutocompletadoIngredientes'
 import { UNIDADES_INGREDIENTE } from '@/features/recetas/types/crearReceta.schema'
@@ -144,6 +144,9 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
             <SheetTitle className="text-xl font-extrabold text-foreground text-left">
               Añadir ingrediente
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              Escribe un ingrediente o escanea un ticket para añadirlo a tu despensa
+            </SheetDescription>
           </SheetHeader>
 
           {/* Nombre */}
@@ -313,10 +316,10 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
               </DialogTitle>
             </div>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <DialogDescription className="leading-relaxed">
             <span className="font-semibold text-foreground">«{nombreDuplicado}»</span> ya está en
             tu despensa. Si quieres modificarlo, edítalo o elimínalo directamente desde la lista.
-          </p>
+          </DialogDescription>
           <Button
             onClick={() => setNombreDuplicado(null)}
             className="mt-2 w-full h-11 rounded-xl bg-brand text-brand-foreground font-bold"

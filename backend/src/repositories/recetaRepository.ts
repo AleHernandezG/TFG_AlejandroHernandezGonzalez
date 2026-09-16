@@ -626,12 +626,12 @@ export const recetaRepository = {
     recetaId: string,
     usuarioId: string,
     datos: Partial<DatosCrearRecetaBody>,
-  ): Promise<void> {
+  ): Promise<{ imagenAnterior: string | null }> {
     if (!Types.ObjectId.isValid(recetaId)) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const receta = await Receta.findById(recetaId).select("autorId").lean().exec();
+    const receta = await Receta.findById(recetaId).select("autorId imagenUrl").lean().exec();
     if (!receta) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
@@ -666,14 +666,35 @@ export const recetaRepository = {
     }
 
     await Receta.findByIdAndUpdate(recetaId, { $set: update });
+
+    const imagenCambiada = datos.imagenUrl !== undefined && receta.imagenUrl !== datos.imagenUrl;
+    return { imagenAnterior: imagenCambiada ? receta.imagenUrl || null : null };
   },
 
-  async eliminar(recetaId: string, usuarioId: string): Promise<void> {
+  async obtenerIngredientesYAlergenos(
+    recetaId: string,
+  ): Promise<{ ingredientes: string[]; alergenos: string[] } | null> {
+    if (!Types.ObjectId.isValid(recetaId)) return null;
+
+    const receta = await Receta.findById(recetaId).select("ingredientes alergenos").lean().exec();
+    if (!receta) return null;
+
+    return {
+      ingredientes: receta.ingredientes.map((ing) => ing.nombre),
+      alergenos: receta.alergenos ?? [],
+    };
+  },
+
+  async contarConImagen(imagenUrl: string): Promise<number> {
+    return Receta.countDocuments({ imagenUrl });
+  },
+
+  async eliminar(recetaId: string, usuarioId: string): Promise<{ imagenUrl: string | null }> {
     if (!Types.ObjectId.isValid(recetaId)) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
-    const receta = await Receta.findById(recetaId).select("autorId").lean().exec();
+    const receta = await Receta.findById(recetaId).select("autorId imagenUrl").lean().exec();
     if (!receta) {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
@@ -685,6 +706,8 @@ export const recetaRepository = {
 
     await Receta.deleteOne({ _id: recetaId });
     await Comentario.deleteMany({ recetaId: new Types.ObjectId(recetaId) });
+
+    return { imagenUrl: receta.imagenUrl || null };
   },
 
   async buscarCandidatasParaDespensa(

@@ -22,7 +22,7 @@ export function PrevisualizacionReceta() {
   const { publicar, publicando, error } = useCrearReceta()
   const { activo, pasoActual, pausado, soportado, iniciar, pausar, reanudar, siguiente, anterior, detener } =
     useModoManoLibres()
-  const { data: fotoPexels, isLoading: buscandoFoto } = useFotoPexelsPreview(datos?.titulo ?? '')
+  const { data: fotoPexels, isLoading: buscandoFoto } = useFotoPexelsPreview(datos?.titulo ?? '', !fotoPreview)
 
   // Captura el valor en el montaje para no re-disparar cuando limpiar() pone datos a null
   const datosAlMontar = useRef(datos)

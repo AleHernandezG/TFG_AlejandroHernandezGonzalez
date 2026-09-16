@@ -1,11 +1,11 @@
-# Revisión del despliegue · F6 y F7
+# Revisión del despliegue
 
-Checklist para llevar a producción los bloques F6 (seguridad) y F7 (rendimiento) mergeando `develop`
-en `main`, y para comprobar después que funcionan. Escrita el 16/09/2026. Sustituye a la de julio,
-que se desplegó el 17/07/2026.
+Checklist para llevar `develop` a `main` y comprobar después que funciona. Marca cada casilla cuando
+la compruebes.
 
-Aquí el orden no es decorativo: hay variables que tienen que estar en Render **antes** del deploy y
-una migración que va **justo después**. Marca cada casilla cuando la compruebes.
+La parte 1 es el despliegue que toca ahora: lo que se arregló el 17/09/2026 a partir de la revisión de
+producción del día anterior. La parte 2 es la de F6 y F7, que ya está desplegada. Se queda como
+referencia y con lo que falta por mirar de ella.
 
 | Qué | URL |
 |---|---|
@@ -17,7 +17,179 @@ una migración que va **justo después**. Marca cada casilla cuando la compruebe
 
 ---
 
-## Qué entra y cómo está producción hoy
+# Parte 1 · Correcciones de la revisión de producción
+
+Escrita el 17/09/2026. El detalle de cada arreglo, con el porqué, está en
+`docs/cambios/revision-produccion.md`.
+
+## Qué entra
+
+Hay dos commits que se quedaron en `develop` después del merge de F6 y F7. `bd07a7c` cambia el modelo
+de Gemini por defecto a `gemini-3.6-flash`; en producción no se nota, porque `GEMINI_MODEL` ya vale eso
+en Render. `30b7b66` solo toca esta checklist. El que importa es el tercero, el de las correcciones.
+De cara a producción cambia esto:
+
+- Las recetas se guardan con los alérgenos que llevan sus ingredientes, los marque el autor o no, y el
+  detector entiende plurales, tildes y nombres largos como «Queso Parmigiano Reggiano rallado».
+  **Las recetas que ya están en Atlas no se corrigen solas: necesitan el script del apartado 3.**
+- La hoja de comentarios carga las páginas siguientes al bajar.
+- Al crear una receta sin foto, la vista previa enseña la de Pexels (antes daba 401).
+- El número de comentarios de la cabecera sube al comentar, sin recargar.
+- Borrar una receta o cambiarle la foto borra la imagen anterior de Cloudinary.
+- `PUT /api/usuarios/me/foto` pasa por Zod y rechaza lo que no sea una URL `https://`.
+- Categorías con su nombre («Alto en proteínas»), diálogos sin aviso de Radix en consola, mensajes en
+  español con el tiempo o las porciones vacíos, foto de respaldo cuando una receta no tiene
+  `imagenUrl` y `/editar-receta` dentro del `matcher`.
+
+Comprobado el 17/09/2026, antes del merge:
+
+- En local, 215 tests del backend en verde (eran 169) y lint y tipos limpios en los dos paquetes.
+- Recorrido con Playwright contra un backend local con Mongo en memoria: los cuatro fallos y los
+  detalles, uno a uno.
+- El script de alérgenos, contra otro Mongo en memoria: en seco, `--apply`, segunda pasada a 0 y
+  `--restaurar`.
+
+Contra Atlas no se ha ejecutado nada.
+
+## 1. Antes del merge
+
+- [ ] CI de `develop` en verde con el último commit.
+- [ ] `CLOUDINARY_URL` sigue en Render → Environment. Sin ella no se puede subir ninguna foto, y
+      además borrar una receta dejaría su imagen en Cloudinary sin avisar.
+
+No hay variables nuevas en Render ni en Vercel, y el Worker no cambia. Tampoco hace falta
+`respaldar.js`: el script de alérgenos guarda su propia copia antes de escribir.
+
+## 2. El merge
+
+- [ ] PR de `develop` a `main`, con `ci-frontend` y `ci-backend` en verde.
+- [ ] Merge.
+- [ ] Vercel → Deployments: el de `main` está en **Ready**.
+- [ ] Render → Events: el deploy acaba en **Live**, con `✅ MongoDB conectado` en los logs.
+
+No pases el script hasta ver el Live. Una receta creada mientras tanto la guarda el backend viejo sin
+recalcular, y el script solo corrige lo que ya está guardado cuando se ejecuta.
+
+## 3. Recalcular los alérgenos de las recetas guardadas
+
+Desde `backend/`, con el `.env` que apunta al Atlas de producción. Primero en seco:
+
+```bash
+npm run recalcular:alergenos
+```
+
+Saca una línea por receta a la que le faltan alérgenos, con los que tiene entre corchetes y los que
+añadiría detrás del `+`, y un resumen por alérgeno.
+
+- [ ] «Tortellini al Pesto Genovese Clásico» está en la lista y entre lo que suma va `lacteos`.
+- [ ] Nada de la lista es absurdo. Hay falsos positivos aceptados: «Pan sin gluten» y «Pasta de
+      curry» marcan cereales. Si ves algo que no sea de ese tipo, para antes de aplicar.
+- [ ] Si sale un `⚠️` con recetas que guardan alérgenos fuera de la lista de 14, apúntalo. No bloquea:
+      el script no las toca, y es el hallazgo M2 de la auditoría.
+
+Luego, de verdad:
+
+```bash
+npm run recalcular:alergenos -- --apply   # el -- es obligatorio o npm se come el argumento
+```
+
+- [ ] Sale `💾 Copia de los alérgenos de antes en respaldos\alergenos-<fecha>.json`. Apunta esa ruta.
+      La carpeta `backend/respaldos/` no se sube a git, así que esa copia solo está en tu equipo.
+- [ ] Acaba con `✅ Ninguna receta tiene ya alérgenos sin declarar.`
+- [ ] Una segunda pasada en seco dice `Recetas a las que les faltan alérgenos: 0`.
+- [ ] En mongosh:
+
+```js
+db.recetas.findOne({ _id: ObjectId("6a3b171979a80ae6b1f988ed") }, { titulo: 1, alergenos: 1 })
+// alergenos lleva frutosSecos, que ya tenía, y ahora también lacteos
+```
+
+**Deshacer.** El propio `--apply` imprime el comando al final:
+
+```bash
+npm run recalcular:alergenos -- --restaurar "respaldos\alergenos-<fecha>.json"
+```
+
+Deja los alérgenos de cada receta de la copia como estaban, y las recetas creadas después no se tocan.
+Úsalo solo si el script ha hecho algo claramente mal: restaurar devuelve el Tortellini a quien es
+alérgico a los lácteos.
+
+## 4. La aplicación, a mano
+
+Recarga forzada (Ctrl+F5) antes de empezar.
+
+### Alérgenos
+
+- [ ] El detalle del Tortellini (`/recetas/6a3b171979a80ae6b1f988ed`) enseña lácteos entre sus
+      alérgenos.
+- [ ] Con una cuenta alérgica a los lácteos, el Tortellini no sale en el feed.
+- [ ] En `/crear-receta`, un ingrediente «Queso parmesano rallado» sale con lácteos en la
+      previsualización. Si publicas, la receta los guarda. Bórrala al terminar.
+
+### Comentarios
+
+- [ ] En `/recetas/6a0ac90ca77fabe17a12550b`, «Ver los 9 comentarios» y bajar hasta el final. En la
+      pestaña de red sale `comentarios?pagina=2` y la hoja acaba en «Has visto todos los comentarios».
+- [ ] Al comentar, el número junto al icono de la cabecera sube sin recargar.
+
+### Crear receta
+
+- [ ] Sin foto propia, la previsualización enseña una foto de Pexels, y
+      `GET /api/recetas/foto-preview` da 200.
+- [ ] Al revisar una receta con foto propia no sale ninguna petición a `foto-preview`.
+- [ ] Vaciar el tiempo o las porciones da un mensaje en español.
+
+### Cloudinary
+
+- [ ] Crea una receta de prueba con foto propia y apunta el nombre del fichero en `cookr/recetas/`.
+      Bórrala. En la Media Library ya no está, y en los logs de Render no sale
+      `[Cloudinary] No se pudo borrar la imagen`.
+
+### Lo demás
+
+- [ ] Una receta con la categoría de proteínas enseña «Alto en proteínas», no `ALTOENPROTEINAS`.
+- [ ] En incógnito, `/editar-receta/6a3b171979a80ae6b1f988ed` lleva al login.
+- [ ] Con la consola abierta, abrir los filtros del feed y el diálogo de cambiar contraseña no da el
+      aviso de Radix sobre `Description`.
+
+## Si algo sale mal
+
+| Síntoma | Causa probable |
+|---|---|
+| El script no encuentra el Tortellini o revisa muy pocas recetas | El `.env` de `backend/` no apunta al Atlas de producción |
+| El Tortellini sigue sin lácteos en la web tras el `--apply` | Caché del navegador: Ctrl+F5. Si mongosh también lo dice, el `--apply` no llegó a escribir |
+| La hoja de comentarios sigue parándose en 8, o `foto-preview` da 401 | Vercel todavía sirve el deploy anterior |
+| Log `[Cloudinary] No se pudo borrar la imagen` | Cloudinary no respondió o `CLOUDINARY_URL` no vale. La receta se borró igual; la foto, a mano |
+| La foto sigue en Cloudinary y no hay ningún log | `CLOUDINARY_URL` no está en Render, o la receta tenía foto de Pexels |
+| 400 al cambiar el avatar | Llega algo que no es una URL `https://`. Es el comportamiento nuevo; si pasa con una subida normal, es un fallo |
+
+**Volver atrás.** Rollback en Render → Events y en Vercel → Deployments, igual que en la parte 2. Los
+alérgenos añadidos no hay que quitarlos: el código viejo los lee igual y siguen siendo correctos.
+
+---
+
+# Parte 2 · F6 y F7
+
+Escrita el 16/09/2026 y **desplegada ese mismo día**. Ese día también se aplicó la migración de
+comentarios y se cambió `GEMINI_MODEL` a `gemini-3.6-flash` en Render. La revisión con Playwright de
+esa tarde dio por buenos los apartados 3 y 4 salvo lo que arregla la parte 1.
+
+Quedan sin comprobar, y necesitan tus manos:
+
+- [ ] Login con Google con una cuenta real.
+- [ ] Escanear un ticket con una foto de cámara desde el móvil.
+- [ ] Con sesión, abrir `/editar-receta/<id>` de una receta de otro usuario: no deja editarla. El
+      código lo bloquea en la página y en el backend, pero la prueba no llegó a devolver resultado.
+- [ ] Los índices en mongosh (apartado 3).
+- [ ] En los logs de Render, `[Gemini guard] llamada N/1000 de hoy (redis)` y
+      `[Gemini cache] HIT pregunta` tras repetir una pregunta.
+- [ ] Borrar a mano de Cloudinary las dos imágenes que dejó la revisión:
+      `cookr/recetas/6a0ac90ba77fabe17a1254e7-1789558365899-a0532788.png` y
+      `cookr/avatares/6a0ac90ba77fabe17a1254e7.png`.
+
+Lo de abajo es la checklist tal como se usó.
+
+## Qué entraba y cómo estaba producción
 
 Diez commits. De cara a producción cambia esto:
 
@@ -89,7 +261,7 @@ Así las variables no se tocan.
 - [ ] Con el valor de `GEMINI_PROXY_TOKEN` que hay en Render:
 
 ```bash
-curl -i https://gemini-proxy.alejes.workers.dev/v1beta/models/gemini-2.5-flash
+curl -i https://gemini-proxy.alejes.workers.dev/v1beta/models/gemini-3.6-flash
 # 403 Forbidden: invalid proxy token
 
 curl -i -H "x-proxy-token: EL_TOKEN" https://gemini-proxy.alejes.workers.dev/v1/otra-cosa
@@ -107,8 +279,11 @@ recupera del propio documento.
 - [ ] Volcado hecho:
 
 ```bash
-mongodump --uri="<MONGODB_URI de producción>" --collection=recetas --out="C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75/respaldar.js"
 ```
+
+No hace falta `mongodump`: el script usa el driver de `backend/node_modules` y el `MONGODB_URI` de
+`backend/.env`, igual que la copia de F7.4 en `backup-antes-de-f74`. Deja `recetas.json` en EJSON.
 
 ---
 
@@ -243,6 +418,7 @@ Recarga forzada (Ctrl+F5) antes de empezar, que TanStack Query guarda datos viej
 | Recetas con 0 comentarios | La migración no se ha aplicado |
 | La tarjeta y el detalle no dan el mismo número | Contador desfasado: repite el `--apply`, que los recalcula todos |
 | El chat da 503 | `GEMINI_BASE_URL` o `GEMINI_PROXY_TOKEN` no cuadran con el Worker |
+| Log `models/gemini-2.5-flash is no longer available` | `GEMINI_MODEL` en Render apunta a un modelo retirado: `gemini-3.6-flash` |
 | El log dice `(memoria)` | Las variables de Upstash no llegan al proceso |
 | Errores de CORS en la consola | `FRONTEND_URL` no es exactamente la URL de Vercel, sin barra final |
 
@@ -252,9 +428,12 @@ código viejo no los va a ver: hay que restaurar la copia y borrar la colección
 migrar quedan duplicados.
 
 ```bash
-mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75/restaurar.js"
 # y en mongosh: db.comentarios.drop()
 ```
+
+`restaurar.js` sustituye cada receta de la copia por su versión de entonces, con el array dentro. Las
+recetas creadas después de la copia no se borran.
 
 ---
 
@@ -264,10 +443,13 @@ Con Render en Live y la migración aplicada, Claude puede recorrer contra produc
 apartado 3, el feed anónimo, las fotos servidas desde Cloudinary, la búsqueda y los comentarios en el
 detalle. Si le pasas una cuenta de correo y contraseña con algún alérgeno, también el filtro de
 alérgenos, el chat, la despensa y el ciclo de crear, editar, comentar y borrar una receta de prueba.
-La foto de esa receta se queda en Cloudinary, porque nada borra allí, y hay que quitarla a mano.
+Desde la parte 1, al borrar esa receta su foto se borra también de Cloudinary; el avatar, si lo
+cambia, sí se queda.
 
 El login con Google real y el ticket desde el móvil siguen necesitando tus manos.
 
-## Cuando termines
+---
+
+# Cuando termines
 
 Di qué casillas han salido bien y cuáles no. Si algo falla, cuenta qué esperabas y qué viste.

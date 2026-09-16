@@ -51,16 +51,22 @@ cd backend && npm run seed:completo        # dataset completo
 cd backend && npm run seed:masivo          # dataset grande (llama a Pexels)
 cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
+
+# Mantenimiento de datos. Van contra el MONGODB_URI de backend/.env, que puede ser Atlas.
+# En seco por defecto; escriben solo con "-- --apply" (sin el --, npm se come el argumento)
+cd backend && npm run migrar:comentarios
+cd backend && npm run recalcular:alergenos
+cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 169 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 215 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
 - **`tsconfig.test.json` existe por un motivo.** `tsconfig.json` tiene `rootDir: ./src` e `include: ["src/**/*"]`, así que no puede compilar `tests/`. De ahí que `npm run lint` **no** typechequee los tests: de eso se encarga ts-jest al ejecutarlos, o `npx tsc --noEmit -p tsconfig.test.json` a mano.
 - **`tests/setup.ts` levanta un Mongo efímero** por fichero, vacía las colecciones en cada `afterEach` y **reinicia los limitadores de auth**. Nunca apuntes las pruebas a Atlas.
 - **Importa `app` de `src/app.ts`, nunca `server.ts`**: el segundo abre el puerto y conecta a Mongo de verdad.
-- **Mockea siempre los servicios externos** (`lib/email.ts`, `chatService.ts`, `imagenService.ts`, `nutritionService.ts`, `ingredientesService.ts`). Ninguna prueba debe gastar cuota real de Gemini, Mailjet ni Pexels.
+- **Mockea siempre los servicios externos** (`lib/email.ts`, `lib/cloudinary.ts`, `chatService.ts`, `imagenService.ts`, `nutritionService.ts`, `ingredientesService.ts`). Ninguna prueba debe gastar cuota real de Gemini, Mailjet ni Pexels, ni borrar nada en Cloudinary: crear, editar y borrar recetas llama a `eliminarImagen`.
 
 Dos cosas del código de producción que existen por los tests, para que nadie las borre pensando que sobran:
 
@@ -126,6 +132,10 @@ Se aplica al feed y a los `similares` (los de `findById` y los de `findSimilares
 
 En el frontend, `drawerFiltros.tsx` enseña los alérgenos del perfil marcados y deshabilitados, con candado y enlace a `/perfil`. Si los dejas togglear, el control miente: el backend los aplica igual. `tests/feed.alergenos.test.ts` fija todo esto.
 
+El suelo solo protege si las recetas están bien etiquetadas, así que **el backend no se fía de los `alergenos` que manda el cliente**: al crear y editar guarda `alergenosDeReceta()`, que es lo declarado (filtrado a los 14 conocidos) más lo que detecta en los ingredientes. Solo suma, nunca quita. Para las recetas ya guardadas está `npm run recalcular:alergenos`.
+
+El catálogo de ingredientes y el detector están **copiados** en `backend/src/lib/ingredientes.ts` y `frontend/src/config/ingredientes.ts`, porque los dos paquetes no comparten código. Si tocas uno, toca el otro: `tests/alergenos.deteccion.test.ts` transpila el del frontend y falla si detectan cosas distintas.
+
 ### Manejo de errores: tres patrones conviviendo
 
 Conviene saberlo antes de tocar nada:
@@ -140,7 +150,7 @@ Si unificas esto, hazlo a conciencia: el middleware global es el que está mal, 
 
 `backend/src/services/chatService.ts` no llama a Google directamente si `GEMINI_BASE_URL` está definida: enruta por el Worker de `gemini-proxy/`, que reenvía a `generativelanguage.googleapis.com` autenticando con la cabecera `x-proxy-token`.
 
-El servicio tiene dos protecciones propias: un tope diario de llamadas (`GEMINI_MAX_LLAMADAS_DIA`, por defecto 1000) y una caché en memoria del contexto de usuario. Modelo por defecto: `gemini-2.5-flash`.
+El servicio tiene dos protecciones propias: un tope diario de llamadas (`GEMINI_MAX_LLAMADAS_DIA`, por defecto 1000) y una caché en memoria del contexto de usuario. Modelo por defecto: `gemini-3.6-flash`. El `gemini-2.5-flash` de antes dejó de admitir claves nuevas en septiembre de 2026 y responde 404: si el chat falla con `no longer available`, lo primero es `GEMINI_MODEL`.
 
 ### El correo va por HTTP, no por SMTP
 
@@ -174,6 +184,7 @@ Los mensajes de commit sí van en inglés e imperativo.
 - `services/ingredientesService.ts`: `buscarIngredientesEdamam()` **no llama a Edamam**, llama a Open Food Facts. Edamam se usa en `nutritionService.ts` (junto con USDA). El nombre es engañoso.
 - `middlewares/rateLimitIA.ts` limita por usuario (`express-rate-limit`, ventana de 60 s) y hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar** (todas sus rutas llevan `requerirAuth` delante, así que en la práctica siempre hay usuario). El login se limita por otro middleware distinto, `rateLimitAuth.ts`, por IP; no los confundas.
 - Los dos limitadores comparten store vía `lib/rateLimitStore.ts`: **Redis (Upstash) si `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están definidas, memoria si no.** El fallback en memoria se reinicia en cada redeploy; el de Redis sobrevive. `reiniciarLimitesAuth()` (que usa `tests/setup.ts`) reinicia todos los stores registrados.
+- Con `npm run dev`, abrir cualquier diálogo, *sheet* o *drawer* saca `Function components cannot be given refs` en `DialogOverlay` y compañía. Los componentes de `components/ui/` son de shadcn v4, pensados para React 19, y Cookr va con React 18. Solo sale en desarrollo y no rompe nada; quitarlo es pasar `components/ui/` a `forwardRef` o subir a React 19.
 - Las insignias del `README.md` mienten: dicen Next 15 / React 19 / Express 5. Lo real es **Next 14.2.35, React 18, Express 4.19, Node ≥20**.
 
 ## Entorno

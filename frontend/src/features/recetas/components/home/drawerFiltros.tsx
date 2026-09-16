@@ -9,6 +9,7 @@ import { useMiPerfil } from '@/features/perfil/hooks/usePerfil'
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -80,6 +81,9 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader>
           <DrawerTitle>Filtros</DrawerTitle>
+          <DrawerDescription className="sr-only">
+            Filtra el feed por dieta y dificultad, o excluye más alérgenos
+          </DrawerDescription>
         </DrawerHeader>
 
         <div className="overflow-y-auto px-4 pb-2 flex flex-col gap-6">

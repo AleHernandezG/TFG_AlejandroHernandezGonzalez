@@ -72,7 +72,7 @@ que desde tu equipo funcionan.
 ## Comprobar que va
 
 ```bash
-curl -s "https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash?key=TU_API_KEY" \
+curl -s "https://TU-WORKER.workers.dev/v1beta/models/gemini-3.6-flash?key=TU_API_KEY" \
   -H "x-proxy-token: TU_TOKEN" | head -c 300
 ```
 

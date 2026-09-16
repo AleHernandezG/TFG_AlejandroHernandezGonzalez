@@ -136,9 +136,12 @@ export const recetasService = {
     }
   },
 
-  async obtenerFotoPreview(query: string): Promise<{ url: string; fotografo: string; urlFoto: string; urlPerfil: string } | null> {
+  async obtenerFotoPreview(query: string, token: string): Promise<{ url: string; fotografo: string; urlFoto: string; urlPerfil: string } | null> {
     try {
-      const { data } = await apiClient.get('/recetas/foto-preview', { params: { query } });
+      const { data } = await apiClient.get('/recetas/foto-preview', {
+        params: { query },
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return data ?? null;
     } catch {
       return null;

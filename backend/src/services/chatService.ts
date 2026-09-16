@@ -27,10 +27,10 @@ function obtenerCliente(): GoogleGenAI {
 }
 
 // ── Modelo y tope global diario de llamadas ──────────────────────────────────
-const MODELO_GEMINI = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+const MODELO_GEMINI = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
 const MAX_LLAMADAS_DIA = Number(process.env.GEMINI_MAX_LLAMADAS_DIA ?? 1000);
 
-// gemini-2.5-flash activa "thinking" por defecto, lo que gasta tokens y cuota
+// gemini-3.6-flash activa "thinking" por defecto, lo que gasta tokens y cuota
 // sin aportar nada en un chat culinario. Lo desactivamos.
 const GENERATION_CONFIG = { thinkingConfig: { thinkingBudget: 0 } };
 

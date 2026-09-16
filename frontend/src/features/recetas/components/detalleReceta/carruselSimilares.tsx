@@ -35,7 +35,7 @@ export function CarruselSimilares({ recetas }: Props) {
               {/* Imagen con overlay */}
               <div className="relative mb-2.5 h-44 w-full overflow-hidden rounded-2xl">
                 <Image
-                  src={post.receta.imagenUrl}
+                  src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
                   alt={post.receta.titulo}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"

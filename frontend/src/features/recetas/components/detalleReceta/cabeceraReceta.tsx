@@ -12,8 +12,14 @@ import { ChipAlergeno } from '@/components/common/chipAlergeno'
 import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
 import { useToggleSeguir } from '@/features/recetas/hooks/useToggleSeguir'
 import { useEliminarReceta } from '@/features/coleccion/hooks/useEliminarReceta'
+import { useComentarios } from '@/features/recetas/hooks/useComentarios'
+import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 import { useSession } from 'next-auth/react'
 import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
+
+function nombreCategoria(id: string): string {
+  return DIETAS_OPCIONES.find((dieta) => dieta.id === id)?.label ?? id
+}
 
 function tiempoRelativo(fechaIso: string): string {
   const diff = Date.now() - new Date(fechaIso).getTime()
@@ -40,6 +46,8 @@ export function CabeceraReceta({ receta }: Props) {
   const { mutate: mutarLike } = useToggleLike(receta.id)
   const { mutate: mutarSeguir, isPending: siguiendoPending } = useToggleSeguir(receta.autor.id, receta.id)
   const { mutate: eliminar, isPending: eliminando } = useEliminarReceta()
+  const { data: paginasComentarios } = useComentarios(receta.id)
+  const numComentarios = paginasComentarios?.pages[0]?.total ?? receta.comentarios
 
   useEffect(() => {
     setLiked(receta.liked)
@@ -101,7 +109,7 @@ export function CabeceraReceta({ receta }: Props) {
               variant="secondary"
               className="bg-[var(--warm-bg)] text-foreground/70 border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
             >
-              {cat}
+              {nombreCategoria(cat)}
             </Badge>
           ))}
           <Badge
@@ -179,7 +187,7 @@ export function CabeceraReceta({ receta }: Props) {
           {/* Comentarios */}
           <button className="flex flex-col items-center gap-0.5 text-muted-foreground">
             <MessageCircle size={22} />
-            <span className="text-[10px] font-bold">{receta.comentarios}</span>
+            <span className="text-[10px] font-bold">{numComentarios}</span>
           </button>
 
           {/* Compartir */}
