@@ -140,7 +140,7 @@ Si unificas esto, hazlo a conciencia: el middleware global es el que está mal, 
 
 `backend/src/services/chatService.ts` no llama a Google directamente si `GEMINI_BASE_URL` está definida: enruta por el Worker de `gemini-proxy/`, que reenvía a `generativelanguage.googleapis.com` autenticando con la cabecera `x-proxy-token`.
 
-El servicio tiene dos protecciones propias: un tope diario de llamadas (`GEMINI_MAX_LLAMADAS_DIA`, por defecto 1000) y una caché en memoria del contexto de usuario. Modelo por defecto: `gemini-2.5-flash`.
+El servicio tiene dos protecciones propias: un tope diario de llamadas (`GEMINI_MAX_LLAMADAS_DIA`, por defecto 1000) y una caché en memoria del contexto de usuario. Modelo por defecto: `gemini-3.6-flash`. El `gemini-2.5-flash` de antes dejó de admitir claves nuevas en septiembre de 2026 y responde 404: si el chat falla con `no longer available`, lo primero es `GEMINI_MODEL`.
 
 ### El correo va por HTTP, no por SMTP
 

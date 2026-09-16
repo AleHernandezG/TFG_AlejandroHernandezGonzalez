@@ -66,13 +66,13 @@ tiene runner.
 
 ```bash
 # 1. sin cabecera → 403
-curl -i https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash
+curl -i https://TU-WORKER.workers.dev/v1beta/models/gemini-3.6-flash
 
 # 2. con cabecera, ruta que no toca → 404
 curl -i -H "x-proxy-token: EL_TOKEN" https://TU-WORKER.workers.dev/v1/otra-cosa
 
 # 3. con cabecera y ruta buena → 200 (o el error que devuelva Google, pero pasando)
-curl -i -H "x-proxy-token: EL_TOKEN" "https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash?key=LA_API_KEY"
+curl -i -H "x-proxy-token: EL_TOKEN" "https://TU-WORKER.workers.dev/v1beta/models/gemini-3.6-flash?key=LA_API_KEY"
 ```
 
 - [ ] Los tres `curl` dan 403, 404 y 200.

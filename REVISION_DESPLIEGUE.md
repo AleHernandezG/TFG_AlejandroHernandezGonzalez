@@ -89,7 +89,7 @@ Así las variables no se tocan.
 - [ ] Con el valor de `GEMINI_PROXY_TOKEN` que hay en Render:
 
 ```bash
-curl -i https://gemini-proxy.alejes.workers.dev/v1beta/models/gemini-2.5-flash
+curl -i https://gemini-proxy.alejes.workers.dev/v1beta/models/gemini-3.6-flash
 # 403 Forbidden: invalid proxy token
 
 curl -i -H "x-proxy-token: EL_TOKEN" https://gemini-proxy.alejes.workers.dev/v1/otra-cosa
@@ -243,6 +243,7 @@ Recarga forzada (Ctrl+F5) antes de empezar, que TanStack Query guarda datos viej
 | Recetas con 0 comentarios | La migración no se ha aplicado |
 | La tarjeta y el detalle no dan el mismo número | Contador desfasado: repite el `--apply`, que los recalcula todos |
 | El chat da 503 | `GEMINI_BASE_URL` o `GEMINI_PROXY_TOKEN` no cuadran con el Worker |
+| Log `models/gemini-2.5-flash is no longer available` | `GEMINI_MODEL` en Render apunta a un modelo retirado: `gemini-3.6-flash` |
 | El log dice `(memoria)` | Las variables de Upstash no llegan al proceso |
 | Errores de CORS en la consola | `FRONTEND_URL` no es exactamente la URL de Vercel, sin barra final |
 
