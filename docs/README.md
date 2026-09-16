@@ -78,7 +78,7 @@ F7.6, F13, F14, F15 y F12.
 
 | Documento | Qué es |
 |---|---|
-| `infraestructura.md` | Stack, servicios externos, variables de entorno. De junio, correcto en lo esencial |
+| `infraestructura.md` | Stack, servicios externos, variables de entorno. De junio; la sección 7 (URLs, deploy y variables) se revisó contra el código el 16/09/2026 |
 | `estructura-frontend.md` | Estructura de carpetas del cliente y convenciones de nombres |
 | `metodo-cookr.md` | Qué se adopta del método de DietMetric y qué no, con el porqué |
 | `sinergias-proyectos.md` | Análisis de proyectos en `Desktop/Proyectos` y módulos reutilizables para Cookr |

@@ -201,58 +201,90 @@ Redis actúa como intermediario entre Express y MongoDB para reducir consultas r
 | CI/CD | GitHub Actions | Deploy automático en push a main |
 
 ### URLs de producción
-- Frontend: https://cookr.vercel.app
-- Backend API: https://{nombre-servicio}.onrender.com  (se define al crear el servicio en Render)
-- CORS permitido: solo cookr.vercel.app en producción
 
-### Flujo de deploy (Fase 6)
+| Qué | URL |
+|---|---|
+| Frontend | https://tfg-alejandro-hernandez-gonzalez.vercel.app |
+| Backend API | https://tfg-alejandrohernandezgonzalez.onrender.com/api |
+| Proxy de Gemini | https://gemini-proxy.alejes.workers.dev |
+
+El CORS del backend solo acepta el origen que diga `FRONTEND_URL`.
+
+Cuidado con `cookr.vercel.app` y `cookr-api.onrender.com`, que salen en documentos viejos de
+`historico/`. El primero es **otra aplicación** que se llama igual y el segundo no existe en Render
+(responde `x-render-routing: no-server`). Comprobado el 16/09/2026. Si pruebas contra ellos, estás
+probando algo que no es Cookr.
+
+### Flujo de deploy
+
 ```
-git push main
+push a main
   ↓
-GitHub Actions: lint + tsc
-  ↓ (si pasa)
-Vercel despliega frontend automáticamente
-Render redespliega backend (curl al Deploy Hook)
-  ↓
-App en producción en ~3 minutos
+GitHub Actions: ci-frontend (lint + tsc) y ci-backend (lint + tsc + npm test)
+  ↓ si los dos pasan
+job deploy: curl al Deploy Hook de Render → Render reconstruye el backend
 ```
+
+Vercel no pasa por el workflow: su integración con Git publica el frontend en cuanto llega el push,
+sin esperar al CI. Durante los minutos que tarda Render, el frontend nuevo habla con el backend
+viejo, así que no se prueba nada hasta que Render marque **Live**.
+
+El job `e2e` corre a la vez y no está en el `needs` del deploy. El Worker de `gemini-proxy/` tampoco
+lo despliega el CI: se sube a mano con `npx wrangler deploy` desde su carpeta.
 
 ### Variables de entorno por entorno
 
-**Frontend — Vercel (Settings → Environment Variables)**
+Sacadas de lo que el código lee de verdad, no de las plantillas.
+
+**Frontend · Vercel (Settings → Environment Variables)**
 ```
+NEXTAUTH_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app
 NEXTAUTH_SECRET
-NEXTAUTH_URL=https://cookr.vercel.app
-GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_ID          el mismo valor que en Render
 GOOGLE_CLIENT_SECRET
-NEXT_PUBLIC_API_URL=https://{nombre-servicio}.onrender.com/api
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+NEXT_PUBLIC_API_URL=https://tfg-alejandrohernandezgonzalez.onrender.com/api
 ```
 
-**Backend — Render (Environment Variables en el panel del servicio)**
+**Backend · Render (Environment en el panel del servicio)**
 ```
+NODE_ENV=production
 MONGODB_URI
-UPSTASH_REDIS_URL
-UPSTASH_REDIS_TOKEN
 JWT_SECRET
-FRONTEND_URL=https://cookr.vercel.app
-GMAIL_USER
-GMAIL_APP_PASSWORD
+FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app   sin barra final
+GOOGLE_CLIENT_ID          el mismo que en Vercel; sin ella /api/auth/google responde 503
+MAILJET_API_KEY
+MAILJET_SECRET_KEY
+SENDER_EMAIL
+SENDER_NAME
 GEMINI_API_KEY
+GEMINI_MODEL
+GEMINI_MAX_LLAMADAS_DIA
+GEMINI_BASE_URL=https://gemini-proxy.alejes.workers.dev
+GEMINI_PROXY_TOKEN        el mismo que PROXY_TOKEN en el Worker
+CLOUDINARY_URL            sin ella POST /api/subidas/firma responde 503
+UPSTASH_REDIS_URL         la REST (https://), no la rediss://
+UPSTASH_REDIS_TOKEN
 EDAMAM_APP_ID
 EDAMAM_APP_KEY
-NODE_ENV=production
-PORT=8080
+USDA_API_KEY
+PEXELS_API_KEY
+```
+
+`PORT` no se define: Render la pone solo. `GMAIL_USER` y `GMAIL_APP_PASSWORD` ya no hacen falta; el
+correo va por la API de Mailjet y `GMAIL_USER` solo se lee como plan B si falta `SENDER_EMAIL`.
+
+**Cloudflare Worker (`npx wrangler secret put`)**
+```
+PROXY_TOKEN               sin él el Worker responde 500 a todo, a propósito
 ```
 
 **GitHub Secrets (Settings → Secrets → Actions)**
 ```
-VERCEL_TOKEN
-VERCEL_ORG_ID
-VERCEL_PROJECT_ID
 RENDER_DEPLOY_HOOK_URL
-RENDER_APP_URL
 ```
+
+Es el único que lee `ci-cd.yml`. Si quedan `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` o
+`RENDER_APP_URL`, son restos de un workflow anterior.
 
 ---
 

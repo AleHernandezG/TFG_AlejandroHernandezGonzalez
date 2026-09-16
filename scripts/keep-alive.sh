@@ -4,16 +4,15 @@
 # Uso normal:
 #   bash scripts/keep-alive.sh
 #
-# Con URL personalizada (cuando ya esté creado el servicio en Render):
-#   RENDER_APP_URL=https://cookr-api.onrender.com bash scripts/keep-alive.sh
+# Con otra URL:
+#   RENDER_APP_URL=https://otro-servicio.onrender.com bash scripts/keep-alive.sh
 #
 # ⚠️  ACTIVACIÓN 100% MANUAL.
 #     Nunca llamar desde CI/CD ni desde ningún workflow de GitHub Actions.
 
 # ─── Configuración ────────────────────────────────────────────────────────────
 
-# Edita esta línea cuando crees el servicio en Render:
-DEFAULT_URL="https://{nombre-servicio}.onrender.com"
+DEFAULT_URL="https://tfg-alejandrohernandezgonzalez.onrender.com"
 
 RENDER_APP_URL="${RENDER_APP_URL:-$DEFAULT_URL}"
 HEALTH_URL="${RENDER_APP_URL}/api/health"

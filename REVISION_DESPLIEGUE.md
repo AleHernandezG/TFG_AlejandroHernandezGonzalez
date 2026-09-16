@@ -1,55 +1,263 @@
-# Revisión de la versión desplegada
+# Revisión del despliegue · F6 y F7
 
-Checklist para comprobar a mano, en producción (Vercel + Render), los cambios que salen al mergear `develop` en `main`. Marca cada punto cuando lo verifiques.
+Checklist para llevar a producción los bloques F6 (seguridad) y F7 (rendimiento) mergeando `develop`
+en `main`, y para comprobar después que funcionan. Escrita el 16/09/2026. Sustituye a la de julio,
+que se desplegó el 17/07/2026.
 
-**Contexto:** el merge lleva a producción 9 commits que hasta ahora solo vivían en `develop`. Los siete de la sesión del 17/07/2026 (tests, arreglos de la Fase 2b y E2E) más dos anteriores que tampoco se habían desplegado (rate limiting por IP del login y documentación). Lo que sigue solo lista lo que cambia **de cara al usuario**; los tests y el CI no se ven en la app.
+Aquí el orden no es decorativo: hay variables que tienen que estar en Render **antes** del deploy y
+una migración que va **justo después**. Marca cada casilla cuando la compruebes.
 
-## Antes de empezar
+| Qué | URL |
+|---|---|
+| Frontend | https://tfg-alejandro-hernandez-gonzalez.vercel.app |
+| Backend | https://tfg-alejandrohernandezgonzalez.onrender.com/api |
+| Worker de Gemini | https://gemini-proxy.alejes.workers.dev |
 
-- [ ] El CI de `develop` tiene que estar en verde en la pestaña **Actions** antes de mergear. Fíjate sobre todo en el job **`e2e`**, que es nuevo y nunca ha corrido en un runner de GitHub. Si sale rojo, no bloquea el deploy (está fuera del `needs`), pero conviene arreglarlo antes de que toque `main`.
-- [ ] Después del merge a `main`, espera a que Render termine el redeploy (el plan gratuito tarda un poco en despertar) y a que Vercel publique el frontend. Comprueba `GET /api/health` del backend antes de probar nada.
-- [ ] Ten a mano una cuenta cuyo **perfil tenga al menos un alérgeno** (por ejemplo, huevo). Si no la tienes, entra en tu perfil y añádelo. Sin esto no puedes probar lo más importante.
-- [ ] Si ya tenías sesión abierta de antes, haz una recarga forzada (Ctrl+F5). El feed se cachea en el cliente (TanStack Query) y podrías ver datos viejos.
+`cookr.vercel.app` no es Cookr, es otra aplicación que se llama igual. No pruebes nada ahí.
 
-## 1. Filtro de alérgenos del perfil (lo crítico)
+---
 
-Es un requisito de salud, no una preferencia. Antes de este cambio, un usuario con alérgenos en el perfil los veía igual en el feed.
+## Qué entra y cómo está producción hoy
 
-- [ ] Con la cuenta que tiene huevo en el perfil, abre **home**. No debe aparecer ninguna receta que contenga huevo, sin que hayas tocado ningún filtro.
-- [ ] Lo mismo en **discover**.
-- [ ] Abre el **drawer de filtros**. Los alérgenos del perfil salen marcados, en rojo, con un candado y deshabilitados (no se pueden desmarcar). Hay una nota con enlace a tu perfil.
-- [ ] En ese mismo drawer, marca **otro** alérgeno distinto (por ejemplo, lácteos) y aplica. Ahora no deben salir ni recetas con huevo ni con lácteos. El drawer suma, no sustituye.
-- [ ] Entra en el **detalle de una receta** y baja al carrusel de "recetas parecidas". Tampoco debe colar ninguna con tu alérgeno del perfil.
-- [ ] Comprobación de que no se ha roto lo de siempre: con una cuenta **sin alérgenos** en el perfil, el feed sale completo, como antes.
+Diez commits. De cara a producción cambia esto:
 
-Aviso esperado, no es un fallo: cualquier usuario con alérgenos en el perfil verá **menos recetas** que antes. Es justo el arreglo.
+- El login con Google verifica el `id_token` contra Google. Hoy `POST /api/auth/google` acepta
+  `googleId` y `correo` sin comprobar nada, así que con el correo de otra persona se entra en su
+  cuenta. Es el hallazgo C1 y sigue abierto en producción hasta este merge.
+- El proxy de Gemini falla cerrado si le falta `PROXY_TOKEN` y solo reenvía `/v1beta/models/`.
+- La búsqueda del feed se escapa, los 404 salen en JSON y los 500 no enseñan el error interno.
+- Mongo tiene índices y el feed se ordena en la base de datos, no en Node.
+- Likes y guardados son atómicos: ni likes duplicados ni guardados perdidos con peticiones a la vez.
+- Las fotos van del navegador a Cloudinary con una firma del backend, y en Mongo solo queda la URL.
+  Las fotos antiguas ya se migraron el 04/09/2026.
+- La cuota diaria de Gemini y las cachés de IA viven en Upstash y sobreviven a un reinicio. Hay caché
+  nueva para preguntas repetidas.
+- Los comentarios pasan a su propia colección, con paginación de verdad. **Necesita migración.**
 
-## 2. Dieta y categoría a la vez (discover)
+Comprobado el 16/09/2026, antes del merge:
 
-Antes, combinar dieta y categoría hacía que una pisara a la otra y salían recetas que no cumplían la dieta.
+- CI de `develop` en verde en `353362b`, con el job `e2e` incluido.
+- En local, 169 tests del backend en verde y lint y tipos limpios en los dos paquetes.
+- Producción sirve el código del 04/08/2026: `/api/subidas/firma` da 404 y los 404 salen en el HTML
+  de Express.
+- El Worker responde 403 sin cabecera, o sea que `PROXY_TOKEN` está puesto.
 
-- [ ] En discover, filtra por una **dieta** (por ejemplo, vegano) y una **categoría** (por ejemplo, postre) a la vez. Los resultados deben cumplir **las dos** condiciones: solo postres veganos, ningún postre con huevo o leche.
-- [ ] Filtra solo por la dieta: debe seguir funcionando como siempre.
-- [ ] Filtra solo por la categoría: igual.
+---
 
-## 3. Correo con espacios (menor)
+## 1. Antes del merge
 
-Antes, un correo con un espacio al final se rechazaba con "Correo no válido" en vez de limpiarse.
+### Render → Environment
 
-- [ ] En **registro** o en **login**, escribe tu correo con un espacio al final (o al principio) y envía. Debe aceptarlo (lo recorta), no rechazarlo. Afecta también a recuperar contraseña y reenviar verificación, pero con probar una de las cuatro puertas basta.
+Guardar variables relanza el código que ya está en `main`. No pasa nada: el código viejo ignora las
+que no conoce.
 
-## 4. Rate limiting del login (venía de antes, se despliega ahora)
+- [ ] `CLOUDINARY_URL`, con el mismo valor que en `backend/.env` (cloud `lphsxuxk`). Sin ella, elegir
+      una foto da 503 y no se puede crear una receta con imagen propia.
+- [ ] `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN`. La URL es la REST, la que empieza por `https://`.
+      Si reutilizas la base de `backend/.env`, el contador diario de Gemini se comparte entre local
+      y producción.
+- [ ] `GOOGLE_CLIENT_ID` está y vale exactamente lo mismo que en Vercel. Se puso el 04/09/2026; si
+      falta, `/api/auth/google` responde 503 en cuanto despliegue.
+- [ ] `GEMINI_BASE_URL` y `GEMINI_PROXY_TOKEN` siguen puestas. Este merge no las toca, pero el chat
+      depende de ellas.
 
-Esto ya estaba en `develop` desde la Fase 1 pero no había llegado a producción.
+En Vercel no hay variables nuevas.
 
-- [ ] Falla el login a propósito varias veces seguidas con una contraseña incorrecta. A partir del intento 10 en 15 minutos debe cortar con un mensaje de demasiados intentos. Un login correcto **no** cuenta para el límite, así que no te autobloqueas por entrar bien varias veces.
-- [ ] Ojo con esto en el primer deploy: el backend confía en un único salto de proxy (`trust proxy = 1`). Si al probar el rate limiting el corte llega a todos los usuarios a la vez, o no llega nunca, es señal de que Render mete más de un proxy por delante y hay que revisarlo. Está anotado en la Fase 1 de `PLAN_AUDITORIA.md`.
+### El Worker de Gemini
 
-## Qué NO hace falta revisar
+El CI no lo despliega.
 
-- Los tests unitarios y el E2E: se ejecutan en CI, no cambian nada de la app en sí.
-- El flujo de correo real (Mailjet): no se ha tocado en esta tanda. Sigue con el aviso de siempre sobre SPF/DKIM y el dominio, que es la Fase 3.
+- [ ] En Cloudflare → Workers & Pages → `gemini-proxy` → Deployments hay un despliegue del
+      04/09/2026 o posterior. Si no lo hay, desde `gemini-proxy/`:
+
+```bash
+npx wrangler deploy
+```
+
+Es seguro porque `PROXY_TOKEN` ya existe: el código nuevo no se va a quedar respondiendo 500.
+
+- [ ] Con el valor de `GEMINI_PROXY_TOKEN` que hay en Render:
+
+```bash
+curl -i https://gemini-proxy.alejes.workers.dev/v1beta/models/gemini-2.5-flash
+# 403 Forbidden: invalid proxy token
+
+curl -i -H "x-proxy-token: EL_TOKEN" https://gemini-proxy.alejes.workers.dev/v1/otra-cosa
+# 404 Ruta no permitida
+```
+
+Si la segunda devuelve un JSON de Google en vez de `Ruta no permitida`, el Worker sigue con el
+código viejo.
+
+### Copia de `recetas`
+
+La migración de comentarios hace `$unset` del array de cada receta, y lo que había dentro no se
+recupera del propio documento.
+
+- [ ] Volcado hecho:
+
+```bash
+mongodump --uri="<MONGODB_URI de producción>" --collection=recetas --out="C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+```
+
+---
+
+## 2. El merge
+
+- [ ] PR de `develop` a `main` en GitHub, con `ci-frontend` y `ci-backend` en verde sobre la PR.
+- [ ] Merge. El push a `main` relanza el CI y, si pasa, el job `deploy` llama al hook de Render.
+      Entre CI y build son unos 6 a 10 minutos.
+- [ ] Vercel → Deployments: el de `main` está en **Ready**.
+- [ ] Render → Events: el deploy acaba en **Live**, y en los logs sale `✅ MongoDB conectado` sin
+      errores de índices.
+
+Vercel publica en uno o dos minutos, bastante antes que Render. Mientras Render no termina, el
+frontend nuevo habla con el backend viejo y fallan el login con Google, las fotos y los comentarios.
+No es un fallo del deploy: espera al Live antes de probar nada.
+
+---
+
+## 3. Nada más desplegar
+
+### El backend que responde es el nuevo
+
+```bash
+B=https://tfg-alejandrohernandezgonzalez.onrender.com/api
+curl -s $B/health                   # {"estado":"ok","entorno":"production"}
+curl -s $B/no-existe                # {"error":"Ruta no encontrada"}
+curl -s -X POST $B/subidas/firma    # 401 Token de autenticación requerido (antes 404)
+curl -s -X POST -H "Content-Type: application/json" -d '{}' $B/auth/google
+                                    # 400 con el campo idToken (antes pedía googleId y correo)
+```
+
+- [ ] Las cuatro responden así.
+
+### Migración de comentarios
+
+En cuanto Render esté Live: hasta que se aplique, todas las recetas enseñan 0 comentarios. Tampoco
+la adelantes al merge. El código viejo seguiría escribiendo dentro del array, y al repetir la
+migración esos comentarios nuevos podrían perderse.
+
+Desde `backend/`, con el `.env` que apunta al Atlas de producción:
+
+```bash
+npm run migrar:comentarios              # en seco, no escribe nada
+npm run migrar:comentarios -- --apply   # el -- es obligatorio o npm se come el argumento
+```
+
+- [ ] La pasada en seco no lista comentarios ilegibles bajo un `⚠️`, o los has mirado en Atlas antes
+      de aplicar. Al aplicar, esos se pierden.
+- [ ] El `--apply` acaba con `✅ Ninguna receta conserva listaComentarios.`
+- [ ] Los contadores cuadran con los documentos, en mongosh:
+
+```js
+db.recetas.countDocuments({ listaComentarios: { $exists: true } })                 // 0
+db.recetas.aggregate([{ $group: { _id: null, n: { $sum: "$numComentarios" } } }])  // mismo número que
+db.comentarios.countDocuments({})                                                  // este
+```
+
+- [ ] Un segundo `--apply` dice 0 movidos y deja los mismos números.
+
+El detalle de cada paso está en `docs/estado/pruebas-manuales.md`, apartado 7.
+
+### Índices
+
+Mongoose los crea al arrancar. En mongosh:
+
+```js
+db.recetas.getIndexes()      // fechaPublicacion_-1, autorId_1_fechaPublicacion_-1,
+                             // categorias_1_fechaPublicacion_-1, esEvento_1_fechaPublicacion_-1
+db.usuarios.getIndexes()     // googleId_1, con sparse: true
+db.comentarios.getIndexes()  // recetaId_1_fecha_-1__id_-1
+```
+
+- [ ] Están todos, con esos nombres.
+
+### Upstash
+
+- [ ] Hazle al chat una pregunta que no hayas hecho antes (las repetidas salen de caché y no llaman a
+      Gemini). En los logs de Render aparece `[Gemini guard] llamada N/1000 de hoy (redis)`. Si pone
+      `(memoria)`, las variables no han llegado al proceso.
+
+---
+
+## 4. La aplicación, a mano
+
+Recarga forzada (Ctrl+F5) antes de empezar, que TanStack Query guarda datos viejos.
+
+### Entrar
+
+- [ ] Login con correo y contraseña.
+- [ ] Login con Google con una cuenta real.
+
+### Fotos
+
+- [ ] Crear una receta con foto propia. Al **elegir** el fichero salen `POST /api/subidas/firma` → 200
+      y la subida a `api.cloudinary.com` → 200. La receta publicada enseña la foto.
+- [ ] En Atlas, esa receta tiene `imagenUrl` empezando por `https://res.cloudinary.com` y ningún
+      `data:` dentro.
+- [ ] Editarla cambiando solo el título. La foto sigue igual y no se pide firma nueva.
+- [ ] Cambiar el avatar en `/perfil`. Sale en la cabecera y sigue ahí después de cerrar sesión y
+      volver a entrar.
+
+### Comentarios
+
+- [ ] Una receta que ya tenía comentarios los enseña: vista previa, total junto al icono y el panel
+      trayendo más al bajar.
+- [ ] Un comentario nuevo aparece arriba sin recargar, y la tarjeta del feed da el mismo número que el
+      detalle.
+
+### Feed
+
+- [ ] Home y discover cargan, con las recetas nuevas primero.
+- [ ] Con una cuenta con alérgenos en el perfil no aparece ninguna receta que los lleve. El feed pasó
+      a ordenarse en Mongo y esta regla es la que no se puede romper.
+- [ ] Buscar `(a+)+$` responde al momento y sin resultados.
+- [ ] Dar y quitar like varias veces seguidas deja el contador coherente.
+
+### IA
+
+- [ ] El chat responde.
+- [ ] Escanear un ticket con una foto de cámara desde el móvil. El límite de cuerpo bajó a 8 MB y una
+      foto normal tiene que entrar.
+
+---
+
+## Si algo sale mal
+
+| Síntoma | Causa probable |
+|---|---|
+| 503 en `/api/auth/google` | Falta `GOOGLE_CLIENT_ID` en Render |
+| 401 al entrar con Google | `GOOGLE_CLIENT_ID` no vale lo mismo en Render y en Vercel |
+| 503 al elegir una foto | Falta `CLOUDINARY_URL` en Render |
+| Recetas con 0 comentarios | La migración no se ha aplicado |
+| La tarjeta y el detalle no dan el mismo número | Contador desfasado: repite el `--apply`, que los recalcula todos |
+| El chat da 503 | `GEMINI_BASE_URL` o `GEMINI_PROXY_TOKEN` no cuadran con el Worker |
+| El log dice `(memoria)` | Las variables de Upstash no llegan al proceso |
+| Errores de CORS en la consola | `FRONTEND_URL` no es exactamente la URL de Vercel, sin barra final |
+
+**Volver atrás.** Render → Events permite hacer rollback al deploy anterior, y Vercel → Deployments
+promociona el anterior con **Instant Rollback**. Si la migración de comentarios ya se aplicó, el
+código viejo no los va a ver: hay que restaurar la copia y borrar la colección nueva, o al volver a
+migrar quedan duplicados.
+
+```bash
+mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+# y en mongosh: db.comentarios.drop()
+```
+
+---
+
+## Lo que puede comprobar Claude con Playwright
+
+Con Render en Live y la migración aplicada, Claude puede recorrer contra producción los `curl` del
+apartado 3, el feed anónimo, las fotos servidas desde Cloudinary, la búsqueda y los comentarios en el
+detalle. Si le pasas una cuenta de correo y contraseña con algún alérgeno, también el filtro de
+alérgenos, el chat, la despensa y el ciclo de crear, editar, comentar y borrar una receta de prueba.
+La foto de esa receta se queda en Cloudinary, porque nada borra allí, y hay que quitarla a mano.
+
+El login con Google real y el ticket desde el móvil siguen necesitando tus manos.
 
 ## Cuando termines
 
-Confírmame qué puntos han salido bien y cuáles no. Si algo falla, dime qué esperabas y qué viste, y lo miro antes de seguir con las Fases 4 y 5.
+Di qué casillas han salido bien y cuáles no. Si algo falla, cuenta qué esperabas y qué viste.
