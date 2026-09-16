@@ -230,7 +230,8 @@ sin esperar al CI. Durante los minutos que tarda Render, el frontend nuevo habla
 viejo, así que no se prueba nada hasta que Render marque **Live**.
 
 El job `e2e` corre a la vez y no está en el `needs` del deploy. El Worker de `gemini-proxy/` tampoco
-lo despliega el CI: se sube a mano con `npx wrangler deploy` desde su carpeta.
+lo despliega el CI: se sube a mano con `npx wrangler deploy --keep-vars` desde su carpeta. Sin el
+flag, wrangler borra las variables de texto plano puestas en el panel.
 
 ### Variables de entorno por entorno
 

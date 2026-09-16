@@ -71,10 +71,20 @@ El CI no lo despliega.
       04/09/2026 o posterior. Si no lo hay, desde `gemini-proxy/`:
 
 ```bash
-npx wrangler deploy
+npx wrangler login
+npx wrangler deploy --keep-vars
 ```
 
-Es seguro porque `PROXY_TOKEN` ya existe: el código nuevo no se va a quedar respondiendo 500.
+`PROXY_TOKEN` existe: el Worker viejo solo responde 403 si la tiene definida. Lo que no se sabe es de
+qué tipo es, y ahí está la trampa. Sin `--keep-vars`, wrangler borra las variables de texto plano que
+no están en `wrangler.toml`, y los secretos no los toca nunca. Si `PROXY_TOKEN` se creó como *Text* en
+el panel, un `deploy` a secas se la lleva y el código nuevo responde 500 a todo: el chat se cae.
+
+Si wrangler avisa de que el Worker se editó por última vez desde el panel, acepta. Se pisan el código
+y lo que diga `wrangler.toml`, y con `--keep-vars` las variables se quedan.
+
+Sin instalar nada vale igual: en el panel, **Edit code**, pegar `worker.js` entero y **Deploy**.
+Así las variables no se tocan.
 
 - [ ] Con el valor de `GEMINI_PROXY_TOKEN` que hay en Render:
 

@@ -50,9 +50,12 @@ node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
 npm install -g wrangler
 wrangler login
 cd gemini-proxy
-wrangler deploy
+wrangler deploy --keep-vars
 wrangler secret put PROXY_TOKEN   # pega el token cuando lo pida
 ```
+
+`--keep-vars` importa en los despliegues siguientes: sin él, wrangler borra las variables de texto
+plano creadas en el panel. Los secretos sobreviven siempre, por eso `PROXY_TOKEN` va como secreto.
 
 ## Conectar el backend (Render)
 
@@ -69,9 +72,10 @@ que desde tu equipo funcionan.
 ## Comprobar que va
 
 ```bash
-curl -s "https://TU-WORKER.workers.dev/v1beta/models?key=TU_API_KEY" \
+curl -s "https://TU-WORKER.workers.dev/v1beta/models/gemini-2.5-flash?key=TU_API_KEY" \
   -H "x-proxy-token: TU_TOKEN" | head -c 300
 ```
 
-Si devuelve el JSON con la lista de modelos, el proxy funciona. Un `403 Forbidden: invalid
-proxy token` significa que el token no coincide.
+Si devuelve el JSON del modelo, el proxy funciona. Un `403 Forbidden: invalid proxy token`
+significa que el token no coincide, y un 500 que al Worker le falta `PROXY_TOKEN`. Ojo con
+`/v1beta/models` sin barra final: no empieza por la ruta permitida y da 404.
