@@ -107,8 +107,11 @@ recupera del propio documento.
 - [ ] Volcado hecho:
 
 ```bash
-mongodump --uri="<MONGODB_URI de producción>" --collection=recetas --out="C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75/respaldar.js"
 ```
+
+No hace falta `mongodump`: el script usa el driver de `backend/node_modules` y el `MONGODB_URI` de
+`backend/.env`, igual que la copia de F7.4 en `backup-antes-de-f74`. Deja `recetas.json` en EJSON.
 
 ---
 
@@ -253,9 +256,12 @@ código viejo no los va a ver: hay que restaurar la copia y borrar la colección
 migrar quedan duplicados.
 
 ```bash
-mongorestore --uri="<MONGODB_URI>" --drop --nsInclude="cookr.recetas" "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75"
+node "C:/Users/usuario/Desktop/Asuntos Generales/4 Curso/backup-antes-de-f75/restaurar.js"
 # y en mongosh: db.comentarios.drop()
 ```
+
+`restaurar.js` sustituye cada receta de la copia por su versión de entonces, con el array dentro. Las
+recetas creadas después de la copia no se borran.
 
 ---
 
