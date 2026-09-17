@@ -14,21 +14,12 @@ import { useToggleSeguir } from '@/features/recetas/hooks/useToggleSeguir'
 import { useEliminarReceta } from '@/features/coleccion/hooks/useEliminarReceta'
 import { useComentarios } from '@/features/recetas/hooks/useComentarios'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
+import { tiempoRelativo } from '@/lib/tiempo'
 import { useSession } from 'next-auth/react'
 import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
 function nombreCategoria(id: string): string {
   return DIETAS_OPCIONES.find((dieta) => dieta.id === id)?.label ?? id
-}
-
-function tiempoRelativo(fechaIso: string): string {
-  const diff = Date.now() - new Date(fechaIso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `hace ${mins} min`
-  const horas = Math.floor(mins / 60)
-  if (horas < 24) return `hace ${horas} h`
-  const dias = Math.floor(horas / 24)
-  return `hace ${dias} d`
 }
 
 type Props = {
