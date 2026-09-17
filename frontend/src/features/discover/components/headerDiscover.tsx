@@ -51,6 +51,7 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
           {buscando && (
             <button
               onClick={() => onChange('')}
+              aria-label="Borrar la búsqueda"
               className="absolute right-3.5 flex h-5 w-5 items-center justify-center rounded-full bg-muted-foreground/20 text-muted-foreground"
             >
               <X size={12} />
@@ -61,6 +62,9 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
         {/* Botón Filtros */}
         <DrawerFiltros filtros={filtrosAvanzados} onChange={onFiltrosChange}>
           <button
+            aria-label={
+              totalActivos > 0 ? `Abrir filtros (${totalActivos} activos)` : 'Abrir filtros'
+            }
             className={cn(
               'relative flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-3 text-xs font-semibold transition-colors',
               totalActivos > 0

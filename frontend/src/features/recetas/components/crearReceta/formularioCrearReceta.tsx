@@ -398,6 +398,7 @@ export function FormularioCrearReceta() {
                   />
                   <select
                     {...register('unidadTiempo')}
+                    aria-label="Unidad de tiempo"
                     className="w-16 bg-background border border-border rounded-xl px-2 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
                   >
                     <option value="min">min</option>
