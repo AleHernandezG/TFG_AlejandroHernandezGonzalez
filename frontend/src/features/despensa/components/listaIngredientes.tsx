@@ -12,7 +12,7 @@ interface Props {
 
 export function ListaIngredientes({ ingredientes, onEditar, onEliminar }: Props) {
   return (
-    <div className="px-5 flex flex-col gap-3">
+    <div className="px-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
       <AnimatePresence initial={false}>
         {ingredientes.map((item) => (
           <TarjetaIngrediente

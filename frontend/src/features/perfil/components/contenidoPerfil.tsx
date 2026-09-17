@@ -11,6 +11,7 @@ import { GrupoAjustes } from './grupoAjustes'
 import { FilaAjuste } from './filaAjuste'
 import { DialogCambiarContrasena } from './dialogCambiarContrasena'
 import { DialogPreferenciasAlergenos } from './dialogPreferenciasAlergenos'
+import { PanelPreferencias } from './panelPreferencias'
 
 export function ContenidoPerfil() {
   const { data: session } = useSession()
@@ -39,46 +40,63 @@ export function ContenidoPerfil() {
         </h1>
       </header>
 
-      <div className="space-y-6 px-5 py-6">
-        {/* Tarjeta avatar */}
-        <TarjetaAvatarPerfil nombre={nombre} email={email} avatar={avatar} />
+      <div className="space-y-6 px-5 py-6 lg:px-0">
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <div className="space-y-6">
+            {/* Tarjeta avatar */}
+            <TarjetaAvatarPerfil nombre={nombre} email={email} avatar={avatar} />
 
-        {/* Grupo: Cuenta */}
-        <GrupoAjustes titulo="Cuenta">
-          {esLocal && (
-            <FilaAjuste
-              icono={Lock}
-              label="Cambiar contraseña"
-              onClick={() => setDialogContrasena(true)}
-            />
-          )}
-          <FilaAjuste
-            icono={UtensilsCrossed}
-            label="Cambiar preferencias y alérgenos"
-            onClick={() => setDialogPreferencias(true)}
-            separador={false}
-          />
-        </GrupoAjustes>
+            {/* Grupo: Cuenta */}
+            <div className={esLocal ? undefined : 'lg:hidden'}>
+              <GrupoAjustes titulo="Cuenta">
+                {esLocal && (
+                  <FilaAjuste
+                    icono={Lock}
+                    label="Cambiar contraseña"
+                    onClick={() => setDialogContrasena(true)}
+                    separador={false}
+                  />
+                )}
+                <div className="border-border/20 border-t lg:hidden">
+                  <FilaAjuste
+                    icono={UtensilsCrossed}
+                    label="Cambiar preferencias y alérgenos"
+                    onClick={() => setDialogPreferencias(true)}
+                    separador={false}
+                  />
+                </div>
+              </GrupoAjustes>
+            </div>
 
-        {/* Grupo: Sesión */}
-        <GrupoAjustes titulo="Sesión">
-          <button
-            onClick={handleCerrarSesion}
-            className="hover:bg-destructive/5 flex w-full items-center justify-center gap-2.5 px-4 py-4 text-destructive transition-colors"
-          >
-            <LogOut size={18} />
-            <span className="text-sm font-semibold">Cerrar sesión</span>
-          </button>
-        </GrupoAjustes>
+            {/* Grupo: Sesión */}
+            <GrupoAjustes titulo="Sesión">
+              <button
+                onClick={handleCerrarSesion}
+                className="hover:bg-destructive/5 flex w-full items-center justify-center gap-2.5 px-4 py-4 text-destructive transition-colors"
+              >
+                <LogOut size={18} />
+                <span className="text-sm font-semibold">Cerrar sesión</span>
+              </button>
+            </GrupoAjustes>
 
-        {/* Botón guardar */}
-        <div className="border-border/20 border-t pt-4">
-          <Button
-            onClick={() => window.history.back()}
-            className="h-12 w-full rounded-full bg-brand font-bold text-brand-foreground"
-          >
-            Guardar cambios
-          </Button>
+            {/* Botón guardar */}
+            <div className="border-border/20 border-t pt-4 lg:hidden">
+              <Button
+                onClick={() => window.history.back()}
+                className="h-12 w-full rounded-full bg-brand font-bold text-brand-foreground"
+              >
+                Guardar cambios
+              </Button>
+            </div>
+          </div>
+
+          <div className="hidden lg:block">
+            <GrupoAjustes titulo="Preferencias y alérgenos">
+              <div className="p-5">
+                <PanelPreferencias />
+              </div>
+            </GrupoAjustes>
+          </div>
         </div>
 
         {/* Footer */}

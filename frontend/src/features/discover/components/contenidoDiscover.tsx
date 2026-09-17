@@ -147,8 +147,8 @@ export function ContenidoDiscover() {
 
             {/* Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-2 gap-3 px-5 pb-28">
-                {Array.from({ length: 6 }).map((_, i) => (
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5 pb-28">
+                {Array.from({ length: 8 }).map((_, i) => (
                   <SkeletonTarjeta key={i} />
                 ))}
               </div>
@@ -158,7 +158,7 @@ export function ContenidoDiscover() {
                   variants={variantesGrid}
                   initial="oculto"
                   animate="visible"
-                  className="grid grid-cols-2 gap-3 px-5"
+                  className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5"
                 >
                   {recetas.map((receta) => (
                     <motion.div key={receta.id} variants={varianteTarjeta}>
@@ -170,7 +170,7 @@ export function ContenidoDiscover() {
                 <div ref={sentinelRef} className="h-10" />
 
                 {isFetchingNextPage && (
-                  <div className="grid grid-cols-2 gap-3 px-5 pb-28">
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5 pb-28">
                     <SkeletonTarjeta />
                     <SkeletonTarjeta />
                   </div>

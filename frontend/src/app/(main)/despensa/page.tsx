@@ -16,7 +16,7 @@ export default function PaginaDespensa() {
       <div className="hidden lg:flex">
         <SidebarNavPc />
         <main className="min-h-screen flex-1 bg-background pl-64">
-          <div className="mx-auto max-w-2xl py-10">
+          <div className="mx-auto max-w-6xl py-10">
             <Suspense>
               <ContenidoDespensa />
             </Suspense>

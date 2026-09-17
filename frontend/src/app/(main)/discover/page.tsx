@@ -18,7 +18,7 @@ export default function DiscoverPage() {
       <div className="hidden lg:flex">
         <SidebarNavPc />
         <main className="min-h-screen flex-1 pl-64">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-6xl">
             <ContenidoDiscover />
           </div>
         </main>
