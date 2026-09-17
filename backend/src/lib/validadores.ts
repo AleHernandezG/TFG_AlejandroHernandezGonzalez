@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { filtrarDietas } from "./dietas";
 
 export const esquemaUrlImagen = z
   .string()
@@ -87,7 +88,7 @@ export const esquemaCrearRecetaBody = z.object({
   unidadTiempo: z.enum(["min", "h"]),
   porciones:    z.number().int().min(1, "Debe haber al menos 1 porción"),
   dificultad:   z.enum(["facil", "media", "dificil"]),
-  dietas:       z.array(z.string()).default([]),
+  dietas:       z.array(z.string()).default([]).transform(filtrarDietas),
   alergenos:    z.array(z.string()).default([]),
   ingredientes: z
     .array(

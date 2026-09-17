@@ -10,8 +10,8 @@ El 17 por la noche se cerró el ciclo contra producción: el merge (PR #35, `8bc
 ejecutó el recálculo de alérgenos en Atlas y aparecieron dos fallos nuevos, REV-007 y REV-008.
 
 El 18 se repasaron los filtros del feed contra la API de producción y se borraron las recetas de
-prueba. Los filtros funcionan; lo que no está bien son los datos, y de ahí sale REV-009, que sigue
-abierto. La revisión de interfaz que se hizo en paralelo va aparte, en
+prueba. Los filtros funcionan; lo que no está bien son los datos, y de ahí salió REV-009, arreglado
+ese mismo día salvo el paso por Atlas. La revisión de interfaz que se hizo en paralelo va aparte, en
 [revision-ui-2026-09.md](../estado/revision-ui-2026-09.md).
 
 ---
@@ -352,7 +352,9 @@ de los datos y en el frontend.
 
 ## [REV-009] Las recetas creadas con IA se etiquetan con categorías inventadas
 
-### Qué está mal
+Fecha: 2026-09-18 | Estado: ✅ Arreglado en el código, pendiente de ejecutar en Atlas | Afecta: BE | Medio
+
+### Qué estaba mal
 
 `categorias` en Mongo tiene 22 valores distintos y varios son el mismo concepto escrito de dos formas:
 
@@ -391,22 +393,51 @@ Además de desaparecer de los filtros, estas recetas tampoco puntúan en el feed
 `$filter` de `recetaRepository.ts:146` cruza `categorias` con las preferencias del perfil, que salen de
 esa misma lista de diez.
 
-### Qué hay que hacer
+### Qué se hizo
 
-Tres cosas, y ninguna es grande:
+**Un vocabulario y un sitio donde vive.** `backend/src/lib/dietas.ts` es nuevo y copia los diez
+identificadores de `frontend/src/config/opcionesUsuario.ts`, igual que `lib/ingredientes.ts` copia el
+catálogo. Exporta `canonizarDieta` (quita acentos y resuelve las variantes de género: `vegetariana` →
+`vegetariano`), `filtrarDietas` (canoniza, descarta lo desconocido y quita repetidos) y
+`esRestriccionDeAlergeno`, que reconoce el patrón `sin …`.
 
-- Enumerar las dietas en el prompt de Gemini, igual que ya se hace con `dificultad`.
-- Cambiar `dietas: z.array(z.string())` por un `z.enum` con los diez identificadores, o filtrar contra
-  la lista antes de guardar. Con filtrar basta: una dieta rara se descarta en vez de tumbar la petición.
-- Un script de migración que normalice lo que ya está (`vegana` → `vegano`, `vegetariana` →
-  `vegetariano`, y borrar `sin lactosa` y `sin gluten (verificar ingredientes)`, que no son dietas sino
-  restos de la detección de alérgenos).
+**Cuatro puntos de la cadena, cerrados de fuera adentro.** El prompt de `chatService.ts` ahora enumera
+las diez dietas y dice que no invente otras; lo que devuelve Gemini pasa por `filtrarDietas` antes de
+cachearse, así que el formulario ya recibe datos limpios. `esquemaCrearRecetaBody` transforma el array
+en vez de aceptar cualquier cadena. Y `recetasService.crear` y `actualizar` filtran antes de llamar al
+repositorio, que es el único paso por el que tienen que pasar todas las escrituras.
 
-La lista de dietas está duplicada en los dos paquetes, igual que el catálogo de ingredientes, así que
-el `z.enum` del backend y `DIETAS_OPCIONES` del frontend hay que tocarlos a la vez.
+Se filtra en vez de rechazar: una dieta rara se descarta y la receta se guarda igual. Devolver 400
+porque Gemini improvisó castigaría al usuario por un fallo que no es suyo.
 
-No se ha arreglado en esta pasada: toca el prompt de IA, el validador y los datos, y merece su propio
-cambio con tests.
+**Editar ya no borra las cocinas.** `categorias` guarda dietas mezcladas con cocinas y tipos de plato
+(`italiana`, `postres`, `desayuno`), que vienen de los seeds y que el formulario no sabe editar: los
+carga en el campo `dietas` y los devuelve tal cual al guardar. Filtrar a secas los habría borrado en
+la primera edición de cualquiera de esas recetas. `actualizar` lee las categorías guardadas y conserva
+las que no son dietas ni restos de alérgeno. Esto ya se perdía antes si el usuario tocaba el selector,
+así que de paso arregla un fallo que estaba de antes.
+
+**Las cuatro recetas de producción.** No hacía falta un script nuevo: `npm run normalizar:categorias`
+ya canonizaba `vegetariana` y `vegana`, en seco por defecto y con `-- --apply` para escribir, y toca
+recetas y preferencias de usuario. Se le ha quitado su copia de la lista, que ahora importa de
+`lib/dietas.ts`, y se le ha añadido que borre las restricciones de alérgeno coladas como categoría.
+Queda por ejecutar contra Atlas.
+
+### Decisiones que costaron
+
+**Filtrar en el servicio y no solo en el validador.** El esquema Zod también lo hace, pero el servicio
+es el paso obligado de las dos escrituras. Es el mismo razonamiento que el suelo de alérgenos: si la
+garantía depende de qué ruta se use, no es una garantía.
+
+**Descartar `sin …` por patrón y no por lista.** `sin lactosa` y `sin gluten (verificar ingredientes)`
+son las dos que hay hoy, pero el que las generó fue un modelo, así que mañana puede escribir
+`sin frutos secos`. El patrón las coge todas y ninguna de ellas es una dieta: de eso filtra el suelo
+de alérgenos.
+
+**La lista sigue duplicada.** Los dos paquetes no comparten código, así que `lib/dietas.ts` es copia de
+`DIETAS_OPCIONES`. `tests/dietas.vocabulario.test.ts` transpila el fichero del frontend y compara los
+diez identificadores en orden, igual que hace el test de alérgenos: si alguien toca una lista y no la
+otra, el test se cae.
 
 ---
 

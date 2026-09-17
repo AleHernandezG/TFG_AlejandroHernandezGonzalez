@@ -3,6 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { usuarioRepository } from "../repositories/usuarioRepository";
 import { recetaRepository, type RecetaCandidataDespensa } from "../repositories/recetaRepository";
 import { almacenIA, almacenIAEnRedis } from "../lib/almacenIA";
+import { DIETAS, filtrarDietas } from "../lib/dietas";
 
 interface MensajeChat {
   rol: "user" | "model";
@@ -312,6 +313,10 @@ export async function generarRecetaDesdeTexto(descripcion: string): Promise<unkn
   "pasos": [{"texto": string}]
 }
 
+En "dietas" solo puedes usar estos valores, escritos exactamente así: ${DIETAS.join(", ")}.
+Incluye solo los que la receta cumpla de verdad y deja el array vacío si no cumple ninguno.
+No inventes otros valores ni traduzcas los de la lista.
+
 Descripción del usuario: ${descripcionSegura}
 
 Solo responde con el JSON, sin markdown, sin explicaciones.`;
@@ -328,6 +333,8 @@ Solo responde con el JSON, sin markdown, sin explicaciones.`;
     if (!validarEsquemaReceta(receta)) {
       throw new Error("La respuesta de Gemini no tiene el formato esperado");
     }
+
+    receta.dietas = filtrarDietas(receta.dietas);
 
     await almacenIA.guardar(clave, receta, TTL_RECETA_SEGUNDOS);
 
