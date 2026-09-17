@@ -4,13 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useDebounce } from '@/hooks/useDebounce'
 import { HeaderDiscover } from './headerDiscover'
-import { TarjetaDestacada } from './tarjetaDestacada'
 import { TarjetaDiscover } from './tarjetaDiscover'
 import { EstadoVacioDiscover } from './estadoVacioDiscover'
-import {
-  EVENTO_DESTACADO_MOCK,
-  SUGERENCIAS_POPULARES,
-} from '@/features/discover/data/datosDiscover'
+import { SUGERENCIAS_POPULARES } from '@/features/discover/data/datosDiscover'
 import type { TabDiscover } from '@/features/discover/types/discover.types'
 import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
 import { useDiscover } from '@/features/discover/hooks/useDiscover'
@@ -92,12 +88,6 @@ export function ContenidoDiscover() {
         filtrosAvanzados={filtrosAvanzados}
         onFiltrosChange={setFiltrosAvanzados}
       />
-
-      {!buscando && (
-        <div className="mt-5">
-          <TarjetaDestacada evento={EVENTO_DESTACADO_MOCK} />
-        </div>
-      )}
 
       <AnimatePresence mode="wait">
         {!isLoading && buscando && recetas.length === 0 ? (
