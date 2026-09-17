@@ -5,14 +5,20 @@ y la cuenta de pruebas del seed justo después de desplegar F6 y F7. Salieron cu
 detalles menores, y al volver a probar aparecieron tres más. Están todos arreglados salvo un aviso de
 consola que se deja a sabiendas (al final).
 
-Queda una tarea contra producción que **no he ejecutado**: recalcular los alérgenos de las recetas
-que ya están en Atlas. Los pasos están en `../../REVISION_DESPLIEGUE.md`, parte 1.
+El 17 por la noche se cerró el ciclo contra producción: el merge (PR #35, `8bcb793`) ya estaba en
+`main` y servido por Vercel y Render, se verificaron los seis arreglos en el sitio desplegado, se
+ejecutó el recálculo de alérgenos en Atlas y aparecieron dos fallos nuevos, REV-007 y REV-008.
+
+El 18 se repasaron los filtros del feed contra la API de producción y se borraron las recetas de
+prueba. Los filtros funcionan; lo que no está bien son los datos, y de ahí sale REV-009, que sigue
+abierto. La revisión de interfaz que se hizo en paralelo va aparte, en
+[revision-ui-2026-09.md](../estado/revision-ui-2026-09.md).
 
 ---
 
 ## [REV-001] Recetas con alérgenos sin detectar
 
-Fecha: 2026-09-17 | Estado: ✅ Completado, falta aplicarlo en Atlas | Afecta: BE + FE | Grave
+Fecha: 2026-09-17 | Estado: ✅ Completado y aplicado en Atlas | Afecta: BE + FE | Grave
 
 ### Qué estaba mal
 
@@ -80,10 +86,24 @@ script avisa bajo un `⚠️` y la deja: añade `lacteos` si los ingredientes lo
 otro. Al crear y editar, en cambio, `alergenosDeReceta` descarta lo que no está entre los 14: las
 recetas nuevas ya no pueden guardar una cadena rara. El perfil sí, y eso es M2 (F8.2), que va aparte.
 
+### Ejecutado en Atlas · 17/09/2026
+
+En seco primero y con `-- --apply` después. **27 de las 145 recetas** tenían menos alérgenos de los
+que llevaban sus ingredientes. La copia previa quedó en
+`backend/respaldos/alergenos-2026-09-17T19-09-52-790Z.json`, fuera de git. La segunda pasada encontró
+0 pendientes.
+
+Se comprobó en el sitio desplegado: el Tortellini pasa de `['frutosSecos']` a
+`['frutosSecos','cereales','huevo','lacteos']` y ya no sale en `GET /api/recetas?alergenos=lacteos`.
+
+Para deshacerlo:
+
+```bash
+cd backend && npm run recalcular:alergenos -- --restaurar "respaldos\alergenos-2026-09-17T19-09-52-790Z.json"
+```
+
 ### Qué queda a medias
 
-- Ejecutarlo en Atlas. Hasta que no se pase el `--apply`, las recetas antiguas siguen con la etiqueta
-  de antes y el Tortellini sigue saliendo a quien es alérgico a los lácteos.
 - El detector sigue yendo por nombre. Un ingrediente que no está en el catálogo y no tiene ninguna
   palabra clave no marca nada, y ahí la única protección es lo que marque el autor.
 - F8.2 sigue abierta: `alergias` del perfil acepta cualquier texto. El test de la copia cubre la mitad
@@ -223,6 +243,173 @@ Los cuatro primeros salieron en la revisión. Los otros tres, al volver a probar
 
 ---
 
+## [REV-007] «hace -1 min» en el comentario recién publicado
+
+Fecha: 2026-09-17 | Estado: ✅ Completado | Afecta: FE | Salió probando en producción
+
+### Qué estaba mal
+
+Al publicar un comentario, la marca de tiempo salía como «hace -1 min» durante un minuto. El
+comentario optimista se crea con `new Date().toISOString()` del navegador, y el reloj del cliente iba
+unos segundos por delante del servidor. `Date.now() - fecha` daba negativo, `Math.floor` de un número
+entre -1 y 0 da -1, y el texto era el que era.
+
+Debajo había algo peor: `tiempoRelativo` estaba escrita **tres veces**, copiada en
+`cabeceraReceta.tsx`, `comentariosReceta.tsx` y `tarjetaPost.tsx`, con tres formatos distintos y el
+mismo fallo en las tres.
+
+### Qué se hizo
+
+`frontend/src/lib/tiempo.ts` con una sola implementación, con el `Math.max(0, ...)` que faltaba y un
+caso nuevo para menos de un minuto:
+
+```ts
+const transcurrido = Math.max(0, Date.now() - new Date(fechaIso).getTime())
+```
+
+`cabeceraReceta` y `comentariosReceta` la importan y borran su copia. La tercera, la de
+`tarjetaPost.tsx` (el feed móvil), sigue ahí: usa otro formato («Hace 88d», sin espacio y con la H en
+mayúscula) y unificarla cambia lo que se ve en el feed. Queda anotada en `estado/revision-ui-2026-09.md`
+como cambio de copia, no como corrección.
+
+---
+
+## [REV-008] El error de dificultad salía en inglés
+
+Fecha: 2026-09-17 | Estado: ✅ Completado | Afecta: FE | Salió probando en producción
+
+### Qué estaba mal
+
+Enviar el formulario de crear receta sin elegir dificultad abría el diálogo de errores con
+«Dificultad: Invalid input». Es el mismo problema que REV-006 arregló para `tiempo` y `porciones`: zod
+4 emite su mensaje por defecto, en inglés, cuando el valor no cumple el tipo.
+
+### Qué se hizo
+
+```ts
+dificultad: z.enum(['facil', 'media', 'dificil'], { error: 'Elige una dificultad' }),
+```
+
+`unidadTiempo` sigue sin mensaje, y se deja así a propósito: tiene valor por defecto (`'min'`) y no
+hay forma de dejarla vacía desde la interfaz, así que el error nunca se dispara.
+
+---
+
+## Limpieza de datos de prueba en Atlas · 17/09/2026
+
+Dos recetas de prueba llevaban meses publicadas en producción, las dos tituladas «Macarrones con
+tomate»:
+
+| Id | Descripción | Autor | Publicada |
+|---|---|---|---|
+| `6a0f2aa6a40ea2e4f1c61855` | `AFASFASAFDASAF` | María García | 21/05/2026 |
+| `6a45344758e8899e6d6b2377` | `Pruebaafasf` | cuenta de pruebas | 01/07/2026 |
+
+Ninguna tenía comentarios ni estaba guardada por nadie; una tenía un like. Borradas con copia previa
+en `backend/respaldos/recetas-prueba-2026-09-17T22-15-11-379Z.json`. La colección pasa de 145 a 143
+recetas.
+
+**Lo que no se ha tocado.** «Bowl de Atún y Arroz Estilo Sushi» tiene siete comentarios de relleno de
+sesiones de prueba (`holaaaa`, `q`, `tal`, `aaa`, `aaaaaaa`, `eeeeee`, `eeerere`), todos de María
+García. Se dejan porque borrarlos no se pidió y porque hacen de caso de prueba para la paginación de
+REV-002: son los que hacen que esa receta pase de ocho comentarios. Si se quieren fuera, van por
+`_id` en la colección `comentarios` y hay que bajar `numComentarios` de la receta en la misma
+operación.
+
+**No hay endpoint para borrar un comentario.** `recetas.routes.ts` solo tiene `GET /:id/comentarios` y
+el `POST`. Ni el autor del comentario ni el de la receta pueden retirarlo desde la interfaz, así que
+cualquier limpieza pasa por Atlas.
+
+---
+
+## Verificación de los filtros del feed en producción · 18/09/2026
+
+Batería de 37 peticiones anónimas contra `https://tfg-alejandrohernandezgonzalez.onrender.com/api/recetas`,
+con la colección en 143 recetas. Todas respondieron 200.
+
+| Filtro | Resultado | Veredicto |
+|---|---|---|
+| `q=paella` / `Paella` / `PAELLA` | 3 en los tres casos | Correcto, la regex lleva `$options: "i"` |
+| `q=espanola` vs `q=española` | 0 vs 1 | **Sensible a tildes**, ya documentado como UI-011 |
+| `q=tortilla de patatas` | 1 | Busca la frase entera, no palabra a palabra |
+| `dietas=vegano` | 29 | Correcto |
+| `dietas=vegana` | 1 | Vocabulario duplicado, ver REV-009 |
+| `categoria=postres` / `pasta` / `desayuno` | 14 / 8 / 12 | Correcto en minúscula |
+| `categoria=Postres` / `Vegano` | 0 / 0 | **Distingue mayúsculas**, ver REV-009 |
+| `dificultad=Fácil` / `Media` / `Difícil` | 86 / 48 / 9 | Correcto, y es lo que manda el drawer |
+| `dificultad=facil` (sin tilde) | 0 | Esperado: `MAPA_DIFICULTAD` normaliza al crear, la base guarda con tilde |
+| `alergenos=gluten` | 143 | **Correcto pese a lo que parece.** El vocabulario del proyecto no tiene `gluten`, tiene `cereales` (la lista de los 14 de la UE). Con `cereales` sí filtra |
+| `soloEvento=true` | 6 | Correcto, ver [eventos.md](../estado/eventos.md) |
+| `sort=likes` / `reciente` / `score` | ordenaciones distintas | Correcto |
+| `limite=999` | devuelve 50 | Correcto, el tope de `Math.min(50, …)` aguanta |
+| `pagina=0` y `pagina=-1` | devuelven la página 1 | Correcto, `Math.max(1, …)` |
+| `categoria=zzzz`, `dificultad=zzzz` | 0 y 0 | Correcto, no revientan |
+
+La conclusión importante: **el backend filtra bien**. Los dos problemas reales están en el vocabulario
+de los datos y en el frontend.
+
+---
+
+## [REV-009] Las recetas creadas con IA se etiquetan con categorías inventadas
+
+### Qué está mal
+
+`categorias` en Mongo tiene 22 valores distintos y varios son el mismo concepto escrito de dos formas:
+
+```
+vegano      → 29 recetas        vegana        → 1
+vegetariano → 74 recetas        vegetariana   → 3
+mediterranea, española, asiática, keto, paleo, halal, lowCarb, …
+sin lactosa → 1
+sin gluten (verificar ingredientes) → 1
+```
+
+`DIETAS_OPCIONES` (`config/opcionesUsuario.ts`) declara diez identificadores y es la lista que pinta el
+drawer de filtros. Ni `vegana`, ni `vegetariana`, ni `sin lactosa`, ni ese `sin gluten (verificar
+ingredientes)` están en ella. O sea que **hay cuatro recetas en producción que ningún filtro de dieta
+puede encontrar**:
+
+| Receta | Categorías guardadas | Publicada |
+|---|---|---|
+| Tarta de Queso Clásica | `vegetariana` | 15/07/2026 |
+| Paella Valenciana Tradicional | `sin lactosa`, `sin gluten (verificar ingredientes)`, `mediterranea` | 02/07/2026 |
+| Sazonado de las Patatas | `vegetariana`, `vegana` | 29/06/2026 |
+| Salsa Kimchi-Mayo | `vegetariana` | 29/06/2026 |
+
+Las cuatro son de la misma cuenta y de los mismos días: son recetas creadas con «Crear desde
+descripción». La cadena completa:
+
+1. El prompt de `chatService.ts:310` pide `"dietas": string[]` **sin decir cuáles**, así que Gemini
+   escribe lo que le parece, y en español lo natural para una tarta de queso es «vegetariana».
+2. `esquemaCrearRecetaBody` valida `dietas: z.array(z.string()).default([])`. Cualquier cadena pasa.
+3. `recetaRepository.crear()` hace `categorias: datos.dietas` y lo guarda tal cual.
+
+No hay ningún punto donde se compruebe que la dieta existe. Con `dificultad` sí lo hay (`z.enum` más
+`MAPA_DIFICULTAD`), y por eso `dificultad` está limpia y `categorias` no.
+
+Además de desaparecer de los filtros, estas recetas tampoco puntúan en el feed personalizado: el
+`$filter` de `recetaRepository.ts:146` cruza `categorias` con las preferencias del perfil, que salen de
+esa misma lista de diez.
+
+### Qué hay que hacer
+
+Tres cosas, y ninguna es grande:
+
+- Enumerar las dietas en el prompt de Gemini, igual que ya se hace con `dificultad`.
+- Cambiar `dietas: z.array(z.string())` por un `z.enum` con los diez identificadores, o filtrar contra
+  la lista antes de guardar. Con filtrar basta: una dieta rara se descarta en vez de tumbar la petición.
+- Un script de migración que normalice lo que ya está (`vegana` → `vegano`, `vegetariana` →
+  `vegetariano`, y borrar `sin lactosa` y `sin gluten (verificar ingredientes)`, que no son dietas sino
+  restos de la detección de alérgenos).
+
+La lista de dietas está duplicada en los dos paquetes, igual que el catálogo de ingredientes, así que
+el `z.enum` del backend y `DIETAS_OPCIONES` del frontend hay que tocarlos a la vez.
+
+No se ha arreglado en esta pasada: toca el prompt de IA, el validador y los datos, y merece su propio
+cambio con tests.
+
+---
+
 ## Lo que se vio y no se tocó
 
 **Aviso de `forwardRef` en desarrollo.** Con `npm run dev`, al abrir cualquier diálogo, *sheet* o
@@ -249,7 +436,19 @@ en producción. Cambiarla o borrar la cuenta es cosa de Atlas, no de código.
 - `recalcular:alergenos` contra otro Mongo en memoria: la pasada en seco no escribe, `--apply` corrige
   y deja copia, una segunda pasada encuentra 0 y `--restaurar` devuelve los datos a como estaban.
 
-Contra Atlas no se ha ejecutado nada.
+**En producción, el 17 por la noche**, con Playwright sobre `tfg-alejandro-hernandez-gonzalez.vercel.app`
+y la cuenta del seed:
+
+| Arreglo | Comprobación en el sitio desplegado |
+|---|---|
+| REV-001 | Receta nueva con «Queso parmesano» guarda `lacteos`; el Tortellini recalculado desaparece de `?alergenos=lacteos` |
+| REV-002 | La hoja pide `pagina=2&limite=8` (200) y termina en «Has visto todos los comentarios» |
+| REV-003 | `GET /api/recetas/foto-preview` responde 200 con la cabecera puesta (antes 401) |
+| REV-004 | El contador de la cabecera pasa de 9 a 10 sin recargar |
+| REV-005 | La URL de Cloudinary de la receta de prueba da 200 antes de borrarla y 404 después |
+| REV-006 | Categoría con su etiqueta, `/editar-receta` sin sesión da 307, consola limpia y los mensajes de NaN en español |
+
+Todo lo creado para probar (una receta y un comentario) se borró al terminar.
 
 ## Ficheros tocados
 
@@ -259,6 +458,7 @@ Backend: `lib/ingredientes.ts` (nuevo), `lib/cloudinary.ts`, `repositories/recet
 `alergenos.deteccion`, `recetas.escritura` y `cloudinary`, y dos casos más en `imagenes`.
 
 Frontend: `config/ingredientes.ts`, `middleware.ts`, `services/recetasService.ts`,
-`hooks/useFotoPexelsPreview.ts`, `types/crearReceta.schema.ts`, los componentes del detalle
+`hooks/useFotoPexelsPreview.ts`, `types/crearReceta.schema.ts`, `lib/tiempo.ts` (nuevo, REV-007),
+los componentes del detalle
 (`cabeceraReceta`, `comentariosReceta`, `heroReceta`, `carruselSimilares`), las tarjetas del feed y de
 discover, y los diálogos de chat, colección, despensa, perfil, filtros y crear receta.
