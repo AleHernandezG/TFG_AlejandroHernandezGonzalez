@@ -253,3 +253,8 @@ seguidores. Todo eso tiene sentido en una plataforma con gente dentro; en una co
 Lo mínimo que hay que hacer **ya**, aunque no se implemente nada más de este documento: quitar
 `EVENTO_DESTACADO_MOCK` de producción. Anunciar una «Semana de la Cocina Mediterránea» que no existe,
 en una tarjeta que no se puede pulsar, es la clase de detalle que se nota en una demo.
+
+**Hecho el 18/09/2026.** La constante y el bloque que la pintaba en `contenidoDiscover.tsx` ya no
+están. El componente `TarjetaDestacada` y el tipo `EventoDestacado` **siguen en el repositorio**: es la
+presentación que hereda lo que se construya aquí, así que el fragmento de código de arriba sirve
+todavía como referencia de la forma del dato, no del contenido.

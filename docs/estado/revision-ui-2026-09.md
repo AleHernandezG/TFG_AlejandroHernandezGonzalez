@@ -16,20 +16,43 @@ Cada hallazgo lleva `UI-XXX`, fichero y línea. Al final hay un orden de ataque.
 
 ## Resumen: lo que hay que arreglar sí o sí
 
-| # | Qué | Dónde | Coste |
-|---|---|---|---|
-| UI-001 | El bento del feed de escritorio deja un hueco cada 7 tarjetas | `feedHomePc.tsx` | 1 h |
-| UI-002 | La tarjeta destacada estira y deja una franja muerta | `tarjetaPostPc.tsx:119` | 30 min |
-| UI-003 | **Like y guardar en escritorio no llaman al backend** | `tarjetaPostPc.tsx:26-31` | 1 h |
-| UI-004 | Cuatro pantallas de escritorio limitadas a 512–768 px en 1440 | 4 `page.tsx` | 3 h |
-| UI-005 | Cada pantalla monta su árbol dos veces | 5 `page.tsx` | 4 h |
-| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h |
-| UI-007 | Dos `<select>` sin nombre accesible | formulario de crear receta | 20 min |
-| UI-008 | El botón de filtros de Discover no tiene nombre | `contenidoDiscover.tsx` | 10 min |
-| UI-009 | `<main>` anidado en todas las rutas | `(main)/layout.tsx` + páginas | 30 min |
-| UI-010 | El FAB tapa un campo del formulario | `navBarInferior.tsx:47` | 20 min |
-| UI-011 | No hay tablet: de 767 a 1023 se ve el móvil estirado | `page.tsx` × 5 | 3 h |
-| UI-012 | `ContenidoDiscover` nunca pasa `categoria` al hook | `contenidoDiscover.tsx` | 15 min |
+| # | Qué | Dónde | Coste | Estado |
+|---|---|---|---|---|
+| UI-001 | El bento del feed de escritorio deja un hueco cada 7 tarjetas | `feedHomePc.tsx` | 1 h | ✅ 18/09 |
+| UI-002 | La tarjeta destacada estira y deja una franja muerta | `tarjetaPostPc.tsx:119` | 30 min | ✅ 18/09 |
+| UI-003 | **Like y guardar en escritorio no llaman al backend** | `tarjetaPostPc.tsx:26-31` | 1 h | ✅ 18/09 |
+| UI-004 | Cuatro pantallas de escritorio limitadas a 512–768 px en 1440 | 4 `page.tsx` | 3 h | ✅ 18/09 |
+| UI-005 | Cada pantalla monta su árbol dos veces | 5 `page.tsx` | 4 h | abierto |
+| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h | abierto |
+| UI-007 | Dos `<select>` sin nombre accesible | formulario de crear receta | 20 min | ✅ 18/09 |
+| UI-008 | El botón de filtros de Discover no tiene nombre | `contenidoDiscover.tsx` | 10 min | ✅ 18/09 |
+| UI-009 | `<main>` anidado en todas las rutas | `(main)/layout.tsx` + páginas | 30 min | abierto |
+| UI-010 | El FAB tapa un campo del formulario | `navBarInferior.tsx:47` | 20 min | ✅ 18/09 |
+| UI-011 | No hay tablet: de 767 a 1023 se ve el móvil estirado | `page.tsx` × 5 | 3 h | abierto |
+| UI-012 | `ContenidoDiscover` nunca pasa `categoria` al hook | `contenidoDiscover.tsx` | 15 min | abierto |
+
+---
+
+## Ola 1, cerrada el 18 de septiembre de 2026
+
+Se atacaron los fallos funcionales y de accesibilidad, no la estética: UI-001, UI-002, UI-003, UI-004,
+UI-007, UI-008 y UI-010, más UI-016 (el evento inventado de Discover, que estaba en la sección 4).
+Quedan abiertos UI-005, UI-006, UI-009, UI-011 y UI-012.
+
+Dos cosas salieron distintas de lo que prescribía este documento, y conviene saber por qué:
+
+**El botón de comentarios de escritorio no lleva ancla.** UI-003 pedía enlazar a
+`/recetas/{id}#comentarios`. Ese ancla no existe, y no puede existir todavía: `detalleRecetaCliente.tsx`
+monta `ComentariosReceta` **dos veces** (líneas 52 y 82), una por árbol, que es exactamente UI-005. Poner
+el `id` ahora crearía dos elementos con el mismo identificador y el navegador saltaría al que está
+oculto. El enlace va a `/recetas/{id}` a secas hasta que UI-005 deje un solo árbol.
+
+**Quitar el `row-span-2` no bastaba para UI-002.** El documento decía que la franja muerta desaparecía
+sola. No: al quitarlo, el `hero` (≈664 px) y la `small` que comparte fila (≈352 px) siguen en la misma
+fila de rejilla, y con `align-items: stretch` el hueco no se elimina, **se muda a la tarjeta pequeña**.
+El arreglo fue dar a la imagen de las dos variantes `flex-1` con un suelo `min-h-*`, de modo que sea la
+imagen la que absorbe el sobrante de la fila. El `row-span-2` sí se quitó y el ciclo suma nueve, como
+pedía UI-001, y no se usó `grid-auto-flow: dense`.
 
 ---
 
@@ -38,7 +61,7 @@ Cada hallazgo lleva `UI-XXX`, fichero y línea. Al final hay un orden de ataque.
 Esto es lo que se ve a simple vista y lo que motivó la revisión. Hay tres causas distintas y conviene
 no confundirlas, porque se arreglan por separado.
 
-### UI-001 · El patrón bento deja un hueco cada siete tarjetas
+### UI-001 · El patrón bento deja un hueco cada siete tarjetas ✅
 
 `features/recetas/components/home/feedHomePc.tsx:14-22`
 
@@ -73,7 +96,12 @@ celdas y el ciclo pasa a nueve, que sí tila:
 Tres filas exactas, sin huecos, y el destacado sigue destacando. Es además el que arregla UI-002 de
 paso.
 
-### UI-002 · La franja muerta de la tarjeta destacada
+**Hecho el 18/09/2026.** Se aplicó el correcto. El ciclo quedó
+`['hero', 'small', 'small', 'wide', 'small', 'small', 'small']`, nueve celdas, y el `hero` perdió el
+`row-span-2`. Si alguien toca ese array, la regla que no puede romper es que la suma de celdas siga
+siendo múltiplo de tres.
+
+### UI-002 · La franja muerta de la tarjeta destacada ✅
 
 `features/recetas/components/home/tarjetaPostPc.tsx:119`
 
@@ -92,7 +120,13 @@ estirarse para igualar dos tarjetas apiladas. Si se quiere mantener el formato a
 fijar la altura de la imagen en `clamp()` y dejar que el texto crezca con `line-clamp-3` en vez de
 `line-clamp-2`, aprovechando el espacio en vez de dejarlo en blanco.
 
-### UI-004 · Cuatro pantallas limitadas a menos de la mitad del ancho
+**Hecho el 18/09/2026, pero no como decía aquí.** Quitar el `row-span-2` no elimina el hueco: lo
+traslada a la tarjeta pequeña que comparte fila, porque la rejilla sigue igualando alturas con
+`align-items: stretch`. Lo que lo resuelve es que el sobrante de la fila se lo coma la imagen y no el
+texto: la imagen del `hero` pasó a `relative min-h-[16rem] flex-1` y la de la `small` a
+`relative min-h-[12rem] flex-1`, y el bloque de texto del `hero` perdió el `flex-grow justify-between`.
+
+### UI-004 · Cuatro pantallas limitadas a menos de la mitad del ancho ✅
 
 Los anchos máximos de escritorio, medidos en un viewport de 1440 px con la barra lateral de 256 px:
 
@@ -130,6 +164,28 @@ las pocas que casi funciona, pero el banner de evento («Semana de la Cocina Med
 175 px de alto con dos líneas de texto y un hueco de 90 px entre el rótulo y el título, sin imagen que
 lo justifique.
 
+**Hecho el 18/09/2026.** Anchos nuevos y qué cambió por dentro:
+
+| Ruta | Antes | Ahora | Rejilla interior |
+|---|---|---|---|
+| `/discover` | `max-w-3xl` | `max-w-6xl` | `grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` |
+| `/coleccion` | `max-w-2xl` | `max-w-6xl` | `grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` |
+| `/despensa` | `max-w-2xl` | `max-w-6xl` | de `flex-col` a `grid lg:grid-cols-2 xl:grid-cols-3` |
+| `/perfil` | `max-w-lg` | `max-w-5xl` | dos columnas en `lg` |
+
+Subir el contenedor no bastaba en ninguna de las cuatro: colección y despensa se habrían limitado a
+estirar la columna de móvil, así que las clases responsive van dentro de los componentes compartidos
+(`gridRecetasColeccion.tsx`, `listaIngredientes.tsx`, `contenidoDiscover.tsx`). Como el árbol móvil se
+monta bajo un `lg:hidden`, esas clases `lg:` solo tienen efecto en el árbol de escritorio: cuando se
+arregle UI-005 y quede un solo árbol, seguirán valiendo tal cual.
+
+El perfil sí necesitó tocar estructura. Las dietas y los alérgenos salieron del diálogo a un componente
+propio, `panelPreferencias.tsx`, que el diálogo sigue usando en móvil y que en escritorio se pinta
+entero en la columna derecha, que es lo que pedía esta ficha: los alérgenos mandan sobre todo el
+filtrado del feed y no pueden seguir escondidos detrás de un enlace. El «Guardar cambios» de abajo
+**no** se dejó fijo en escritorio, se ocultó: no guardaba nada, era un `window.history.back()`. El botón
+que guarda de verdad es el del panel.
+
 ### UI-011 · Entre 768 y 1023 px no hay diseño
 
 El punto de corte es `lg` (1024 px). Todo lo que hay por debajo se lleva el árbol de móvil. En un iPad
@@ -146,7 +202,7 @@ en vez de `4/3` entran dos recetas por pantalla.
 
 ## 2 · Fallos de comportamiento
 
-### UI-003 · En escritorio, el like y el guardar no persisten
+### UI-003 · En escritorio, el like y el guardar no persisten ✅
 
 `features/recetas/components/home/tarjetaPostPc.tsx:26-31`
 
@@ -175,7 +231,17 @@ De paso hay que decidir si el like desde el feed existe o no, porque ahora **en 
 like desde el feed y en escritorio parece que sí**. Recomiendo que exista en los dos: es el gesto más
 barato de la interfaz y hoy obliga a entrar en el detalle.
 
-### UI-010 · El botón flotante de Cookr IA tapa contenido
+**Hecho el 18/09/2026.** `tarjetaPostPc.tsx` ya llama a `useToggleLike` y `useToggleGuardado` con el
+patrón optimista y retroceso de la tarjeta de móvil, y un `useEffect` resincroniza el estado local
+cuando el post cambia de identidad al refetchear el feed. El botón de comentarios pasó a `<Link>` con
+`aria-label`, **pero sin el ancla `#comentarios`**: ese `id` no existe y no puede existir mientras
+`detalleRecetaCliente.tsx` monte `ComentariosReceta` dos veces (UI-005). El enlace lleva a
+`/recetas/{id}` a secas; el ancla se añade cuando se cierre UI-005.
+
+La decisión de fondo (si el like desde el feed existe en las dos plataformas) sigue sin tomar. Ahora
+mismo funciona en escritorio y no está en móvil.
+
+### UI-010 · El botón flotante de Cookr IA tapa contenido ✅
 
 `components/common/navBarInferior.tsx:44-47`
 
@@ -201,6 +267,16 @@ Tres arreglos, en orden de preferencia:
 2. Moverlo a la esquina inferior derecha, que es donde se espera un FAB y donde estorba menos.
 3. Dejarlo donde está y subir el `padding-bottom` del `<main>` a 8,5 rem. Tapa menos, pero sigue
    flotando sobre el contenido al hacer scroll.
+
+**Hecho el 18/09/2026 con la opción 1.** El FAB ya no existe. Cookr IA es el tercero de seis ítems de
+la barra, entre Despensa y Discover, que es la misma posición que ocupa en la barra lateral de
+escritorio. Con seis ítems en 390 px cada uno pasó a `min-w-0 flex-1` con la etiqueta en `truncate`, y
+el contenedor de `px-2` a `px-1`. Es el cambio de diseño más visible de la ola.
+
+`RUTAS_SIN_NAVBAR` sigue ocultando la barra en `/chat` aunque `/chat` esté ahora en la barra, y no es
+una incoherencia: `contenidoChat.tsx:31` es un `fixed inset-0 z-[60]`, una capa a pantalla completa por
+encima del `z-40` de la barra, así que la barra no se vería de todos modos y el chat tiene su propia
+salida.
 
 ### UI-005 · Cada pantalla se monta dos veces
 
@@ -269,7 +345,7 @@ axe-core sobre las ocho rutas, con sesión y en las dos anchuras. `/chat` sale l
 | `page-has-heading-one` | moderada | `/home` | 1 |
 | `heading-order` | moderada | `/coleccion`, `/recetas/[id]` | 1 |
 
-### UI-007 · Dos `<select>` sin nombre accesible (crítica)
+### UI-007 · Dos `<select>` sin nombre accesible (crítica) ✅
 
 `select[name="unidadTiempo"]` y `select[name="ingredientes.N.unidad"]`. Tienen etiqueta visual encima
 («TIEMPO», «INGREDIENTES») pero ninguna asociada: sin `<label for>`, sin `aria-label`, sin
@@ -279,7 +355,12 @@ eligiendo la unidad de tiempo, la de un ingrediente o cuál de los ocho ingredie
 Arreglo: `aria-label="Unidad de tiempo"` y `aria-label={`Unidad del ingrediente ${i + 1}`}`. Veinte
 minutos y cierra la violación crítica que más se repite.
 
-### UI-008 · El botón de filtros de Discover no tiene nombre (crítica)
+**Hecho el 18/09/2026**, tal cual. Un detalle que ahorra trabajo: el `<select>` de la unidad del
+ingrediente vive en `crearReceta/seccionIngredientes.tsx`, que `formularioEditarReceta.tsx` importa,
+así que una sola edición cubre crear y editar. El de la unidad de tiempo sí está duplicado en los dos
+formularios y hubo que tocarlo dos veces.
+
+### UI-008 · El botón de filtros de Discover no tiene nombre (crítica) ✅
 
 El botón de la derecha del buscador solo contiene un `<svg>` decorativo. Se anuncia como «botón», sin
 más. `aria-label="Abrir filtros"`.
@@ -287,6 +368,15 @@ más. `aria-label="Abrir filtros"`.
 Vale la pena repasar todos los botones de solo icono de la aplicación con el mismo criterio. Las
 tarjetas del feed en escritorio los tienen bien (`aria-label="Dar like"`), pero los lápices y las
 papeleras de la despensa habría que comprobarlos uno a uno.
+
+**Hecho el 18/09/2026.** El botón vive en `headerDiscover.tsx`, no en `contenidoDiscover.tsx` como
+decía la tabla. Lleva `aria-label="Abrir filtros"`, y cuando hay filtros puestos
+`Abrir filtros (N activos)`, porque ese número solo se veía en la insignia. De paso, la «x» de borrar
+la búsqueda, que estaba al lado y tampoco tenía nombre, es «Borrar la búsqueda».
+
+Repasados los de la despensa: los lápices y las papeleras ya venían con `aria-label` (`Editar {nombre}`,
+`Eliminar {nombre}`). En el panel de preferencias los iconos de alérgeno pasaron a `alt=""`, que es lo
+correcto: la etiqueta de texto va al lado y un lector de pantalla los leía dos veces.
 
 ### UI-006 · El color de marca no llega a AA (seria)
 
@@ -391,11 +481,16 @@ Mientras llega F15, algo barato ayuda mucho: guardar un campo normalizado (sin t
 al crear y editar, y buscar contra él. Resuelve las tildes y las mayúsculas, que son la mitad de los
 fallos, sin tocar la infraestructura.
 
-### UI-016 · Discover enseña un evento que no existe
+### UI-016 · Discover enseña un evento que no existe ✅
 
 `EVENTO_DESTACADO_MOCK` en `features/discover/data/datosDiscover.ts` pinta «Semana de la Cocina
 Mediterránea» a todo el mundo, siempre, y no lleva a ninguna parte. Es contenido falso en producción.
 Va en su propio documento: `estado/eventos.md`.
+
+**Hecho el 18/09/2026.** Fuera la constante y fuera el bloque que la pintaba en
+`contenidoDiscover.tsx`. `TarjetaDestacada` y el tipo `EventoDestacado` **se quedan en el repositorio a
+propósito**: son la pieza de presentación que van a reutilizar los eventos de verdad de
+`estado/eventos.md`. Lo que se ha quitado es el dato inventado, no el componente.
 
 ### UI-017 · Dos vocabularios de dificultad conviviendo
 
@@ -430,18 +525,20 @@ direcciones) y el resto de la aplicación hablar siempre en minúsculas sin tild
 
 ## Orden de ataque
 
-**Primero, lo que está roto** (una tarde):
+**Primero, lo que está roto** (una tarde): ✅ cerrado el 18/09/2026
 
-1. UI-003, el like y el guardar de escritorio. Es una función principal que no funciona.
-2. UI-007 y UI-008, las tres violaciones críticas de accesibilidad. Media hora entre las dos.
-3. UI-009, el `<main>` anidado. Una línea por fichero.
-4. UI-010, el FAB que tapa un campo del formulario.
-5. UI-001, el hueco del bento. Quitar un `row-span-2`.
+1. ~~UI-003, el like y el guardar de escritorio.~~ Hecho, sin el ancla `#comentarios`.
+2. ~~UI-007 y UI-008, las tres violaciones críticas de accesibilidad.~~ Hechas.
+3. UI-009, el `<main>` anidado. Una línea por fichero. **Sigue abierto**: es el único de este bloque
+   que no se tocó, y conviene hacerlo junto a UI-005, que mueve los mismos ficheros.
+4. ~~UI-010, el FAB que tapa un campo del formulario.~~ Hecho con la opción 1.
+5. ~~UI-001, el hueco del bento.~~ Hecho, más el `flex-1` de las imágenes que UI-002 necesitaba de
+   verdad.
 
 **Después, el espacio y la accesibilidad de fondo** (dos o tres días):
 
 6. UI-006, el tono de marca para texto sobre fondo cálido, con la revisión de contrastes entera.
-7. UI-004, los anchos de despensa, colección y perfil, empezando por la despensa.
+7. ~~UI-004, los anchos de despensa, colección y perfil.~~ Hecho el 18/09/2026, las cuatro pantallas.
 8. UI-011, el punto de corte `md` para tablet.
 9. UI-014, los filtros activos visibles.
 
