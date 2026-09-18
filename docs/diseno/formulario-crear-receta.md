@@ -445,6 +445,39 @@ valida ni borra nada; los que quedan por delante son texto y no se pueden saltar
 paso va en un `sr-only`, así que quien navega a ciegas oye «Paso 3 de 5» al llegar y puede repasar la
 lista sin depender del color de las barras.
 
+### El repaso en navegador, hecho el 18/09/2026
+
+Con los cinco puntos cerrados, el asistente se probó a mano en Chrome contra el backend aislado de
+los E2E (Mongo efímero en el 27018, nunca Atlas), a 1440 px y a 390 px. Salieron tres cosas que
+ninguna comprobación automática iba a ver:
+
+- **El selector de unidad de tiempo se salía de su celda.** El `input` de tiempo es `flex-1` y un
+  campo numérico no baja de su ancho intrínseco, así que en la columna estrecha del diálogo empujaba
+  al `select` encima del campo de porciones. Un `min-w-0` lo arregla; en el formulario ancho de antes
+  el problema no se veía porque sobraba sitio.
+- **Los pasos ya hechos de la barra de progreso eran invisibles.** `bg-brand/40` no pinta nada:
+  Tailwind 3 descarta el modificador de opacidad cuando el color es un `var(--brand)` con un valor
+  completo, y no llega a generar la clase. El indicador pasa a `bg-brand-muted`, y el resto de fondos
+  suaves del asistente a `bg-brand-subtle`, que son tokens reales del tema y existen en claro y en
+  oscuro.
+- **El botón de IA se quedaba mudo en móvil.** Su texto es `hidden sm:inline`, y `display: none` no
+  cuenta para el nombre accesible, así que por debajo de 640 px era un botón sin nombre. Lleva
+  `aria-label` fijo.
+
+Lo demás respondió: el borrador se recupera y se puede tirar, `Atrás` no borra nada (los pasos se
+desmontan pero `shouldUnregister` está en `false`), la validación por paso frena y enfoca el campo
+que falla, la confirmación de la IA aparece cuando ya hay algo escrito y `/crear-receta/revisar` sigue
+recibiendo los datos igual que antes.
+
+Queda una cosa sin resolver, y es más grande que este formulario: **el modificador de opacidad sobre
+`brand` no funciona en ninguna parte de la aplicación**. Son 104 clases repartidas por todo `src/`:
+54 `bg-brand/*`, 18 `ring-brand/*`, 16 `border-brand/*` y el resto entre texto y degradados. La
+mayoría solo se queda sin pintar, pero los 18 `focus:ring-brand/40` tienen consecuencia visible: como
+`ring-2` sí se aplica y `ring-brand/40` no, el anillo de foco de todos los campos sale con el azul de
+fábrica de Tailwind (`#3b82f680`) en lugar del naranja de la marca. Se arregla de raíz cambiando el
+tema (guardar los colores por canales, o pasar a Tailwind 4, que resuelve esto con `color-mix`), y
+eso toca pantallas que no son esta.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:

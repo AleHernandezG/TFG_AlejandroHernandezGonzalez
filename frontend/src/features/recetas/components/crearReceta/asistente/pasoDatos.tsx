@@ -84,7 +84,7 @@ export function PasoDatos() {
                 min={1}
                 placeholder="30"
                 className={[
-                  'flex-1 bg-background border rounded-xl px-3 py-3 text-sm text-foreground',
+                  'flex-1 min-w-0 bg-background border rounded-xl px-3 py-3 text-sm text-foreground',
                   'placeholder:text-muted-foreground',
                   'focus:outline-none focus:ring-2 focus:ring-brand/40',
                   errors.tiempo ? 'border-destructive' : 'border-border',

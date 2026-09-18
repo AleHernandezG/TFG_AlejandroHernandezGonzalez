@@ -18,7 +18,7 @@ export function IndicadorProgreso({ pasos, indice, onIr, className }: Props) {
         const actual = i === indice
         const barra = cn(
           'block h-1.5 w-full rounded-full transition-colors',
-          actual ? 'bg-brand' : hecho ? 'bg-brand/40' : 'bg-border',
+          actual ? 'bg-brand' : hecho ? 'bg-brand-muted' : 'bg-border',
         )
 
         return (

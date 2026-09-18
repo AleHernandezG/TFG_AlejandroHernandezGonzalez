@@ -117,7 +117,8 @@ export function AsistenteCrearReceta({
                 <button
                   type="button"
                   onClick={() => setVista('ia')}
-                  className="flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-2 text-xs font-bold text-brand transition-colors hover:bg-brand/20"
+                  aria-label="Crear con IA"
+                  className="flex items-center gap-1.5 rounded-full bg-brand-subtle px-3 py-2 text-xs font-bold text-brand transition-colors hover:bg-brand-muted"
                 >
                   <Sparkles size={14} />
                   <span className="hidden sm:inline">Crear con IA</span>
@@ -145,7 +146,7 @@ export function AsistenteCrearReceta({
             {vista === 'pasos' && (
               <div className="flex flex-col gap-4">
                 {borradorRecuperado && esPrimero && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-brand/30 bg-brand/5 px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-brand-muted bg-brand-subtle px-4 py-3">
                     <p className="text-xs font-semibold text-foreground">
                       Hemos recuperado lo que dejaste a medias.
                     </p>
