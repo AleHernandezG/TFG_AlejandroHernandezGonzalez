@@ -409,6 +409,28 @@ está. Va con `DialogTitle asChild` porque los envoltorios de shadcn v4 son func
 y en React 18 una `ref` puesta encima llega vacía. El indicador de progreso visual y el
 `aria-current="step"` son el punto 5.
 
+### El diálogo partido en escritorio, hecho el 18/09/2026
+
+El punto 4. A partir de `lg` (1024 px) el diálogo se ensancha a `max-w-5xl` y se parte en dos: los
+campos del paso a la izquierda, `VistaPreviaPaso` a la derecha bajo un «Así se verá». Por debajo de
+esa anchura la columna derecha no existe (`hidden lg:flex`), no se apila: el paso ya ocupa la
+pantalla entera y una previsualización debajo obligaría a bajar para ver lo que acabas de escribir.
+
+`VistaPreviaPaso` reutiliza los bloques de `previsualizacion/` y los alimenta con un `useWatch` de
+los nueve campos, así que se actualiza mientras escribes sin pasar por el store ni por
+`/crear-receta/revisar`. Enseña solo el bloque del paso en el que estás; en el de alérgenos, cuando
+no hay ninguno, lo dice en vez de quedarse en blanco.
+
+Dos cosas que hubo que tocar en los bloques para que aguanten un formulario a medias:
+`MetaPrevisualizacion` pinta cada píldora solo si su número es finito y mayor que cero (con
+`valueAsNumber`, un campo vacío es `NaN`, y `NaN &&` acaba pintando «NaN» en pantalla) y la
+dificultad de `CabeceraPrevisualizacion` pasa a ser opcional. En `/crear-receta/revisar` los tres
+valores están siempre validados, así que allí no cambia nada.
+
+La columna es un `aria-live="polite"` y no tiene nada enfocable dentro: no se le pasan los huecos de
+manos libres ni el crédito de Pexels, así que el tabulador va de campo a campo y no se mete en un
+escaparate que no se puede tocar.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -451,8 +473,9 @@ eso.
 3. ~~El armazón del asistente: estado del paso, navegación adelante y atrás, validación **por bloque**
    con `trigger` de los campos de ese paso.~~ **Hecho el 18/09/2026**, detallado en «El armazón del
    asistente».
-4. El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
-   `useWatch`, `aria-live="polite"` y fuera del orden de tabulación.
+4. ~~El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
+   `useWatch`, `aria-live="polite"` y fuera del orden de tabulación.~~ **Hecho el 18/09/2026**,
+   detallado en «El diálogo partido en escritorio».
 5. Los pasos en móvil a pantalla completa, con el indicador de progreso y `aria-current="step"`.
 
 Del 2 al 5 el orden importa. El 2 es útil por sí solo aunque el asistente se quede a medias.

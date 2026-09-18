@@ -10,6 +10,7 @@ import { PasoAlergenos } from './pasoAlergenos'
 import { PasoDatos } from './pasoDatos'
 import { PasoFoto, type PropsPasoFoto } from './pasoFoto'
 import { VistaGenerarIa, type PropsGeneracionIa } from './vistaGenerarIa'
+import { VistaPreviaPaso } from './vistaPreviaPaso'
 import type { Asistente } from './useAsistenteCrearReceta'
 
 type Vista = 'pasos' | 'ia' | 'salir'
@@ -70,7 +71,7 @@ export function AsistenteCrearReceta({
     <Dialog open={abierto} onOpenChange={(v) => { if (!v) onCerrar() }}>
       <DialogContent
         showCloseButton={false}
-        className="flex h-[92dvh] max-w-[calc(100%-1rem)] flex-col gap-0 overflow-hidden rounded-3xl p-0 sm:h-[88dvh] sm:max-w-xl"
+        className="flex h-[92dvh] max-w-[calc(100%-1rem)] flex-col gap-0 overflow-hidden rounded-3xl p-0 sm:h-[88dvh] sm:max-w-xl lg:max-w-5xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => {
           if (vista !== 'pasos') {
@@ -131,65 +132,81 @@ export function AsistenteCrearReceta({
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto bg-[var(--warm-bg)] px-4 py-4">
-          {vista === 'pasos' && (
-            <div className="flex flex-col gap-4">
-              {borradorRecuperado && esPrimero && (
-                <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-brand/30 bg-brand/5 px-4 py-3">
-                  <p className="text-xs font-semibold text-foreground">
-                    Hemos recuperado lo que dejaste a medias.
+        <div className="flex min-h-0 flex-1">
+          <div className="flex-1 overflow-y-auto bg-[var(--warm-bg)] px-4 py-4">
+            {vista === 'pasos' && (
+              <div className="flex flex-col gap-4">
+                {borradorRecuperado && esPrimero && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-brand/30 bg-brand/5 px-4 py-3">
+                    <p className="text-xs font-semibold text-foreground">
+                      Hemos recuperado lo que dejaste a medias.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={onEmpezarDeCero}
+                      className="text-xs font-bold text-brand underline underline-offset-2"
+                    >
+                      Empezar de cero
+                    </button>
+                  </div>
+                )}
+
+                {paso.id === 'foto' && <PasoFoto {...foto} />}
+                {paso.id === 'datos' && <PasoDatos />}
+                {paso.id === 'ingredientes' && <SeccionIngredientes />}
+                {paso.id === 'pasos' && <SeccionPasos />}
+                {paso.id === 'alergenos' && <PasoAlergenos />}
+
+                {paso.ayuda && (
+                  <p className="flex items-start gap-2 px-1 text-xs text-muted-foreground">
+                    <Lightbulb size={14} className="mt-0.5 shrink-0 text-brand" />
+                    {paso.ayuda}
                   </p>
-                  <button
-                    type="button"
-                    onClick={onEmpezarDeCero}
-                    className="text-xs font-bold text-brand underline underline-offset-2"
-                  >
-                    Empezar de cero
-                  </button>
-                </div>
-              )}
-
-              {paso.id === 'foto' && <PasoFoto {...foto} />}
-              {paso.id === 'datos' && <PasoDatos />}
-              {paso.id === 'ingredientes' && <SeccionIngredientes />}
-              {paso.id === 'pasos' && <SeccionPasos />}
-              {paso.id === 'alergenos' && <PasoAlergenos />}
-
-              {paso.ayuda && (
-                <p className="flex items-start gap-2 px-1 text-xs text-muted-foreground">
-                  <Lightbulb size={14} className="mt-0.5 shrink-0 text-brand" />
-                  {paso.ayuda}
-                </p>
-              )}
-            </div>
-          )}
-
-          {vista === 'ia' && <VistaGenerarIa {...ia} onVolver={() => setVista('pasos')} />}
-
-          {vista === 'salir' && (
-            <div className="flex flex-col gap-3 rounded-2xl bg-[var(--warm-bg-accent)] p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
-              <p className="text-sm text-muted-foreground">
-                Borrarás la foto, los ingredientes y los pasos que llevas escritos.
-              </p>
-              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 rounded-xl font-bold"
-                  onClick={() => setVista('pasos')}
-                >
-                  Seguir editando
-                </Button>
-                <Button
-                  type="button"
-                  className="h-11 rounded-xl bg-destructive font-bold text-destructive-foreground hover:bg-destructive/90"
-                  onClick={onBorrarYSalir}
-                >
-                  <Trash2 size={16} />
-                  Borrar y salir
-                </Button>
+                )}
               </div>
-            </div>
+            )}
+
+            {vista === 'ia' && <VistaGenerarIa {...ia} onVolver={() => setVista('pasos')} />}
+
+            {vista === 'salir' && (
+              <div className="flex flex-col gap-3 rounded-2xl bg-[var(--warm-bg-accent)] p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+                <p className="text-sm text-muted-foreground">
+                  Borrarás la foto, los ingredientes y los pasos que llevas escritos.
+                </p>
+                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 rounded-xl font-bold"
+                    onClick={() => setVista('pasos')}
+                  >
+                    Seguir editando
+                  </Button>
+                  <Button
+                    type="button"
+                    className="h-11 rounded-xl bg-destructive font-bold text-destructive-foreground hover:bg-destructive/90"
+                    onClick={onBorrarYSalir}
+                  >
+                    <Trash2 size={16} />
+                    Borrar y salir
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {vista === 'pasos' && (
+            <aside
+              aria-live="polite"
+              className="hidden w-[44%] shrink-0 flex-col overflow-y-auto border-l border-border/60 bg-[var(--warm-bg-accent)] px-5 py-4 lg:flex"
+            >
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Así se verá
+              </p>
+              <div className="overflow-hidden rounded-3xl bg-background shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+                <VistaPreviaPaso paso={paso.id} fotoUrl={foto.url} />
+              </div>
+            </aside>
           )}
         </div>
 

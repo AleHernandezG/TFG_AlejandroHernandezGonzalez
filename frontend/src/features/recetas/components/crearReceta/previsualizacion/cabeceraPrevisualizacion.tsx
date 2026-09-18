@@ -11,7 +11,7 @@ interface Props {
   titulo: string
   descripcion: string
   dietas: string[]
-  dificultad: DificultadInterna
+  dificultad?: DificultadInterna
   alergenos: string[]
   mostrarAutor?: boolean
 }
@@ -41,12 +41,14 @@ export function CabeceraPrevisualizacion({
               {label}
             </Badge>
           ))}
-          <Badge
-            variant="secondary"
-            className="bg-brand/15 text-brand border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
-          >
-            {ETIQUETAS_DIFICULTAD[dificultad]}
-          </Badge>
+          {dificultad && (
+            <Badge
+              variant="secondary"
+              className="bg-brand/15 text-brand border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
+            >
+              {ETIQUETAS_DIFICULTAD[dificultad]}
+            </Badge>
+          )}
         </div>
         {alergenos.length > 0 && (
           <div className="flex flex-wrap gap-1 justify-end shrink-0 max-w-[45%]">
