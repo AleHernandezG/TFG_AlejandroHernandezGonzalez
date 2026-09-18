@@ -45,15 +45,46 @@ botón de publicar.
 
 ### Qué no
 
-| Problema | Consecuencia |
-|---|---|
-| 390 px fijos en 1440 | En escritorio se rellena un formulario del tamaño de un móvil con una foto decorativa alrededor |
-| El fondo fotográfico compite con los campos | El velo al 45 % no basta: el texto de ayuda se lee sobre trozos de piña |
-| La previsualización está al final | El autor escribe a ciegas y descubre cómo queda cuando ya no quiere cambiar nada |
-| Los errores llegan de golpe al enviar | Diez campos mal a la vez, en un diálogo, con un botón que lleva al primero |
-| Dos `<select>` sin nombre accesible | UI-007, violación crítica |
-| El FAB tapa el campo PORCIONES en móvil | UI-010 |
-| No se guarda nada | Si el navegador se cierra a la mitad, se pierde todo. Hay un store de Zustand (`useCrearRecetaStore`) pero solo se rellena al enviar |
+| Problema | Consecuencia | Estado |
+|---|---|---|
+| 390 px fijos en 1440 | En escritorio se rellena un formulario del tamaño de un móvil con una foto decorativa alrededor | ✅ 18/09 (provisional) |
+| El fondo fotográfico compite con los campos | El velo al 45 % no basta: el texto de ayuda se lee sobre trozos de piña | ✅ 18/09 (provisional) |
+| La previsualización está al final | El autor escribe a ciegas y descubre cómo queda cuando ya no quiere cambiar nada | abierto, lo resuelve el asistente |
+| Los errores llegan de golpe al enviar | Diez campos mal a la vez, en un diálogo, con un botón que lleva al primero | ✅ 18/09 |
+| Dos `<select>` sin nombre accesible | UI-007, violación crítica | ✅ 17/09 |
+| El FAB tapa el campo PORCIONES en móvil | UI-010 | ✅ 18/09 |
+| No se guarda nada | Si el navegador se cierra a la mitad, se pierde todo. Hay un store de Zustand (`useCrearRecetaStore`) pero solo se rellena al enviar | ✅ 18/09 |
+
+### Arreglos prioritarios, hechos el 18/09/2026
+
+Antes de rehacer nada. Tres de los cinco que quedaban sobreviven enteros al asistente; los otros dos
+son provisionales y se tiran cuando el formulario pase a diálogos, pero la aplicación está en
+producción mientras tanto.
+
+**Borrador persistido.** `useCrearRecetaStore` pasa a usar el middleware `persist` de Zustand contra
+`localStorage`, con la clave `cookr-borrador-receta`. Se guardan `borrador`, `fotoPreview` y
+`guardadoEn`; **`datos` no se persiste** a propósito, porque lleva el `File` de la foto (que no
+sobrevive a `JSON.stringify`) y porque un `datos` viejo haría que `/crear-receta/revisar` enseñara una
+receta que ya no se está escribiendo.
+
+El formulario se suscribe a `watch` y vuelca los valores 600 ms después de la última tecla. No guarda
+nada mientras el formulario esté vacío (`tieneContenido`), así que nadie se encuentra un aviso de
+borrador recuperado por haber entrado y salido. Al volver, `reset` mezcla el borrador sobre los valores
+iniciales —nunca lo sustituye, o `useFieldArray` se queda sin arrays— y sale un aviso con «Empezar de
+cero». La foto se restaura desde `fotoPreview`, que es la URL de Cloudinary ya subida, así que no hay
+que volver a subirla.
+
+`limpiar()` y `descartarBorrador()` borran también lo persistido, de modo que publicar o pulsar «Borrar
+y salir» dejan el sitio limpio para la siguiente receta.
+
+**Validación campo a campo.** `mode: 'onBlur'` más `reValidateMode: 'onChange'`: el error aparece al
+salir del campo y desaparece mientras se corrige, no en el siguiente envío. El diálogo de errores se
+queda como resumen al enviar, que para eso sirve.
+
+**Ancho y fondo (provisionales).** El contenedor pasa de `max-w-[390px]` a `max-w-[420px]
+md:max-w-2xl`, y tiempo y porciones se ponen en dos columnas a partir de `md`. El velo sube de 45 % a
+55 % con un desenfoque de 3 px, y a 65 % con 6 px en `lg`, que es donde la fotografía ocupa más
+pantalla. El crédito de Unsplash se queda donde estaba.
 
 ---
 
@@ -236,7 +267,27 @@ la opción C.
 
 ---
 
-## Recomendación
+## Decisión tomada el 18/09/2026
+
+**Opción A de base y luego B y C, pero repartidas por tamaño de pantalla.** El asistente es la columna
+vertebral en las dos, y no hace falta que el resultado sea el mismo en un móvil que en un monitor:
+
+| Ancho | Qué se ve |
+|---|---|
+| `< 1024 px` | **Opción B.** Asistente por pasos: un diálogo por bloque de la receta, a pantalla completa |
+| `≥ 1024 px` | **Opción B + C.** El mismo diálogo, ancho y partido en dos: campos a la izquierda, previsualización en vivo **de ese bloque** a la derecha, con la página atenuada detrás |
+
+En las dos, `/crear-receta/revisar` **se queda como está**: la previsualización completa de la receta
+tal como quedará publicada, con el botón de publicar. El asistente no la sustituye, la precede.
+
+Lo que esto descarta de la recomendación original: la pantalla partida con la previsualización
+pegajosa al lado del formulario. La previsualización en escritorio vive dentro del diálogo del bloque
+que se está rellenando, no en un panel permanente al margen.
+
+Queda por decidir, y no bloquea empezar: si el diálogo de escritorio enseña además un mapa de los seis
+bloques con su estado, o si el progreso se lleva solo con la barra de pasos.
+
+### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
 
@@ -257,7 +308,7 @@ superior con las seis secciones, cada una con su estado (vacía, incompleta, lis
 la sección al pulsarla. El usuario ve cuánto le queda sin perder la vista de conjunto. Es lo que hacen
 los formularios largos bien hechos y no arrastra ninguno de los problemas de navegación del asistente.
 
-### Por qué esta y no otra
+#### Por qué esta y no otra
 
 `previsualizacionReceta.tsx` ya existe, ya está probado en producción y ya sabe pintar una receta a
 partir de los datos del formulario. La opción C es, en gran medida, moverlo de ruta. Las opciones B y D
@@ -270,16 +321,24 @@ eso.
 
 ### Orden de trabajo
 
-1. La base de la opción A: ancho, fondo, `onBlur`, `aria-label` de los dos `<select>`, borrador
-   persistido. Es lo que arregla UI-007 y parte de UI-010.
-2. Mover la previsualización a la misma pantalla, alimentada por `useWatch`, con `aria-live` y fuera
-   del orden de tabulación. `/crear-receta/revisar` pasa a ser confirmación de publicar, no
-   descubrimiento.
-3. El botón «Ver cómo queda» en móvil, reutilizando el mismo componente dentro de un `Sheet`.
-4. La navegación de secciones con estado.
-5. La previsualización pinchable.
+1. ~~La base de la opción A: ancho, fondo, `onBlur`, `aria-label` de los dos `<select>`, borrador
+   persistido.~~ **Hecho el 18/09/2026.**
+2. Partir la previsualización por bloques. `previsualizacionReceta.tsx` pinta la receta entera; hace
+   falta poder pedirle solo la cabecera, solo los ingredientes o solo los pasos, sin duplicar el
+   maquetado ni tocar lo que enseña `/crear-receta/revisar`. Es el trabajo con más riesgo de los cinco
+   y conviene hacerlo antes que el asistente, no a la vez.
+3. El armazón del asistente: estado del paso, navegación adelante y atrás, validación **por bloque** con
+   `trigger` de los campos de ese paso. Volver atrás no borra nada escrito (NN/G).
+4. El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
+   `useWatch`, `aria-live="polite"` y fuera del orden de tabulación.
+5. Los pasos en móvil a pantalla completa, con el indicador de progreso y `aria-current="step"`.
 
-Los cuatro primeros son útiles por sí solos: si el quinto se queda fuera, no pasa nada.
+Del 2 al 5 el orden importa. El 2 es útil por sí solo aunque el asistente se quede a medias.
+
+Dos cosas que hay que mirar antes de escribir el 3: el `Dialog` de shadcn atrapa el foco, así que
+encadenar diálogos (el del asistente y el de «Crear desde descripción») pide cerrar uno antes de abrir
+el otro; y el tutorial de la primera vez (`PopUpTutorial` + `TutorialCrearReceta`) tiene que decidir
+dónde encaja, porque hoy sustituye el formulario entero.
 
 ### Qué medir después
 
