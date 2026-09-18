@@ -48,7 +48,7 @@ export function FormularioCrearReceta() {
   const router = useRouter()
   const { data: session } = useSession()
   const { setDatos, setFoto, guardarBorrador, descartarBorrador } = useCrearRecetaStore()
-  const { data: misRecetas, isLoading: cargandoRecetas } = useMisRecetas()
+  const { data: misRecetas } = useMisRecetas()
 
   const [mostrarTutorial, setMostrarTutorial] = useState(false)
   const [asistenteAbierto, setAsistenteAbierto] = useState(false)
@@ -72,11 +72,11 @@ export function FormularioCrearReceta() {
   const asistente = useAsistenteCrearReceta(methods.trigger)
 
   useEffect(() => {
-    if (cargandoRecetas || bienvenidaResuelta.current) return
+    if (bienvenidaResuelta.current || !misRecetas) return
     bienvenidaResuelta.current = true
-    if ((misRecetas?.length ?? 1) === 0) setMostrarTutorial(true)
+    if (misRecetas.length === 0) setMostrarTutorial(true)
     else setAsistenteAbierto(true)
-  }, [cargandoRecetas, misRecetas])
+  }, [misRecetas])
 
   useEffect(() => {
     const { borrador, fotoPreview } = useCrearRecetaStore.getState()
