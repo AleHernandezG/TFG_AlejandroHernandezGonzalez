@@ -12,9 +12,7 @@ import { Button } from '@/components/ui/button'
 import { useCrearRecetaStore, type BorradorReceta } from '@/stores/useCrearRecetaStore'
 import { esquemaCrearReceta, type DatosCrearReceta } from '../../types/crearReceta.schema'
 import { normalizarNombreIngrediente } from '@/features/despensa/utils/normalizadorIngredientes'
-import { PopUpTutorial } from './popUpTutorial'
 import { AsistenteCrearReceta, pasoConPrimerError, useAsistenteCrearReceta } from './asistente'
-import { useMisRecetas } from '@/features/coleccion/hooks/useMisRecetas'
 
 const VALORES_INICIALES: DefaultValues<DatosCrearReceta> = {
   titulo: '',
@@ -48,9 +46,7 @@ export function FormularioCrearReceta() {
   const router = useRouter()
   const { data: session } = useSession()
   const { setDatos, setFoto, guardarBorrador, descartarBorrador } = useCrearRecetaStore()
-  const { data: misRecetas } = useMisRecetas()
 
-  const [mostrarTutorial, setMostrarTutorial] = useState(false)
   const [asistenteAbierto, setAsistenteAbierto] = useState(false)
   const [vistaAsistente, setVistaAsistente] = useState<'pasos' | 'ia'>('pasos')
   const [fotoUrl, setFotoUrl] = useState<string | null>(null)
@@ -60,7 +56,6 @@ export function FormularioCrearReceta() {
   const [errorFoto, setErrorFoto] = useState<string | null>(null)
   const [borradorRecuperado, setBorradorRecuperado] = useState(false)
   const temporizadorGuardado = useRef<ReturnType<typeof setTimeout>>()
-  const bienvenidaResuelta = useRef(false)
 
   const methods = useForm<DatosCrearReceta>({
     resolver: zodResolver(esquemaCrearReceta),
@@ -70,13 +65,6 @@ export function FormularioCrearReceta() {
   })
 
   const asistente = useAsistenteCrearReceta(methods.trigger)
-
-  useEffect(() => {
-    if (bienvenidaResuelta.current || !misRecetas) return
-    bienvenidaResuelta.current = true
-    if (misRecetas.length === 0) setMostrarTutorial(true)
-    else setAsistenteAbierto(true)
-  }, [misRecetas])
 
   useEffect(() => {
     const { borrador, fotoPreview } = useCrearRecetaStore.getState()
@@ -199,12 +187,6 @@ export function FormularioCrearReceta() {
 
   return (
     <FormProvider {...methods}>
-      <PopUpTutorial
-        abierto={mostrarTutorial}
-        onAceptar={() => { setMostrarTutorial(false); abrirAsistente() }}
-        onSaltar={() => { setMostrarTutorial(false); abrirAsistente() }}
-      />
-
       <div className="rounded-3xl bg-[var(--warm-bg)] p-8 text-center shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-subtle">
           <NotebookPen size={26} className="text-brand" />
