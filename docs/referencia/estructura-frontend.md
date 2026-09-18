@@ -98,7 +98,18 @@ src/
 │   │   │   │   ├── popUpTutorial.tsx           # Dialog ¿Primera receta? (Camera/ListOrdered/Eye)
 │   │   │   │   ├── tutorialCrearReceta.tsx     # Stepper animado 3 pasos (Framer Motion)
 │   │   │   │   ├── popUpError.tsx              # Dialog lista de campos erróneos
-│   │   │   │   ├── previsualizacionReceta.tsx  # Clone detalleReceta + banner preview + publicar mock
+│   │   │   │   ├── previsualizacionReceta.tsx  # Compone los bloques + publicar (lee el store)
+│   │   │   │   ├── previsualizacion/           # Bloques sueltos, sin store, para el asistente
+│   │   │   │   │   ├── heroPrevisualizacion.tsx      # Foto + degradado + crédito Pexels
+│   │   │   │   │   ├── cabeceraPrevisualizacion.tsx  # Dietas, dificultad, título, autor
+│   │   │   │   │   ├── metaPrevisualizacion.tsx      # Píldoras de tiempo y porciones
+│   │   │   │   │   ├── ingredientesPrevisualizacion.tsx
+│   │   │   │   │   ├── nutricionPrevisualizacion.tsx # Marcador hasta Edamam
+│   │   │   │   │   ├── pasosPrevisualizacion.tsx     # Huecos acciones/controles (manos libres)
+│   │   │   │   │   ├── alergenosPrevisualizacion.tsx
+│   │   │   │   │   ├── divisorPrevisualizacion.tsx
+│   │   │   │   │   ├── tipos.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
 │   │   │   └── index.ts        # Barrel raíz — re-exporta home/, detalleReceta/ y crearReceta/
 │   │   ├── data/

@@ -315,6 +315,41 @@ paso, el consejo es ayuda; dicho cinco minutos antes de que exista el campo, es 
 `PopUpTutorial` se queda: es una bienvenida de una sola vez, aparece cuando el usuario no tiene ninguna
 receta y ahora abre el asistente en vez del carrusel. Eso no estorba a nadie.
 
+### La previsualización, partida por bloques el 18/09/2026
+
+El punto 2 del orden de trabajo, hecho antes que el asistente para no arrastrar el riesgo.
+
+`previsualizacionReceta.tsx` baja de 323 a 169 líneas y deja de pintar la receta: ahora compone
+bloques que viven en `components/crearReceta/previsualizacion/`, uno por trozo de receta.
+
+| Bloque | Qué pinta | Qué hay que darle |
+|---|---|---|
+| `HeroPrevisualizacion` | Foto, degradado y crédito de Pexels | `src`, `alt`, `credito`, `textoVacio` y `children` para lo que vaya encima (hoy, el botón de volver) |
+| `CabeceraPrevisualizacion` | Dietas, dificultad, alérgenos, título, descripción y fila de autor | `titulo`, `descripcion`, `dietas`, `dificultad`, `alergenos`, `mostrarAutor` |
+| `MetaPrevisualizacion` | Las dos píldoras: tiempo y porciones | `tiempo`, `unidadTiempo`, `porciones`, `className` |
+| `IngredientesPrevisualizacion` | Encabezado con el recuento y la lista | `ingredientes` y el hueco `meta` |
+| `NutricionPrevisualizacion` | El marcador de Edamam | nada |
+| `PasosPrevisualizacion` | La lista numerada | `pasos`, `pasoResaltado` y los huecos `acciones` y `controles` |
+| `AlergenosPrevisualizacion` | Chips y aviso | `alergenos`; devuelve `null` si no hay ninguno |
+| `DivisorPrevisualizacion` | La línea entre secciones | nada |
+
+Ninguno lee el store. Reciben los datos por props, así que el asistente podrá alimentarlos desde
+`useWatch` sin pasar por `useCrearRecetaStore`; quien lee el store es la página de revisar, que es la
+que sabe de dónde vienen los datos. Dos cosas que no son evidentes:
+
+**El modo manos libres no vive dentro de los pasos.** `PasosPrevisualizacion` recibe el botón y la
+barra de controles como huecos y solo sabe qué paso resaltar. `useModoManoLibres` se queda en
+`previsualizacionReceta.tsx`, que es su sitio: leer la receta en voz alta mientras se rellena el paso
+4 del asistente no lo pide nadie.
+
+**Las píldoras de tiempo y porciones son un hueco de los ingredientes.** Visualmente caen dentro de
+esa sección, pero pertenecen al bloque de datos básicos. Pasarlas como `meta` deja que el asistente
+las enseñe con los datos y que la página de revisar las siga enseñando donde estaban, sin duplicar el
+contenedor ni descuadrar los márgenes.
+
+`/crear-receta/revisar` enseña exactamente lo mismo que antes: el reparto no cambia ni una clase de
+Tailwind ni el orden del DOM.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -351,10 +386,9 @@ eso.
 
 1. ~~La base de la opción A: ancho, fondo, `onBlur`, `aria-label` de los dos `<select>`, borrador
    persistido.~~ **Hecho el 18/09/2026.**
-2. Partir la previsualización por bloques. `previsualizacionReceta.tsx` pinta la receta entera; hace
-   falta poder pedirle solo la cabecera, solo los ingredientes o solo los pasos, sin duplicar el
-   maquetado ni tocar lo que enseña `/crear-receta/revisar`. Es el trabajo con más riesgo de los cinco
-   y conviene hacerlo antes que el asistente, no a la vez.
+2. ~~Partir la previsualización por bloques, sin duplicar el maquetado ni tocar lo que enseña
+   `/crear-receta/revisar`.~~ **Hecho el 18/09/2026**, detallado en «La previsualización, partida por
+   bloques».
 3. El armazón del asistente: estado del paso, navegación adelante y atrás, validación **por bloque** con
    `trigger` de los campos de ese paso. Volver atrás no borra nada escrito (NN/G).
 4. El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
