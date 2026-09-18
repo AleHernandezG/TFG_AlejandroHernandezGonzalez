@@ -287,6 +287,34 @@ que se está rellenando, no en un panel permanente al margen.
 Queda por decidir, y no bloquea empezar: si el diálogo de escritorio enseña además un mapa de los seis
 bloques con su estado, o si el progreso se lleva solo con la barra de pasos.
 
+### Dos decisiones que el asistente obliga a tomar
+
+Partir el formulario en diálogos toca dos cosas que hoy conviven con él y que no caben tal cual. Están
+decididas y no hay que volver sobre ellas al implementar.
+
+**El atajo de IA deja de ser un diálogo propio.** «Crear desde descripción» pasa a ser **otra vista
+dentro del diálogo del asistente**, a la que se llega desde su cabecera en cualquier paso. El motivo es
+técnico y no tiene vuelta: el `Dialog` de Radix atrapa el foco, así que dos diálogos abiertos a la vez
+encadenan dos trampas y quien navega con teclado o lector de pantalla se queda dando vueltas en la
+ventana equivocada. Una ventana que enseña otra cosa no tiene ese problema.
+
+Se descartó ponerlo como paso 0 («¿la describes o la escribes?») porque cobra una pantalla de decisión
+a todo el mundo, incluido quien entra sabiendo lo que quiere. Y se descartó dejarlo en la página, fuera
+del asistente, porque entonces el atajo desaparece justo cuando aparecen las ganas de usarlo, que es a
+mitad de rellenar los pasos, no antes de empezar.
+
+Con esto llega un caso que hoy no existe: `methods.reset(generado)` **machaca lo escrito**. Ahora da
+igual porque el botón vive encima de un formulario vacío, pero dentro del asistente hay que preguntar
+antes de sustituir si ya hay contenido.
+
+**El carrusel del tutorial se borra.** `TutorialCrearReceta` (103 líneas, tres diapositivas que hoy
+sustituyen el formulario entero) desaparece, y sus tres consejos —la foto, las cantidades con unidad,
+revisar antes de publicar— pasan a ser **una línea de ayuda en el paso al que pertenecen**. Dicho en el
+paso, el consejo es ayuda; dicho cinco minutos antes de que exista el campo, es un peaje.
+
+`PopUpTutorial` se queda: es una bienvenida de una sola vez, aparece cuando el usuario no tiene ninguna
+receta y ahora abre el asistente en vez del carrusel. Eso no estorba a nadie.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -335,10 +363,8 @@ eso.
 
 Del 2 al 5 el orden importa. El 2 es útil por sí solo aunque el asistente se quede a medias.
 
-Dos cosas que hay que mirar antes de escribir el 3: el `Dialog` de shadcn atrapa el foco, así que
-encadenar diálogos (el del asistente y el de «Crear desde descripción») pide cerrar uno antes de abrir
-el otro; y el tutorial de la primera vez (`PopUpTutorial` + `TutorialCrearReceta`) tiene que decidir
-dónde encaja, porque hoy sustituye el formulario entero.
+El atajo de IA y el tutorial de la primera vez entran en el punto 3, y cómo entran está resuelto en
+«Dos decisiones que el asistente obliga a tomar», más arriba.
 
 ### Qué medir después
 
