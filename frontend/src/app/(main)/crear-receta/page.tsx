@@ -19,7 +19,7 @@ export default function PaginaCrearReceta() {
         className="object-cover object-top"
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-black/45" />
+      <div className="absolute inset-0 bg-black/55 backdrop-blur-[3px] lg:bg-black/65 lg:backdrop-blur-[6px]" />
 
       {/* Crédito — Unsplash (buena práctica, ver rules.md §16) */}
       <p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/40 leading-tight">
@@ -43,7 +43,7 @@ export default function PaginaCrearReceta() {
         </a>
       </p>
 
-      <main className="relative z-10 max-w-[390px] mx-auto px-5 pt-6 pb-8">
+      <main className="relative z-10 mx-auto w-full max-w-[420px] px-5 pt-6 pb-8 md:max-w-2xl">
         <h1
           className="text-center text-[1.75rem] font-bold leading-snug tracking-tight text-white mb-6"
           style={{ textShadow: '0 1px 12px rgba(0,0,0,0.9), 0 2px 24px rgba(0,0,0,0.6)' }}
