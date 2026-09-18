@@ -350,6 +350,65 @@ contenedor ni descuadrar los márgenes.
 `/crear-receta/revisar` enseña exactamente lo mismo que antes: el reparto no cambia ni una clase de
 Tailwind ni el orden del DOM.
 
+### El armazón del asistente, hecho el 18/09/2026
+
+El punto 3 del orden de trabajo. El formulario deja de ser una página larga: ahora
+`formularioCrearReceta.tsx` es el contenedor (el `useForm`, el borrador, la foto, la llamada a la IA y
+el envío) y todo lo que se rellena vive en `components/crearReceta/asistente/`.
+
+Los pasos están declarados como datos en `asistente/pasos.ts`, no repartidos por el JSX:
+
+| Paso | Qué pide | Campos que valida |
+|---|---|---|
+| `foto` | La foto, con opción de saltarla | ninguno |
+| `datos` | Título, descripción, tiempo, porciones, dificultad y tipo de receta | `titulo`, `descripcion`, `tiempo`, `unidadTiempo`, `porciones`, `dificultad`, `dietas` |
+| `ingredientes` | `SeccionIngredientes`, la misma que usa editar | `ingredientes` |
+| `pasos` | `SeccionPasos`, la misma que usa editar | `pasos` |
+| `alergenos` | Lo que ha detectado de los ingredientes | ninguno |
+
+`useAsistenteCrearReceta(trigger)` guarda el índice y expone `siguiente`, `atras` e `irAPaso`.
+«Siguiente» llama a `trigger(paso.campos, { shouldFocus: true })` y solo avanza si ese bloque está
+bien; los pasos sin campos pasan siempre. Recibe el `trigger` por parámetro en vez de leer el
+contexto porque quien lo necesita es el contenedor, que está por fuera del `FormProvider` y no puede
+usar `useFormContext`.
+
+**Volver atrás no borra nada.** El estado vive en react-hook-form, no en los componentes de cada
+paso, y `shouldUnregister` está en su valor por defecto (`false`), así que desmontar el bloque no
+descarta sus valores. El borrador se sigue guardando a los 600 ms de la última tecla, se pinte el
+paso que se pinte.
+
+**Un solo diálogo, tres vistas.** `AsistenteCrearReceta` alterna entre `pasos`, `ia` y `salir` dentro
+del mismo `Dialog`. Abrir un Radix encima de otro encadena dos trampas de foco y deja teclado y
+lectores de pantalla en tierra de nadie, así que el atajo de IA y la confirmación de borrar son
+vistas, no diálogos. `Escape` desde una vista secundaria vuelve a los pasos en lugar de cerrar, y
+`onInteractOutside` está anulado: con un formulario a medias, un clic fuera no puede cerrar nada.
+
+**El atajo de IA avisa antes de pisar lo escrito.** `VistaGenerarIa` comprueba `hayContenido()` antes
+de generar; si hay algo, el botón pasa a «Sustituir y generar» y enseña de qué va la sustitución. Al
+volver la receta generada, el contenedor hace `reset({ ...VALORES_INICIALES, ...generado })` (mezclar
+es obligatorio: si `ingredientes` o `pasos` llegan sin definir, `useFieldArray` se queda sin filas) y
+manda al paso de datos, para que se vea lo que ha rellenado.
+
+**El carrusel `TutorialCrearReceta` ya no existe.** Sus tres consejos son ahora la línea de ayuda del
+paso al que pertenecen: la foto con luz natural en `foto`, la cantidad con unidad en `ingredientes` y
+el aviso de que la pantalla siguiente es la revisión en `alergenos`. `PopUpTutorial` se queda como
+bienvenida de una sola vez y abre el asistente, tanto si se acepta como si se salta.
+
+**`PopUpError` sale de crear.** Cuando el envío final no valida, `pasoConPrimerError()` mira los
+errores contra los campos de cada paso y el asistente salta al primero que falla, que es donde está
+el mensaje. El pop-up sigue vivo para `editarReceta`, que todavía es una página larga.
+
+Detrás del diálogo, la página de crear enseña un panel con el botón de abrir el asistente («Empezar
+la receta» o «Seguir con la receta» si hay borrador) y el atajo de IA, que abre el diálogo
+directamente en esa vista. El fondo atenuado no hay que inventarlo: la foto y su capa oscura ya
+estaban en `/crear-receta`.
+
+De accesibilidad, lo que hay hoy: el título de cada paso es un `<h2 tabIndex={-1}>` que recibe el
+foco al cambiar de paso, con un `sr-only` «Paso X de N» delante para que el lector anuncie dónde
+está. Va con `DialogTitle asChild` porque los envoltorios de shadcn v4 son funciones sin `forwardRef`
+y en React 18 una `ref` puesta encima llega vacía. El indicador de progreso visual y el
+`aria-current="step"` son el punto 5.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -389,8 +448,9 @@ eso.
 2. ~~Partir la previsualización por bloques, sin duplicar el maquetado ni tocar lo que enseña
    `/crear-receta/revisar`.~~ **Hecho el 18/09/2026**, detallado en «La previsualización, partida por
    bloques».
-3. El armazón del asistente: estado del paso, navegación adelante y atrás, validación **por bloque** con
-   `trigger` de los campos de ese paso. Volver atrás no borra nada escrito (NN/G).
+3. ~~El armazón del asistente: estado del paso, navegación adelante y atrás, validación **por bloque**
+   con `trigger` de los campos de ese paso.~~ **Hecho el 18/09/2026**, detallado en «El armazón del
+   asistente».
 4. El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
    `useWatch`, `aria-live="polite"` y fuera del orden de tabulación.
 5. Los pasos en móvil a pantalla completa, con el indicador de progreso y `aria-current="step"`.

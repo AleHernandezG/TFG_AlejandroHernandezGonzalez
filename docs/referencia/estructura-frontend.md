@@ -91,13 +91,21 @@ src/
 │   │   │   │   ├── tabsReceta.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── crearReceta/    # Componentes exclusivos de /crear-receta y /crear-receta/revisar
-│   │   │   │   ├── formularioCrearReceta.tsx   # Client component principal (RHF + FormProvider)
+│   │   │   │   ├── formularioCrearReceta.tsx   # Contenedor: RHF, borrador, foto, IA y envío
 │   │   │   │   ├── seccionIngredientes.tsx     # Filas nombre/cantidad/unidad + autocompletado
 │   │   │   │   ├── seccionPasos.tsx            # Badge numerado + textarea + drag handle visual
 │   │   │   │   ├── seccionAlergenos.tsx        # Chips read-only + disclaimer
 │   │   │   │   ├── popUpTutorial.tsx           # Dialog ¿Primera receta? (Camera/ListOrdered/Eye)
-│   │   │   │   ├── tutorialCrearReceta.tsx     # Stepper animado 3 pasos (Framer Motion)
 │   │   │   │   ├── popUpError.tsx              # Dialog lista de campos erróneos
+│   │   │   │   ├── asistente/                  # El asistente por pasos de /crear-receta
+│   │   │   │   │   ├── asistenteCrearReceta.tsx     # Diálogo único: vistas pasos / ia / salir
+│   │   │   │   │   ├── useAsistenteCrearReceta.ts   # Índice del paso + validación con trigger
+│   │   │   │   │   ├── pasos.ts                     # Los pasos como datos + pasoConPrimerError
+│   │   │   │   │   ├── pasoFoto.tsx                 # Subida de foto (input file propio)
+│   │   │   │   │   ├── pasoDatos.tsx                # Información básica + tipo de receta
+│   │   │   │   │   ├── pasoAlergenos.tsx            # useWatch de ingredientes → seccionAlergenos
+│   │   │   │   │   ├── vistaGenerarIa.tsx           # Atajo de IA, con confirmación si hay contenido
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── previsualizacionReceta.tsx  # Compone los bloques + publicar (lee el store)
 │   │   │   │   ├── previsualizacion/           # Bloques sueltos, sin store, para el asistente
 │   │   │   │   │   ├── heroPrevisualizacion.tsx      # Foto + degradado + crédito Pexels

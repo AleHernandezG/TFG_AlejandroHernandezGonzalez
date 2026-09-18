@@ -1,37 +1,20 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm, FormProvider, type DefaultValues } from 'react-hook-form'
+import { useForm, FormProvider, type DefaultValues, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, Trash2, Sparkles, Loader2, RotateCcw } from 'lucide-react'
+import { NotebookPen, Pencil, Sparkles } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { recetasService } from '@/services/recetasService'
 import { subidasService } from '@/services/subidasService'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { SelectorChips } from '@/components/common/selectorChips'
-import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
 import { useCrearRecetaStore, type BorradorReceta } from '@/stores/useCrearRecetaStore'
-import { esquemaCrearReceta, ETIQUETAS_DIFICULTAD, type DatosCrearReceta, type DificultadInterna } from '../../types/crearReceta.schema'
-import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
+import { esquemaCrearReceta, type DatosCrearReceta } from '../../types/crearReceta.schema'
 import { normalizarNombreIngrediente } from '@/features/despensa/utils/normalizadorIngredientes'
-import { SeccionIngredientes } from './seccionIngredientes'
-import { SeccionPasos } from './seccionPasos'
-import { SeccionAlergenos } from './seccionAlergenos'
 import { PopUpTutorial } from './popUpTutorial'
-import { TutorialCrearReceta } from './tutorialCrearReceta'
-import { PopUpError } from './popUpError'
+import { AsistenteCrearReceta, pasoConPrimerError, useAsistenteCrearReceta } from './asistente'
 import { useMisRecetas } from '@/features/coleccion/hooks/useMisRecetas'
-
-const DIFICULTADES: DificultadInterna[] = ['facil', 'media', 'dificil']
 
 const VALORES_INICIALES: DefaultValues<DatosCrearReceta> = {
   titulo: '',
@@ -61,34 +44,6 @@ function limpiarParaGuardar(valores: DatosCrearReceta): BorradorReceta {
   }
 }
 
-function extraerMensajesError(errors: ReturnType<typeof useForm>['formState']['errors']): string[] {
-  const msgs: string[] = []
-
-  if (errors.titulo) msgs.push(`Título: ${errors.titulo.message}`)
-  if (errors.descripcion) msgs.push(`Descripción: ${errors.descripcion.message}`)
-  if (errors.porciones) msgs.push(`Porciones: ${errors.porciones.message}`)
-  if (errors.tiempo) msgs.push(`Tiempo: ${errors.tiempo.message}`)
-  if (errors.dificultad) msgs.push(`Dificultad: ${errors.dificultad.message}`)
-
-  if (errors.ingredientes) {
-    if (!Array.isArray(errors.ingredientes) && errors.ingredientes.message) {
-      msgs.push(`Ingredientes: ${errors.ingredientes.message}`)
-    } else {
-      msgs.push('Ingredientes: revisa que todos tengan nombre, cantidad y unidad')
-    }
-  }
-
-  if (errors.pasos) {
-    if (!Array.isArray(errors.pasos) && errors.pasos.message) {
-      msgs.push(`Pasos: ${errors.pasos.message}`)
-    } else {
-      msgs.push('Pasos: cada paso debe tener al menos 10 caracteres')
-    }
-  }
-
-  return msgs
-}
-
 export function FormularioCrearReceta() {
   const router = useRouter()
   const { data: session } = useSession()
@@ -96,25 +51,16 @@ export function FormularioCrearReceta() {
   const { data: misRecetas, isLoading: cargandoRecetas } = useMisRecetas()
 
   const [mostrarTutorial, setMostrarTutorial] = useState(false)
-  const [mostrarStepper, setMostrarStepper] = useState(false)
-  const [mostrarError, setMostrarError] = useState(false)
-  const [mostrarDialogSalir, setMostrarDialogSalir] = useState(false)
+  const [asistenteAbierto, setAsistenteAbierto] = useState(false)
+  const [vistaAsistente, setVistaAsistente] = useState<'pasos' | 'ia'>('pasos')
   const [fotoUrl, setFotoUrl] = useState<string | null>(null)
-  const inputFotoRef = useRef<HTMLInputElement>(null)
-  const [mostrarDialogTexto, setMostrarDialogTexto] = useState(false)
-  const [textoDescripcion, setTextoDescripcion] = useState('')
   const [generando, setGenerando] = useState(false)
   const [errorGeneracion, setErrorGeneracion] = useState<string | null>(null)
   const [subiendoFoto, setSubiendoFoto] = useState(false)
   const [errorFoto, setErrorFoto] = useState<string | null>(null)
   const [borradorRecuperado, setBorradorRecuperado] = useState(false)
   const temporizadorGuardado = useRef<ReturnType<typeof setTimeout>>()
-
-  useEffect(() => {
-    if (!cargandoRecetas && (misRecetas?.length ?? 1) === 0) {
-      setMostrarTutorial(true)
-    }
-  }, [cargandoRecetas, misRecetas])
+  const bienvenidaResuelta = useRef(false)
 
   const methods = useForm<DatosCrearReceta>({
     resolver: zodResolver(esquemaCrearReceta),
@@ -123,13 +69,14 @@ export function FormularioCrearReceta() {
     defaultValues: VALORES_INICIALES,
   })
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = methods
+  const asistente = useAsistenteCrearReceta(methods.trigger)
+
+  useEffect(() => {
+    if (cargandoRecetas || bienvenidaResuelta.current) return
+    bienvenidaResuelta.current = true
+    if ((misRecetas?.length ?? 1) === 0) setMostrarTutorial(true)
+    else setAsistenteAbierto(true)
+  }, [cargandoRecetas, misRecetas])
 
   useEffect(() => {
     const { borrador, fotoPreview } = useCrearRecetaStore.getState()
@@ -160,19 +107,15 @@ export function FormularioCrearReceta() {
     setFotoUrl(null)
     setErrorFoto(null)
     setBorradorRecuperado(false)
+    asistente.irAPaso(0)
   }
 
-  const ingredientesActuales = watch('ingredientes') ?? []
-  const alergenosDetectados = detectarAlergenos(
-    ingredientesActuales.map((i) => i.nombre).filter(Boolean)
-  )
-
-  async function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
     setFotoUrl(URL.createObjectURL(file))
-    setValue('foto', file)
+    methods.setValue('foto', file)
     setErrorFoto(null)
     setSubiendoFoto(true)
 
@@ -182,34 +125,47 @@ export function FormularioCrearReceta() {
     } catch {
       setFotoUrl(null)
       setFoto(null)
-      setValue('foto', undefined)
+      methods.setValue('foto', undefined)
       setErrorFoto('No se pudo subir la foto. Inténtalo de nuevo.')
     } finally {
       setSubiendoFoto(false)
     }
   }
 
-  async function handleGenerarDesdeTexto() {
-    if (textoDescripcion.trim().length < 10) return
+  function handleQuitarFoto() {
+    setFotoUrl(null)
+    setFoto(null)
+    methods.setValue('foto', undefined)
+    setErrorFoto(null)
+  }
+
+  function hayContenidoEscrito() {
+    return tieneContenido(limpiarParaGuardar(methods.getValues()))
+  }
+
+  async function handleGenerarDesdeTexto(texto: string) {
     setGenerando(true)
     setErrorGeneracion(null)
     const token = session?.user?.backendToken ?? ''
-    const generado = await recetasService.generarDesdeTexto(textoDescripcion.trim(), token)
+    const generado = await recetasService.generarDesdeTexto(texto, token)
     setGenerando(false)
+
     if (!generado) {
       setErrorGeneracion('No se pudo generar la receta. Inténtalo con una descripción más detallada.')
-      return
+      return false
     }
-    // Normalizar nombres de ingredientes mapeándolos contra la base de datos local
-    if (generado.ingredientes && Array.isArray(generado.ingredientes)) {
+
+    if (Array.isArray(generado.ingredientes)) {
       generado.ingredientes = generado.ingredientes.map((ing) => ({
         ...ing,
-        nombre: normalizarNombreIngrediente(ing.nombre)
+        nombre: normalizarNombreIngrediente(ing.nombre),
       }))
     }
-    methods.reset(generado)
-    setMostrarDialogTexto(false)
-    setTextoDescripcion('')
+
+    methods.reset({ ...VALORES_INICIALES, ...generado })
+    setBorradorRecuperado(false)
+    asistente.irAPaso(1)
+    return true
   }
 
   function onSubmitValido(datos: DatosCrearReceta) {
@@ -224,358 +180,85 @@ export function FormularioCrearReceta() {
     router.push('/crear-receta/revisar')
   }
 
-  function onSubmitInvalido() {
-    setMostrarError(true)
+  function onSubmitInvalido(errores: FieldErrors<DatosCrearReceta>) {
+    asistente.irAPaso(pasoConPrimerError(errores))
   }
 
-  function handleCorregir() {
-    setMostrarError(false)
-    const primerError = document.querySelector('[data-error="true"]')
-    if (primerError) {
-      primerError.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+  function abrirAsistente(vista: 'pasos' | 'ia' = 'pasos') {
+    setVistaAsistente(vista)
+    setAsistenteAbierto(true)
   }
 
   function handleBorrarYSalir() {
+    clearTimeout(temporizadorGuardado.current)
     useCrearRecetaStore.getState().limpiar()
     router.push('/home')
   }
 
-  if (mostrarStepper) {
-    return <TutorialCrearReceta onTerminar={() => setMostrarStepper(false)} />
-  }
+  const empezada = borradorRecuperado || fotoUrl !== null || hayContenidoEscrito()
 
   return (
-    <>
+    <FormProvider {...methods}>
       <PopUpTutorial
         abierto={mostrarTutorial}
-        onAceptar={() => { setMostrarTutorial(false); setMostrarStepper(true) }}
-        onSaltar={() => setMostrarTutorial(false)}
+        onAceptar={() => { setMostrarTutorial(false); abrirAsistente() }}
+        onSaltar={() => { setMostrarTutorial(false); abrirAsistente() }}
       />
 
-      <PopUpError
-        abierto={mostrarError}
-        errores={extraerMensajesError(errors)}
-        onCorregir={handleCorregir}
-      />
-
-      {/* Dialog: generar desde texto */}
-      <Dialog open={mostrarDialogTexto} onOpenChange={setMostrarDialogTexto}>
-        <DialogContent className="max-w-sm rounded-2xl bg-card p-6">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-extrabold flex items-center gap-2">
-              <Sparkles size={18} className="text-brand" />
-              Crear desde descripción
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground mt-1">
-              Describe tu receta con palabras y la IA rellenará el formulario por ti.
-            </DialogDescription>
-          </DialogHeader>
-          <textarea
-            value={textoDescripcion}
-            onChange={(e) => setTextoDescripcion(e.target.value)}
-            placeholder="Ej: Un risotto cremoso de setas con parmesano, para 4 personas, listo en 40 minutos..."
-            rows={4}
-            className="w-full mt-3 bg-background border border-border rounded-xl px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-brand/40"
-          />
-          {errorGeneracion && (
-            <p className="text-xs text-destructive mt-1">{errorGeneracion}</p>
-          )}
-          <div className="flex gap-3 mt-4">
-            <Button variant="outline" className="flex-1" onClick={() => { setMostrarDialogTexto(false); setErrorGeneracion(null) }} disabled={generando}>
-              Cancelar
-            </Button>
-            <Button
-              className="flex-1 bg-brand text-brand-foreground font-bold"
-              onClick={handleGenerarDesdeTexto}
-              disabled={generando || textoDescripcion.trim().length < 10}
-            >
-              {generando ? <><Loader2 size={14} className="animate-spin mr-1.5" />Generando…</> : 'Generar'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog confirmación borrar */}
-      <Dialog open={mostrarDialogSalir} onOpenChange={setMostrarDialogSalir}>
-        <DialogContent className="max-w-sm rounded-2xl bg-card p-6">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-extrabold text-foreground">¿Borrar receta?</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground mt-1">
-              Perderás todos los cambios realizados. Esta acción no se puede deshacer.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button variant="outline" className="flex-1" onClick={() => setMostrarDialogSalir(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              className="flex-1"
-              onClick={handleBorrarYSalir}
-            >
-              Borrar y salir
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {borradorRecuperado && (
-        <div
-          role="status"
-          className="mb-3 flex items-center gap-3 rounded-2xl border border-border bg-[var(--warm-bg-accent)] px-4 py-3"
-        >
-          <p className="flex-1 text-xs text-muted-foreground">
-            Hemos recuperado el borrador que dejaste a medias.
-          </p>
-          <button
-            type="button"
-            onClick={handleEmpezarDeCero}
-            className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-brand transition-opacity hover:opacity-80"
-          >
-            <RotateCcw size={13} />
-            Empezar de cero
-          </button>
+      <div className="rounded-3xl bg-[var(--warm-bg)] p-8 text-center shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand/10">
+          <NotebookPen size={26} className="text-brand" />
         </div>
-      )}
-
-      <button
-        type="button"
-        onClick={() => { setMostrarDialogTexto(true); setErrorGeneracion(null) }}
-        className="w-full mb-3 flex items-center justify-center gap-2 rounded-2xl border border-brand/30 bg-[var(--brand-subtle)] py-3 text-sm font-bold text-brand transition-all hover:bg-brand/20 active:scale-95"
-      >
-        <Sparkles size={16} />
-        Crear desde descripción (IA)
-      </button>
-
-      <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmitValido, onSubmitInvalido)}
-          className="flex flex-col gap-4 bg-[var(--warm-bg)] rounded-3xl p-3 pb-8"
-          noValidate
+        <h2 className="text-lg font-extrabold text-foreground">
+          {empezada ? 'Tienes una receta a medias' : 'Te lo preguntamos paso a paso'}
+        </h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+          {empezada
+            ? 'Retoma el asistente donde lo dejaste. No se ha borrado nada.'
+            : 'La foto, los datos, los ingredientes y los pasos, de uno en uno. Al final la revisas antes de publicar.'}
+        </p>
+        <Button
+          type="button"
+          onClick={() => abrirAsistente()}
+          className="mt-5 h-12 rounded-xl bg-brand px-8 font-bold text-brand-foreground hover:bg-brand/90"
         >
-          {/* ── Foto ── */}
-          <section className="bg-[var(--warm-bg-accent)] rounded-2xl overflow-hidden shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
-            <input
-              ref={inputFotoRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFotoChange}
-            />
-            {fotoUrl ? (
-              <div className="relative h-52 w-full">
-                <Image src={fotoUrl} alt="Preview receta" fill className="object-cover" />
-                {subiendoFoto && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-                    <Loader2 size={28} className="animate-spin text-white" />
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => { setFotoUrl(null); setFoto(null); setValue('foto', undefined); setErrorFoto(null) }}
-                  className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg text-white"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => inputFotoRef.current?.click()}
-                className="w-full h-44 flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-2xl text-muted-foreground hover:bg-muted/30 transition-colors"
-              >
-                <Camera size={32} />
-                <span className="text-sm font-medium">Añadir foto</span>
-              </button>
-            )}
-            {errorFoto && (
-              <p className="text-xs text-destructive px-4 pb-3">{errorFoto}</p>
-            )}
-          </section>
+          <Pencil size={16} />
+          {empezada ? 'Seguir con la receta' : 'Empezar la receta'}
+        </Button>
+        <button
+          type="button"
+          onClick={() => abrirAsistente('ia')}
+          className="mx-auto mt-4 flex items-center gap-1.5 text-xs font-bold text-brand transition-opacity hover:opacity-80"
+        >
+          <Sparkles size={14} />
+          Crear desde descripción (IA)
+        </button>
+      </div>
 
-          {/* ── Información básica ── */}
-          <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
-            <h2 className="text-base font-extrabold text-foreground mb-4">Información básica</h2>
-
-            {/* Título */}
-            <div className="mb-4">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                Título *
-              </label>
-              <input
-                {...register('titulo')}
-                data-error={!!errors.titulo}
-                placeholder="Ej. Paella valenciana"
-                className={[
-                  'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
-                  'placeholder:text-muted-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                  errors.titulo ? 'border-destructive' : 'border-border',
-                ].join(' ')}
-              />
-              {errors.titulo && (
-                <p className="text-xs text-destructive mt-1">{errors.titulo.message}</p>
-              )}
-            </div>
-
-            {/* Descripción */}
-            <div className="mb-4">
-              <div className="flex justify-between items-baseline mb-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Descripción *
-                </label>
-                <span className="text-[10px] text-muted-foreground">
-                  {(watch('descripcion') ?? '').length}/300
-                </span>
-              </div>
-              <textarea
-                {...register('descripcion')}
-                data-error={!!errors.descripcion}
-                placeholder="Cuéntanos algo sobre esta receta..."
-                maxLength={300}
-                rows={3}
-                className={[
-                  'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
-                  'placeholder:text-muted-foreground resize-none',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                  errors.descripcion ? 'border-destructive' : 'border-border',
-                ].join(' ')}
-              />
-              {errors.descripcion && (
-                <p className="text-xs text-destructive mt-1">{errors.descripcion.message}</p>
-              )}
-            </div>
-
-            {/* Tiempo + dificultad */}
-            <div className="grid grid-cols-1 gap-3 mb-4 md:grid-cols-2">
-              {/* Tiempo */}
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                  Tiempo *
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    {...register('tiempo', { valueAsNumber: true })}
-                    data-error={!!errors.tiempo}
-                    type="number"
-                    min={1}
-                    placeholder="30"
-                    className={[
-                      'flex-1 bg-background border rounded-xl px-3 py-3 text-sm text-foreground',
-                      'placeholder:text-muted-foreground',
-                      'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                      errors.tiempo ? 'border-destructive' : 'border-border',
-                    ].join(' ')}
-                  />
-                  <select
-                    {...register('unidadTiempo')}
-                    aria-label="Unidad de tiempo"
-                    className="w-16 bg-background border border-border rounded-xl px-2 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
-                  >
-                    <option value="min">min</option>
-                    <option value="h">h</option>
-                  </select>
-                </div>
-                {errors.tiempo && (
-                  <p className="text-xs text-destructive mt-1">{errors.tiempo.message}</p>
-                )}
-              </div>
-
-              {/* Porciones */}
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                  Porciones *
-                </label>
-                <input
-                  {...register('porciones', { valueAsNumber: true })}
-                  data-error={!!errors.porciones}
-                  type="number"
-                  min={1}
-                  placeholder="4"
-                  className={[
-                    'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
-                    'placeholder:text-muted-foreground',
-                    'focus:outline-none focus:ring-2 focus:ring-brand/40',
-                    errors.porciones ? 'border-destructive' : 'border-border',
-                  ].join(' ')}
-                />
-                {errors.porciones && (
-                  <p className="text-xs text-destructive mt-1">{errors.porciones.message}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Dificultad */}
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                Dificultad *
-              </label>
-              <div className="flex gap-2">
-                {DIFICULTADES.map((d) => {
-                  const activo = watch('dificultad') === d
-                  return (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setValue('dificultad', d, { shouldValidate: true })}
-                      className={[
-                        'flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors',
-                        activo
-                          ? 'bg-brand text-brand-foreground'
-                          : 'bg-[var(--warm-bg)] text-muted-foreground hover:bg-[var(--warm-bg)]/80',
-                      ].join(' ')}
-                    >
-                      {ETIQUETAS_DIFICULTAD[d]}
-                    </button>
-                  )
-                })}
-              </div>
-              {errors.dificultad && (
-                <p className="text-xs text-destructive mt-1">{errors.dificultad.message}</p>
-              )}
-            </div>
-          </section>
-
-          {/* ── Tipo de receta ── */}
-          <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
-            <h2 className="text-base font-extrabold text-foreground mb-3">Tipo de receta</h2>
-            <SelectorChips
-              opciones={DIETAS_OPCIONES}
-              seleccionados={watch('dietas') ?? []}
-              onChange={(sel) => setValue('dietas', sel)}
-            />
-          </section>
-
-          {/* ── Ingredientes ── */}
-          <SeccionIngredientes />
-
-          {/* ── Pasos ── */}
-          <SeccionPasos />
-
-          {/* ── Alérgenos ── */}
-          <SeccionAlergenos alergenosDetectados={alergenosDetectados} />
-
-          {/* ── Botones ── */}
-          <div className="flex gap-3 mt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setMostrarDialogSalir(true)}
-              className="flex-1 h-12 rounded-xl text-destructive border-destructive/40 font-bold"
-            >
-              Borrar y salir
-            </Button>
-            <Button
-              type="submit"
-              disabled={subiendoFoto}
-              className="flex-1 h-12 rounded-xl bg-brand text-brand-foreground font-bold"
-            >
-              {subiendoFoto ? 'Subiendo foto…' : 'Revisar receta'}
-            </Button>
-          </div>
-        </form>
-      </FormProvider>
-    </>
+      <AsistenteCrearReceta
+        abierto={asistenteAbierto}
+        vistaInicial={vistaAsistente}
+        onCerrar={() => setAsistenteAbierto(false)}
+        asistente={asistente}
+        enviando={subiendoFoto}
+        onEnviar={methods.handleSubmit(onSubmitValido, onSubmitInvalido)}
+        borradorRecuperado={borradorRecuperado}
+        onEmpezarDeCero={handleEmpezarDeCero}
+        onBorrarYSalir={handleBorrarYSalir}
+        foto={{
+          url: fotoUrl,
+          subiendo: subiendoFoto,
+          error: errorFoto,
+          onArchivo: handleFotoChange,
+          onQuitar: handleQuitarFoto,
+        }}
+        ia={{
+          generando,
+          error: errorGeneracion,
+          hayContenido: hayContenidoEscrito,
+          onGenerar: handleGenerarDesdeTexto,
+        }}
+      />
+    </FormProvider>
   )
 }
