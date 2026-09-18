@@ -8,9 +8,11 @@ import { SeccionIngredientes } from '../seccionIngredientes'
 import { SeccionPasos } from '../seccionPasos'
 import { PasoAlergenos } from './pasoAlergenos'
 import { PasoDatos } from './pasoDatos'
+import { IndicadorProgreso } from './indicadorProgreso'
 import { PasoFoto, type PropsPasoFoto } from './pasoFoto'
 import { VistaGenerarIa, type PropsGeneracionIa } from './vistaGenerarIa'
 import { VistaPreviaPaso } from './vistaPreviaPaso'
+import { PASOS_ASISTENTE } from './pasos'
 import type { Asistente } from './useAsistenteCrearReceta'
 
 type Vista = 'pasos' | 'ia' | 'salir'
@@ -53,7 +55,7 @@ export function AsistenteCrearReceta({
   foto,
   ia,
 }: Props) {
-  const { paso, indice, total, esPrimero, esUltimo, siguiente, atras } = asistente
+  const { paso, indice, total, esPrimero, esUltimo, siguiente, atras, irAPaso } = asistente
   const [vista, setVista] = useState<Vista>('pasos')
   const tituloRef = useRef<HTMLHeadingElement>(null)
 
@@ -71,7 +73,7 @@ export function AsistenteCrearReceta({
     <Dialog open={abierto} onOpenChange={(v) => { if (!v) onCerrar() }}>
       <DialogContent
         showCloseButton={false}
-        className="flex h-[92dvh] max-w-[calc(100%-1rem)] flex-col gap-0 overflow-hidden rounded-3xl p-0 sm:h-[88dvh] sm:max-w-xl lg:max-w-5xl"
+        className="flex h-dvh w-screen max-w-none flex-col gap-0 overflow-hidden rounded-none p-0 lg:h-[88dvh] lg:w-full lg:max-w-5xl lg:rounded-3xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => {
           if (vista !== 'pasos') {
@@ -80,56 +82,62 @@ export function AsistenteCrearReceta({
           }
         }}
       >
-        <header className="flex items-start gap-3 border-b border-border/60 bg-[var(--warm-bg-accent)] px-5 py-4">
-          {vista !== 'pasos' && (
-            <button
-              type="button"
-              onClick={() => setVista('pasos')}
-              aria-label="Volver a los pasos"
-              className="-ml-1 mt-0.5 shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <ArrowLeft size={18} />
-            </button>
+        <header className="border-b border-border/60 bg-[var(--warm-bg-accent)] px-5 pb-3 pt-4">
+          <div className="flex items-start gap-3">
+            {vista !== 'pasos' && (
+              <button
+                type="button"
+                onClick={() => setVista('pasos')}
+                aria-label="Volver a los pasos"
+                className="-ml-1 mt-0.5 shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <ArrowLeft size={18} />
+              </button>
+            )}
+
+            <div className="min-w-0 flex-1">
+              {vista === 'pasos' && (
+                <p aria-hidden className="mb-1 text-[11px] font-bold uppercase tracking-wider text-brand">
+                  Paso {indice + 1} de {total}
+                </p>
+              )}
+              <DialogTitle asChild>
+                <h2 ref={tituloRef} tabIndex={-1} className="truncate text-lg font-extrabold text-foreground outline-none">
+                  {vista === 'pasos' && <span className="sr-only">Paso {indice + 1} de {total}. </span>}
+                  {cabecera.titulo}
+                </h2>
+              </DialogTitle>
+              <DialogDescription className="mt-0.5 text-xs text-muted-foreground">
+                {cabecera.descripcion}
+              </DialogDescription>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              {vista === 'pasos' && (
+                <button
+                  type="button"
+                  onClick={() => setVista('ia')}
+                  className="flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-2 text-xs font-bold text-brand transition-colors hover:bg-brand/20"
+                >
+                  <Sparkles size={14} />
+                  <span className="hidden sm:inline">Crear con IA</span>
+                </button>
+              )}
+              <DialogClose asChild>
+                <button
+                  type="button"
+                  aria-label="Cerrar el asistente"
+                  className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <X size={18} />
+                </button>
+              </DialogClose>
+            </div>
+          </div>
+
+          {vista === 'pasos' && (
+            <IndicadorProgreso pasos={PASOS_ASISTENTE} indice={indice} onIr={irAPaso} className="mt-2" />
           )}
-
-          <div className="min-w-0 flex-1">
-            {vista === 'pasos' && (
-              <p aria-hidden className="mb-1 text-[11px] font-bold uppercase tracking-wider text-brand">
-                Paso {indice + 1} de {total}
-              </p>
-            )}
-            <DialogTitle asChild>
-              <h2 ref={tituloRef} tabIndex={-1} className="truncate text-lg font-extrabold text-foreground outline-none">
-                {vista === 'pasos' && <span className="sr-only">Paso {indice + 1} de {total}. </span>}
-                {cabecera.titulo}
-              </h2>
-            </DialogTitle>
-            <DialogDescription className="mt-0.5 text-xs text-muted-foreground">
-              {cabecera.descripcion}
-            </DialogDescription>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1">
-            {vista === 'pasos' && (
-              <button
-                type="button"
-                onClick={() => setVista('ia')}
-                className="flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-2 text-xs font-bold text-brand transition-colors hover:bg-brand/20"
-              >
-                <Sparkles size={14} />
-                <span className="hidden sm:inline">Crear con IA</span>
-              </button>
-            )}
-            <DialogClose asChild>
-              <button
-                type="button"
-                aria-label="Cerrar el asistente"
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <X size={18} />
-              </button>
-            </DialogClose>
-          </div>
         </header>
 
         <div className="flex min-h-0 flex-1">
@@ -211,7 +219,7 @@ export function AsistenteCrearReceta({
         </div>
 
         {vista === 'pasos' && (
-          <footer className="flex items-center justify-between gap-3 border-t border-border/60 bg-[var(--warm-bg-accent)] px-4 py-3">
+          <footer className="flex items-center justify-between gap-3 border-t border-border/60 bg-[var(--warm-bg-accent)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-3">
             <button
               type="button"
               onClick={() => setVista('salir')}

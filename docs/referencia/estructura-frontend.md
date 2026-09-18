@@ -105,6 +105,8 @@ src/
 │   │   │   │   │   ├── pasoDatos.tsx                # Información básica + tipo de receta
 │   │   │   │   │   ├── pasoAlergenos.tsx            # useWatch de ingredientes → seccionAlergenos
 │   │   │   │   │   ├── vistaGenerarIa.tsx           # Atajo de IA, con confirmación si hay contenido
+│   │   │   │   │   ├── vistaPreviaPaso.tsx          # Previsualización en vivo del bloque (useWatch)
+│   │   │   │   │   ├── indicadorProgreso.tsx        # Barras de progreso + aria-current="step"
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── previsualizacionReceta.tsx  # Compone los bloques + publicar (lee el store)
 │   │   │   │   ├── previsualizacion/           # Bloques sueltos, sin store, para el asistente

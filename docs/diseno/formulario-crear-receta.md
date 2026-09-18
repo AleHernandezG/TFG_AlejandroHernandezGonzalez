@@ -431,6 +431,20 @@ La columna es un `aria-live="polite"` y no tiene nada enfocable dentro: no se le
 manos libres ni el crédito de Pexels, así que el tabulador va de campo a campo y no se mete en un
 escaparate que no se puede tocar.
 
+### Los pasos a pantalla completa, hecho el 18/09/2026
+
+El punto 5, y con él se cierra el asistente. Por debajo de `lg` el diálogo ocupa la pantalla entera
+(`h-dvh w-screen`, sin esquinas redondeadas) y solo a partir de 1024 px vuelve a ser una ventana
+centrada. En un móvil, un diálogo con márgenes deja al teclado virtual comiéndose media receta; a
+pantalla completa el campo que estás rellenando se queda donde debe. La barra de botones lleva
+`env(safe-area-inset-bottom)` para no quedar debajo de la barra de gestos del iPhone.
+
+El progreso es un `<ol>` de cinco barras en la cabecera. El paso actual va marcado con
+`aria-current="step"` y los pasos ya pasados son botones que vuelven a ellos, porque volver atrás no
+valida ni borra nada; los que quedan por delante son texto y no se pueden saltar. El nombre de cada
+paso va en un `sr-only`, así que quien navega a ciegas oye «Paso 3 de 5» al llegar y puede repasar la
+lista sin depender del color de las barras.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -476,9 +490,13 @@ eso.
 4. ~~El diálogo de escritorio partido en dos, con la previsualización del bloque alimentada por
    `useWatch`, `aria-live="polite"` y fuera del orden de tabulación.~~ **Hecho el 18/09/2026**,
    detallado en «El diálogo partido en escritorio».
-5. Los pasos en móvil a pantalla completa, con el indicador de progreso y `aria-current="step"`.
+5. ~~Los pasos en móvil a pantalla completa, con el indicador de progreso y `aria-current="step"`.~~
+   **Hecho el 18/09/2026**, detallado en «Los pasos a pantalla completa».
 
 Del 2 al 5 el orden importa. El 2 es útil por sí solo aunque el asistente se quede a medias.
+
+**Los cinco puntos están hechos.** Lo que queda es mirarlo con usuarios: «Qué medir después», aquí
+abajo.
 
 El atajo de IA y el tutorial de la primera vez entran en el punto 3, y cómo entran está resuelto en
 «Dos decisiones que el asistente obliga a tomar», más arriba.
