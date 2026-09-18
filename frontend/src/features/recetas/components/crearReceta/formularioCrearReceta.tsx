@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm, FormProvider } from 'react-hook-form'
+import { useForm, FormProvider, type DefaultValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, Trash2, Sparkles, Loader2 } from 'lucide-react'
+import { Camera, Trash2, Sparkles, Loader2, RotateCcw } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { recetasService } from '@/services/recetasService'
 import { subidasService } from '@/services/subidasService'
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dialog'
 import { SelectorChips } from '@/components/common/selectorChips'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
-import { useCrearRecetaStore } from '@/stores/useCrearRecetaStore'
+import { useCrearRecetaStore, type BorradorReceta } from '@/stores/useCrearRecetaStore'
 import { esquemaCrearReceta, ETIQUETAS_DIFICULTAD, type DatosCrearReceta, type DificultadInterna } from '../../types/crearReceta.schema'
 import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
 import { normalizarNombreIngrediente } from '@/features/despensa/utils/normalizadorIngredientes'
@@ -32,6 +32,34 @@ import { PopUpError } from './popUpError'
 import { useMisRecetas } from '@/features/coleccion/hooks/useMisRecetas'
 
 const DIFICULTADES: DificultadInterna[] = ['facil', 'media', 'dificil']
+
+const VALORES_INICIALES: DefaultValues<DatosCrearReceta> = {
+  titulo: '',
+  descripcion: '',
+  ingredientes: [{ nombre: '', cantidad: '', unidad: '' }],
+  pasos: [{ texto: '' }],
+  porciones: undefined,
+  dificultad: undefined,
+  tiempo: undefined,
+  unidadTiempo: 'min',
+  dietas: [],
+}
+
+function tieneContenido(b: BorradorReceta): boolean {
+  if (b.titulo?.trim() || b.descripcion?.trim()) return true
+  if (b.ingredientes?.some((i) => i.nombre?.trim())) return true
+  if (b.pasos?.some((p) => p.texto?.trim())) return true
+  return Boolean(b.tiempo || b.porciones || b.dificultad || b.dietas?.length)
+}
+
+function limpiarParaGuardar(valores: DatosCrearReceta): BorradorReceta {
+  const { foto: _foto, ...resto } = valores
+  return {
+    ...resto,
+    tiempo: Number.isFinite(resto.tiempo) ? resto.tiempo : undefined,
+    porciones: Number.isFinite(resto.porciones) ? resto.porciones : undefined,
+  }
+}
 
 function extraerMensajesError(errors: ReturnType<typeof useForm>['formState']['errors']): string[] {
   const msgs: string[] = []
@@ -64,7 +92,7 @@ function extraerMensajesError(errors: ReturnType<typeof useForm>['formState']['e
 export function FormularioCrearReceta() {
   const router = useRouter()
   const { data: session } = useSession()
-  const { setDatos, setFoto } = useCrearRecetaStore()
+  const { setDatos, setFoto, guardarBorrador, descartarBorrador } = useCrearRecetaStore()
   const { data: misRecetas, isLoading: cargandoRecetas } = useMisRecetas()
 
   const [mostrarTutorial, setMostrarTutorial] = useState(false)
@@ -79,6 +107,8 @@ export function FormularioCrearReceta() {
   const [errorGeneracion, setErrorGeneracion] = useState<string | null>(null)
   const [subiendoFoto, setSubiendoFoto] = useState(false)
   const [errorFoto, setErrorFoto] = useState<string | null>(null)
+  const [borradorRecuperado, setBorradorRecuperado] = useState(false)
+  const temporizadorGuardado = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     if (!cargandoRecetas && (misRecetas?.length ?? 1) === 0) {
@@ -88,17 +118,9 @@ export function FormularioCrearReceta() {
 
   const methods = useForm<DatosCrearReceta>({
     resolver: zodResolver(esquemaCrearReceta),
-    defaultValues: {
-      titulo: '',
-      descripcion: '',
-      ingredientes: [{ nombre: '', cantidad: '', unidad: '' }],
-      pasos: [{ texto: '' }],
-      porciones: undefined,
-      dificultad: undefined,
-      tiempo: undefined,
-      unidadTiempo: 'min',
-      dietas: [],
-    },
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    defaultValues: VALORES_INICIALES,
   })
 
   const {
@@ -108,6 +130,37 @@ export function FormularioCrearReceta() {
     setValue,
     formState: { errors },
   } = methods
+
+  useEffect(() => {
+    const { borrador, fotoPreview } = useCrearRecetaStore.getState()
+    if (!borrador || !tieneContenido(borrador)) return
+    methods.reset({ ...VALORES_INICIALES, ...borrador })
+    if (fotoPreview) setFotoUrl(fotoPreview)
+    setBorradorRecuperado(true)
+  }, [methods])
+
+  useEffect(() => {
+    const suscripcion = methods.watch((valores) => {
+      clearTimeout(temporizadorGuardado.current)
+      temporizadorGuardado.current = setTimeout(() => {
+        const borrador = limpiarParaGuardar(valores as DatosCrearReceta)
+        if (tieneContenido(borrador)) guardarBorrador(borrador)
+      }, 600)
+    })
+    return () => {
+      clearTimeout(temporizadorGuardado.current)
+      suscripcion.unsubscribe()
+    }
+  }, [methods, guardarBorrador])
+
+  function handleEmpezarDeCero() {
+    clearTimeout(temporizadorGuardado.current)
+    descartarBorrador()
+    methods.reset(VALORES_INICIALES)
+    setFotoUrl(null)
+    setErrorFoto(null)
+    setBorradorRecuperado(false)
+  }
 
   const ingredientesActuales = watch('ingredientes') ?? []
   const alergenosDetectados = detectarAlergenos(
@@ -267,6 +320,25 @@ export function FormularioCrearReceta() {
         </DialogContent>
       </Dialog>
 
+      {borradorRecuperado && (
+        <div
+          role="status"
+          className="mb-3 flex items-center gap-3 rounded-2xl border border-border bg-[var(--warm-bg-accent)] px-4 py-3"
+        >
+          <p className="flex-1 text-xs text-muted-foreground">
+            Hemos recuperado el borrador que dejaste a medias.
+          </p>
+          <button
+            type="button"
+            onClick={handleEmpezarDeCero}
+            className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-brand transition-opacity hover:opacity-80"
+          >
+            <RotateCcw size={13} />
+            Empezar de cero
+          </button>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={() => { setMostrarDialogTexto(true); setErrorGeneracion(null) }}
@@ -376,7 +448,7 @@ export function FormularioCrearReceta() {
             </div>
 
             {/* Tiempo + dificultad */}
-            <div className="grid grid-cols-1 gap-3 mb-4">
+            <div className="grid grid-cols-1 gap-3 mb-4 md:grid-cols-2">
               {/* Tiempo */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block">
