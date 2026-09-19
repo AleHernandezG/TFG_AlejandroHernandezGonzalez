@@ -9,6 +9,19 @@ export const esquemaFirmaSubida = z.object({
   tipo: z.enum(["receta", "avatar"]),
 });
 
+export const esquemaMacrosPreview = z.object({
+  ingredientes: z
+    .array(
+      z.object({
+        nombre:   z.string().min(1, "El nombre del ingrediente es obligatorio"),
+        cantidad: z.string().default(""),
+        unidad:   z.string().default(""),
+      }),
+    )
+    .min(1, "Añade al menos un ingrediente")
+    .max(50, "Demasiados ingredientes para calcular los macros"),
+});
+
 export const esquemaFotoUsuario = z.object({
   fotoUrl: esquemaUrlImagen,
 });

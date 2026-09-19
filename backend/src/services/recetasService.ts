@@ -5,6 +5,13 @@ import { buscarFotoPexelsCascada } from "./imagenService";
 import { alergenosDeReceta } from "../lib/ingredientes";
 import { canonizarDieta, esRestriccionDeAlergeno, filtrarDietas } from "../lib/dietas";
 import { eliminarImagen } from "../lib/cloudinary";
+import { calcularMacros } from "./nutritionService";
+
+export interface IngredientePreview {
+  nombre: string;
+  cantidad: string;
+  unidad: string;
+}
 
 async function resolverAlergenos(
   delQuery: string[] | undefined,
@@ -135,5 +142,15 @@ export const recetasService = {
 
   async obtenerFotoPreview(query: string) {
     return buscarFotoPexelsCascada(query);
+  },
+
+  async calcularMacrosPreview(ingredientes: IngredientePreview[]) {
+    return calcularMacros(
+      ingredientes.map((ing) => ({
+        nombre: ing.nombre,
+        cantidad: parseFloat(ing.cantidad) || 0,
+        unidad: ing.unidad,
+      })),
+    );
   },
 };

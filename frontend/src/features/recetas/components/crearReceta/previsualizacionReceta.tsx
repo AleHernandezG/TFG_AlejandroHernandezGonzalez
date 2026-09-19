@@ -8,6 +8,7 @@ import { useCrearRecetaStore } from '@/stores/useCrearRecetaStore'
 import { detectarAlergenos } from '@/features/recetas/utils/detectarAlergenos'
 import { useCrearReceta } from '@/features/recetas/hooks/useCrearReceta'
 import { useFotoPexelsPreview } from '@/features/recetas/hooks/useFotoPexelsPreview'
+import { useMacrosPreview } from '@/features/recetas/hooks/useMacrosPreview'
 import { useModoManoLibres } from '@/features/recetas/hooks/useModoManoLibres'
 import {
   HeroPrevisualizacion,
@@ -27,6 +28,7 @@ export function PrevisualizacionReceta() {
   const { activo, pasoActual, pausado, soportado, iniciar, pausar, reanudar, siguiente, anterior, detener } =
     useModoManoLibres()
   const { data: fotoPexels, isLoading: buscandoFoto } = useFotoPexelsPreview(datos?.titulo ?? '', !fotoPreview)
+  const { data: macros, isLoading: calculandoMacros } = useMacrosPreview(datos?.ingredientes ?? [])
 
   // Captura el valor en el montaje para no re-disparar cuando limpiar() pone datos a null
   const datosAlMontar = useRef(datos)
@@ -84,7 +86,7 @@ export function PrevisualizacionReceta() {
 
         <DivisorPrevisualizacion />
 
-        <NutricionPrevisualizacion />
+        <NutricionPrevisualizacion macros={macros} calculando={calculandoMacros} />
 
         <DivisorPrevisualizacion />
 

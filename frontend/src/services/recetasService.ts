@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient";
-import type { PostFeed, RecetaDetalle, FiltrosAvanzados } from "@/features/recetas/types/receta.types";
+import type { PostFeed, RecetaDetalle, FiltrosAvanzados, MacrosReceta } from "@/features/recetas/types/receta.types";
 import type { DatosRecetaNueva } from "@/features/recetas/types/crearReceta.schema";
 
 export interface FiltrosFeed {
@@ -140,6 +140,20 @@ export const recetasService = {
     try {
       const { data } = await apiClient.get('/recetas/foto-preview', {
         params: { query },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  },
+
+  async obtenerMacrosPreview(
+    ingredientes: { nombre: string; cantidad: string; unidad: string }[],
+    token: string,
+  ): Promise<MacrosReceta | null> {
+    try {
+      const { data } = await apiClient.post('/recetas/macros-preview', { ingredientes }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return data ?? null;
