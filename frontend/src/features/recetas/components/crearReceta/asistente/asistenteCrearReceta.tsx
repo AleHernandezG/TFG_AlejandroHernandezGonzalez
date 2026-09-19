@@ -193,7 +193,7 @@ export function AsistenteCrearReceta({
                   </Button>
                   <Button
                     type="button"
-                    className="h-11 rounded-xl bg-destructive font-bold text-destructive-foreground hover:bg-destructive/90"
+                    className="h-11 rounded-xl bg-destructive font-bold text-white hover:opacity-90"
                     onClick={onBorrarYSalir}
                   >
                     <Trash2 size={16} />
@@ -224,8 +224,9 @@ export function AsistenteCrearReceta({
             <button
               type="button"
               onClick={() => setVista('salir')}
-              className="text-xs font-bold text-muted-foreground transition-colors hover:text-destructive"
+              className="flex items-center gap-1.5 rounded-xl border border-destructive px-3 py-2.5 text-xs font-bold text-destructive transition-colors hover:bg-destructive hover:text-white"
             >
+              <Trash2 size={14} />
               Borrar y salir
             </button>
             <div className="flex items-center gap-2">
