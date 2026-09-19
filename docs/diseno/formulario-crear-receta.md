@@ -478,6 +478,61 @@ fábrica de Tailwind (`#3b82f680`) en lugar del naranja de la marca. Se arregla 
 tema (guardar los colores por canales, o pasar a Tailwind 4, que resuelve esto con `color-mix`), y
 eso toca pantallas que no son esta.
 
+### Lo que salió de enseñárselo a alguien, el 19/09/2026
+
+El asistente se probó ya terminado, en Chrome y a 390 px, y salieron cuatro cosas. Tres son de
+criterio y una es un fallo de verdad.
+
+**El diálogo de bienvenida manda, no el tutorial.** Había dos pantallas peleándose por ser la
+primera: un pop-up de «¿Es tu primera receta?» con tres consejos genéricos para quien no tenía
+ninguna publicada, y la apertura automática del asistente para quien sí. Las dos desaparecen. Al
+entrar en `/crear-receta` ahora se ve siempre la tarjeta de bienvenida, con «Empezar la receta» y
+«Crear desde descripción (IA)» al mismo nivel, y si hay borrador guardado cambia el título a «Tienes
+una receta a medias». Abrir el asistente solo porque sí se lleva por delante la otra mitad de la
+pantalla, que es la entrada por IA; el consejo de poner una foto apetecible lo da mejor el propio
+paso de la foto. Con el pop-up se fueron `popUpTutorial.tsx` y la llamada a `useMisRecetas` que lo
+alimentaba, así que la página ya no espera a que cargue la lista de recetas para decidir qué enseñar.
+
+**«Borrar y salir» era gris sobre gris.** El botón vivía en la barra inferior como texto suelto y
+competía de menos con «Siguiente», hasta el punto de que hay que buscarlo. Pasa a borde y texto en
+`destructive`, con relleno rojo y texto blanco al pasar por encima. De paso salió el mismo problema
+del tema que ya documentamos con `brand`: `hover:bg-destructive/90` no generaba ninguna regla, y
+`text-destructive-foreground` era todavía peor, porque ese token **no está definido** en
+`tailwind.config.ts`. El botón de confirmar del paso de salida llevaba las dos clases muertas a la
+vez: rojo invisible y texto invisible. Ahora son `bg-destructive`, `text-white` y `hover:opacity-90`.
+
+**El repaso enseña la foto y los macros.** La previsualización final ya montaba la imagen de fondo,
+pero el panel nutricional era un marcador de posición con guiones y la frase «se calculará al
+publicar». Los macros los calculaba `nutritionService` (Edamam primero, USDA de reserva) y solo
+existían dentro de `recetaRepository`, en el momento de publicar, así que quien revisaba no tenía
+manera de ver si su receta salía en 300 kcal o en 900. Se abre `POST /api/recetas/macros-preview`:
+recibe la lista de ingredientes, convierte la cantidad de texto a número (`"250"` → `250`, `"al
+gusto"` → `0`) y devuelve los mismos macros que se guardarán, sin tocar la base de datos. Lleva
+`requerirAuth`, `limitarPorUsuario(20)` porque gasta cuota de API externa, y un tope de 50
+ingredientes. En el frontend es `useMacrosPreview`, con `staleTime` de cinco minutos y la lista de
+ingredientes en la `queryKey`, de modo que volver atrás y adelante en el asistente no vuelve a
+pedirlo. El panel distingue tres estados: calculando, estimación real, y «no hemos podido estimarla
+ahora», que es lo que se ve si faltan las claves de Edamam y USDA.
+
+**No se podía adjuntar una foto.** Este era el fallo, y no estaba en el formulario: `POST
+/api/subidas/firma` respondía 503 «El almacenamiento de imágenes no está configurado». El backend
+contra el que se estaba probando es el de los E2E, que a propósito no lee `backend/.env` para que
+ninguna prueba gaste cuota ni escriba en Atlas. Sin `CLOUDINARY_URL` no hay firma, sin firma el
+navegador no puede subir nada a Cloudinary y el paso de la foto se queda mudo. La subida de
+producción nunca estuvo rota.
+
+Para no volver a confundir un entorno de pruebas con un fallo de la aplicación, hay un tercer
+servidor: `npm run pruebas:ui` (`backend/scripts/servidorPruebasUI.js`). Mantiene el Mongo efímero en
+el 27018, y de `backend/.env` toma **solo** las claves de servicios externos —Cloudinary, Pexels,
+Edamam, USDA, Gemini y `GOOGLE_CLIENT_ID`—, nunca `MONGODB_URI` ni las de Mailjet; si alguna de esas
+tres está exportada en el entorno, el proceso se niega a arrancar. Sirve el `dist/`, así que hay que
+hacer `npm run build` antes. Gasta cuota real: es para probar a mano, no para el CI.
+
+Dos avisos si lo usas. Arranca con `NODE_ENV=development`, así que el login exige el correo
+verificado y no hay Mailjet para mandarlo: la cuenta de prueba se marca a mano con
+`cuentaVerificada: true` en el Mongo efímero. Y las fotos que subas acaban en el Cloudinary de
+verdad, en `cookr/recetas/`, sin ninguna receta que las apunte si no llegas a publicar.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
