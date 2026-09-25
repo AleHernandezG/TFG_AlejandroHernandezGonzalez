@@ -654,6 +654,64 @@ formularios empezados acaban publicados, cuánto se tarda de media, y cuántas r
 hora siguiente a publicarlas (esa última es la que dice si el autor vio venir el resultado o se llevó
 una sorpresa).
 
+#### Qué hay hoy para sacarlos (revisado el 25/09/2026)
+
+Poco. Mongo solo sabe de lo que llega a publicarse, y ni siquiera guarda cuándo se toca después:
+
+- `Receta` tiene `fechaPublicacion` y nada más. El esquema no lleva `timestamps`, así que no hay
+  `updatedAt`, ni historial, ni estado de borrador.
+- `recetaRepository.actualizar()` hace un `findByIdAndUpdate` con `$set` de los campos que cambian y
+  no deja rastro de la fecha.
+- El borrador del asistente vive solo en el `localStorage` del navegador (`cookr-borrador-receta`,
+  vía `persist` de Zustand). El servidor no se entera de que alguien ha abierto el formulario hasta
+  que publica. Y el `guardadoEn` que acompaña al borrador se pisa en cada guardado, así que es la
+  hora del último cambio, no la del primero.
+- No hay ninguna herramienta de analítica instalada, ni en el frontend ni en el backend.
+
+Con lo que ya hay solo sale el denominador de abajo: cuántas recetas se publican por día o por semana,
+agrupando por `fechaPublicacion`. Todo lo demás necesita instrumentación.
+
+#### Qué habría que añadir para cada número
+
+**Empezados que acaban publicados.** Es el único que exige un evento nuevo de verdad, porque el
+abandono ocurre entero en el cliente. Haría falta un `POST /api/metricas/eventos` con `requerirAuth`
+que reciba `formulario_iniciado` la primera vez que el usuario escribe algo (el primer
+`guardarBorrador` con contenido, no al montar la página, o contaría a quien entra a curiosear). El
+evento lleva un `sesionFormulario` (un uuid que se genera en ese momento y se guarda junto al
+borrador) y el modo, asistente o «desde descripción (IA)», para no mezclar los dos caminos. Al
+publicar, el cliente manda el mismo `sesionFormulario` en el body de `POST /recetas` y la receta lo
+guarda. El ratio es sesiones con receta entre sesiones iniciadas. Sin el uuid se puede aproximar
+contando eventos contra recetas por usuario y día, pero se descuadra en cuanto alguien retoma un
+borrador de ayer.
+
+**Tiempo medio.** No hace falta evento propio si se hace lo anterior: basta con que el store guarde un
+`iniciadoEn` que se fije una vez y no se pise (lo contrario de `guardadoEn`), y que viaje al publicar.
+La receta guarda `iniciadoEn` y el tiempo es `fechaPublicacion - iniciadoEn`. Conviene la mediana, no la
+media: un borrador olvidado una semana y retomado después se come cualquier media. Y hay que tratar
+aparte los retomados, que el formulario ya distingue: al montar recupera el borrador y marca
+`borradorRecuperado`, así que basta con mandar ese booleano junto a `iniciadoEn`.
+
+**Editadas en la hora siguiente.** Este sí sale casi solo de Mongo con un cambio pequeño: que
+`actualizar()` apunte la fecha de cada edición. Lo mínimo es un `ultimaEdicion` en el `$set`, pero así
+solo se ve la última y una receta editada a los diez minutos y otra vez al mes desaparece del número.
+Mejor un array `ediciones: [Date]` con `$push`, o activar `timestamps` y además guardar
+`primeraEdicion` con `$min`. La consulta es recetas con alguna edición a menos de 60 minutos de
+`fechaPublicacion`, entre recetas publicadas. Las recetas ya existentes no tienen ese dato y no se
+puede reconstruir: el número empieza a contar el día que se despliegue.
+
+#### Qué no hace falta
+
+Una herramienta de analítica de terceros. Tres números caben en una colección `eventos` con índice por
+`tipo` y fecha, y el único evento que no se puede derivar de Mongo es `formulario_iniciado`. Meter
+PostHog o similar trae banner de cookies y un tercero viendo lo que escribe la gente en sus recetas,
+por un solo evento. `sesionFormulario` e `iniciadoEn` pasan por `esquemaCrearRecetaBody`, que hoy
+descarta los campos que no conoce, así que hay que declararlos ahí. Y los tests de la colección nueva
+van contra el Mongo efímero, como todos.
+
+Lo que sí hay que hacer antes de tocar el formulario es desplegar esto y dejarlo correr unas semanas.
+Sin una cifra de partida con el asistente actual, los números del formulario nuevo no se pueden
+comparar con nada.
+
 ---
 
 ## Referencias
