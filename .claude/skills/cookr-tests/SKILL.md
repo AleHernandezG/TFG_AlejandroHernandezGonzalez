@@ -17,7 +17,8 @@ description: Escribir y ejecutar pruebas en Cookr (Jest + Supertest + mongodb-me
 | `tests/feed.alergenos.test.ts` | Alérgenos del feed: query, perfil y la unión de ambos (12 casos) |
 | `tests/feed.filtros.test.ts` | `dietas` × `categoria` y `excluirPropio` × `soloSiguiendo` (7 casos) |
 | `tests/upstashStore.test.ts` | El store de Redis del rate limiting, contra un Redis falso (5 casos) |
-| `tests/setup.ts` | Mongo efímero, limpieza, reinicio de limitadores |
+| `tests/globalSetup.ts` / `globalTeardown.ts` | Un solo Mongo efímero para toda la ejecución |
+| `tests/setup.ts` | Una base de datos por fichero, limpieza, reinicio de limitadores |
 | `tests/helpers/factories.ts` | `crearUsuario`, `crearReceta`, `tokenDe`, tokens de verificación y recuperación |
 
 **El frontend no tiene tests unitarios**, pero **sí hay E2E con Playwright** desde el 17/07/2026: `frontend/e2e/`, dos casos (registro → verificación → login → crear receta, y el rechazo de login sin verificar). Detalle abajo.
@@ -97,7 +98,7 @@ expect(mockVerificacion).toHaveBeenCalledWith("nuevo@cookr.dev", "Alejandro", ex
 - **Los limitadores son estado global en memoria.** `tests/setup.ts` llama a `reiniciarLimitesAuth()` en cada `afterEach`. Si escribes un test que hace muchos logins o registros y ves 429 inesperados, es eso. No borres esa llamada ni el export de `rateLimitAuth.ts`.
 - **Jest aísla los módulos por fichero**, así que los limitadores y sus cupos no se filtran entre ficheros, pero sí entre tests del mismo fichero sin el reinicio.
 - **morgan está callado** con `NODE_ENV === "test"` (`app.ts`). Si lo quitas, la salida de `npm test` se vuelve ilegible.
-- **Mongo se levanta por fichero de test**, no por proceso. Añadir ficheros cuesta segundos, no décimas.
+- **Mongo se levanta una vez por ejecución** y cada fichero trabaja en su propia base de datos, así que los ficheros no se ven entre sí. Con un servidor por fichero, dos workers podían elegir el mismo puerto a la vez y el CI fallaba al azar.
 
 ## Lo que fija `feed.alergenos.test.ts`, y por qué no se toca a la ligera
 

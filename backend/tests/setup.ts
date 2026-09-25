@@ -1,4 +1,4 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { randomUUID } from "crypto";
 import mongoose from "mongoose";
 import { reiniciarLimitesAuth } from "../src/middlewares/rateLimitAuth";
 import { reiniciarAlmacenIA } from "../src/lib/almacenIA";
@@ -6,11 +6,12 @@ import { reiniciarAlmacenIA } from "../src/lib/almacenIA";
 process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-solo-para-tests";
 process.env.FRONTEND_URL = "http://localhost:3000";
 
-let mongo: MongoMemoryServer;
-
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
-  await mongoose.connect(mongo.getUri());
+  const uri = process.env.MONGO_URI_TESTS;
+  if (!uri) {
+    throw new Error("Falta MONGO_URI_TESTS: tests/globalSetup.ts no ha arrancado el Mongo de pruebas");
+  }
+  await mongoose.connect(uri, { dbName: `test-${randomUUID()}` });
 });
 
 afterEach(async () => {
@@ -24,6 +25,8 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.dropDatabase();
+  }
   await mongoose.disconnect();
-  await mongo.stop();
 });

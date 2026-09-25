@@ -63,12 +63,12 @@ cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 215 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 247 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
 - **`tsconfig.test.json` existe por un motivo.** `tsconfig.json` tiene `rootDir: ./src` e `include: ["src/**/*"]`, así que no puede compilar `tests/`. De ahí que `npm run lint` **no** typechequee los tests: de eso se encarga ts-jest al ejecutarlos, o `npx tsc --noEmit -p tsconfig.test.json` a mano.
-- **`tests/setup.ts` levanta un Mongo efímero** por fichero, vacía las colecciones en cada `afterEach` y **reinicia los limitadores de auth**. Nunca apuntes las pruebas a Atlas.
+- **Hay un solo Mongo efímero para toda la ejecución**, que arranca `tests/globalSetup.ts`. `tests/setup.ts` conecta cada fichero a su propia base de datos (`test-<uuid>`), vacía las colecciones en cada `afterEach`, **reinicia los limitadores de auth** y borra la base al acabar. Antes cada fichero levantaba su propio servidor y en el CI dos workers se pisaban el puerto (`Port already in use`). Nunca apuntes las pruebas a Atlas.
 - **Importa `app` de `src/app.ts`, nunca `server.ts`**: el segundo abre el puerto y conecta a Mongo de verdad.
 - **Mockea siempre los servicios externos** (`lib/email.ts`, `lib/cloudinary.ts`, `chatService.ts`, `imagenService.ts`, `nutritionService.ts`, `ingredientesService.ts`). Ninguna prueba debe gastar cuota real de Gemini, Mailjet ni Pexels, ni borrar nada en Cloudinary: crear, editar y borrar recetas llama a `eliminarImagen`.
 
