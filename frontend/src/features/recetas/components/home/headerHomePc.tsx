@@ -27,7 +27,7 @@ export function HeaderHomePc({
     filtrosAvanzados.alergenos.length
 
   return (
-    <header className="bg-background/80 fixed left-0 right-0 top-0 z-50 hidden h-20 items-center px-8 shadow-[0px_4px_24px_var(--foreground)_/_0.05] backdrop-blur-md lg:grid lg:grid-cols-3">
+    <header className="bg-background/80 fixed left-0 right-0 top-0 z-50 hidden h-20 items-center px-8 shadow-[0px_4px_24px_color-mix(in_oklab,var(--foreground)_5%,transparent)] backdrop-blur-md lg:grid lg:grid-cols-3">
       {/* Logo */}
       <span className="justify-self-start text-2xl font-black uppercase tracking-widest text-brand">
         Cookr
@@ -45,7 +45,7 @@ export function HeaderHomePc({
             placeholder="Buscar recetas..."
             value={busqueda}
             onChange={(e) => onBuscar(e.target.value)}
-            className="focus:ring-brand/20 w-64 rounded-full bg-muted py-2 pl-5 pr-10 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground focus:ring-2"
+            className="focus:ring-brand/20 w-64 rounded-full bg-muted py-2 pl-5 pr-10 text-sm text-foreground outline-hidden transition-all placeholder:text-muted-foreground focus:ring-2"
           />
         </div>
 

@@ -26,12 +26,12 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
   return (
     <div className="flex w-full justify-start gap-2">
       {/* Avatar IA */}
-      <div className="mt-auto flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-subtle)]">
+      <div className="mt-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-(--brand-subtle)">
         <ChefHat className="h-4 w-4 text-brand" />
       </div>
 
       <div className="flex max-w-[85%] flex-col items-start gap-1">
-        <div className="rounded-2xl rounded-tl-sm border border-border/15 bg-card px-5 py-4 shadow-[0px_4px_12px_oklch(0.22_0.02_50_/_0.03)]">
+        <div className="rounded-2xl rounded-tl-sm border border-border/15 bg-card px-5 py-4 shadow-[0px_4px_12px_oklch(0.22_0.02_50/0.03)]">
           <div className="prose-chat text-sm leading-relaxed text-foreground">
             <ReactMarkdown
               components={{
@@ -63,7 +63,7 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
           </span>
           <button
             onClick={handleCopiar}
-            className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-[var(--warm-bg)] hover:text-brand"
+            className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-(--warm-bg) hover:text-brand"
           >
             {copiado ? (
               <><Check className="h-3.5 w-3.5" />Copiado</>
@@ -76,7 +76,7 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
             className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors ${
               liked
                 ? 'text-brand'
-                : 'text-muted-foreground hover:bg-[var(--warm-bg)] hover:text-brand'
+                : 'text-muted-foreground hover:bg-(--warm-bg) hover:text-brand'
             }`}
           >
             <ThumbsUp className="h-3.5 w-3.5" />

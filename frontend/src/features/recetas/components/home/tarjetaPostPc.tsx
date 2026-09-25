@@ -118,10 +118,10 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   // ── Hero (col-span-2 row-span-2) ──────────────────────────────
   if (variante === 'hero') {
     return (
-      <article className="group relative col-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <article className="group relative col-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
         {/* Overlay link — cubre toda la tarjeta; los botones quedan por encima con z-10 */}
         <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
-        <div className="relative min-h-[16rem] flex-1 overflow-hidden">
+        <div className="relative min-h-64 flex-1 overflow-hidden">
           <Image
             src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={post.receta.titulo}
@@ -166,7 +166,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   // ── Wide (col-span-2, horizontal) ─────────────────────────────
   if (variante === 'wide') {
     return (
-      <article className="group relative col-span-2 flex min-h-[220px] overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <article className="group relative col-span-2 flex min-h-[220px] overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
         <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
         <div className="relative w-1/2 overflow-hidden">
           <Image
@@ -208,9 +208,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
 
   // ── Small (col-span-1, default) ───────────────────────────────
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
       <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
-      <div className="relative min-h-[12rem] flex-1 overflow-hidden">
+      <div className="relative min-h-48 flex-1 overflow-hidden">
         <Image
           src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
           alt={post.receta.titulo}

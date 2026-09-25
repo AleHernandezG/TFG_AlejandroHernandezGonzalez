@@ -13,12 +13,12 @@ export function BurbujaUsuario({ contenido, timestamp, imagen }: Props) {
     <div className="flex w-full justify-end">
       <div className="flex max-w-[85%] flex-col items-end gap-1">
         {imagen && (
-          <div className="overflow-hidden rounded-2xl rounded-tr-sm shadow-sm">
+          <div className="overflow-hidden rounded-2xl rounded-tr-sm shadow-xs">
             <img src={imagen} alt="Imagen adjunta" className="max-h-48 w-auto object-cover" />
           </div>
         )}
         {contenido && (
-          <div className="rounded-2xl rounded-tr-sm bg-brand px-5 py-3 shadow-sm">
+          <div className="rounded-2xl rounded-tr-sm bg-brand px-5 py-3 shadow-xs">
             <p className="text-sm leading-relaxed text-brand-foreground">{contenido}</p>
           </div>
         )}

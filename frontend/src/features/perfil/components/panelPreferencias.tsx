@@ -66,7 +66,7 @@ export function PanelPreferencias({ onGuardado }: Props) {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                   activo
                     ? 'bg-brand text-brand-foreground'
-                    : 'bg-[var(--warm-bg)] text-foreground/80 hover:bg-[var(--warm-bg-accent)]'
+                    : 'bg-(--warm-bg) text-foreground/80 hover:bg-(--warm-bg-accent)'
                 }`}
               >
                 {dieta.label}
@@ -92,7 +92,7 @@ export function PanelPreferencias({ onGuardado }: Props) {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                   activo
                     ? 'bg-destructive/10 text-destructive border border-destructive/20'
-                    : 'bg-[var(--warm-bg)] text-foreground/80 hover:bg-[var(--warm-bg-accent)]'
+                    : 'bg-(--warm-bg) text-foreground/80 hover:bg-(--warm-bg-accent)'
                 }`}
               >
                 <Image
@@ -100,7 +100,7 @@ export function PanelPreferencias({ onGuardado }: Props) {
                   alt=""
                   width={14}
                   height={14}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 />
                 {alergeno.label}
               </button>

@@ -175,7 +175,7 @@ export function FormularioRegistro() {
                 <button
                   type="button"
                   onClick={() => setMostrarContrasena((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden"
                   aria-label={mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {mostrarContrasena ? (
@@ -208,7 +208,7 @@ export function FormularioRegistro() {
                 <button
                   type="button"
                   onClick={() => setMostrarConfirmacion((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden"
                   aria-label={
                     mostrarConfirmacion ? "Ocultar contraseña" : "Mostrar contraseña"
                   }

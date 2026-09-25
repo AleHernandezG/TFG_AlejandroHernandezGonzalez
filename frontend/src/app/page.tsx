@@ -14,7 +14,7 @@ const contenedor = {
 
 export default function PaginaInicio() {
   return (
-    <main className="relative min-h-screen bg-[var(--warm-bg)]">
+    <main className="relative min-h-screen bg-(--warm-bg)">
       
       <SeccionHero />
       

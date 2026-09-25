@@ -552,6 +552,112 @@ En el repaso, el panel nutricional sale con «No hemos podido estimarla ahora»,
 La lección es incómoda: un E2E que no bloquea nada solo sirve si alguien lo mira. Cualquier cambio en
 la entrada de `/crear-receta` pide lanzar `npm run e2e` antes del commit.
 
+### El paso a producción, el 25/09/2026
+
+`develop` llevaba 25 commits por delante de `main`, todo el asistente incluido, y entró en dos PR
+porque el primero no llegó a desplegar.
+
+**El PR #36 se mergeó y el deploy no salió.** En el push a `main` falló `escrituras.concurrentes`:
+dos likes simultáneos del mismo usuario dejaban el array en un estado que el test no aceptaba. No era
+el test. `toggleLike` y `toggleGuardado` leían el documento, miraban si el id estaba y después
+escribían `$addToSet` o `$pull`. Entre la lectura y la escritura cabe otra petición, las dos ven lo
+mismo y las dos hacen lo mismo, así que un doble clic podía acabar en un like que el usuario creía
+haber quitado. El job `deploy` depende de `ci-backend` y Render se quedó con el código de antes, que
+es justo lo que tiene que pasar.
+
+Ahora cada toggle es **un solo** `findByIdAndUpdate` con pipeline: `alternarEnArray()` monta un
+`$cond` que quita el id con `$filter` si está y lo añade con `$concatArrays` si no. Mongo lo aplica
+atómicamente por documento, así que dos toggles a la vez valen lo mismo que dos seguidos, y la
+respuesta sale del documento ya escrito, no de lo que se leyó antes. Los tests cambiaron de
+expectativa en consecuencia: dos likes simultáneos devuelven `liked` `true` y `false` y dejan el array
+vacío, y nueve seguidos dejan exactamente un like.
+
+**El PR del arreglo tampoco pasó, por otra cosa.** `feed.indices.test.ts` reventaba con `Port "37475"
+already in use`: cada fichero levantaba su propio `MongoMemoryServer`, varios workers de Jest pedían
+puerto a la vez y alguno se lo pisaba a otro. En local, con menos núcleos, no salía nunca. Ya había
+pasado el 16/09 en bd07a7c y se tomó por mala suerte. Ahora `tests/globalSetup.ts` arranca un único
+Mongo por ejecución, lo deja en `MONGO_URI_TESTS`, y `tests/setup.ts` conecta cada fichero a su
+propia base `test-<uuid>`, que tira en el `afterAll`. Sigue sin haber estado compartido entre
+ficheros y la suite baja a unos 6 s con tres workers. Se pasó nueve veces seguidas, con 3 y con 19
+workers, las nueve con 247 de 247.
+
+De paso, el test del ReDoS en `feed.filtros` exigía responder en menos de un segundo, y en un runner
+de GitHub cargado eso no es una garantía de nada. El umbral sube a 5 s: una expresión catastrófica
+sin escapar tarda minutos, así que sigue distinguiendo el fallo real del ruido.
+
+El PR #38 entró a las 19:01. Render sirve el código nuevo (`POST /api/recetas/macros-preview` sin
+token responde 401, y en el `main` anterior esa ruta no existía) y Vercel despliega por su cuenta.
+
+La lección: un test inestable en el backend no es una molestia, es un deploy bloqueado. Si un test
+falla solo en el CI, se investiga ese día, no se relanza el job.
+
+### Tailwind 4, hecho el 25/09/2026 en la rama `tailwind-4`
+
+El problema del tema que salió con `brand` y con `destructive` era más grande de lo que parecía.
+Tailwind 3.4 no sabe aplicar opacidad a un color definido como `var(--x)` con oklch, así que cualquier
+`bg-brand/10`, `border-border/50` o `ring-ring/50` no generaba ninguna regla. Contadas, eran unas 284
+clases muertas repartidas en 13 tokens, con `brand` (100), `border` (54) y `destructive` (51) a la
+cabeza. Lo que más se notaba era el anillo de foco: `focus:ring-brand/40` no existía y Tailwind ponía
+su color por defecto, que es azul.
+
+Debajo había otra cosa. `components/ui/` es shadcn en estilo `radix-nova`, escrito para Tailwind 4:
+`data-open:`, `in-data-`, `has-data-`, `ring-3`, `backdrop-blur-xs`, `bg-(--var)` y las animaciones
+`animate-in` de `tw-animate-css`, que estaba instalado pero nadie importaba. En v3 todo eso también
+era CSS que no existía, así que diálogos, *sheets* y *drawers* abrían sin animación y con estados a
+medias.
+
+**Por qué v4 y no canales.** La alternativa era quedarse en v3 y escribir los tokens como canales
+(`--brand: 0.55 0.14 55` con `oklch(var(--brand) / <alpha-value>)` en el config). Funciona, está
+comprobado con el CLI, pero obliga a reescribir los 13 tokens en claro y en oscuro, a rediseñar
+`--border` e `--input` en oscuro porque llevan el alfa dentro, y deja muertas las variantes de v4 de
+shadcn. v4 resuelve la opacidad con `color-mix()` sobre cualquier color, así que los tokens se quedan
+como estaban.
+
+**Qué se hizo.** `npx @tailwindcss/upgrade` pasó `tailwind.config.ts` a un bloque `@theme` en
+`globals.css`, cambió PostCSS a `@tailwindcss/postcss` y renombró clases en 86 ficheros:
+`shadow-sm` → `shadow-xs`, `outline-none` → `outline-hidden`, `flex-shrink-0` → `shrink-0`,
+`bg-gradient-to-*` → `bg-linear-to-*` y `bg-[var(--x)]` → `bg-(--x)`, entre otras.
+
+El codemod se equivocó en `components/ui/`: trató ese código como si fuera de v3, invirtió el orden de
+las variantes apiladas (`*:data-[slot=avatar]:ring-2` pasó a `data-[slot=avatar]:*:ring-2`, que en v4
+selecciona otra cosa) y renombró sombras que ya eran de v4. Esa carpeta se devolvió entera a como
+estaba. Si algún día se vuelve a pasar el codemod, hay que excluirla.
+
+Lo demás, a mano:
+
+- `@theme inline` en vez de `@theme`, como lo monta shadcn, para que los colores apunten a los tokens
+  sin copiarlos a `:root`. De paso desaparece un `--font-sans: var(--font-sans)` que el codemod dejaba
+  como referencia circular.
+- `@custom-variant dark (&:is(.dark *))`. Nadie pone la clase `.dark`, así que los tokens oscuros nunca
+  se aplicaron, pero en v3 `dark:` iba por `prefers-color-scheme` y con el sistema en oscuro se colaban
+  clases oscuras sobre tokens claros. Ahora `dark:` y los tokens van por el mismo sitio. Encender el
+  modo oscuro, si algún día se quiere, es poner `.dark` en el `<html>`.
+- `@import 'tw-animate-css'`, así que diálogos, *sheets* y *drawers* ya animan al abrir y al cerrar.
+- `cursor: pointer` en botones y `[role=button]` en la capa base, porque v4 los deja con cursor por
+  defecto.
+- El bloque de compatibilidad de bordes que añade el codemod sobra, porque `* { @apply border-border }`
+  ya pone el color.
+- `headerHomePc.tsx` tenía `shadow-[0px_4px_24px_var(--foreground)_/_0.05]`, que tampoco era CSS válido
+  en v3. Pasa a `color-mix(in_oklab,var(--foreground)_5%,transparent)`.
+- `components.json` deja de apuntar a `tailwind.config.ts` (`"config": ""`) y `.prettierrc` apunta el
+  plugin de Tailwind 0.8 a `globals.css` con `tailwindStylesheet`.
+
+**Comprobado.** `next build`, `tsc`, lint (los tres avisos de `img` de siempre) y el E2E, 2 de 2. En
+el CSS generado aparecen `ring-brand/40`, `bg-brand/10`, `border-border/50`, `data-open:animate-in`,
+`ring-3` y `backdrop-blur-xs`. En el navegador, con `pruebas:ui` y `next dev --turbo`, se repasaron
+login, completar perfil, Discover con el *drawer* de filtros, el asistente en escritorio y a 390 px,
+perfil, colección y el detalle de una receta. El anillo del título en el paso de datos mide
+`oklab(0.55 0.08 0.11 / 0.4)`: el naranja de la marca al 40 %, no el azul.
+
+Cambios que se ven, y son a propósito: el anillo de foco en naranja, el tramo ya completado de la
+barra de progreso del asistente con su tinte suave, los chips de alérgenos con fondo rojo claro y los
+diálogos con animación.
+
+**Avisos.** v4 pide Safari 16.4, Chrome 111 o Firefox 128 como mínimo. En un navegador sin
+`color-mix()`, las clases con opacidad caen al color sólido: un `bg-brand/10` se pinta `brand` entero.
+Y `hover:` solo se aplica en dispositivos con puntero, así que en móvil ya no se quedan estados de
+*hover* pegados después de tocar.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
@@ -614,6 +720,64 @@ Si se hace, conviene saber si sirvió. Tres números, todos sacables de la propi
 formularios empezados acaban publicados, cuánto se tarda de media, y cuántas recetas se editan en la
 hora siguiente a publicarlas (esa última es la que dice si el autor vio venir el resultado o se llevó
 una sorpresa).
+
+#### Qué hay hoy para sacarlos (revisado el 25/09/2026)
+
+Poco. Mongo solo sabe de lo que llega a publicarse, y ni siquiera guarda cuándo se toca después:
+
+- `Receta` tiene `fechaPublicacion` y nada más. El esquema no lleva `timestamps`, así que no hay
+  `updatedAt`, ni historial, ni estado de borrador.
+- `recetaRepository.actualizar()` hace un `findByIdAndUpdate` con `$set` de los campos que cambian y
+  no deja rastro de la fecha.
+- El borrador del asistente vive solo en el `localStorage` del navegador (`cookr-borrador-receta`,
+  vía `persist` de Zustand). El servidor no se entera de que alguien ha abierto el formulario hasta
+  que publica. Y el `guardadoEn` que acompaña al borrador se pisa en cada guardado, así que es la
+  hora del último cambio, no la del primero.
+- No hay ninguna herramienta de analítica instalada, ni en el frontend ni en el backend.
+
+Con lo que ya hay solo sale el denominador de abajo: cuántas recetas se publican por día o por semana,
+agrupando por `fechaPublicacion`. Todo lo demás necesita instrumentación.
+
+#### Qué habría que añadir para cada número
+
+**Empezados que acaban publicados.** Es el único que exige un evento nuevo de verdad, porque el
+abandono ocurre entero en el cliente. Haría falta un `POST /api/metricas/eventos` con `requerirAuth`
+que reciba `formulario_iniciado` la primera vez que el usuario escribe algo (el primer
+`guardarBorrador` con contenido, no al montar la página, o contaría a quien entra a curiosear). El
+evento lleva un `sesionFormulario` (un uuid que se genera en ese momento y se guarda junto al
+borrador) y el modo, asistente o «desde descripción (IA)», para no mezclar los dos caminos. Al
+publicar, el cliente manda el mismo `sesionFormulario` en el body de `POST /recetas` y la receta lo
+guarda. El ratio es sesiones con receta entre sesiones iniciadas. Sin el uuid se puede aproximar
+contando eventos contra recetas por usuario y día, pero se descuadra en cuanto alguien retoma un
+borrador de ayer.
+
+**Tiempo medio.** No hace falta evento propio si se hace lo anterior: basta con que el store guarde un
+`iniciadoEn` que se fije una vez y no se pise (lo contrario de `guardadoEn`), y que viaje al publicar.
+La receta guarda `iniciadoEn` y el tiempo es `fechaPublicacion - iniciadoEn`. Conviene la mediana, no la
+media: un borrador olvidado una semana y retomado después se come cualquier media. Y hay que tratar
+aparte los retomados, que el formulario ya distingue: al montar recupera el borrador y marca
+`borradorRecuperado`, así que basta con mandar ese booleano junto a `iniciadoEn`.
+
+**Editadas en la hora siguiente.** Este sí sale casi solo de Mongo con un cambio pequeño: que
+`actualizar()` apunte la fecha de cada edición. Lo mínimo es un `ultimaEdicion` en el `$set`, pero así
+solo se ve la última y una receta editada a los diez minutos y otra vez al mes desaparece del número.
+Mejor un array `ediciones: [Date]` con `$push`, o activar `timestamps` y además guardar
+`primeraEdicion` con `$min`. La consulta es recetas con alguna edición a menos de 60 minutos de
+`fechaPublicacion`, entre recetas publicadas. Las recetas ya existentes no tienen ese dato y no se
+puede reconstruir: el número empieza a contar el día que se despliegue.
+
+#### Qué no hace falta
+
+Una herramienta de analítica de terceros. Tres números caben en una colección `eventos` con índice por
+`tipo` y fecha, y el único evento que no se puede derivar de Mongo es `formulario_iniciado`. Meter
+PostHog o similar trae banner de cookies y un tercero viendo lo que escribe la gente en sus recetas,
+por un solo evento. `sesionFormulario` e `iniciadoEn` pasan por `esquemaCrearRecetaBody`, que hoy
+descarta los campos que no conoce, así que hay que declararlos ahí. Y los tests de la colección nueva
+van contra el Mongo efímero, como todos.
+
+Lo que sí hay que hacer antes de tocar el formulario es desplegar esto y dejarlo correr unas semanas.
+Sin una cifra de partida con el asistente actual, los números del formulario nuevo no se pueden
+comparar con nada.
 
 ---
 

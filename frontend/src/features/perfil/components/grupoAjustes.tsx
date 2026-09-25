@@ -11,7 +11,7 @@ export function GrupoAjustes({ titulo, children }: Props) {
       <h3 className="text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground px-1">
         {titulo}
       </h3>
-      <div className="bg-card rounded-2xl overflow-hidden shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <div className="bg-card rounded-2xl overflow-hidden shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
         {children}
       </div>
     </section>

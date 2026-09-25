@@ -83,7 +83,7 @@ export function DialogCambiarContrasena({ abierto, onCerrar }: Props) {
 
         {exito ? (
           <div className="flex flex-col items-center gap-4 py-6 text-center">
-            <CheckCircle2 size={48} className="text-[var(--chart-3)]" />
+            <CheckCircle2 size={48} className="text-(--chart-3)" />
             <p className="text-sm font-medium text-foreground">
               ¡Contraseña actualizada correctamente!
             </p>

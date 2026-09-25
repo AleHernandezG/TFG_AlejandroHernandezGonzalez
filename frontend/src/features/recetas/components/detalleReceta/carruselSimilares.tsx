@@ -54,7 +54,7 @@ export function CarruselSimilares({ recetas }: Props) {
               <div className="flex items-center gap-1.5">
                 <Avatar className="h-5 w-5 shrink-0">
                   <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />
-                  <AvatarFallback className="bg-[var(--warm-bg)] text-[8px]">
+                  <AvatarFallback className="bg-(--warm-bg) text-[8px]">
                     {post.autor.nombre.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

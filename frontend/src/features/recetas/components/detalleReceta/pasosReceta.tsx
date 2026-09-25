@@ -20,7 +20,7 @@ export function PasosReceta({ pasos }: Props) {
         {soportado && !activo && (
           <button
             onClick={() => iniciar(pasos)}
-            className="flex items-center gap-1.5 bg-[var(--brand-subtle)] text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
           >
             <Headphones size={14} />
             Modo manos libres
@@ -87,7 +87,7 @@ export function PasosReceta({ pasos }: Props) {
                 className={`shrink-0 h-8 w-8 flex items-center justify-center rounded-full font-black text-sm border transition-colors ${
                   activo && i === pasoActual
                     ? 'bg-brand text-brand-foreground border-brand'
-                    : 'bg-[var(--brand-subtle)] text-brand border-brand/20'
+                    : 'bg-(--brand-subtle) text-brand border-brand/20'
                 }`}
               >
                 {i + 1}

@@ -46,7 +46,7 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
             value={query}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Busca recetas, chefs, ingredientes…"
-            className="w-full rounded-full bg-[var(--warm-bg-accent)] py-3 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
+            className="w-full rounded-full bg-(--warm-bg-accent) py-3 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-brand/30"
           />
           {buscando && (
             <button
@@ -69,7 +69,7 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
               'relative flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-3 text-xs font-semibold transition-colors',
               totalActivos > 0
                 ? 'border-brand bg-brand/10 text-brand'
-                : 'border-border bg-[var(--warm-bg-accent)] text-muted-foreground',
+                : 'border-border bg-(--warm-bg-accent) text-muted-foreground',
             )}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={2} />

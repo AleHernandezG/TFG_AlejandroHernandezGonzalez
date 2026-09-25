@@ -46,7 +46,7 @@ export function SeccionHero() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: 'easeInOut' }}
-            className={`absolute inset-0 bg-gradient-to-br ${slidesHero[slideActivo].gradiente}`}
+            className={`absolute inset-0 bg-linear-to-br ${slidesHero[slideActivo].gradiente}`}
           >
             <Image
               src={slidesHero[slideActivo].imageUrl}
@@ -66,7 +66,7 @@ export function SeccionHero() {
           2. Gradiente bottom-up — refuerza extra en la zona del texto central
         */}
         <div className="absolute inset-0 bg-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/10" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/25 to-black/10" />
       </div>
 
       {/* ── Aria live para lectores de pantalla ───────────── */}
@@ -82,7 +82,7 @@ export function SeccionHero() {
         className="relative z-10 flex w-full max-w-4xl flex-col items-center px-6 text-center md:px-12"
       >
         {/* Titular principal
-            Tipografía A+D: texto blanco puro + drop-shadow fuerte.
+            Tipografía A+D: texto blanco puro + drop-shadow-sm fuerte.
             "cocinando" y "Cookr" en naranja sólido (bg-clip-text pierde contraste sobre oscuro).
         */}
         <motion.h1
@@ -146,7 +146,7 @@ export function SeccionHero() {
           <Button
             asChild
             variant="outline"
-            className="border-white/25 bg-white/10 hover:bg-white/20 h-11 w-full rounded-full px-8 text-base text-white backdrop-blur-sm transition-all hover:scale-105 sm:h-12 sm:w-auto sm:min-w-[200px] sm:px-10 lg:h-14 lg:min-w-[220px] lg:px-12 lg:text-lg"
+            className="border-white/25 bg-white/10 hover:bg-white/20 h-11 w-full rounded-full px-8 text-base text-white backdrop-blur-xs transition-all hover:scale-105 sm:h-12 sm:w-auto sm:min-w-[200px] sm:px-10 lg:h-14 lg:min-w-[220px] lg:px-12 lg:text-lg"
           >
             <Link href="/login">Ya tengo cuenta</Link>
           </Button>

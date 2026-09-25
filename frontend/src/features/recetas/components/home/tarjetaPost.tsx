@@ -60,7 +60,7 @@ export function TarjetaPost({ post }: TarjetaPostProps) {
 
       {/* Imagen + contenido clickable → DetalleReceta */}
       <Link href={`/recetas/${post.id}`} className="block">
-        <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[var(--warm-bg-accent)]">
+        <div className="relative mb-3 aspect-4/3 w-full overflow-hidden rounded-2xl bg-(--warm-bg-accent)">
           <Image
             src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={post.receta.titulo}

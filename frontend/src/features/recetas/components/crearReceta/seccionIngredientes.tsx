@@ -29,7 +29,7 @@ export function SeccionIngredientes() {
   }
 
   return (
-    <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+    <section className="bg-(--warm-bg-accent) rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
       <h2 className="text-base font-extrabold text-foreground mb-4">Ingredientes</h2>
 
       <div className="space-y-3">
@@ -55,7 +55,7 @@ export function SeccionIngredientes() {
                       onBlur={(e) => { rhfOnBlur(e); setTimeout(() => setInputActivo(null), 150) }}
                       placeholder="Ej. Harina de trigo"
                       autoComplete="off"
-                      className="w-full h-12 bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none"
+                      className="w-full h-12 bg-transparent text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-hidden"
                     />
                   </div>
                   {fields.length > 1 && (
@@ -85,7 +85,7 @@ export function SeccionIngredientes() {
                       inputMode="decimal"
                       className={[
                         'w-full h-10 bg-transparent text-sm text-foreground',
-                        'placeholder:text-muted-foreground focus:outline-none',
+                        'placeholder:text-muted-foreground focus:outline-hidden',
                         errors.ingredientes?.[i]?.cantidad ? 'text-destructive' : '',
                       ].join(' ')}
                     />
@@ -98,7 +98,7 @@ export function SeccionIngredientes() {
                       {...register(`ingredientes.${i}.unidad`)}
                       aria-label={`Unidad del ingrediente ${i + 1}`}
                       className={[
-                        'w-full h-10 bg-transparent text-sm text-foreground focus:outline-none',
+                        'w-full h-10 bg-transparent text-sm text-foreground focus:outline-hidden',
                         errors.ingredientes?.[i]?.unidad ? 'text-destructive' : '',
                       ].join(' ')}
                     >

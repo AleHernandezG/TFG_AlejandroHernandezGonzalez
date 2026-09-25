@@ -27,7 +27,7 @@ export function NutricionPrevisualizacion({ macros, calculando }: Props) {
       <p className="mb-4 text-xs text-muted-foreground">{subtitulo}</p>
       <div className="grid grid-cols-2 gap-3">
         {CAMPOS.map(({ clave, label, unidad }) => (
-          <div key={clave} className="flex flex-col gap-0.5 rounded-2xl bg-[var(--warm-bg)] p-4 shadow-sm">
+          <div key={clave} className="flex flex-col gap-0.5 rounded-2xl bg-(--warm-bg) p-4 shadow-xs">
             <span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">{label}</span>
             {hayMacros ? (
               <span className="text-2xl font-extrabold leading-none text-foreground">

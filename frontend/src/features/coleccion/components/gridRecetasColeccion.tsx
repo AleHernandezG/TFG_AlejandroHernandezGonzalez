@@ -14,7 +14,7 @@ export function GridRecetasColeccion({ recetas, pestana }: Props) {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {pestana === 'mis-recetas' && (
           <Link href="/crear-receta" className="block">
-            <div className="aspect-[3/4] rounded-xl border-2 border-dashed border-brand/40 bg-brand/5 flex flex-col items-center justify-center gap-2 hover:bg-brand/10 hover:border-brand/60 transition-colors">
+            <div className="aspect-3/4 rounded-xl border-2 border-dashed border-brand/40 bg-brand/5 flex flex-col items-center justify-center gap-2 hover:bg-brand/10 hover:border-brand/60 transition-colors">
               <div className="w-11 h-11 rounded-full bg-brand/15 flex items-center justify-center">
                 <Plus className="w-5 h-5 text-brand" strokeWidth={2.5} />
               </div>

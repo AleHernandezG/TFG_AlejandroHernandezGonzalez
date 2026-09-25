@@ -91,7 +91,7 @@ export function FormularioNuevaContrasena({ token }: Props) {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
-              <CheckCircle2 className="h-14 w-14 text-[var(--chart-3)]" aria-hidden />
+              <CheckCircle2 className="h-14 w-14 text-(--chart-3)" aria-hidden />
             </motion.div>
             <div className="space-y-1.5">
               <h1 className="text-2xl font-bold tracking-tight">
@@ -179,7 +179,7 @@ export function FormularioNuevaContrasena({ token }: Props) {
                 <button
                   type="button"
                   onClick={() => setMostrarContrasena((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden"
                   aria-label={mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {mostrarContrasena ? (
@@ -212,7 +212,7 @@ export function FormularioNuevaContrasena({ token }: Props) {
                 <button
                   type="button"
                   onClick={() => setMostrarConfirmacion((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-hidden"
                   aria-label={mostrarConfirmacion ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {mostrarConfirmacion ? (

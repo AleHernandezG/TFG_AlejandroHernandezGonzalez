@@ -21,7 +21,7 @@ export function MetaPrevisualizacion({ tiempo, unidadTiempo, porciones, classNam
         </span>
       )}
       {hayPorciones && (
-        <span className="bg-[var(--warm-bg)] text-foreground/70 rounded-full px-3 py-1.5 text-xs font-bold">
+        <span className="bg-(--warm-bg) text-foreground/70 rounded-full px-3 py-1.5 text-xs font-bold">
           🍽 {porciones} {porciones === 1 ? 'porción' : 'porciones'}
         </span>
       )}

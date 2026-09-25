@@ -22,7 +22,7 @@ function ItemComentario({ c }: { c: Comentario }) {
     <li className="flex gap-3">
       <Avatar className="h-9 w-9 shrink-0 mt-0.5">
         <AvatarImage src={c.avatarUrl ?? undefined} alt={c.autorNombre} />
-        <AvatarFallback className="text-xs bg-[var(--warm-bg)] text-foreground font-semibold">
+        <AvatarFallback className="text-xs bg-(--warm-bg) text-foreground font-semibold">
           {c.autorNombre.slice(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
@@ -142,7 +142,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
         <div className="mb-5 flex gap-3 items-start">
           <Avatar className="h-8 w-8 shrink-0 mt-0.5">
             <AvatarImage src={session.user?.image ?? undefined} alt={session.user?.name ?? ''} />
-            <AvatarFallback className="text-xs bg-[var(--warm-bg)] text-foreground">
+            <AvatarFallback className="text-xs bg-(--warm-bg) text-foreground">
               {(session.user?.name ?? 'TU').slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -151,7 +151,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
               value={texto}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTexto(e.target.value)}
               placeholder="Añade un comentario..."
-              className="w-full resize-none text-sm rounded-2xl bg-[var(--warm-bg)] border-0 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground/60"
+              className="w-full resize-none text-sm rounded-2xl bg-(--warm-bg) border-0 px-3.5 py-2.5 outline-hidden focus:ring-1 focus:ring-brand placeholder:text-muted-foreground/60"
               rows={2}
               maxLength={500}
             />
@@ -254,7 +254,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
             <div className="border-t border-border/30 px-5 py-3 flex gap-3 items-start bg-background">
               <Avatar className="h-8 w-8 shrink-0 mt-0.5">
                 <AvatarImage src={session.user?.image ?? undefined} alt={session.user?.name ?? ''} />
-                <AvatarFallback className="text-xs bg-[var(--warm-bg)] text-foreground">
+                <AvatarFallback className="text-xs bg-(--warm-bg) text-foreground">
                   {(session.user?.name ?? 'TU').slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -263,7 +263,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
                   value={texto}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTexto(e.target.value)}
                   placeholder="Añade un comentario..."
-                  className="flex-1 resize-none text-sm rounded-2xl bg-[var(--warm-bg)] border-0 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-brand placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px]"
+                  className="flex-1 resize-none text-sm rounded-2xl bg-(--warm-bg) border-0 px-3.5 py-2.5 outline-hidden focus:ring-1 focus:ring-brand placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px]"
                   rows={1}
                   maxLength={500}
                 />

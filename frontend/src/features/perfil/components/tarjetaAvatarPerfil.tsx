@@ -28,8 +28,8 @@ export function TarjetaAvatarPerfil({ nombre, email, avatar }: Props) {
   const fotoMostrada = preview ?? avatar
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-[var(--warm-bg)] p-6 flex flex-col items-center shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--warm-bg-accent)] to-transparent opacity-40 pointer-events-none" />
+    <section className="relative overflow-hidden rounded-2xl bg-(--warm-bg) p-6 flex flex-col items-center shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
+      <div className="absolute inset-0 bg-linear-to-br from-(--warm-bg-accent) to-transparent opacity-40 pointer-events-none" />
 
       <input
         ref={inputRef}
@@ -49,7 +49,7 @@ export function TarjetaAvatarPerfil({ nombre, email, avatar }: Props) {
               className="w-full h-full rounded-full object-cover"
             />
           ) : (
-            <div className="w-full h-full rounded-full bg-[var(--warm-bg-accent)] flex items-center justify-center">
+            <div className="w-full h-full rounded-full bg-(--warm-bg-accent) flex items-center justify-center">
               <UserCircle2 size={40} className="text-muted-foreground" />
             </div>
           )}
@@ -57,7 +57,7 @@ export function TarjetaAvatarPerfil({ nombre, email, avatar }: Props) {
         <button
           onClick={() => inputRef.current?.click()}
           disabled={isPending}
-          className="absolute bottom-0 right-0 bg-card rounded-full p-1.5 shadow-sm border border-border text-muted-foreground hover:text-brand transition-colors disabled:opacity-60"
+          className="absolute bottom-0 right-0 bg-card rounded-full p-1.5 shadow-xs border border-border text-muted-foreground hover:text-brand transition-colors disabled:opacity-60"
           aria-label="Cambiar foto de perfil"
         >
           {isPending ? (

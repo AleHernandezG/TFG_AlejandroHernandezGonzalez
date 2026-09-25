@@ -36,13 +36,13 @@ export function VistaGenerarIa({ generando, error, hayContenido, onGenerar, onVo
   }
 
   return (
-    <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+    <section className="bg-(--warm-bg-accent) rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
       <textarea
         value={texto}
         onChange={(e) => { setTexto(e.target.value); setConfirmando(false) }}
         placeholder="Ej: Un risotto cremoso de setas con parmesano, para 4 personas, listo en 40 minutos..."
         rows={5}
-        className="w-full bg-background border border-border rounded-xl px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-brand/40"
+        className="w-full bg-background border border-border rounded-xl px-3.5 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-hidden focus:ring-2 focus:ring-brand/40"
       />
 
       {error && <p className="text-xs text-destructive mt-2">{error}</p>}

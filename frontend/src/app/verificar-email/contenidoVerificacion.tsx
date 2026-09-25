@@ -91,7 +91,7 @@ export function ContenidoVerificacion({ token }: Props) {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className="flex flex-col items-center gap-6"
               >
-                <CheckCircle2 className="h-14 w-14 text-[var(--chart-3)]" aria-hidden />
+                <CheckCircle2 className="h-14 w-14 text-(--chart-3)" aria-hidden />
                 <div className="space-y-1.5">
                   <h1 className="text-2xl font-bold tracking-tight">¡Correo verificado!</h1>
                   <p className="text-sm leading-relaxed text-muted-foreground">

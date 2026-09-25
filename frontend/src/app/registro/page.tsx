@@ -48,7 +48,7 @@ export default function PaginaRegistro() {
 
           {/* Marca — beige cálido: from-amber-100 to-amber-200 */}
           <h1
-            className="bg-gradient-to-br from-amber-100 to-amber-200 bg-clip-text font-black italic leading-none tracking-tight text-transparent"
+            className="bg-linear-to-br from-amber-100 to-amber-200 bg-clip-text font-black italic leading-none tracking-tight text-transparent"
             style={{
               fontSize: 'clamp(4rem, 5.5vw, 6.5rem)',
               filter:

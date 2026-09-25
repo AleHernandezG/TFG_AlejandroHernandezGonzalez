@@ -4,7 +4,7 @@ export default function CargandoDetalle() {
   return (
     <div className="min-h-screen bg-background">
       <Skeleton className="h-[400px] w-full" />
-      <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem] px-5 pt-8">
+      <div className="-mt-8 relative z-10 bg-background rounded-t-4xl px-5 pt-8">
         <div className="flex gap-2 mb-4">
           <Skeleton className="h-6 w-20 rounded-full" />
           <Skeleton className="h-6 w-16 rounded-full" />

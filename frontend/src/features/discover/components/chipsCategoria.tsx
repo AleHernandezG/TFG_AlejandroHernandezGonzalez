@@ -19,7 +19,7 @@ export function ChipsCategoria({ categorias, activa, onChange }: Props) {
             'shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors',
             cat === activa
               ? 'bg-brand text-brand-foreground'
-              : 'bg-[var(--warm-bg-accent)] text-muted-foreground hover:text-foreground',
+              : 'bg-(--warm-bg-accent) text-muted-foreground hover:text-foreground',
           ].join(' ')}
         >
           {cat}

@@ -187,7 +187,7 @@ export function FormularioCrearReceta() {
 
   return (
     <FormProvider {...methods}>
-      <div className="rounded-3xl bg-[var(--warm-bg)] p-8 text-center shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+      <div className="rounded-3xl bg-(--warm-bg) p-8 text-center shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-subtle">
           <NotebookPen size={26} className="text-brand" />
         </div>
