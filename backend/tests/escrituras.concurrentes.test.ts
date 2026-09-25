@@ -29,7 +29,7 @@ async function guardadasDe(usuarioId: string) {
 }
 
 describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
-  it("dos likes simultaneos del mismo usuario dejan una sola entrada", async () => {
+  it("dos likes simultaneos del mismo usuario valen lo mismo que dos seguidos", async () => {
     const usuario = await crearUsuario({ correo: "doble@cookr.dev" });
     const receta = await crearReceta({ titulo: "Disputada" });
     const token = tokenDe(usuario as never);
@@ -42,7 +42,8 @@ describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
 
     expect(a.status).toBe(200);
     expect(b.status).toBe(200);
-    expect(await likesDe(id)).toEqual([String(usuario._id)]);
+    expect([a.body.liked, b.body.liked].sort()).toEqual([false, true]);
+    expect(await likesDe(id)).toEqual([]);
   });
 
   it("dos usuarios dando like a la vez no se borran el uno al otro", async () => {
@@ -67,14 +68,12 @@ describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
     const token = tokenDe(usuario as never);
     const id = String(receta._id);
 
-    await Promise.all(
-      Array.from({ length: 8 }, () => postear(`/api/recetas/${id}/like`, token)),
+    const respuestas = await Promise.all(
+      Array.from({ length: 9 }, () => postear(`/api/recetas/${id}/like`, token)),
     );
 
-    const likes = await likesDe(id);
-
-    expect(likes.length).toBeLessThanOrEqual(1);
-    expect(new Set(likes).size).toBe(likes.length);
+    expect(respuestas.filter((r) => r.body.liked).length).toBe(5);
+    expect(await likesDe(id)).toEqual([String(usuario._id)]);
   });
 
   it("el like sigue siendo un interruptor: dar y quitar deja el array vacio", async () => {
@@ -91,18 +90,19 @@ describe("dos escrituras a la vez sobre el mismo array no se pisan", () => {
     expect(await likesDe(id)).toEqual([]);
   });
 
-  it("dos guardados simultaneos del mismo usuario dejan una sola entrada", async () => {
+  it("dos guardados simultaneos del mismo usuario valen lo mismo que dos seguidos", async () => {
     const usuario = await crearUsuario({ correo: "guardador@cookr.dev" });
     const receta = await crearReceta({ titulo: "Para luego" });
     const token = tokenDe(usuario as never);
     const id = String(receta._id);
 
-    await Promise.all([
+    const [a, b] = await Promise.all([
       postear(`/api/recetas/${id}/guardar`, token),
       postear(`/api/recetas/${id}/guardar`, token),
     ]);
 
-    expect(await guardadasDe(String(usuario._id))).toEqual([id]);
+    expect([a.body.guardado, b.body.guardado].sort()).toEqual([false, true]);
+    expect(await guardadasDe(String(usuario._id))).toEqual([]);
   });
 
   it("guardar dos recetas a la vez no pierde ninguna", async () => {

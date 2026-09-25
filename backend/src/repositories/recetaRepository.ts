@@ -188,6 +188,17 @@ function escaparRegex(texto: string): string {
   return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function alternarEnArray(campo: string, id: Types.ObjectId) {
+  const actual = { $ifNull: [`$${campo}`, []] };
+  return {
+    $cond: [
+      { $in: [id, actual] },
+      { $filter: { input: actual, cond: { $ne: ["$$this", id] } } },
+      { $concatArrays: [actual, [id]] },
+    ],
+  };
+}
+
 export const recetaRepository = {
   async findAll(
     filtros: FiltrosFeed = {},
@@ -393,11 +404,10 @@ export const recetaRepository = {
     }
 
     const uid = new Types.ObjectId(usuarioId);
-    const yaLiked = (await Receta.exists({ _id: recetaId, likes: uid })) !== null;
 
     const actualizada = await Receta.findByIdAndUpdate(
       recetaId,
-      yaLiked ? { $pull: { likes: uid } } : { $addToSet: { likes: uid } },
+      [{ $set: { likes: alternarEnArray("likes", uid) } }],
       { new: true, projection: { likes: 1 } },
     )
       .lean()
@@ -407,9 +417,11 @@ export const recetaRepository = {
       throw Object.assign(new Error("Receta no encontrada"), { status: 404 });
     }
 
+    const likes = actualizada.likes as Types.ObjectId[];
+
     return {
-      liked: !yaLiked,
-      totalLikes: (actualizada.likes as Types.ObjectId[]).length,
+      liked: likes.some((id) => id.equals(uid)),
+      totalLikes: likes.length,
     };
   },
 
@@ -468,13 +480,11 @@ export const recetaRepository = {
     }
 
     const rid = new Types.ObjectId(recetaId);
-    const yaGuardado =
-      (await Usuario.exists({ _id: usuarioId, recetasGuardadas: rid })) !== null;
 
     const actualizado = await Usuario.findByIdAndUpdate(
       usuarioId,
-      yaGuardado ? { $pull: { recetasGuardadas: rid } } : { $addToSet: { recetasGuardadas: rid } },
-      { new: true, projection: { _id: 1 } },
+      [{ $set: { recetasGuardadas: alternarEnArray("recetasGuardadas", rid) } }],
+      { new: true, projection: { recetasGuardadas: 1 } },
     )
       .lean()
       .exec();
@@ -483,7 +493,9 @@ export const recetaRepository = {
       throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
     }
 
-    return { guardado: !yaGuardado };
+    const guardadas = actualizado.recetasGuardadas as Types.ObjectId[];
+
+    return { guardado: guardadas.some((id) => id.equals(rid)) };
   },
 
   async findGuardadas(usuarioId: string): Promise<RecetaColeccion[]> {
