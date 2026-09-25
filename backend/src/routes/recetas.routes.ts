@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { recetasController } from "../controllers/recetasController";
 import { requerirAuth, optionalAuth } from "../middlewares/autenticacion";
 import { validarBody } from "../middlewares/validarBody";
-import { esquemaComentario } from "../lib/validadores";
+import { esquemaComentario, esquemaMacrosPreview } from "../lib/validadores";
 import { limitarPorUsuario } from "../middlewares/rateLimitIA";
 import { generarRecetaDesdeTexto } from "../services/chatService";
 
@@ -44,6 +44,14 @@ router.post(
       res.status(e.status ?? 500).json({ error: e.message ?? "Error generando receta" });
     }
   },
+);
+
+router.post(
+  "/macros-preview",
+  requerirAuth,
+  validarBody(esquemaMacrosPreview),
+  limitarPorUsuario(20),
+  recetasController.calcularMacrosPreview,
 );
 
 router.get("/:id", optionalAuth, recetasController.obtenerPorId);

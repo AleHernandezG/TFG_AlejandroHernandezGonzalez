@@ -5,7 +5,9 @@ import { motion } from 'framer-motion'
 import { Bookmark, Heart, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useToggleGuardado } from '@/features/recetas/hooks/useToggleGuardado'
+import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
 import type { PostFeed } from '../../types/receta.types'
 
 export type VarianteTarjeta = 'hero' | 'small' | 'wide'
@@ -19,13 +21,38 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   const [liked, setLiked] = useState(post.liked)
   const [likes, setLikes] = useState(post.likes)
   const [guardado, setGuardado] = useState(post.guardado)
+  const { mutate: mutarLike } = useToggleLike(post.id)
+  const { mutate: mutarGuardado } = useToggleGuardado(post.id)
+
+  useEffect(() => {
+    setLiked(post.liked)
+    setLikes(post.likes)
+    setGuardado(post.guardado)
+  }, [post.liked, post.likes, post.guardado])
 
   const toggleLike = () => {
-    setLikes((prev) => (liked ? prev - 1 : prev + 1))
-    setLiked((prev) => !prev)
+    const siguiente = !liked
+    setLiked(siguiente)
+    setLikes((prev) => prev + (siguiente ? 1 : -1))
+    mutarLike(undefined, {
+      onSuccess: (data) => {
+        setLiked(data.liked)
+        setLikes(data.totalLikes)
+      },
+      onError: () => {
+        setLiked(!siguiente)
+        setLikes((prev) => prev + (siguiente ? -1 : 1))
+      },
+    })
   }
 
-  const toggleGuardado = () => setGuardado((prev) => !prev)
+  const toggleGuardado = () => {
+    const siguiente = !guardado
+    setGuardado(siguiente)
+    mutarGuardado(undefined, {
+      onError: () => setGuardado(!siguiente),
+    })
+  }
 
   const AccionesBar = ({ compact = false }: { compact?: boolean }) => (
     <div className={`flex items-center gap-4 ${compact ? '' : 'mt-auto'}`}>
@@ -54,7 +81,11 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         </span>
       </button>
 
-      <button className="flex items-center gap-1" aria-label="Ver comentarios">
+      <Link
+        href={`/recetas/${post.id}`}
+        className="flex items-center gap-1"
+        aria-label={`Ver los ${post.comentarios} comentarios`}
+      >
         <MessageCircle
           className={`text-muted-foreground ${compact ? 'h-[18px] w-[18px]' : 'h-5 w-5'}`}
           strokeWidth={1.8}
@@ -62,7 +93,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         <span className={`font-bold text-muted-foreground ${compact ? 'text-xs' : 'text-sm'}`}>
           {post.comentarios}
         </span>
-      </button>
+      </Link>
 
       <button
         onClick={toggleGuardado}
@@ -87,10 +118,10 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   // ── Hero (col-span-2 row-span-2) ──────────────────────────────
   if (variante === 'hero') {
     return (
-      <article className="group relative col-span-2 row-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+      <article className="group relative col-span-2 flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
         {/* Overlay link — cubre toda la tarjeta; los botones quedan por encima con z-10 */}
         <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
-        <div className="relative h-[400px] overflow-hidden">
+        <div className="relative min-h-[16rem] flex-1 overflow-hidden">
           <Image
             src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={post.receta.titulo}
@@ -100,7 +131,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
           />
         </div>
 
-        <div className="flex flex-grow flex-col justify-between p-6">
+        <div className="flex flex-col p-6">
           <div>
             <div className="mb-3 flex items-center gap-2">
               <Avatar className="h-8 w-8">
@@ -179,7 +210,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
       <Link href={`/recetas/${post.id}`} className="absolute inset-0 z-0" aria-label={`Ver receta: ${post.receta.titulo}`} />
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative min-h-[12rem] flex-1 overflow-hidden">
         <Image
           src={post.receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
           alt={post.receta.titulo}

@@ -16,6 +16,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "start": "node dist/server.js",
+    "pruebas:ui": "node scripts/servidorPruebasUI.js",
     "seed": "ts-node --transpile-only src/scripts/seed.ts",
     "seed:force": "ts-node --transpile-only src/scripts/seed.ts -- --force",
     "seed:completo": "ts-node --transpile-only src/scripts/seedCompleto.ts",

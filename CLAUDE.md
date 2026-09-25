@@ -52,6 +52,10 @@ cd backend && npm run seed:masivo          # dataset grande (llama a Pexels)
 cd backend && npm run seed:masivo:sin-imagenes
 cd backend && npm run limpiar:test
 
+# Backend de pruebas manuales: Mongo efímero + claves reales de Cloudinary, Pexels, Edamam, USDA y Gemini.
+# Bloquea MONGODB_URI y MAILJET_*. Sirve dist/, así que build primero. Gasta cuota real.
+cd backend && npm run build && npm run pruebas:ui
+
 # Mantenimiento de datos. Van contra el MONGODB_URI de backend/.env, que puede ser Atlas.
 # En seco por defecto; escriben solo con "-- --apply" (sin el --, npm se come el argumento)
 cd backend && npm run migrar:comentarios

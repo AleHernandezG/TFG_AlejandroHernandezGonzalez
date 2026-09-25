@@ -96,6 +96,7 @@ export function SeccionIngredientes() {
                     </span>
                     <select
                       {...register(`ingredientes.${i}.unidad`)}
+                      aria-label={`Unidad del ingrediente ${i + 1}`}
                       className={[
                         'w-full h-10 bg-transparent text-sm text-foreground focus:outline-none',
                         errors.ingredientes?.[i]?.unidad ? 'text-destructive' : '',

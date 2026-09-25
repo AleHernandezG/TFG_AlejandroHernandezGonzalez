@@ -34,6 +34,10 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | Saber qué toca hacer y en qué orden | `estado/plan-2026-09.md` |
 | Ver el catálogo de producto que viene después | `informe_auditoria_mejoras.md`, y el plan a partir de F12 |
 | Comprobar algo a mano en un rato libre | `estado/pruebas-manuales.md` |
+| Tocar cualquier pantalla, en móvil o escritorio | `estado/revision-ui-2026-09.md` |
+| Rehacer el formulario de crear receta | `diseno/formulario-crear-receta.md` |
+| Hacer Cookr instalable como aplicación | `estado/pwa.md` |
+| Montar los eventos semanales o mensuales | `estado/eventos.md` |
 | Entender por qué el código es como es | `cambios/` y `historico/fases/tech-debt.md` |
 | Desplegar o revisar producción | `../REVISION_DESPLIEGUE.md` |
 | Entender la infraestructura y los servicios externos | `referencia/infraestructura.md` |
@@ -51,8 +55,11 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | `plan-2026-09.md` | El plan que sale de esa auditoría. Bloques F0 y F6 a F12, con criterio de cierre comprobable |
 | `pruebas-manuales.md` | Lo que los tests no pueden comprobar: Google real, entrega de correo, el proxy. Con pasos y síntomas |
 | `diario.md` | Una entrada por sesión de trabajo |
+| `revision-ui-2026-09.md` | Revisión de interfaz del 18 de septiembre, móvil y escritorio. Doce puntos (UI-001 a UI-012) con fichero, línea y coste, más el resultado de axe-core sobre ocho rutas |
+| `pwa.md` | Qué hace falta para que Cookr se instale como aplicación en PC, móvil y tablet: manifiesto, iconos, service worker y modo sin conexión |
+| `eventos.md` | Diseño de los eventos semanales y mensuales de verdad, para sustituir el booleano `esEvento` y la tarjeta destacada inventada |
 
-Estos cuatro se actualizan. El resto de la carpeta `docs/`, no.
+Estos siete se actualizan. El resto de la carpeta `docs/`, no.
 
 ---
 
@@ -97,7 +104,7 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 |---|---|
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
 | `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, migrado: 6,72 MB → 0,24 MB) |
-| `revision-produccion.md` | Revisión de producción del 16 de septiembre y lo que se arregló al día siguiente: alérgenos que el detector no veía, la paginación de comentarios, el 401 de Pexels y las fotos huérfanas en Cloudinary |
+| `revision-produccion.md` | Revisión de producción del 16 de septiembre y todo lo que salió de ella hasta el 18: alérgenos que el detector no veía, la paginación de comentarios, el 401 de Pexels, las fotos huérfanas en Cloudinary, el recálculo ejecutado en Atlas, la limpieza de recetas de prueba y la verificación de los filtros del feed. REV-009 sigue abierto |
 
 ---
 
@@ -109,9 +116,14 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 | Wireframes | `wireframes/`, tres PDF |
 | Casos de uso | `casos-de-uso.html` |
 | Pruebas de interfaz | `pruebas-ui.pdf` |
+| Rediseño del formulario de crear receta | `formulario-crear-receta.md` |
 
-Material de marzo. Sigue valiendo como referencia visual, pero donde el código y la maqueta no
-coincidan, manda el código.
+Material de marzo, salvo `formulario-crear-receta.md`, que es del 18 de septiembre y compara cuatro
+maneras de plantear el alta de receta (arreglar lo que hay, asistente por pasos, editor con
+previsualización en vivo, bento editable) con las referencias y las pegas de accesibilidad de cada una.
+
+El resto sigue valiendo como referencia visual, pero donde el código y la maqueta no coincidan, manda
+el código.
 
 ---
 

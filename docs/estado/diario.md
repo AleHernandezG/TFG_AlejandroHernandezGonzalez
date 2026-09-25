@@ -6,6 +6,76 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-18 · Cierre del ciclo de producción y revisión de interfaz
+
+**Qué se hizo.** Empezó comprobando que el merge estuviera desplegado y acabó siendo una revisión
+larga. El PR #35 (`8bcb793`) estaba en `main` y servido, así que se verificaron los seis arreglos en el
+sitio real, uno a uno, con Playwright sobre `tfg-alejandro-hernandez-gonzalez.vercel.app`. Los seis
+bien. Después, el recálculo de alérgenos contra Atlas: en seco primero, y con `--apply` corrigió 27
+recetas de 145 dejando copia. Con eso REV-001 queda cerrado de verdad.
+
+Al probar salieron dos fallos nuevos. Un comentario recién publicado decía «hace -1 min», porque la
+hora del servidor va unos segundos por delante de la del navegador y la resta salía negativa; y
+`tiempoRelativo` estaba escrita tres veces en tres ficheros distintos, con tres formatos. Ahora vive
+en `lib/tiempo.ts`, con un `Math.max(0, …)` delante (REV-007). El otro: al enviar el formulario de
+crear receta sin elegir dificultad, el error salía en inglés, «Dificultad: Invalid input», porque zod 4
+cambió `invalid_type_error` por `error` y ese campo se quedó sin migrar (REV-008).
+
+Se borraron las dos recetas de prueba que llevaban meses en producción, las dos «Macarrones con
+tomate», con descripciones tipo `AFASFASAFDASAF`. Ninguna tenía comentarios ni estaba guardada. La
+colección pasa de 145 a 143. Los siete comentarios de relleno de «Bowl de Atún y Arroz Estilo Sushi»
+se quedan a propósito: son los que hacen que esa receta pase de ocho comentarios y son el caso de
+prueba de la paginación de REV-002.
+
+Después, el encargo grande: revisar la interfaz entera. Salieron doce puntos, en
+`docs/estado/revision-ui-2026-09.md`. El del espacio desaprovechado en escritorio resultó ser tres
+fallos distintos y no uno. El ciclo de variantes del feed bento suma 11 celdas en una rejilla de 3
+columnas, así que cada siete tarjetas queda un hueco literal. La tarjeta grande lleva `flex-grow` y
+`justify-between` dentro de un `row-span-2`, y eso le abre una franja muerta en medio. Y cuatro de las
+cinco páginas de escritorio encierran el contenido en 512 u 768 px dentro de un área de 1184.
+
+El peor hallazgo no era de maquetación. Los botones de me gusta y de guardar del feed de escritorio
+solo tocan estado local: animan, cambian el número y anuncian `aria-label="Dar like"`, y no mandan nada
+al backend. Al recargar, todo vuelve atrás.
+
+Por último, los filtros. 37 peticiones a la API de producción: el backend filtra bien, sin
+excepciones. Lo que está mal son los datos. Hay cuatro recetas etiquetadas `vegetariana`, `vegana`,
+`sin lactosa` y `sin gluten (verificar ingredientes)`, categorías que no existen en `DIETAS_OPCIONES`,
+así que no aparecen en ningún filtro de dieta ni puntúan en el feed personalizado. Vienen todas de
+«Crear desde descripción»: el prompt de Gemini pide `"dietas": string[]` sin enumerar cuáles, el
+validador acepta cualquier cadena y el repositorio lo guarda tal cual. Queda como REV-009, sin
+arreglar.
+
+Tres documentos nuevos de diseño: `docs/diseno/formulario-crear-receta.md`,
+`docs/estado/pwa.md` y `docs/estado/eventos.md`.
+
+**Qué decisión costó.** Cómo arreglar el hueco del bento. La salida fácil es
+`grid-auto-flow: dense`, que rellena los huecos sola, pero deja el orden visual distinto del orden del
+DOM, y entonces el lector de pantalla y el tabulador recorren el feed por un camino que no es el que se
+ve (WCAG 2.4.3 y 1.3.2). Se descarta. Quitando el `row-span-2` de la tarjeta grande el ciclo baja a 9
+celdas y encaja solo, sin tocar el orden de nada.
+
+La otra, qué recomendar para el formulario de crear receta. La idea del bento editable es la más
+bonita y la que peor se porta: convierte el orden de tabulación en un laberinto y esconde qué campos
+existen, que es justo lo que no puede pasar en un formulario que se usa dos veces al mes. Gana el
+editor con previsualización al lado, sobre todo porque `previsualizacionReceta.tsx` ya existe y ya
+pinta la receta: es moverlo de ruta, no escribirlo.
+
+**Qué queda a medias.** REV-009 sin tocar: hay que enumerar las dietas en el prompt, cerrar el
+validador con un `z.enum` y migrar las cuatro recetas. Toca IA, validación y datos a la vez, y quiere
+sus propios tests.
+
+De la revisión de interfaz no se ha implementado nada, es solo el documento. Lo primero de la lista son
+los dos `<select>` sin nombre accesible y los likes de escritorio que no persisten, que son fallo
+funcional y no estética.
+
+Y el evento falso sigue en producción: la tarjeta de Discover anuncia una «Semana de la Cocina
+Mediterránea» que no existe, no se puede pulsar, y no tiene nada que ver con las 6 recetas marcadas
+como de evento. Quitar el mock es media hora; hacer eventos de verdad son cuatro jornadas y está
+planteado en `docs/estado/eventos.md`.
+
+---
+
 ## 2026-09-17 · La revisión de producción y sus arreglos
 
 **Qué se hizo.** F6 y F7 se desplegaron el 16. Ese mismo día se aplicó la migración de comentarios
@@ -36,10 +106,11 @@ La otra, qué hacer con los falsos positivos. «Pan sin gluten» marca cereales,
 también. Se aceptan: tanto el backend como el script solo suman alérgenos y nunca quitan uno. A un
 alérgico, una receta escondida de más le molesta; una de menos es justo lo que pasó con el Tortellini.
 
-**Qué queda a medias.** Todo está en `develop`. Falta el merge a `main` y, con Render ya Live, pasar el
-script contra Atlas, primero en seco y luego con `-- --apply`. Hasta entonces el Tortellini sigue
-saliendo a quien es alérgico a los lácteos. Contra Atlas no se ha ejecutado nada desde aquí; los pasos
-están en `REVISION_DESPLIEGUE.md`, parte 1.
+**Qué queda a medias.** *(Resuelto esa misma noche, ver la entrada del 18.)* El merge a `main` entró
+como PR #35 (`8bcb793`), Vercel y Render lo sirvieron, y el recálculo de alérgenos se pasó contra
+Atlas en seco y luego con `-- --apply`: 27 recetas corregidas de 145, con copia previa en
+`backend/respaldos/alergenos-2026-09-17T19-09-52-790Z.json`. El Tortellini ya no le sale a quien es
+alérgico a los lácteos.
 
 De la parte 2 de esa checklist quedan cosas que necesitan manos: el login con Google con una cuenta
 real, escanear un ticket con la cámara del móvil, los índices en mongosh, los logs de Gemini en Render,

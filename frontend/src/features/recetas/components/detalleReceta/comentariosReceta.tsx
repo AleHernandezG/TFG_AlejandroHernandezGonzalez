@@ -10,21 +10,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { tiempoRelativo } from '@/lib/tiempo'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useAgregarComentario } from '../../hooks/useAgregarComentario'
 import { useComentarios, useInvalidarComentarios } from '../../hooks/useComentarios'
 import type { Comentario } from '../../types/receta.types'
-
-function tiempoRelativo(fechaIso: string): string {
-  const diff = Date.now() - new Date(fechaIso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `hace ${mins} min`
-  const horas = Math.floor(mins / 60)
-  if (horas < 24) return `hace ${horas} h`
-  const dias = Math.floor(horas / 24)
-  return `hace ${dias} d`
-}
 
 function ItemComentario({ c }: { c: Comentario }) {
   return (

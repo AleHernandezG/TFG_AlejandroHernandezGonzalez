@@ -5,6 +5,10 @@
  * "mediterranea", "mediterránea"), lo que hace que el boost por gustos del feed
  * no acierte. Este script las unifica.
  *
+ * También borra las restricciones de alérgeno que "Crear desde descripción" coló
+ * como categorías ("sin lactosa", "sin gluten (verificar ingredientes)"): no son
+ * dietas y ningún filtro las encuentra. De eso filtra el suelo de alérgenos.
+ *
  * Solo toca variantes conocidas de dietas. Las categorías que no son dietas
  * (cocinas y tipos de plato: "italiana", "desayuno", "postres"...) se respetan.
  *
@@ -18,50 +22,10 @@ import mongoose from "mongoose";
 import { conectarDB } from "../lib/db";
 import { Receta } from "../models/recetaMongo";
 import { Usuario } from "../models/usuarioMongo";
-
-const DIETAS_CANONICAS = [
-  "vegetariano",
-  "vegano",
-  "keto",
-  "mediterranea",
-  "paleo",
-  "halal",
-  "kosher",
-  "bajoEnCalorias",
-  "altoEnProteinas",
-  "lowCarb",
-];
-
-// Variantes de género/escritura que el deacento+minúsculas no resuelve solo.
-const ALIAS: Record<string, string> = {
-  vegetariana: "vegetariano",
-  vegetariano: "vegetariano",
-  vegana: "vegano",
-  vegano: "vegano",
-};
-
-function quitarAcentos(texto: string): string {
-  return texto.normalize("NFD").replace(/[̀-ͯ]/g, "");
-}
-
-function normalizar(categoria: string): string {
-  const base = quitarAcentos(categoria.trim().toLowerCase());
-  if (ALIAS[base]) return ALIAS[base];
-  const canonica = DIETAS_CANONICAS.find((d) => quitarAcentos(d.toLowerCase()) === base);
-  if (canonica) return canonica;
-  return categoria;
-}
+import { normalizarCategorias } from "../lib/dietas";
 
 function normalizarLista(lista: string[]): { nueva: string[]; cambio: boolean } {
-  const vistos = new Set<string>();
-  const nueva: string[] = [];
-  for (const item of lista) {
-    const norm = normalizar(item);
-    if (!vistos.has(norm)) {
-      vistos.add(norm);
-      nueva.push(norm);
-    }
-  }
+  const nueva = normalizarCategorias(lista);
   const cambio =
     nueva.length !== lista.length || nueva.some((v, i) => v !== lista[i]);
   return { nueva, cambio };

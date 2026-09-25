@@ -11,7 +11,7 @@ interface Props {
 export function GridRecetasColeccion({ recetas, pestana }: Props) {
   return (
     <div className="px-5 pt-8 pb-10">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {pestana === 'mis-recetas' && (
           <Link href="/crear-receta" className="block">
             <div className="aspect-[3/4] rounded-xl border-2 border-dashed border-brand/40 bg-brand/5 flex flex-col items-center justify-center gap-2 hover:bg-brand/10 hover:border-brand/60 transition-colors">

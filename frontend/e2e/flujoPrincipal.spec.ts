@@ -34,7 +34,12 @@ async function completarPerfil(page: Page) {
 
 async function rellenarReceta(page: Page, titulo: string) {
   await page.goto('/crear-receta')
-  await page.getByRole('button', { name: 'Saltar tutorial' }).click()
+  await page.getByRole('button', { name: /^(Empezar|Seguir con) la receta$/ }).click()
+
+  const siguiente = page.getByRole('button', { name: 'Siguiente' })
+
+  await expect(page.getByRole('heading', { name: 'Empieza por la foto' })).toBeVisible()
+  await siguiente.click()
 
   await page.getByPlaceholder('Ej. Paella valenciana').fill(titulo)
   await page.getByPlaceholder('Cuéntanos algo sobre esta receta...').fill(
@@ -43,15 +48,18 @@ async function rellenarReceta(page: Page, titulo: string) {
   await page.getByPlaceholder('30').fill('25')
   await page.getByPlaceholder('4').fill('2')
   await page.getByRole('button', { name: 'Fácil' }).click()
+  await siguiente.click()
 
   await page.getByPlaceholder('Ej. Harina de trigo').first().fill('Patata')
   await page.getByPlaceholder('100').first().fill('300')
   await page.locator('select[name="ingredientes.0.unidad"]').selectOption('g')
+  await siguiente.click()
 
   await page
     .getByPlaceholder('Describe este paso con detalle...')
     .first()
     .fill('Pelar las patatas, cortarlas finas y freírlas a fuego suave hasta que estén tiernas.')
+  await siguiente.click()
 
   await page.getByRole('button', { name: 'Revisar receta' }).click()
   await expect(page).toHaveURL(/\/crear-receta\/revisar/)

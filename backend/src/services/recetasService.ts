@@ -3,7 +3,15 @@ import { usuarioRepository } from "../repositories/usuarioRepository";
 import { DatosCrearRecetaBody, FiltrosFeed } from "../types/receta";
 import { buscarFotoPexelsCascada } from "./imagenService";
 import { alergenosDeReceta } from "../lib/ingredientes";
+import { canonizarDieta, esRestriccionDeAlergeno, filtrarDietas } from "../lib/dietas";
 import { eliminarImagen } from "../lib/cloudinary";
+import { calcularMacros } from "./nutritionService";
+
+export interface IngredientePreview {
+  nombre: string;
+  cantidad: string;
+  unidad: string;
+}
 
 async function resolverAlergenos(
   delQuery: string[] | undefined,
@@ -28,6 +36,19 @@ async function alergenosActualizados(
   const ingredientes = datos.ingredientes?.map((ing) => ing.nombre) ?? actual?.ingredientes ?? [];
   const declarados = datos.alergenos ?? actual?.alergenos ?? [];
   return alergenosDeReceta(ingredientes, declarados);
+}
+
+async function dietasActualizadas(
+  recetaId: string,
+  datos: Partial<DatosCrearRecetaBody>,
+): Promise<string[] | undefined> {
+  if (datos.dietas === undefined) return undefined;
+
+  const guardadas = await recetaRepository.obtenerCategorias(recetaId);
+  const ajenas = guardadas.filter(
+    (categoria) => !canonizarDieta(categoria) && !esRestriccionDeAlergeno(categoria),
+  );
+  return [...new Set([...filtrarDietas(datos.dietas), ...ajenas])];
 }
 
 async function borrarImagenSiNadieLaUsa(imagenUrl: string | null) {
@@ -89,15 +110,18 @@ export const recetasService = {
       datos.ingredientes.map((ing) => ing.nombre),
       datos.alergenos,
     );
-    return recetaRepository.crear({ ...datos, alergenos }, autorId);
+    const dietas = filtrarDietas(datos.dietas);
+    return recetaRepository.crear({ ...datos, alergenos, dietas }, autorId);
   },
 
   async actualizar(recetaId: string, usuarioId: string, datos: Partial<DatosCrearRecetaBody>) {
     try {
       const alergenos = await alergenosActualizados(recetaId, datos);
+      const dietas = await dietasActualizadas(recetaId, datos);
       const { imagenAnterior } = await recetaRepository.actualizar(recetaId, usuarioId, {
         ...datos,
         alergenos,
+        dietas,
       });
       await borrarImagenSiNadieLaUsa(imagenAnterior);
     } catch (err) {
@@ -118,5 +142,15 @@ export const recetasService = {
 
   async obtenerFotoPreview(query: string) {
     return buscarFotoPexelsCascada(query);
+  },
+
+  async calcularMacrosPreview(ingredientes: IngredientePreview[]) {
+    return calcularMacros(
+      ingredientes.map((ing) => ({
+        nombre: ing.nombre,
+        cantidad: parseFloat(ing.cantidad) || 0,
+        unidad: ing.unidad,
+      })),
+    );
   },
 };

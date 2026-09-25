@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { recetasService } from "../services/recetasService";
+import { recetasService, type IngredientePreview } from "../services/recetasService";
 import { esquemaCrearRecetaBody } from "../lib/validadores";
 import { manejarError } from "../middlewares/errores";
 
@@ -167,6 +167,16 @@ export const recetasController = {
     try {
       await recetasService.eliminar(req.params.id, req.usuario!.id);
       res.status(204).send();
+    } catch (error) {
+      manejarError(res, error);
+    }
+  },
+
+  async calcularMacrosPreview(req: Request, res: Response): Promise<void> {
+    try {
+      const { ingredientes } = req.body as { ingredientes: IngredientePreview[] };
+      const macros = await recetasService.calcularMacrosPreview(ingredientes);
+      res.status(200).json(macros);
     } catch (error) {
       manejarError(res, error);
     }

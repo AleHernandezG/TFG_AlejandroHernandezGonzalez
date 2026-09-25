@@ -685,6 +685,13 @@ export const recetaRepository = {
     };
   },
 
+  async obtenerCategorias(recetaId: string): Promise<string[]> {
+    if (!Types.ObjectId.isValid(recetaId)) return [];
+
+    const receta = await Receta.findById(recetaId).select("categorias").lean().exec();
+    return receta?.categorias ?? [];
+  },
+
   async contarConImagen(imagenUrl: string): Promise<number> {
     return Receta.countDocuments({ imagenUrl });
   },

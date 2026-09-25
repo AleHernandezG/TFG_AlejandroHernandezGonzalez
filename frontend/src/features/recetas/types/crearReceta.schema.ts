@@ -25,7 +25,7 @@ export const esquemaCrearReceta = z.object({
   ingredientes: z.array(esquemaIngrediente).min(1, 'Añade al menos un ingrediente'),
   pasos: z.array(esquemaPaso).min(1, 'Añade al menos un paso'),
   porciones: z.number({ error: 'Indica cuántas porciones salen' }).min(1, 'Debe haber al menos 1 porción'),
-  dificultad: z.enum(['facil', 'media', 'dificil']),
+  dificultad: z.enum(['facil', 'media', 'dificil'], { error: 'Elige una dificultad' }),
   tiempo: z.number({ error: 'Indica cuánto tiempo lleva la receta' }).min(1, 'El tiempo debe ser al menos 1'),
   unidadTiempo: z.enum(['min', 'h']),
   dietas: z.array(z.string()),

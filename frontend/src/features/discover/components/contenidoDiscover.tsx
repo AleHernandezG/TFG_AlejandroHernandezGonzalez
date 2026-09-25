@@ -4,13 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { useDebounce } from '@/hooks/useDebounce'
 import { HeaderDiscover } from './headerDiscover'
-import { TarjetaDestacada } from './tarjetaDestacada'
 import { TarjetaDiscover } from './tarjetaDiscover'
 import { EstadoVacioDiscover } from './estadoVacioDiscover'
-import {
-  EVENTO_DESTACADO_MOCK,
-  SUGERENCIAS_POPULARES,
-} from '@/features/discover/data/datosDiscover'
+import { SUGERENCIAS_POPULARES } from '@/features/discover/data/datosDiscover'
 import type { TabDiscover } from '@/features/discover/types/discover.types'
 import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
 import { useDiscover } from '@/features/discover/hooks/useDiscover'
@@ -93,12 +89,6 @@ export function ContenidoDiscover() {
         onFiltrosChange={setFiltrosAvanzados}
       />
 
-      {!buscando && (
-        <div className="mt-5">
-          <TarjetaDestacada evento={EVENTO_DESTACADO_MOCK} />
-        </div>
-      )}
-
       <AnimatePresence mode="wait">
         {!isLoading && buscando && recetas.length === 0 ? (
           <motion.div
@@ -157,8 +147,8 @@ export function ContenidoDiscover() {
 
             {/* Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-2 gap-3 px-5 pb-28">
-                {Array.from({ length: 6 }).map((_, i) => (
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5 pb-28">
+                {Array.from({ length: 8 }).map((_, i) => (
                   <SkeletonTarjeta key={i} />
                 ))}
               </div>
@@ -168,7 +158,7 @@ export function ContenidoDiscover() {
                   variants={variantesGrid}
                   initial="oculto"
                   animate="visible"
-                  className="grid grid-cols-2 gap-3 px-5"
+                  className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5"
                 >
                   {recetas.map((receta) => (
                     <motion.div key={receta.id} variants={varianteTarjeta}>
@@ -180,7 +170,7 @@ export function ContenidoDiscover() {
                 <div ref={sentinelRef} className="h-10" />
 
                 {isFetchingNextPage && (
-                  <div className="grid grid-cols-2 gap-3 px-5 pb-28">
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 px-5 pb-28">
                     <SkeletonTarjeta />
                     <SkeletonTarjeta />
                   </div>

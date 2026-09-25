@@ -1,4 +1,4 @@
-import type { CategoriaDiscover, EventoDestacado, RecetaDiscover } from '@/features/discover/types/discover.types'
+import type { CategoriaDiscover, RecetaDiscover } from '@/features/discover/types/discover.types'
 
 export const CATEGORIAS_DISCOVER: CategoriaDiscover[] = [
   'Todos', 'Desayuno', 'Pasta', 'Vegano', 'Postres',
@@ -10,12 +10,6 @@ export const SUGERENCIAS_POPULARES: string[] = [
   'Ensalada Keto',
   'Postres Sin Horno',
 ]
-
-export const EVENTO_DESTACADO_MOCK: EventoDestacado = {
-  titulo: 'Semana de la Cocina Mediterránea',
-  subtitulo: 'Recetas frescas, saludables y llenas de sabor',
-  etiqueta: 'Especial de la semana',
-}
 
 export const RECETAS_DISCOVER_MOCK: RecetaDiscover[] = [
   {

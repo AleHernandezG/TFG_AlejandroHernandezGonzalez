@@ -16,7 +16,7 @@ export default function PaginaPerfil() {
       <div className="hidden lg:flex">
         <SidebarNavPc />
         <main className="min-h-screen flex-1 bg-background pl-64">
-          <div className="mx-auto max-w-lg py-10">
+          <div className="mx-auto max-w-5xl py-10">
             <Suspense>
               <ContenidoPerfil />
             </Suspense>

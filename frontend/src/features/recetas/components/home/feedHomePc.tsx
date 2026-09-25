@@ -7,19 +7,12 @@ import type { FiltrosAvanzados, PostFeed } from '../../types/receta.types'
 import { TarjetaPostPc, type VarianteTarjeta } from './tarjetaPostPc'
 import { useHomeFeed } from '@/features/recetas/hooks/useHomeFeed'
 
-// Bento grid layout pattern for first 7 posts:
-// [HERO col-span-2 row-span-2][SMALL]
-// [HERO continues            ][SMALL]
-// [SMALL][WIDE col-span-2        ]
-// remaining posts → SMALL
 const VARIANTES: VarianteTarjeta[] = [
-  'hero', 'small', 'small', 'small', 'wide', 'small', 'small',
+  'hero', 'small', 'small', 'wide', 'small', 'small', 'small',
 ]
 
 function varianteParaIndice(i: number): VarianteTarjeta {
-  if (i < VARIANTES.length) return VARIANTES[i]
-  const resto = (i - VARIANTES.length) % 7
-  return VARIANTES[resto]
+  return VARIANTES[i % VARIANTES.length]
 }
 
 function TarjetaPostSkeletonPc() {
