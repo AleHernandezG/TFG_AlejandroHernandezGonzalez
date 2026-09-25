@@ -34,7 +34,7 @@ async function completarPerfil(page: Page) {
 
 async function rellenarReceta(page: Page, titulo: string) {
   await page.goto('/crear-receta')
-  await page.getByRole('button', { name: 'Saltar tutorial' }).click()
+  await page.getByRole('button', { name: /^(Empezar|Seguir con) la receta$/ }).click()
 
   const siguiente = page.getByRole('button', { name: 'Siguiente' })
 

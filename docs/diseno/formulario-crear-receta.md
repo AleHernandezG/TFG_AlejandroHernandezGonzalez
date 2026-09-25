@@ -533,6 +533,25 @@ verificado y no hay Mailjet para mandarlo: la cuenta de prueba se marca a mano c
 `cuentaVerificada: true` en el Mongo efímero. Y las fotos que subas acaban en el Cloudinary de
 verdad, en `cookr/recetas/`, sin ninguna receta que las apunte si no llegas a publicar.
 
+### El E2E, de vuelta a verde el 25/09/2026
+
+Quitar el pop-up de tutorial rompió el E2E del flujo principal y nadie se enteró, porque el job `e2e`
+no bloquea el despliegue. `rellenarReceta` empezaba pulsando «Saltar tutorial», un botón que desde el
+commit 37e6314 no existe, y el test se quedaba esperándolo hasta agotar el tiempo.
+
+Ahora entra por la tarjeta de bienvenida, igual que una persona. El nombre del botón cambia según haya
+borrador o no, así que el locator acepta los dos: `/^(Empezar|Seguir con) la receta$/`. Un navegador
+recién abierto por Playwright nunca tiene borrador, pero si algún día el test reutiliza contexto o
+alguien añade un paso que recarga la página a medias, el texto pasa a «Seguir con la receta» y no
+queremos que eso lo tumbe. Del asistente en adelante no cambia nada: los cinco pasos, «Siguiente» y
+«Revisar receta» son los mismos que antes.
+
+En el repaso, el panel nutricional sale con «No hemos podido estimarla ahora», porque
+`servidorE2E.js` no tiene claves de Edamam ni USDA. Es lo esperado y ningún test lo comprueba.
+
+La lección es incómoda: un E2E que no bloquea nada solo sirve si alguien lo mira. Cualquier cambio en
+la entrada de `/crear-receta` pide lanzar `npm run e2e` antes del commit.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
