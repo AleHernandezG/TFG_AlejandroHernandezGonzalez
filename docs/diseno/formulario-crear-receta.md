@@ -552,6 +552,45 @@ En el repaso, el panel nutricional sale con «No hemos podido estimarla ahora»,
 La lección es incómoda: un E2E que no bloquea nada solo sirve si alguien lo mira. Cualquier cambio en
 la entrada de `/crear-receta` pide lanzar `npm run e2e` antes del commit.
 
+### El paso a producción, el 25/09/2026
+
+`develop` llevaba 25 commits por delante de `main`, todo el asistente incluido, y entró en dos PR
+porque el primero no llegó a desplegar.
+
+**El PR #36 se mergeó y el deploy no salió.** En el push a `main` falló `escrituras.concurrentes`:
+dos likes simultáneos del mismo usuario dejaban el array en un estado que el test no aceptaba. No era
+el test. `toggleLike` y `toggleGuardado` leían el documento, miraban si el id estaba y después
+escribían `$addToSet` o `$pull`. Entre la lectura y la escritura cabe otra petición, las dos ven lo
+mismo y las dos hacen lo mismo, así que un doble clic podía acabar en un like que el usuario creía
+haber quitado. El job `deploy` depende de `ci-backend` y Render se quedó con el código de antes, que
+es justo lo que tiene que pasar.
+
+Ahora cada toggle es **un solo** `findByIdAndUpdate` con pipeline: `alternarEnArray()` monta un
+`$cond` que quita el id con `$filter` si está y lo añade con `$concatArrays` si no. Mongo lo aplica
+atómicamente por documento, así que dos toggles a la vez valen lo mismo que dos seguidos, y la
+respuesta sale del documento ya escrito, no de lo que se leyó antes. Los tests cambiaron de
+expectativa en consecuencia: dos likes simultáneos devuelven `liked` `true` y `false` y dejan el array
+vacío, y nueve seguidos dejan exactamente un like.
+
+**El PR del arreglo tampoco pasó, por otra cosa.** `feed.indices.test.ts` reventaba con `Port "37475"
+already in use`: cada fichero levantaba su propio `MongoMemoryServer`, varios workers de Jest pedían
+puerto a la vez y alguno se lo pisaba a otro. En local, con menos núcleos, no salía nunca. Ya había
+pasado el 16/09 en bd07a7c y se tomó por mala suerte. Ahora `tests/globalSetup.ts` arranca un único
+Mongo por ejecución, lo deja en `MONGO_URI_TESTS`, y `tests/setup.ts` conecta cada fichero a su
+propia base `test-<uuid>`, que tira en el `afterAll`. Sigue sin haber estado compartido entre
+ficheros y la suite baja a unos 6 s con tres workers. Se pasó nueve veces seguidas, con 3 y con 19
+workers, las nueve con 247 de 247.
+
+De paso, el test del ReDoS en `feed.filtros` exigía responder en menos de un segundo, y en un runner
+de GitHub cargado eso no es una garantía de nada. El umbral sube a 5 s: una expresión catastrófica
+sin escapar tarda minutos, así que sigue distinguiendo el fallo real del ruido.
+
+El PR #38 entró a las 19:01. Render sirve el código nuevo (`POST /api/recetas/macros-preview` sin
+token responde 401, y en el `main` anterior esa ruta no existía) y Vercel despliega por su cuenta.
+
+La lección: un test inestable en el backend no es una molestia, es un deploy bloqueado. Si un test
+falla solo en el CI, se investiga ese día, no se relanza el job.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:
