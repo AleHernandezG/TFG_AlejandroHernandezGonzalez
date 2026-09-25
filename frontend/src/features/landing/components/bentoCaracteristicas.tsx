@@ -14,8 +14,8 @@ const mapaIconos: Record<IconoCaracteristicaLanding, typeof ChefHat> = {
 
 const gradienteIcono: Record<IconoCaracteristicaLanding, string> = {
   chef:   "from-brand/20 to-brand-muted/10 text-brand",
-  social: "bg-[oklch(0.92_0.04_240)] text-[var(--category-social)]",
-  ia:     "bg-[oklch(0.92_0.04_290)] text-[var(--category-ai)]",
+  social: "bg-[oklch(0.92_0.04_240)] text-(--category-social)",
+  ia:     "bg-[oklch(0.92_0.04_290)] text-(--category-ai)",
 };
 
 const contenedor = {
@@ -70,17 +70,17 @@ export function BentoCaracteristicas() {
               className={esPrincipal ? "md:col-span-2 md:row-span-2" : ""}
             >
               <Card
-                className={`group relative h-full overflow-hidden border-border/40 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 ${
+                className={`group relative h-full overflow-hidden border-border/40 bg-card/80 backdrop-blur-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-xl hover:shadow-brand/5 ${
                   esPrincipal ? "flex flex-col justify-between" : ""
                 }`}
               >
                 {/* Acento de gradiente al hacer hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-brand/3 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-br from-brand/3 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 <CardHeader className={`relative ${esPrincipal ? "p-8 md:p-10" : "p-6"}`}>
                   {/* Icono */}
                   <div
-                    className={`mb-5 inline-flex items-center justify-center rounded-2xl bg-gradient-to-br p-3.5 ${gradiente} ${
+                    className={`mb-5 inline-flex items-center justify-center rounded-2xl bg-linear-to-br p-3.5 ${gradiente} ${
                       esPrincipal ? "h-14 w-14" : "h-11 w-11"
                     }`}
                   >

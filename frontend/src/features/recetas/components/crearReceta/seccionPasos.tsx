@@ -20,7 +20,7 @@ export function SeccionPasos() {
   }
 
   return (
-    <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+    <section className="bg-(--warm-bg-accent) rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
       <h2 className="text-base font-extrabold text-foreground mb-4">Pasos</h2>
 
       <div className="space-y-4">
@@ -44,7 +44,7 @@ export function SeccionPasos() {
                 className={[
                   'w-full min-h-[80px] bg-background border rounded-xl px-4 py-3.5 text-sm text-foreground',
                   'placeholder:text-muted-foreground resize-none overflow-hidden',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
+                  'focus:outline-hidden focus:ring-2 focus:ring-brand/40',
                   errors.pasos?.[i]?.texto ? 'border-destructive' : 'border-border',
                 ].join(' ')}
               />

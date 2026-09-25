@@ -34,28 +34,28 @@ export const slidesHero: SlideHero[] = [
     id: 'slide-1',
     imageUrl: '/images/hero/desayuno.webp',
     gradiente:
-      'from-[var(--hero-gradient-start)] via-[var(--hero-gradient-mid)] to-[var(--hero-gradient-end)]',
+      'from-(--hero-gradient-start) via-(--hero-gradient-mid) to-(--hero-gradient-end)',
     etiqueta: 'Desayunos creativos',
   },
   {
     id: 'slide-2',
     imageUrl: '/images/hero/ensalada.webp',
     gradiente:
-      'from-[var(--theme-fresh)]/45 via-[var(--theme-fresh)]/20 to-[var(--theme-fresh)]/10',
+      'from-(--theme-fresh)/45 via-(--theme-fresh)/20 to-(--theme-fresh)/10',
     etiqueta: 'Ensaladas frescas',
   },
   {
     id: 'slide-3',
     imageUrl: '/images/hero/postre.webp',
     gradiente:
-      'from-[var(--theme-sweet)]/45 via-[var(--theme-sweet)]/20 to-[var(--theme-sweet)]/10',
+      'from-(--theme-sweet)/45 via-(--theme-sweet)/20 to-(--theme-sweet)/10',
     etiqueta: 'Postres caseros',
   },
   {
     id: 'slide-4',
     imageUrl: '/images/hero/pasta.webp',
     gradiente:
-      'from-[var(--theme-pasta)]/45 via-[var(--theme-pasta)]/20 to-[var(--theme-pasta)]/10',
+      'from-(--theme-pasta)/45 via-(--theme-pasta)/20 to-(--theme-pasta)/10',
     etiqueta: 'Pastas artesanales',
   },
 ]

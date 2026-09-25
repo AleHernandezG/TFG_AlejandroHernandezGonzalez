@@ -49,7 +49,7 @@ export function SheetHistorialChat({ abierto, onCerrar }: Props) {
                 onClick={handleNueva}
                 className="flex w-full items-center gap-3 rounded-xl bg-brand/10 px-4 py-3 text-left text-sm font-medium text-brand transition-colors hover:bg-brand/15 active:scale-[0.98]"
               >
-                <Plus className="h-4 w-4 flex-shrink-0" />
+                <Plus className="h-4 w-4 shrink-0" />
                 Guardar y empezar nueva conversación
               </button>
             </div>
@@ -79,7 +79,7 @@ export function SheetHistorialChat({ abierto, onCerrar }: Props) {
                   </button>
                   <button
                     onClick={() => eliminarConversacion(conv.id)}
-                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-muted-foreground/50 opacity-0 transition-all group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground/50 opacity-0 transition-all group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Eliminar conversación"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

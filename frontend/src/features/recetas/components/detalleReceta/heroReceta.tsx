@@ -33,13 +33,13 @@ export function HeroReceta({ imagenUrl, titulo, guardado, onToggleGuardado, foto
         </div>
 
         {/* Gradiente: oscuro en top (legibilidad botones) + funde en bottom con contenido */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/25" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-black/25" />
 
         {/* Botón volver — top-left glassmorphism */}
         <button
           onClick={() => router.back()}
           aria-label="Volver"
-          className="absolute top-4 left-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-sm active:scale-95 transition-transform"
+          className="absolute top-4 left-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-xs active:scale-95 transition-transform"
         >
           <ArrowLeft size={20} />
         </button>
@@ -48,7 +48,7 @@ export function HeroReceta({ imagenUrl, titulo, guardado, onToggleGuardado, foto
         <button
           onClick={onToggleGuardado}
           aria-label={guardado ? 'Quitar de guardados' : 'Guardar receta'}
-          className="absolute top-4 right-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-sm active:scale-95 transition-transform"
+          className="absolute top-4 right-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-xs active:scale-95 transition-transform"
         >
           {guardado ? (
             <BookmarkCheck size={20} className="fill-white text-white" />

@@ -16,7 +16,7 @@ export function PasoFoto({ url, subiendo, error, onArchivo, onQuitar }: PropsPas
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <section className="bg-[var(--warm-bg-accent)] rounded-2xl overflow-hidden shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+    <section className="bg-(--warm-bg-accent) rounded-2xl overflow-hidden shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
       <input
         ref={inputRef}
         type="file"
@@ -35,7 +35,7 @@ export function PasoFoto({ url, subiendo, error, onArchivo, onQuitar }: PropsPas
           <button
             type="button"
             onClick={onQuitar}
-            className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg text-white"
+            className="absolute top-3 right-3 h-8 w-8 flex items-center justify-center bg-black/40 backdrop-blur-xs rounded-lg text-white"
             aria-label="Quitar foto"
           >
             <Trash2 size={16} />

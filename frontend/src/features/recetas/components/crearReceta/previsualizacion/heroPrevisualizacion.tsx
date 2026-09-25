@@ -43,7 +43,7 @@ export function HeroPrevisualizacion({
           </a>
         </p>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/25" />
+      <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-black/25" />
       {children}
     </div>
   )

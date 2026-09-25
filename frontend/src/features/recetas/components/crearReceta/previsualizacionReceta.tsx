@@ -53,14 +53,14 @@ export function PrevisualizacionReceta() {
         <button
           onClick={() => router.back()}
           aria-label="Volver al formulario"
-          className="absolute top-4 left-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-sm active:scale-95 transition-transform"
+          className="absolute top-4 left-4 z-10 h-10 w-10 flex items-center justify-center bg-white/20 backdrop-blur-md rounded-xl text-white shadow-xs active:scale-95 transition-transform"
         >
           <ArrowLeft size={20} />
         </button>
       </HeroPrevisualizacion>
 
       {/* ── Tarjeta contenido — misma estructura que DetalleRecetaCliente ── */}
-      <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem]">
+      <div className="-mt-8 relative z-10 bg-background rounded-t-4xl">
 
         <CabeceraPrevisualizacion
           titulo={datos.titulo}
@@ -97,7 +97,7 @@ export function PrevisualizacionReceta() {
             soportado && !activo ? (
               <button
                 onClick={() => iniciar(datos.pasos.map((p) => p.texto))}
-                className="flex items-center gap-1.5 bg-[var(--brand-subtle)] text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
+                className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
               >
                 <Headphones size={14} />
                 Modo manos libres

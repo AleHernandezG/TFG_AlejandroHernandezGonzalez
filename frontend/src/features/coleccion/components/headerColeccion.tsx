@@ -11,7 +11,7 @@ interface Props {
 
 export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
   return (
-    <header className="sticky top-0 z-40 bg-card px-6 pt-8 pb-4 shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.02)]">
+    <header className="sticky top-0 z-40 bg-card px-6 pt-8 pb-4 shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.02)]">
       <div className="text-center mb-5">
         {pestana === 'guardadas' ? (
           <h1 className="text-3xl font-light tracking-[0.03em] text-foreground leading-tight">
@@ -34,7 +34,7 @@ export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
           className={cn(
             'flex-1 py-2.5 px-4 text-sm font-semibold rounded-full transition-all',
             pestana === 'guardadas'
-              ? 'bg-brand text-brand-foreground shadow-sm'
+              ? 'bg-brand text-brand-foreground shadow-xs'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
@@ -45,7 +45,7 @@ export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
           className={cn(
             'flex-1 py-2.5 px-4 text-sm font-semibold rounded-full transition-all',
             pestana === 'mis-recetas'
-              ? 'bg-brand text-brand-foreground shadow-sm'
+              ? 'bg-brand text-brand-foreground shadow-xs'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

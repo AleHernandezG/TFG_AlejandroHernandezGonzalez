@@ -591,6 +591,73 @@ token responde 401, y en el `main` anterior esa ruta no existía) y Vercel despl
 La lección: un test inestable en el backend no es una molestia, es un deploy bloqueado. Si un test
 falla solo en el CI, se investiga ese día, no se relanza el job.
 
+### Tailwind 4, hecho el 25/09/2026 en la rama `tailwind-4`
+
+El problema del tema que salió con `brand` y con `destructive` era más grande de lo que parecía.
+Tailwind 3.4 no sabe aplicar opacidad a un color definido como `var(--x)` con oklch, así que cualquier
+`bg-brand/10`, `border-border/50` o `ring-ring/50` no generaba ninguna regla. Contadas, eran unas 284
+clases muertas repartidas en 13 tokens, con `brand` (100), `border` (54) y `destructive` (51) a la
+cabeza. Lo que más se notaba era el anillo de foco: `focus:ring-brand/40` no existía y Tailwind ponía
+su color por defecto, que es azul.
+
+Debajo había otra cosa. `components/ui/` es shadcn en estilo `radix-nova`, escrito para Tailwind 4:
+`data-open:`, `in-data-`, `has-data-`, `ring-3`, `backdrop-blur-xs`, `bg-(--var)` y las animaciones
+`animate-in` de `tw-animate-css`, que estaba instalado pero nadie importaba. En v3 todo eso también
+era CSS que no existía, así que diálogos, *sheets* y *drawers* abrían sin animación y con estados a
+medias.
+
+**Por qué v4 y no canales.** La alternativa era quedarse en v3 y escribir los tokens como canales
+(`--brand: 0.55 0.14 55` con `oklch(var(--brand) / <alpha-value>)` en el config). Funciona, está
+comprobado con el CLI, pero obliga a reescribir los 13 tokens en claro y en oscuro, a rediseñar
+`--border` e `--input` en oscuro porque llevan el alfa dentro, y deja muertas las variantes de v4 de
+shadcn. v4 resuelve la opacidad con `color-mix()` sobre cualquier color, así que los tokens se quedan
+como estaban.
+
+**Qué se hizo.** `npx @tailwindcss/upgrade` pasó `tailwind.config.ts` a un bloque `@theme` en
+`globals.css`, cambió PostCSS a `@tailwindcss/postcss` y renombró clases en 86 ficheros:
+`shadow-sm` → `shadow-xs`, `outline-none` → `outline-hidden`, `flex-shrink-0` → `shrink-0`,
+`bg-gradient-to-*` → `bg-linear-to-*` y `bg-[var(--x)]` → `bg-(--x)`, entre otras.
+
+El codemod se equivocó en `components/ui/`: trató ese código como si fuera de v3, invirtió el orden de
+las variantes apiladas (`*:data-[slot=avatar]:ring-2` pasó a `data-[slot=avatar]:*:ring-2`, que en v4
+selecciona otra cosa) y renombró sombras que ya eran de v4. Esa carpeta se devolvió entera a como
+estaba. Si algún día se vuelve a pasar el codemod, hay que excluirla.
+
+Lo demás, a mano:
+
+- `@theme inline` en vez de `@theme`, como lo monta shadcn, para que los colores apunten a los tokens
+  sin copiarlos a `:root`. De paso desaparece un `--font-sans: var(--font-sans)` que el codemod dejaba
+  como referencia circular.
+- `@custom-variant dark (&:is(.dark *))`. Nadie pone la clase `.dark`, así que los tokens oscuros nunca
+  se aplicaron, pero en v3 `dark:` iba por `prefers-color-scheme` y con el sistema en oscuro se colaban
+  clases oscuras sobre tokens claros. Ahora `dark:` y los tokens van por el mismo sitio. Encender el
+  modo oscuro, si algún día se quiere, es poner `.dark` en el `<html>`.
+- `@import 'tw-animate-css'`, así que diálogos, *sheets* y *drawers* ya animan al abrir y al cerrar.
+- `cursor: pointer` en botones y `[role=button]` en la capa base, porque v4 los deja con cursor por
+  defecto.
+- El bloque de compatibilidad de bordes que añade el codemod sobra, porque `* { @apply border-border }`
+  ya pone el color.
+- `headerHomePc.tsx` tenía `shadow-[0px_4px_24px_var(--foreground)_/_0.05]`, que tampoco era CSS válido
+  en v3. Pasa a `color-mix(in_oklab,var(--foreground)_5%,transparent)`.
+- `components.json` deja de apuntar a `tailwind.config.ts` (`"config": ""`) y `.prettierrc` apunta el
+  plugin de Tailwind 0.8 a `globals.css` con `tailwindStylesheet`.
+
+**Comprobado.** `next build`, `tsc`, lint (los tres avisos de `img` de siempre) y el E2E, 2 de 2. En
+el CSS generado aparecen `ring-brand/40`, `bg-brand/10`, `border-border/50`, `data-open:animate-in`,
+`ring-3` y `backdrop-blur-xs`. En el navegador, con `pruebas:ui` y `next dev --turbo`, se repasaron
+login, completar perfil, Discover con el *drawer* de filtros, el asistente en escritorio y a 390 px,
+perfil, colección y el detalle de una receta. El anillo del título en el paso de datos mide
+`oklab(0.55 0.08 0.11 / 0.4)`: el naranja de la marca al 40 %, no el azul.
+
+Cambios que se ven, y son a propósito: el anillo de foco en naranja, el tramo ya completado de la
+barra de progreso del asistente con su tinte suave, los chips de alérgenos con fondo rojo claro y los
+diálogos con animación.
+
+**Avisos.** v4 pide Safari 16.4, Chrome 111 o Firefox 128 como mínimo. En un navegador sin
+`color-mix()`, las clases con opacidad caen al color sólido: un `bg-brand/10` se pinta `brand` entero.
+Y `hover:` solo se aplica en dispositivos con puntero, así que en móvil ya no se quedan estados de
+*hover* pegados después de tocar.
+
 ### Recomendación original (superada por lo de arriba)
 
 **Opción A como base, opción C encima.** Concretamente:

@@ -8,7 +8,7 @@ interface Props {
 export function EstadoVacioDespensa({ onAnadir }: Props) {
   return (
     <div className="flex flex-col items-center justify-center px-10 py-20 text-center">
-      <div className="w-20 h-20 rounded-full bg-[var(--warm-bg)] flex items-center justify-center mb-6">
+      <div className="w-20 h-20 rounded-full bg-(--warm-bg) flex items-center justify-center mb-6">
         <ShoppingBasket size={36} className="text-brand/50" />
       </div>
       <h2 className="text-lg font-extrabold text-foreground mb-2">

@@ -64,7 +64,7 @@ export default function PaginaPrivacidad() {
             derechos tienes sobre ellos, en cumplimiento del Reglamento General de Protección de
             Datos (RGPD / UE 2016/679).
           </p>
-          <div className="border-brand/20 mt-4 rounded-lg border bg-[var(--brand-subtle)] px-4 py-3 text-sm text-muted-foreground">
+          <div className="border-brand/20 mt-4 rounded-lg border bg-(--brand-subtle) px-4 py-3 text-sm text-muted-foreground">
             <strong className="text-foreground">Aviso académico —</strong> Cookr es un Trabajo de
             Fin de Grado. Los datos recogidos no se utilizarán con fines comerciales ni se cederán a
             terceros fuera del contexto académico de la aplicación.

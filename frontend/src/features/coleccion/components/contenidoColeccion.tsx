@@ -21,7 +21,7 @@ function GridSkeletonColeccion() {
   return (
     <div className="px-5 pt-8 pb-10 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="aspect-[3/4] rounded-xl bg-muted animate-pulse" />
+        <div key={i} className="aspect-3/4 rounded-xl bg-muted animate-pulse" />
       ))}
     </div>
   )

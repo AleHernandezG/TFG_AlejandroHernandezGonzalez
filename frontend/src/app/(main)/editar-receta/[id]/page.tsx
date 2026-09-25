@@ -48,7 +48,7 @@ export default function PaginaEditarReceta() {
 
   if (cargando || status === 'loading') {
     return (
-      <div className="min-h-screen bg-[var(--warm-bg)] flex items-center justify-center">
+      <div className="min-h-screen bg-(--warm-bg) flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Cargando receta…</p>
       </div>
     )
@@ -56,7 +56,7 @@ export default function PaginaEditarReceta() {
 
   if (error || !receta) {
     return (
-      <div className="min-h-screen bg-[var(--warm-bg)] flex flex-col items-center justify-center gap-4 px-5">
+      <div className="min-h-screen bg-(--warm-bg) flex flex-col items-center justify-center gap-4 px-5">
         <p className="text-sm text-destructive text-center">{error ?? 'Error desconocido'}</p>
         <button
           onClick={() => router.back()}
@@ -70,12 +70,12 @@ export default function PaginaEditarReceta() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--warm-bg)]">
+    <div className="min-h-screen bg-(--warm-bg)">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[var(--warm-bg)] border-b border-border/40 px-5 py-4 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-(--warm-bg) border-b border-border/40 px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="h-9 w-9 flex items-center justify-center rounded-xl bg-[var(--warm-bg-accent)] text-foreground hover:opacity-80 transition-opacity"
+          className="h-9 w-9 flex items-center justify-center rounded-xl bg-(--warm-bg-accent) text-foreground hover:opacity-80 transition-opacity"
         >
           <ArrowLeft size={18} />
         </button>

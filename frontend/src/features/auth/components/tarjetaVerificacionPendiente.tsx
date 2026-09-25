@@ -56,7 +56,7 @@ export function TarjetaVerificacionPendiente({ email }: Props) {
       <Card className="border-border/60 shadow-lg">
         <CardContent className="flex flex-col items-center gap-6 px-6 py-10 text-center">
           {/* Icono */}
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-subtle)]">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-(--brand-subtle)">
             <Mail className="h-8 w-8 text-brand" aria-hidden />
           </div>
 

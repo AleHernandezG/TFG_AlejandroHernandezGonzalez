@@ -98,7 +98,7 @@ export function CabeceraReceta({ receta }: Props) {
             <Badge
               key={cat}
               variant="secondary"
-              className="bg-[var(--warm-bg)] text-foreground/70 border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
+              className="bg-(--warm-bg) text-foreground/70 border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
             >
               {nombreCategoria(cat)}
             </Badge>
@@ -128,9 +128,9 @@ export function CabeceraReceta({ receta }: Props) {
       <div className="flex items-center justify-between">
         {/* Autor + botón seguir */}
         <div className="flex items-center gap-2.5">
-          <Avatar className="h-10 w-10 ring-2 ring-[var(--warm-bg)]">
+          <Avatar className="h-10 w-10 ring-2 ring-(--warm-bg)">
             <AvatarImage src={receta.autor.avatarUrl} alt={receta.autor.nombre} />
-            <AvatarFallback className="text-xs bg-[var(--warm-bg)] text-foreground">
+            <AvatarFallback className="text-xs bg-(--warm-bg) text-foreground">
               {receta.autor.nombre.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>

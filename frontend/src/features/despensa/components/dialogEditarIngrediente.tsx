@@ -50,7 +50,7 @@ export function DialogEditarIngrediente({ item, onCerrar, onGuardar }: Props) {
             <input
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full bg-[var(--warm-bg)] rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
+              className="w-full bg-(--warm-bg) rounded-xl px-4 py-3 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand/40"
             />
           </div>
 
@@ -66,12 +66,12 @@ export function DialogEditarIngrediente({ item, onCerrar, onGuardar }: Props) {
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.value)}
                 min={0}
-                className="flex-1 bg-[var(--warm-bg)] rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand/40 text-center"
+                className="flex-1 bg-(--warm-bg) rounded-xl px-4 py-3 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand/40 text-center"
               />
               <select
                 value={unidad}
                 onChange={(e) => setUnidad(e.target.value)}
-                className="flex-[2] bg-[var(--warm-bg)] rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none appearance-none text-center cursor-pointer"
+                className="flex-2 bg-(--warm-bg) rounded-xl px-4 py-3 text-sm text-foreground focus:outline-hidden appearance-none text-center cursor-pointer"
               >
                 {UNIDADES_INGREDIENTE.map((u) => (
                   <option key={u} value={u}>{u}</option>

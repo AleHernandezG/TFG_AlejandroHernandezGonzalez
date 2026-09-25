@@ -20,7 +20,7 @@ function formatTiempo(min: number): string {
 export function TarjetaDiscover({ receta }: Props) {
   return (
     <Link href={`/recetas/${receta.id}`} className="block group">
-      <article className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted shadow-[0px_8px_24px_oklch(0.22_0.02_50_/_0.10)]">
+      <article className="relative aspect-3/4 rounded-2xl overflow-hidden bg-muted shadow-[0px_8px_24px_oklch(0.22_0.02_50/0.10)]">
         <Image
           src={receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
           alt={receta.titulo}
@@ -30,10 +30,10 @@ export function TarjetaDiscover({ receta }: Props) {
         />
 
         {/* Gradiente — más fuerte en la parte inferior */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/25 to-transparent" />
 
         {/* Badge likes — esquina superior derecha */}
-        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm px-2 py-1">
+        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-xs px-2 py-1">
           <Heart size={9} className="text-rose-400" fill="currentColor" />
           <span className="text-white text-[10px] font-semibold leading-none">
             {receta.likes}
