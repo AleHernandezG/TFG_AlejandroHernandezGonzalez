@@ -26,7 +26,7 @@ const varianteTarjeta: Variants = {
 
 function SkeletonTarjeta() {
   return (
-    <div className="aspect-[3/4] rounded-2xl bg-muted animate-pulse" />
+    <div className="aspect-3/4 rounded-2xl bg-muted animate-pulse" />
   )
 }
 
@@ -81,7 +81,7 @@ export function ContenidoDiscover() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--warm-bg)]">
+    <div className="min-h-screen bg-(--warm-bg)">
       <HeaderDiscover
         query={query}
         onChange={setQuery}
@@ -121,7 +121,7 @@ export function ContenidoDiscover() {
                 </h2>
               ) : (
                 <div className="flex justify-center">
-                  <div className="flex items-center gap-1 rounded-full bg-[var(--warm-bg-accent)] p-1">
+                  <div className="flex items-center gap-1 rounded-full bg-(--warm-bg-accent) p-1">
                     {([
                       { id: 'recientes', label: 'Tendencias' },
                       { id: 'valorados', label: 'Mejor valorados' },
@@ -133,7 +133,7 @@ export function ContenidoDiscover() {
                         className={[
                           'rounded-full px-3 py-1 text-xs font-bold transition-colors',
                           id === tabActiva
-                            ? 'bg-background text-foreground shadow-sm'
+                            ? 'bg-background text-foreground shadow-xs'
                             : 'text-muted-foreground',
                         ].join(' ')}
                       >

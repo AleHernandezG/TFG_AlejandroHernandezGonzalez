@@ -63,7 +63,7 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
   return (
     <>
       <Link href={`/recetas/${receta.id}`} className="block">
-        <article className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer bg-muted shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.06)]">
+        <article className="relative aspect-3/4 rounded-xl overflow-hidden cursor-pointer bg-muted shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
           <Image
             src={receta.imagenUrl || '/images/recetas/crearRecetaImagen.webp'}
             alt={receta.titulo}
@@ -73,13 +73,13 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
             unoptimized={receta.imagenUrl?.startsWith('data:')}
           />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10" />
 
           {pestana === 'guardadas' ? (
             <button
               aria-label="Quitar de guardadas"
               onClick={handleDesguardar}
-              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-brand shadow-sm hover:scale-110 transition-transform"
+              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-brand shadow-xs hover:scale-110 transition-transform"
             >
               <Bookmark className="w-4 h-4 fill-current" />
             </button>
@@ -87,14 +87,14 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
             <button
               aria-label="Opciones de la receta"
               onClick={handleAbrirSheet}
-              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shadow-sm hover:scale-110 transition-transform"
+              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white shadow-xs hover:scale-110 transition-transform"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
           )}
 
           <div className="absolute bottom-0 left-0 w-full p-4 z-20">
-            <h3 className="font-bold text-white text-base leading-tight mb-2 drop-shadow-sm">
+            <h3 className="font-bold text-white text-base leading-tight mb-2 drop-shadow-xs">
               {receta.titulo}
             </h3>
             <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
                   className="rounded-full object-cover border border-white/20"
                 />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-brand/40 border border-white/20 flex-shrink-0" />
+                <div className="w-5 h-5 rounded-full bg-brand/40 border border-white/20 shrink-0" />
               )}
               <span className="text-white/90 text-xs font-medium">{receta.autor.nombre}</span>
             </div>

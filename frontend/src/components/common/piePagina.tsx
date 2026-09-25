@@ -26,7 +26,7 @@ const enlacesUtiles = [
 
 export function PiePagina() {
   return (
-    <footer className="border-border/50 bg-card/50 border-t backdrop-blur-sm">
+    <footer className="border-border/50 bg-card/50 border-t backdrop-blur-xs">
       <div className="mx-auto w-full max-w-5xl px-5 py-14 md:px-10">
         <Separator className="mb-12 opacity-50" />
 

@@ -17,7 +17,7 @@ export function EstadoVacioGuardadas() {
       </div>
       <Link
         href="/home"
-        className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-foreground shadow-sm active:scale-95 transition-transform"
+        className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-brand-foreground shadow-xs active:scale-95 transition-transform"
       >
         <Compass className="w-4 h-4" />
         Explorar recetas

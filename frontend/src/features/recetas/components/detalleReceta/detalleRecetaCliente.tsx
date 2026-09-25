@@ -41,7 +41,7 @@ export function DetalleRecetaCliente({ receta }: Props) {
           fotoCredito={receta.receta.fotoCredito}
         />
         {/* Tarjeta de contenido que sube sobre el hero con esquinas redondeadas */}
-        <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem]">
+        <div className="-mt-8 relative z-10 bg-background rounded-t-4xl">
           <CabeceraReceta receta={receta} />
           <TabsReceta
             ingredientes={receta.ingredientes}
@@ -66,7 +66,7 @@ export function DetalleRecetaCliente({ receta }: Props) {
             fotoFuente={receta.receta.fotoFuente}
             fotoCredito={receta.receta.fotoCredito}
           />
-          <div className="-mt-8 relative z-10 bg-background rounded-t-[2rem]">
+          <div className="-mt-8 relative z-10 bg-background rounded-t-4xl">
             <CabeceraReceta receta={receta} />
             <TabsReceta
               ingredientes={receta.ingredientes}

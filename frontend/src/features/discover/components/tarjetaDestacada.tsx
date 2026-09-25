@@ -7,9 +7,9 @@ interface Props {
 
 export function TarjetaDestacada({ evento }: Props) {
   return (
-    <div className="relative mx-5 h-44 rounded-2xl overflow-hidden bg-[var(--warm-bg-accent)] shadow-[0px_12px_32px_oklch(0.22_0.02_50_/_0.1)]">
+    <div className="relative mx-5 h-44 rounded-2xl overflow-hidden bg-(--warm-bg-accent) shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.1)]">
       {/* Fondo degradado editorial */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand/20 via-[var(--warm-bg-accent)] to-brand/5" />
+      <div className="absolute inset-0 bg-linear-to-br from-brand/20 via-(--warm-bg-accent) to-brand/5" />
 
       {/* Patrón decorativo */}
       <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-brand/10" />

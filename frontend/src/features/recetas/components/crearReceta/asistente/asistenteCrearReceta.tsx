@@ -82,7 +82,7 @@ export function AsistenteCrearReceta({
           }
         }}
       >
-        <header className="border-b border-border/60 bg-[var(--warm-bg-accent)] px-5 pb-3 pt-4">
+        <header className="border-b border-border/60 bg-(--warm-bg-accent) px-5 pb-3 pt-4">
           <div className="flex items-start gap-3">
             {vista !== 'pasos' && (
               <button
@@ -102,7 +102,7 @@ export function AsistenteCrearReceta({
                 </p>
               )}
               <DialogTitle asChild>
-                <h2 ref={tituloRef} tabIndex={-1} className="truncate text-lg font-extrabold text-foreground outline-none">
+                <h2 ref={tituloRef} tabIndex={-1} className="truncate text-lg font-extrabold text-foreground outline-hidden">
                   {vista === 'pasos' && <span className="sr-only">Paso {indice + 1} de {total}. </span>}
                   {cabecera.titulo}
                 </h2>
@@ -142,7 +142,7 @@ export function AsistenteCrearReceta({
         </header>
 
         <div className="flex min-h-0 flex-1">
-          <div className="flex-1 overflow-y-auto bg-[var(--warm-bg)] px-4 py-4">
+          <div className="flex-1 overflow-y-auto bg-(--warm-bg) px-4 py-4">
             {vista === 'pasos' && (
               <div className="flex flex-col gap-4">
                 {borradorRecuperado && esPrimero && (
@@ -178,7 +178,7 @@ export function AsistenteCrearReceta({
             {vista === 'ia' && <VistaGenerarIa {...ia} onVolver={() => setVista('pasos')} />}
 
             {vista === 'salir' && (
-              <div className="flex flex-col gap-3 rounded-2xl bg-[var(--warm-bg-accent)] p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+              <div className="flex flex-col gap-3 rounded-2xl bg-(--warm-bg-accent) p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
                 <p className="text-sm text-muted-foreground">
                   Borrarás la foto, los ingredientes y los pasos que llevas escritos.
                 </p>
@@ -207,12 +207,12 @@ export function AsistenteCrearReceta({
           {vista === 'pasos' && (
             <aside
               aria-live="polite"
-              className="hidden w-[44%] shrink-0 flex-col overflow-y-auto border-l border-border/60 bg-[var(--warm-bg-accent)] px-5 py-4 lg:flex"
+              className="hidden w-[44%] shrink-0 flex-col overflow-y-auto border-l border-border/60 bg-(--warm-bg-accent) px-5 py-4 lg:flex"
             >
               <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Así se verá
               </p>
-              <div className="overflow-hidden rounded-3xl bg-background shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+              <div className="overflow-hidden rounded-3xl bg-background shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
                 <VistaPreviaPaso paso={paso.id} fotoUrl={foto.url} />
               </div>
             </aside>
@@ -220,7 +220,7 @@ export function AsistenteCrearReceta({
         </div>
 
         {vista === 'pasos' && (
-          <footer className="flex items-center justify-between gap-3 border-t border-border/60 bg-[var(--warm-bg-accent)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-3">
+          <footer className="flex items-center justify-between gap-3 border-t border-border/60 bg-(--warm-bg-accent) px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:pb-3">
             <button
               type="button"
               onClick={() => setVista('salir')}

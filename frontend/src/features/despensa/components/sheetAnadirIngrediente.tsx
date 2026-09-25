@@ -155,8 +155,8 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
               Nombre del ingrediente
             </label>
             <div className="relative">
-              <div className="flex items-center gap-2 bg-[var(--warm-bg)] rounded-2xl px-4 py-3.5">
-                <Search size={16} className="text-muted-foreground flex-shrink-0" />
+              <div className="flex items-center gap-2 bg-(--warm-bg) rounded-2xl px-4 py-3.5">
+                <Search size={16} className="text-muted-foreground shrink-0" />
                 <input
                   ref={inputRef}
                   value={nombre}
@@ -168,7 +168,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
                   onBlur={() => setTimeout(() => setMostrandoSugerencias(false), 150)}
                   placeholder="Ej. Tomate"
                   autoComplete="off"
-                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden"
                 />
               </div>
 
@@ -195,7 +195,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
                     key={s}
                     type="button"
                     onClick={() => handleSeleccionarNombre(s)}
-                    className="px-3.5 py-1.5 rounded-full bg-[var(--warm-bg)] text-xs font-medium text-foreground/80 hover:bg-[var(--warm-bg-accent)] transition-colors"
+                    className="px-3.5 py-1.5 rounded-full bg-(--warm-bg) text-xs font-medium text-foreground/80 hover:bg-(--warm-bg-accent) transition-colors"
                   >
                     {s}
                   </button>
@@ -210,7 +210,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
               Cantidad
             </label>
             <div className="flex gap-3">
-              <div className="flex-1 bg-[var(--warm-bg)] rounded-2xl px-4 py-3.5">
+              <div className="flex-1 bg-(--warm-bg) rounded-2xl px-4 py-3.5">
                 <input
                   type="number"
                   inputMode="decimal"
@@ -218,14 +218,14 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
                   onChange={(e) => setCantidad(e.target.value)}
                   placeholder="0"
                   min={0}
-                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none text-center font-medium"
+                  className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden text-center font-medium"
                 />
               </div>
-              <div className="flex-[2] bg-[var(--warm-bg)] rounded-2xl px-4 py-3.5">
+              <div className="flex-2 bg-(--warm-bg) rounded-2xl px-4 py-3.5">
                 <select
                   value={unidad}
                   onChange={(e) => setUnidad(e.target.value)}
-                  className="w-full bg-transparent text-sm text-foreground focus:outline-none appearance-none text-center font-medium cursor-pointer"
+                  className="w-full bg-transparent text-sm text-foreground focus:outline-hidden appearance-none text-center font-medium cursor-pointer"
                 >
                   {UNIDADES_INGREDIENTE.map((u) => (
                     <option key={u} value={u}>{u}</option>
@@ -308,7 +308,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
         <DialogContent className="max-w-sm rounded-2xl">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-1">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--warm-bg)]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--warm-bg)">
                 <AlertCircle size={20} className="text-brand" />
               </div>
               <DialogTitle className="text-base font-extrabold text-foreground">

@@ -38,7 +38,7 @@ export function BuscadorFiltros({
         <input
           type="search"
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-hidden"
           onChange={(e) => onBuscar(e.target.value)}
         />
       </label>

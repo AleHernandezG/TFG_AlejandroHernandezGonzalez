@@ -21,7 +21,7 @@ export function PasoDatos() {
 
   return (
     <>
-      <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+      <section className="bg-(--warm-bg-accent) rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
         <h2 className="text-base font-extrabold text-foreground mb-4">Información básica</h2>
 
         <div className="mb-4">
@@ -35,7 +35,7 @@ export function PasoDatos() {
             className={[
               'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
               'placeholder:text-muted-foreground',
-              'focus:outline-none focus:ring-2 focus:ring-brand/40',
+              'focus:outline-hidden focus:ring-2 focus:ring-brand/40',
               errors.titulo ? 'border-destructive' : 'border-border',
             ].join(' ')}
           />
@@ -62,7 +62,7 @@ export function PasoDatos() {
             className={[
               'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
               'placeholder:text-muted-foreground resize-none',
-              'focus:outline-none focus:ring-2 focus:ring-brand/40',
+              'focus:outline-hidden focus:ring-2 focus:ring-brand/40',
               errors.descripcion ? 'border-destructive' : 'border-border',
             ].join(' ')}
           />
@@ -86,14 +86,14 @@ export function PasoDatos() {
                 className={[
                   'flex-1 min-w-0 bg-background border rounded-xl px-3 py-3 text-sm text-foreground',
                   'placeholder:text-muted-foreground',
-                  'focus:outline-none focus:ring-2 focus:ring-brand/40',
+                  'focus:outline-hidden focus:ring-2 focus:ring-brand/40',
                   errors.tiempo ? 'border-destructive' : 'border-border',
                 ].join(' ')}
               />
               <select
                 {...register('unidadTiempo')}
                 aria-label="Unidad de tiempo"
-                className="w-16 bg-background border border-border rounded-xl px-2 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand/40"
+                className="w-16 bg-background border border-border rounded-xl px-2 py-3 text-sm text-foreground focus:outline-hidden focus:ring-2 focus:ring-brand/40"
               >
                 <option value="min">min</option>
                 <option value="h">h</option>
@@ -117,7 +117,7 @@ export function PasoDatos() {
               className={[
                 'w-full bg-background border rounded-xl px-3.5 py-3 text-sm text-foreground',
                 'placeholder:text-muted-foreground',
-                'focus:outline-none focus:ring-2 focus:ring-brand/40',
+                'focus:outline-hidden focus:ring-2 focus:ring-brand/40',
                 errors.porciones ? 'border-destructive' : 'border-border',
               ].join(' ')}
             />
@@ -143,7 +143,7 @@ export function PasoDatos() {
                     'flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors',
                     activo
                       ? 'bg-brand text-brand-foreground'
-                      : 'bg-[var(--warm-bg)] text-muted-foreground hover:bg-[var(--warm-bg)]/80',
+                      : 'bg-(--warm-bg) text-muted-foreground hover:bg-(--warm-bg)/80',
                   ].join(' ')}
                 >
                   {ETIQUETAS_DIFICULTAD[d]}
@@ -157,7 +157,7 @@ export function PasoDatos() {
         </div>
       </section>
 
-      <section className="bg-[var(--warm-bg-accent)] rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50_/_0.4)]">
+      <section className="bg-(--warm-bg-accent) rounded-2xl p-5 shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
         <h2 className="text-base font-extrabold text-foreground mb-3">Tipo de receta</h2>
         <SelectorChips
           opciones={DIETAS_OPCIONES}

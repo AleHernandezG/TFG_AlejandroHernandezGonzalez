@@ -28,7 +28,7 @@ export function ContenidoChat() {
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-background">
+    <div className="fixed inset-0 z-60 flex flex-col bg-background">
       <HeaderChat onVerHistorial={() => setHistorialAbierto(true)} />
 
       <div className="flex-1 overflow-y-auto">

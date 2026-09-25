@@ -54,14 +54,14 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
       <h2 className="mb-4 text-xl font-extrabold text-foreground">Ingredientes</h2>
 
       {/* Ajustador porciones */}
-      <div className="mb-4 flex items-center justify-between rounded-2xl bg-[var(--warm-bg)] px-4 py-3">
+      <div className="mb-4 flex items-center justify-between rounded-2xl bg-(--warm-bg) px-4 py-3">
         <span className="text-sm font-bold text-foreground">Porciones</span>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPorciones((p) => Math.max(1, p - 1))}
             disabled={porciones <= 1}
             aria-label="Reducir porciones"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-opacity disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-xs transition-opacity disabled:opacity-40"
           >
             <Minus size={16} />
           </button>
@@ -71,7 +71,7 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
           <button
             onClick={() => setPorciones((p) => p + 1)}
             aria-label="Aumentar porciones"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-opacity"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-xs transition-opacity"
           >
             <Plus size={16} />
           </button>
@@ -112,7 +112,7 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
         {MACROS_CONFIG.map(({ key, label, unidad }) => (
           <div
             key={key}
-            className="flex flex-col gap-0.5 rounded-2xl bg-[var(--warm-bg)] p-4 shadow-sm"
+            className="flex flex-col gap-0.5 rounded-2xl bg-(--warm-bg) p-4 shadow-xs"
           >
             <span className="text-xs font-bold uppercase tracking-tighter text-muted-foreground">
               {label}

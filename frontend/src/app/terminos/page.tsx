@@ -64,7 +64,7 @@ export default function PaginaTerminos() {
             utilizar cualquier parte de la plataforma, aceptas estos Términos de uso en su
             totalidad. Léelos con atención antes de continuar.
           </p>
-          <div className="border-brand/20 mt-4 rounded-lg border bg-[var(--brand-subtle)] px-4 py-3 text-sm text-muted-foreground">
+          <div className="border-brand/20 mt-4 rounded-lg border bg-(--brand-subtle) px-4 py-3 text-sm text-muted-foreground">
             <strong className="text-foreground">Aviso académico —</strong> Cookr es un Trabajo de
             Fin de Grado sin finalidad comercial. Su uso es exclusivamente educativo y de
             demostración técnica.
