@@ -33,8 +33,8 @@ export function ContenidoColeccion() {
     searchParams.get('tab') === 'mis-recetas' ? 'mis-recetas' : 'guardadas'
   const [pestana, setPestana] = useState<PestanaColeccion>(tabInicial)
 
-  const { data: guardadas = [], isLoading: cargandoGuardadas } = useRecetasGuardadas()
-  const { data: misRecetas = [], isLoading: cargandoMisRecetas } = useMisRecetas()
+  const { data: guardadas = [], isPending: cargandoGuardadas } = useRecetasGuardadas()
+  const { data: misRecetas = [], isPending: cargandoMisRecetas } = useMisRecetas()
 
   const recetas = pestana === 'guardadas' ? guardadas : misRecetas
   const cargando = pestana === 'guardadas' ? cargandoGuardadas : cargandoMisRecetas
@@ -42,7 +42,7 @@ export function ContenidoColeccion() {
 
   return (
     <div className="min-h-screen bg-background">
-      <HeaderColeccion pestana={pestana} onCambiar={setPestana} total={recetas.length} />
+      <HeaderColeccion pestana={pestana} onCambiar={setPestana} total={cargando ? null : recetas.length} />
 
       <AnimatePresence mode="wait">
         <motion.div
