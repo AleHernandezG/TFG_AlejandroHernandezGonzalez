@@ -25,7 +25,7 @@ export function CarruselSimilares({ recetas }: Props) {
 
       {/* Carrusel Embla — sangra hasta los bordes */}
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex items-center justify-center gap-4 pl-6 pr-5">
+        <div className="flex items-center gap-4 pl-6 pr-5">
           {recetas.map((post) => (
             <Link
               key={post.id}

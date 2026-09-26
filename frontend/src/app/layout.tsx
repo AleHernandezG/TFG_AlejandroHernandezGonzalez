@@ -6,13 +6,13 @@ import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
-  variable: "--font-sans",
+  variable: "--font-geist-sans",
   weight: "100 900",
 });
 
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-mono",
+  variable: "--font-geist-mono",
   weight: "100 900",
 });
 
@@ -27,14 +27,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body
-        className={cn(
-          geistSans.variable,
-          geistMono.variable,
-          "font-sans antialiased"
-        )}
-      >
+    <html
+      lang="es"
+      suppressHydrationWarning
+      className={cn(geistSans.variable, geistMono.variable)}
+    >
+      <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
