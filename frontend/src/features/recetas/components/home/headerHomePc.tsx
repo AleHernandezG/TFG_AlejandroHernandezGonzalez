@@ -1,9 +1,9 @@
 'use client'
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Search, SlidersHorizontal, LogOut } from 'lucide-react'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
 import type { FiltrosAvanzados } from '../../types/receta.types'
 import { DrawerFiltros } from './drawerFiltros'
@@ -21,6 +21,8 @@ export function HeaderHomePc({
   filtrosAvanzados,
   onFiltrosAvanzadosChange,
 }: HeaderHomePcProps) {
+  const { data: session } = useSession()
+  const nombre = session?.user?.name ?? ''
   const totalActivos =
     filtrosAvanzados.dietas.length +
     filtrosAvanzados.dificultad.length +
@@ -72,8 +74,9 @@ export function HeaderHomePc({
       {/* Acciones */}
       <div className="flex items-center gap-3 justify-self-end">
         <Avatar className="h-9 w-9">
+          <AvatarImage src={session?.user?.image ?? undefined} alt={nombre} />
           <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand">
-            U
+            {nombre.charAt(0).toUpperCase() || 'U'}
           </AvatarFallback>
         </Avatar>
         <Button

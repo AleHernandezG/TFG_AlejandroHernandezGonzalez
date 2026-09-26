@@ -135,7 +135,8 @@ export const useChatStore = create<ChatStore>()(
         const { historial } = get()
         const conv = historial.find((c) => c.id === id)
         if (!conv) return
-        set({ mensajes: conv.mensajes, cargando: false })
+        const mensajes = conv.mensajes.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }))
+        set({ mensajes, cargando: false })
       },
 
       eliminarConversacion: (id: string) => {
