@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ContenidoColeccion } from '@/features/coleccion/components'
 import { SidebarNavPc } from '@/features/recetas/components'
+
+export const metadata: Metadata = {
+  title: 'Mi colección — Cookr',
+  description: 'Tus recetas guardadas y las que has publicado.',
+}
 
 export default function PaginaColeccion() {
   return (
