@@ -11,7 +11,7 @@ import { useMiDespensa, useAñadirItem, useEditarItem, useEliminarItem } from '@
 import type { ItemDespensa } from '@/features/despensa/types/despensa.types'
 
 export function ContenidoDespensa() {
-  const { data: ingredientes = [], isLoading } = useMiDespensa()
+  const { data: ingredientes = [], isPending } = useMiDespensa()
   const { mutate: añadir } = useAñadirItem()
   const { mutate: editar } = useEditarItem()
   const { mutate: eliminar } = useEliminarItem()
@@ -19,7 +19,7 @@ export function ContenidoDespensa() {
   const [sheetAbierto, setSheetAbierto] = useState(false)
   const [itemEditando, setItemEditando] = useState<ItemDespensa | null>(null)
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Cargando despensa…</p>

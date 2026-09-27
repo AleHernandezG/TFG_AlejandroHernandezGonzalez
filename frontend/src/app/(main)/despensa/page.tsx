@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ContenidoDespensa } from '@/features/despensa/components'
 import { SidebarNavPc } from '@/features/recetas/components'
+
+export const metadata: Metadata = {
+  title: 'Mi despensa — Cookr',
+  description: 'Los ingredientes que tienes en casa, listos para buscar recetas con ellos.',
+}
 
 export default function PaginaDespensa() {
   return (

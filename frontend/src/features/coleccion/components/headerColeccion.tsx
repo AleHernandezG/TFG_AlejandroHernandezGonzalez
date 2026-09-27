@@ -6,7 +6,7 @@ import type { PestanaColeccion } from '@/features/coleccion/types/coleccion.type
 interface Props {
   pestana: PestanaColeccion
   onCambiar: (p: PestanaColeccion) => void
-  total: number
+  total: number | null
 }
 
 export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
@@ -24,7 +24,11 @@ export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
           </h1>
         )}
         <p className="text-muted-foreground text-sm mt-2 font-medium tracking-wide">
-          {total} {pestana === 'guardadas' ? 'recetas guardadas' : 'recetas publicadas'}
+          {total === null ? (
+            <span className="inline-block h-4 w-32 rounded-full bg-muted animate-pulse align-middle" />
+          ) : (
+            `${total} ${pestana === 'guardadas' ? 'recetas guardadas' : 'recetas publicadas'}`
+          )}
         </p>
       </div>
 

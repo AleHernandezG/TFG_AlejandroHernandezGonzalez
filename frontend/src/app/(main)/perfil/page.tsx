@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { ContenidoPerfil } from '@/features/perfil/components'
 import { SidebarNavPc } from '@/features/recetas/components'
+
+export const metadata: Metadata = {
+  title: 'Mi perfil — Cookr',
+  description: 'Tu foto, tus preferencias de dieta y tus alergias.',
+}
 
 export default function PaginaPerfil() {
   return (
