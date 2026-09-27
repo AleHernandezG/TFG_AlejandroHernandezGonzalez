@@ -255,8 +255,9 @@ FRONTEND_URL=https://tfg-alejandro-hernandez-gonzalez.vercel.app   sin barra fin
 GOOGLE_CLIENT_ID          el mismo que en Vercel; sin ella /api/auth/google responde 503
 MAILJET_API_KEY
 MAILJET_SECRET_KEY
-SENDER_EMAIL
+SENDER_EMAIL              obligatoria; de un dominio autenticado en Mailjet o Hotmail la descarta
 SENDER_NAME
+REPLY_TO_EMAIL            opcional; a dónde van las respuestas
 GEMINI_API_KEY
 GEMINI_MODEL
 GEMINI_MAX_LLAMADAS_DIA
@@ -271,8 +272,8 @@ USDA_API_KEY
 PEXELS_API_KEY
 ```
 
-`PORT` no se define: Render la pone solo. `GMAIL_USER` y `GMAIL_APP_PASSWORD` ya no hacen falta; el
-correo va por la API de Mailjet y `GMAIL_USER` solo se lee como plan B si falta `SENDER_EMAIL`.
+`PORT` no se define: Render la pone solo. `GMAIL_USER` y `GMAIL_APP_PASSWORD` ya no hacen falta: el
+correo va por la API de Mailjet y el código ya no lee `GMAIL_USER` ni como plan B.
 
 **Cloudflare Worker (`npx wrangler secret put`)**
 ```

@@ -63,7 +63,7 @@ cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 247 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 269 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -140,15 +140,14 @@ El suelo solo protege si las recetas están bien etiquetadas, así que **el back
 
 El catálogo de ingredientes y el detector están **copiados** en `backend/src/lib/ingredientes.ts` y `frontend/src/config/ingredientes.ts`, porque los dos paquetes no comparten código. Si tocas uno, toca el otro: `tests/alergenos.deteccion.test.ts` transpila el del frontend y falla si detectan cosas distintas.
 
-### Manejo de errores: tres patrones conviviendo
+### Manejo de errores: un solo camino
 
-Conviene saberlo antes de tocar nada:
+Todo acaba en `manejarError(res, error)` de `middlewares/errores.ts`: los controladores, el try/catch de `routes/chat.routes.ts` y el middleware global `manejadorErrores`, registrado al final de `app.ts`, que delega en él.
 
-- Los controladores usan `manejarError(res, error)`.
-- `routes/chat.routes.ts` hace try/catch inline y respeta `err.status`.
-- `middlewares/errores.ts` (`manejadorErrores`, registrado en `app.ts`) **nunca llega a ejecutarse** porque todo se captura antes, y además descarta `err.status` devolviendo siempre 500.
+- Respeta `err.status`. Un error con status devuelve su propio mensaje; uno sin status es un fallo no controlado y responde 500 con un mensaje genérico, sin filtrar el interno.
+- El middleware global solo recibe lo que no pasa por un controlador, como los errores de `express.json` (cuerpo por encima del límite: 413).
 
-Si unificas esto, hazlo a conciencia: el middleware global es el que está mal, no los otros dos.
+`tests/errores.test.ts` y `tests/imagenes.test.ts` fijan este comportamiento. Si añades una ruta, lanza errores con status embebido y deja que `manejarError` responda; no montes otro formato de error.
 
 ### Gemini pasa por un proxy propio
 
@@ -160,7 +159,7 @@ El servicio tiene dos protecciones propias: un tope diario de llamadas (`GEMINI_
 
 `backend/src/lib/email.ts` usa la **API REST de Mailjet** (`https://api.mailjet.com/v3.1/send`) vía axios. Es deliberado: **Render bloquea los puertos de SMTP saliente**. No lo "arregles" migrando a nodemailer o SMTP, no funcionará en producción.
 
-`nodemailer` y `resend` siguen en `package.json` pero **no se importan en `src/`**: son restos.
+`SENDER_EMAIL` es obligatoria: sin ella `enviarEmail` lanza un error que la nombra, y `server.ts` avisa al arrancar. También avisa (sin bloquear) si el remitente es de un dominio que no se puede autenticar, como `gmail.com` o `usal.es`. `REPLY_TO_EMAIL` es opcional: si está, el payload lleva `ReplyTo`.
 
 Aviso de entrega: el remitente debe estar en un dominio con SPF y DKIM alineados en Mailjet. Enviar desde `@usal.es` o `@gmail.com` falla DMARC y Outlook/Hotmail lo descarta en silencio (Mailjet devuelve 200 igualmente).
 
@@ -189,13 +188,13 @@ Los mensajes de commit sí van en inglés e imperativo.
 - `middlewares/rateLimitIA.ts` limita por usuario (`express-rate-limit`, ventana de 60 s) y hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar** (todas sus rutas llevan `requerirAuth` delante, así que en la práctica siempre hay usuario). El login se limita por otro middleware distinto, `rateLimitAuth.ts`, por IP; no los confundas.
 - Los dos limitadores comparten store vía `lib/rateLimitStore.ts`: **Redis (Upstash) si `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están definidas, memoria si no.** El fallback en memoria se reinicia en cada redeploy; el de Redis sobrevive. `reiniciarLimitesAuth()` (que usa `tests/setup.ts`) reinicia todos los stores registrados.
 - Con `npm run dev`, abrir cualquier diálogo, *sheet* o *drawer* saca `Function components cannot be given refs` en `DialogOverlay` y compañía. Los componentes de `components/ui/` son de shadcn v4, pensados para React 19, y Cookr va con React 18. Solo sale en desarrollo y no rompe nada; quitarlo es pasar `components/ui/` a `forwardRef` o subir a React 19.
-- Las insignias del `README.md` mienten: dicen Next 15 / React 19 / Express 5. Lo real es **Next 14.2.35, React 18, Express 4.19, Node ≥20**.
+- Versiones reales: **Next 14.2.35, React 18, Express 4.19, Tailwind 4, Node ≥20**. Muchos ejemplos de shadcn y de la doc de Next ya asumen Next 15 y React 19: no los copies tal cual.
 
 ## Entorno
 
 Plantillas en `backend/.env.example` y `frontend/.env.example`.
 
-Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
+Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL` (obligatoria), `REPLY_TO_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
 `GOOGLE_CLIENT_ID`.
 
 `GOOGLE_CLIENT_ID` tiene que valer **lo mismo** en el backend y en el frontend: el backend lo usa

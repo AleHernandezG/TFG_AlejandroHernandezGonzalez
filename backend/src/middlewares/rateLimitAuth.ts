@@ -61,3 +61,17 @@ export const limiteReenvioVerificacion = limitarPorIP({
   mensaje: "Demasiados reenvíos del correo de verificación. Vuelve a probar en una hora.",
   prefijo: "reenvio",
 });
+
+export const limiteVerificacionEmail = limitarPorIP({
+  ventanaMinutos: 60,
+  maxIntentos: 20,
+  mensaje: "Demasiados intentos de verificar el correo. Vuelve a probar en una hora.",
+  prefijo: "verificar",
+});
+
+export const limiteNuevaContrasena = limitarPorIP({
+  ventanaMinutos: 60,
+  maxIntentos: 20,
+  mensaje: "Demasiados intentos de cambiar la contraseña. Vuelve a probar en una hora.",
+  prefijo: "nueva-contrasena",
+});
