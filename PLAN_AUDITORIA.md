@@ -38,7 +38,7 @@ Comprobación tras el reinicio: escribe `/` y confirma que aparecen las tres ski
 
 > **A falta de decisión (16/07/2026).** Todo lo del dominio está parado a la espera de decidir si se compra. Mientras siga parado, la Fase 3 no se puede cerrar: los cambios de código sí se pueden hacer, la verificación de entrega no.
 >
-> Descartado ya: cambiar `SENDER_EMAIL` a un `@gmail.com` **no arregla nada** (es lo que hoy recomienda `.env.example` y es justo lo que produce el bug). Mailjet firma DKIM con su dominio, no con el tuyo, así que DMARC no alinea ni con `usal.es` ni con `gmail.com`. La diferencia es solo la política: `usal.es` publica `p=quarantine` (descarte seguro) y `gmail.com` `p=none` (sin acción obligatoria, pero los filtros de Microsoft lo mandan a spam igual por parecer spoofing). Cambiar de proveedor tampoco: Brevo, SendGrid y Postmark aplican las mismas reglas, porque son de SPF/DKIM/DMARC, no de Mailjet.
+> Descartado ya: cambiar `SENDER_EMAIL` a un `@gmail.com` **no arregla nada** (es lo que recomendaba `.env.example` hasta la Fase 3 y es justo lo que produce el bug). Mailjet firma DKIM con su dominio, no con el tuyo, así que DMARC no alinea ni con `usal.es` ni con `gmail.com`. La diferencia es solo la política: `usal.es` publica `p=quarantine` (descarte seguro) y `gmail.com` `p=none` (sin acción obligatoria, pero los filtros de Microsoft lo mandan a spam igual por parecer spoofing). Cambiar de proveedor tampoco: Brevo, SendGrid y Postmark aplican las mismas reglas, porque son de SPF/DKIM/DMARC, no de Mailjet.
 >
 > Única alternativa gratuita que sí pasa DMARC: **Gmail API por HTTPS con OAuth2** (sale de Google como `gmail.com` auténtico, y al ser REST no le afecta el bloqueo SMTP de Render). Se descartó por el riesgo: con la pantalla de consentimiento en *Testing* los refresh tokens caducan a los 7 días y el envío moriría en silencio a mitad de curso.
 
@@ -46,7 +46,7 @@ Comprobación tras el reinicio: escribe `/` y confirma que aparecen las tres ski
 - [ ] **Comprar un dominio** (5-12 €/año en Cloudflare Registrar, Porkbun o Namecheap). Por ejemplo `cookr.app`.
 - [ ] **Autenticar el dominio en Mailjet**: *Account → Senders & Domains → Add a domain*. Añade en tu DNS el registro DKIM (TXT) y el SPF que te dé.
 - [ ] **Publicar DMARC propio**: TXT en `_dmarc.tudominio` con `v=DMARC1; p=none; rua=mailto:alejes@usal.es`. Empieza en `p=none` y endurece cuando lleguen los informes.
-- [ ] **Definir `SENDER_EMAIL=noreply@tudominio` en las variables de entorno de Render.**
+- [ ] **Definir `SENDER_EMAIL=noreply@tudominio` en las variables de entorno de Render.** Y `REPLY_TO_EMAIL=alejes@usal.es` para que las respuestas sigan llegando al buzón de la universidad (el código ya lo manda desde la Fase 3).
 
 **Por qué:** enviar como `@usal.es` a través de Mailjet falla DMARC (la USAL publica `p=quarantine`) y Outlook lo descarta en silencio. No es un problema de código: sin un dominio propio con SPF y DKIM alineados no hay arreglo posible, con ninguna librería ni proveedor.
 
@@ -79,9 +79,7 @@ Se pasó `/security-review` al diff. **Sin hallazgos** de severidad alta ni medi
 
   *Cómo se comprueba:* añade temporalmente `req.ip` y `req.ips` a la respuesta de `/api/health`, despliega, y compara con tu IP pública real (`curl ifconfig.me`). Si coinciden, `1` es correcto. Si `req.ip` sale como IP privada, sube el número de saltos hasta que cuadre y quita el añadido temporal de `/api/health`. Ojo: `trust proxy: true` no es la salida fácil, porque hace `X-Forwarded-For` falsificable y `express-rate-limit` v8 lo rechaza con `ERR_ERL_PERMISSIVE_TRUST_PROXY`.
 
-- [ ] **Limitador en `/nueva-contrasena` y `/verificar-email`.** Son las dos rutas de `auth.routes.ts` que consumen token y se quedaron sin limitar. **No es urgente y no es una vulnerabilidad**: los tokens son `crypto.randomBytes(32).toString("hex")` (`authService.ts:38`, `:153`, `:264`), 256 bits de entropía, adivinarlos por fuerza bruta es inviable aunque les dejes intentarlo un millón de veces. Lo que se gana es defensa en profundidad y no comerse una consulta a Mongo por cada intento basura.
-
-  *Cómo se arregla:* dos exports más en `middlewares/rateLimitAuth.ts` reusando `limitarPorIP`, generosos (del orden de 20/hora, que son rutas que un usuario legítimo toca una o dos veces), y engancharlos en `auth.routes.ts` delante de `validarBody`. Diez minutos.
+- [x] **Limitador en `/nueva-contrasena` y `/verificar-email`.** Hecho (27/09/2026). `limiteVerificacionEmail` y `limiteNuevaContrasena` en `rateLimitAuth.ts`, 20 intentos / hora por IP cada uno, enganchados en `auth.routes.ts` delante de `validarBody`. Salen de `crearStore` como los demás, así que usan Redis si está configurado y `reiniciarLimitesAuth()` los resetea. Los dos tests de `rateLimitAuth.test.ts` que fijaban el hueco pasan a comprobar el 429 en el intento 21, que el cupo empieza entero en cada test y que las dos rutas no comparten cupo. No era una vulnerabilidad (tokens de 256 bits): es defensa en profundidad y una consulta a Mongo menos por cada intento basura.
 
 ---
 
@@ -230,17 +228,17 @@ Tres selectores que dieron guerra y quedan anotados para el siguiente que amplí
 
 ## Fase 3 — Correo
 
-> **Bloqueada por la decisión del dominio (Fase 0).** No empezar hasta que esté decidido. Redactar `.env.example` o el `ReplyTo` sin saber el dominio final es escribir dos veces lo mismo. Lo único que se puede sacar de aquí sin dominio es borrar las dependencias muertas, y para eso no hace falta abrir esta fase.
+> **Código hecho el 27/09/2026, sin esperar al dominio.** Nada de lo cambiado impide que `alejes@usal.es` siga enviando: el backend solo avisa al arrancar. Lo que queda abierto es la verificación de entrega, y esa sí necesita la Fase 0.
 
 **Por qué después de la 1 y la 2:** el código de aquí es menor. Lo que arregla el bug de verdad es la Fase 0, que depende de ti. Los cambios de código se pueden hacer ya, pero **la verificación final necesita el dominio comprado y con DNS propagado**.
 
-- [ ] **Añadir `ReplyTo`** al payload de `lib/email.ts`: envías desde `noreply@tudominio` (pasa DMARC) y las respuestas van a `alejes@usal.es`. Mantiene el aspecto institucional sin romper nada.
-- [ ] **Quitar el fallback `noreply@cookr.app`** de `SENDER_EMAIL`. Es un dominio que no controlas: si la variable falta, hoy falla en silencio. Mejor que reviente al arrancar con un error claro.
-- [ ] **Actualizar `backend/.env.example`.** Ahora recomienda `SENDER_EMAIL=tucuenta@gmail.com`, que reproduce exactamente el bug. Debe pedir un dominio propio autenticado y explicar por qué.
-- [ ] **Borrar las dependencias muertas**: `nodemailer`, `resend`, `@types/nodemailer`. No se importan en `src/`. Deja el comentario de que Render bloquea SMTP, para que nadie intente volver a ese camino.
+- [x] **Añadir `ReplyTo`** al payload de `lib/email.ts`: envías desde `noreply@tudominio` (pasa DMARC) y las respuestas van a `alejes@usal.es`. Mantiene el aspecto institucional sin romper nada. Hecho (27/09/2026) con la variable nueva `REPLY_TO_EMAIL`; si no está, el payload no lleva `ReplyTo`.
+- [x] **Quitar el fallback `noreply@cookr.app`** de `SENDER_EMAIL`. Es un dominio que no controlas: si la variable falta, hoy falla en silencio. Mejor que reviente al arrancar con un error claro. Hecho (27/09/2026): fuera también el de `GMAIL_USER`. Sin `SENDER_EMAIL`, `enviarEmail` lanza un error que la nombra; se valida al enviar, como las claves de Mailjet, para que `jest.mock` del módulo no reviente en el import. Al arrancar, `server.ts` avisa por `console.warn` si falta o si es de un dominio que no se puede autenticar (gmail, hotmail, outlook, usal.es...). Solo avisa, no bloquea ni cambia el remitente, y en `NODE_ENV=test` calla. Tests en `tests/email.test.ts` con axios mockeado.
+- [x] **Actualizar `backend/.env.example`.** Ahora recomienda `SENDER_EMAIL=tucuenta@gmail.com`, que reproduce exactamente el bug. Debe pedir un dominio propio autenticado y explicar por qué. Hecho (27/09/2026): pide `noreply@tudominio.com`, explica que `@gmail.com` y `@usal.es` fallan DMARC y añade `REPLY_TO_EMAIL`.
+- [x] **Borrar las dependencias muertas**: `nodemailer`, `resend`, `@types/nodemailer`. No se importan en `src/`. Deja el comentario de que Render bloquea SMTP, para que nadie intente volver a ese camino. Hecho (27/09/2026) con `npm uninstall`, tras confirmar con grep que no aparecían en `src/`, `tests/` ni `scripts/`. El aviso de SMTP sigue en `.env.example` y en `CLAUDE.md`.
 - [ ] **Verificar de punta a punta**: registro con una cuenta `@hotmail.com` real y comprobar que llega a la bandeja de entrada. Contrasta en Mailjet (*Statistics → Message events*) que sale como `delivered` y no como `blocked`.
 
-**Ficheros:** `backend/src/lib/email.ts`, `backend/.env.example`, `backend/package.json`.
+**Ficheros:** `backend/src/lib/email.ts`, `backend/src/server.ts`, `backend/.env.example`, `backend/package.json`, `backend/tests/email.test.ts` (nuevo).
 
 ---
 
@@ -283,11 +281,11 @@ Producto (las dos primeras ya están en el guion de la defensa):
 ## Resumen del orden y su porqué
 
 1. **Fase 0** (tú) — *a falta de decisión sobre el dominio.* Bloquea la Fase 3.
-2. **Fase 1** — *hecha el 16/07/2026*, salvo dos flecos anotados al final de la fase: verificar los saltos de proxy en el primer deploy y limitar las dos rutas de token que faltan.
+2. **Fase 1** — *hecha el 16/07/2026*, salvo verificar los saltos de proxy en el primer deploy. Las dos rutas de token se limitaron el 27/09/2026.
 3. **Fase 2** — *hecha del todo el 17/07/2026*, Playwright incluido. Red de seguridad para todo lo demás.
 4. **Fase 2b** — *hecha el 17/07/2026*. Los tres bugs arreglados. 75 tests unitarios en verde y CI ejecutándolos.
 5. **Fase 2c** — *hecha el 17/07/2026*. E2E con Playwright del flujo completo, en un job de CI que no bloquea el deploy.
-6. **Fase 3** — **la siguiente**, aunque la verificación depende de la Fase 0.
+6. **Fase 3** — *código hecho el 27/09/2026.* Queda verificar la entrega a Hotmail, que depende de la Fase 0.
 7. **Fase 4** — refactors, ya cubiertos por las pruebas de la Fase 2. *Hecha entera el 17/07/2026. Redis queda a verificar por el autor en producción.*
 8. **Fase 5** — mejoras, sobre una base sana.
 
