@@ -27,7 +27,7 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
     <div className="flex w-full justify-start gap-2">
       {/* Avatar IA */}
       <div className="mt-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-(--brand-subtle)">
-        <ChefHat className="h-4 w-4 text-brand" />
+        <ChefHat className="h-4 w-4 text-brand-texto" />
       </div>
 
       <div className="flex max-w-[85%] flex-col items-start gap-1">
@@ -42,7 +42,7 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
                 strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
                 h3: ({ children }) => <p className="mb-1 mt-3 font-semibold text-foreground first:mt-0">{children}</p>,
                 a: ({ href, children }) => (
-                  <a href={href} className="font-semibold text-brand underline underline-offset-2 hover:opacity-80">
+                  <a href={href} className="font-semibold text-brand-texto underline underline-offset-2 hover:opacity-80">
                     {children}
                   </a>
                 ),
@@ -63,7 +63,7 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
           </span>
           <button
             onClick={handleCopiar}
-            className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-(--warm-bg) hover:text-brand"
+            className="flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-(--warm-bg) hover:text-brand-texto"
           >
             {copiado ? (
               <><Check className="h-3.5 w-3.5" />Copiado</>
@@ -75,8 +75,8 @@ export function BurbujaIA({ contenido, timestamp }: Props) {
             onClick={() => setLiked((v) => !v)}
             className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors ${
               liked
-                ? 'text-brand'
-                : 'text-muted-foreground hover:bg-(--warm-bg) hover:text-brand'
+                ? 'text-brand-texto'
+                : 'text-muted-foreground hover:bg-(--warm-bg) hover:text-brand-texto'
             }`}
           >
             <ThumbsUp className="h-3.5 w-3.5" />

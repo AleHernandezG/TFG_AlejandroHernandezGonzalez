@@ -73,7 +73,7 @@ export function ContenidoVerificacion({ token }: Props) {
             {/* ── Verificando ──────────────────────────────────────── */}
             {estado === 'verificando' && (
               <>
-                <Loader2 className="h-14 w-14 animate-spin text-brand" aria-hidden />
+                <Loader2 className="h-14 w-14 animate-spin text-brand-texto" aria-hidden />
                 <div className="space-y-1">
                   <h1 className="text-xl font-semibold">Verificando tu correo…</h1>
                   <p className="text-sm text-muted-foreground">

@@ -23,13 +23,14 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
     <header className="px-5 pt-6 pb-4">
       {buscando ? (
         <div className="mb-4 flex items-center gap-2">
-          <span className="text-lg font-extrabold text-brand">Cookr</span>
+          <h1 className="sr-only">Buscar recetas</h1>
+          <span className="text-lg font-extrabold text-brand-texto">Cookr</span>
         </div>
       ) : (
         <div className="mb-4">
           <h1 className="text-2xl font-extrabold leading-tight text-foreground text-center">
             Descubre lo que está{' '}
-            <span className="italic text-brand">trending?</span>
+            <span className="italic text-brand-texto">trending?</span>
           </h1>
         </div>
       )}
@@ -68,7 +69,7 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
             className={cn(
               'relative flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-3 text-xs font-semibold transition-colors',
               totalActivos > 0
-                ? 'border-brand bg-brand/10 text-brand'
+                ? 'border-brand bg-brand/10 text-brand-texto'
                 : 'border-border bg-(--warm-bg-accent) text-muted-foreground',
             )}
           >

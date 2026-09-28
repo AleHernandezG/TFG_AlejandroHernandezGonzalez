@@ -47,7 +47,7 @@ export function SheetHistorialChat({ abierto, onCerrar }: Props) {
             <div className="border-b border-border/10 p-4">
               <button
                 onClick={handleNueva}
-                className="flex w-full items-center gap-3 rounded-xl bg-brand/10 px-4 py-3 text-left text-sm font-medium text-brand transition-colors hover:bg-brand/15 active:scale-[0.98]"
+                className="flex w-full items-center gap-3 rounded-xl bg-brand/10 px-4 py-3 text-left text-sm font-medium text-brand-texto transition-colors hover:bg-brand/15 active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4 shrink-0" />
                 Guardar y empezar nueva conversación
@@ -70,7 +70,7 @@ export function SheetHistorialChat({ abierto, onCerrar }: Props) {
                     onClick={() => handleRestaurar(conv.id)}
                     className="flex flex-1 flex-col items-start gap-0.5 text-left"
                   >
-                    <span className="line-clamp-1 text-sm font-medium text-foreground group-hover:text-brand transition-colors">
+                    <span className="line-clamp-1 text-sm font-medium text-foreground group-hover:text-brand-texto transition-colors">
                       {conv.primerMensaje}
                     </span>
                     <span className="text-xs text-muted-foreground">

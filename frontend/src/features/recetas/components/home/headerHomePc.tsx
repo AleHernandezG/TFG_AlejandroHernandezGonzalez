@@ -31,7 +31,7 @@ export function HeaderHomePc({
   return (
     <header className="bg-background/80 fixed left-0 right-0 top-0 z-50 hidden h-20 items-center px-8 shadow-[0px_4px_24px_color-mix(in_oklab,var(--foreground)_5%,transparent)] backdrop-blur-md lg:grid lg:grid-cols-3">
       {/* Logo */}
-      <span className="justify-self-start text-2xl font-black uppercase tracking-widest text-brand">
+      <span className="justify-self-start text-2xl font-black uppercase tracking-widest text-brand-texto">
         Cookr
       </span>
 
@@ -56,7 +56,7 @@ export function HeaderHomePc({
             className={cn(
               'relative flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-colors',
               totalActivos > 0
-                ? 'bg-brand/10 border-brand text-brand'
+                ? 'bg-brand/10 border-brand text-brand-texto'
                 : 'hover:bg-muted/80 border-border bg-muted text-muted-foreground'
             )}
           >
@@ -75,7 +75,7 @@ export function HeaderHomePc({
       <div className="flex items-center gap-3 justify-self-end">
         <Avatar className="h-9 w-9">
           <AvatarImage src={session?.user?.image ?? undefined} alt={nombre} />
-          <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand">
+          <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand-texto">
             {nombre.charAt(0).toUpperCase() || 'U'}
           </AvatarFallback>
         </Avatar>

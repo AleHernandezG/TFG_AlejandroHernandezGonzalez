@@ -67,14 +67,14 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         >
           <Heart
             className={`transition-colors ${compact ? 'h-[18px] w-[18px]' : 'h-5 w-5'} ${
-              liked ? 'fill-brand text-brand' : 'text-muted-foreground'
+              liked ? 'fill-brand text-brand-texto' : 'text-muted-foreground'
             }`}
             strokeWidth={liked ? 0 : 1.8}
           />
         </motion.div>
         <span
           className={`font-bold ${compact ? 'text-xs' : 'text-sm'} ${
-            liked ? 'text-brand' : 'text-muted-foreground'
+            liked ? 'text-brand-texto' : 'text-muted-foreground'
           }`}
         >
           {likes}
@@ -82,7 +82,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
       </button>
 
       <Link
-        href={`/recetas/${post.id}`}
+        href={`/recetas/${post.id}#comentarios`}
         className="flex items-center gap-1"
         aria-label={`Ver los ${post.comentarios} comentarios`}
       >
@@ -106,7 +106,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         >
           <Bookmark
             className={`transition-colors ${compact ? 'h-[18px] w-[18px]' : 'h-5 w-5'} ${
-              guardado ? 'fill-brand text-brand' : 'text-muted-foreground'
+              guardado ? 'fill-brand text-brand-texto' : 'text-muted-foreground'
             }`}
             strokeWidth={guardado ? 0 : 1.8}
           />
@@ -136,7 +136,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
             <div className="mb-3 flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />
-                <AvatarFallback className="bg-brand/10 text-xs font-semibold text-brand">
+                <AvatarFallback className="bg-brand/10 text-xs font-semibold text-brand-texto">
                   {post.autor.nombre.charAt(0)}
                 </AvatarFallback>
               </Avatar>
@@ -182,7 +182,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
           <div className="mb-3 flex items-center gap-2">
             <Avatar className="h-6 w-6">
               <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />
-              <AvatarFallback className="bg-brand/10 text-[10px] font-semibold text-brand">
+              <AvatarFallback className="bg-brand/10 text-[10px] font-semibold text-brand-texto">
                 {post.autor.nombre.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -191,9 +191,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
             </span>
           </div>
 
-          <h3 className="mb-2 text-2xl font-bold leading-tight text-foreground">
+          <h2 className="mb-2 text-2xl font-bold leading-tight text-foreground">
             {post.receta.titulo}
-          </h3>
+          </h2>
           <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
             {post.receta.descripcion}
           </p>
@@ -224,7 +224,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
         <div className="mb-2 flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />
-            <AvatarFallback className="bg-brand/10 text-[10px] font-semibold text-brand">
+            <AvatarFallback className="bg-brand/10 text-[10px] font-semibold text-brand-texto">
               {post.autor.nombre.charAt(0)}
             </AvatarFallback>
           </Avatar>
@@ -233,9 +233,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
           </span>
         </div>
 
-        <h3 className="mb-3 text-lg font-bold leading-tight text-foreground">
+        <h2 className="mb-3 text-lg font-bold leading-tight text-foreground">
           {post.receta.titulo}
-        </h3>
+        </h2>
 
         <div className="relative z-10">
           <AccionesBar compact />

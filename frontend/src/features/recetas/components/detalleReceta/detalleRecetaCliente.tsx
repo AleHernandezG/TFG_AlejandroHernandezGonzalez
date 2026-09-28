@@ -29,9 +29,8 @@ export function DetalleRecetaCliente({ receta }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* ── Mobile layout (< md) — scroll único vertical ─── */}
-      <div className="md:hidden">
+    <div className="min-h-screen bg-background md:grid md:grid-cols-2">
+      <div className="md:flex md:flex-col md:overflow-y-auto md:border-r md:border-border/40">
         <HeroReceta
           imagenUrl={receta.receta.imagenUrl}
           titulo={receta.receta.titulo}
@@ -40,48 +39,20 @@ export function DetalleRecetaCliente({ receta }: Props) {
           fotoFuente={receta.receta.fotoFuente}
           fotoCredito={receta.receta.fotoCredito}
         />
-        {/* Tarjeta de contenido que sube sobre el hero con esquinas redondeadas */}
-        <div className="-mt-8 relative z-10 bg-background rounded-t-4xl">
+        <div className="relative z-10 -mt-8 rounded-t-4xl bg-background">
           <CabeceraReceta receta={receta} />
           <TabsReceta
             ingredientes={receta.ingredientes}
             macros={receta.macros}
             porcionesBase={receta.porciones}
           />
-          <PasosReceta pasos={receta.pasos} />
-          <ComentariosReceta recetaId={receta.id} total={receta.comentarios} />
-          <CarruselSimilares recetas={receta.similares} />
         </div>
       </div>
 
-      {/* ── Desktop layout (≥ md) — bento grid dos columnas ─ */}
-      <div className="hidden md:grid md:grid-cols-2 md:min-h-screen">
-        {/* Columna izquierda: hero + cabecera + tabs */}
-        <div className="flex flex-col border-r border-border/40 overflow-y-auto">
-          <HeroReceta
-            imagenUrl={receta.receta.imagenUrl}
-            titulo={receta.receta.titulo}
-            guardado={guardado}
-            onToggleGuardado={toggleGuardado}
-            fotoFuente={receta.receta.fotoFuente}
-            fotoCredito={receta.receta.fotoCredito}
-          />
-          <div className="-mt-8 relative z-10 bg-background rounded-t-4xl">
-            <CabeceraReceta receta={receta} />
-            <TabsReceta
-              ingredientes={receta.ingredientes}
-              macros={receta.macros}
-              porcionesBase={receta.porciones}
-            />
-          </div>
-        </div>
-
-        {/* Columna derecha: pasos + comentarios + similares */}
-        <div className="overflow-y-auto pt-6">
-          <PasosReceta pasos={receta.pasos} />
-          <ComentariosReceta recetaId={receta.id} total={receta.comentarios} />
-          <CarruselSimilares recetas={receta.similares} />
-        </div>
+      <div className="md:overflow-y-auto md:pt-6">
+        <PasosReceta pasos={receta.pasos} />
+        <ComentariosReceta recetaId={receta.id} total={receta.comentarios} />
+        <CarruselSimilares recetas={receta.similares} />
       </div>
     </div>
   )

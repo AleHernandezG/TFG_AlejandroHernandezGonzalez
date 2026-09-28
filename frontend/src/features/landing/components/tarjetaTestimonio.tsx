@@ -31,7 +31,7 @@ export function TarjetaTestimonio({ testimonio, variants }: PropsTarjetaTestimon
           {/* Avatar + Nombre */}
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 shrink-0 border-2 border-brand-subtle shadow-xs">
-              <AvatarFallback className="bg-brand-subtle text-xs font-bold text-brand">
+              <AvatarFallback className="bg-brand-subtle text-xs font-bold text-brand-texto">
                 {testimonio.avatarId}
               </AvatarFallback>
             </Avatar>

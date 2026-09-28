@@ -44,7 +44,7 @@ export function CabeceraPrevisualizacion({
           {dificultad && (
             <Badge
               variant="secondary"
-              className="bg-brand/15 text-brand border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
+              className="bg-brand/15 text-brand-texto border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
             >
               {ETIQUETAS_DIFICULTAD[dificultad]}
             </Badge>

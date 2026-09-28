@@ -56,7 +56,7 @@ function BotonSeguir({ chef }: { chef: ChefDestacado }) {
       className={`rounded-full border px-3 py-1 text-[10px] font-bold transition-colors ${
         siguiendo
           ? 'border-muted-foreground/30 bg-muted text-muted-foreground hover:border-destructive/40 hover:text-destructive'
-          : 'border-brand/20 text-brand hover:bg-brand hover:text-brand-foreground'
+          : 'border-brand/20 text-brand-texto hover:bg-brand hover:text-brand-foreground'
       }`}
     >
       {siguiendo ? 'Siguiendo' : 'Seguir'}
@@ -75,7 +75,7 @@ export function SidebarTendencias() {
 
       {/* ── Recetas Populares ─────────────────────────── */}
       <section>
-        <h3 className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand">
+        <h3 className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-texto">
           <TrendingUp className="h-4 w-4" strokeWidth={2} />
           Recetas Populares
         </h3>
@@ -100,13 +100,13 @@ export function SidebarTendencias() {
                   />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="line-clamp-1 text-sm font-bold text-foreground transition-colors group-hover:text-brand">
+                  <h4 className="line-clamp-1 text-sm font-bold text-foreground transition-colors group-hover:text-brand-texto">
                     {post.receta.titulo}
                   </h4>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     Por {post.autor.nombre}
                   </p>
-                  <div className="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight text-brand">
+                  <div className="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-tight text-brand-texto">
                     <span>{post.receta.tiempo}</span>
                     <span>{post.receta.dificultad}</span>
                   </div>
@@ -119,7 +119,7 @@ export function SidebarTendencias() {
 
       {/* ── Chefs Destacados ─────────────────────────── */}
       <section>
-        <h3 className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand">
+        <h3 className="mb-6 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-texto">
           <Star className="h-4 w-4" strokeWidth={2} />
           Chefs Destacados
         </h3>
@@ -140,7 +140,7 @@ export function SidebarTendencias() {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={chef.foto ?? undefined} alt={chef.nombre} />
-                    <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand">
+                    <AvatarFallback className="bg-brand/10 text-sm font-semibold text-brand-texto">
                       {chef.nombre.charAt(0)}
                     </AvatarFallback>
                   </Avatar>

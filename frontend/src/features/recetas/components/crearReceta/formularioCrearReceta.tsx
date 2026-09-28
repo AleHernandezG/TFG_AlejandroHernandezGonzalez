@@ -189,7 +189,7 @@ export function FormularioCrearReceta() {
     <FormProvider {...methods}>
       <div className="rounded-3xl bg-(--warm-bg) p-8 text-center shadow-[0px_4px_20px_oklch(0.1_0.02_50/0.4)]">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-subtle">
-          <NotebookPen size={26} className="text-brand" />
+          <NotebookPen size={26} className="text-brand-texto" />
         </div>
         <h2 className="text-lg font-extrabold text-foreground">
           {empezada ? 'Tienes una receta a medias' : 'Te lo preguntamos paso a paso'}
@@ -210,7 +210,7 @@ export function FormularioCrearReceta() {
         <button
           type="button"
           onClick={() => abrirAsistente('ia')}
-          className="mx-auto mt-4 flex items-center gap-1.5 text-xs font-bold text-brand transition-opacity hover:opacity-80"
+          className="mx-auto mt-4 flex items-center gap-1.5 text-xs font-bold text-brand-texto transition-opacity hover:opacity-80"
         >
           <Sparkles size={14} />
           Crear desde descripción (IA)

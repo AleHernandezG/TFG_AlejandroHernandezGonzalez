@@ -13,7 +13,7 @@ const mapaIconos: Record<IconoCaracteristicaLanding, typeof ChefHat> = {
 };
 
 const gradienteIcono: Record<IconoCaracteristicaLanding, string> = {
-  chef:   "from-brand/20 to-brand-muted/10 text-brand",
+  chef:   "from-brand/20 to-brand-muted/10 text-brand-texto",
   social: "bg-[oklch(0.92_0.04_240)] text-(--category-social)",
   ia:     "bg-[oklch(0.92_0.04_290)] text-(--category-ai)",
 };
@@ -42,7 +42,7 @@ export function BentoCaracteristicas() {
     >
       {/* Encabezado de sección */}
       <motion.div variants={elemento} className="mb-12 text-center">
-        <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand">
+        <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand-texto">
           Funcionalidades
         </span>
         <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">
@@ -88,7 +88,7 @@ export function BentoCaracteristicas() {
                   </div>
 
                   {/* Etiqueta de subtítulo */}
-                  <span className="mb-2 inline-block text-xs font-semibold uppercase tracking-widest text-brand/70">
+                  <span className="mb-2 inline-block text-xs font-semibold uppercase tracking-widest text-brand-texto">
                     {caracteristica.subtitulo}
                   </span>
 

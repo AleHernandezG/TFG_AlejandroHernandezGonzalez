@@ -16,7 +16,7 @@ export function MetaPrevisualizacion({ tiempo, unidadTiempo, porciones, classNam
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {hayTiempo && (
-        <span className="bg-brand/10 text-brand rounded-full px-3 py-1.5 text-xs font-bold">
+        <span className="bg-brand/10 text-brand-texto rounded-full px-3 py-1.5 text-xs font-bold">
           ⏱ Listo en {tiempo} {unidadTiempo}
         </span>
       )}

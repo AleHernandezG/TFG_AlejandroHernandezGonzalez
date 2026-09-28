@@ -42,9 +42,9 @@ export function TarjetaDiscover({ receta }: Props) {
 
         {/* Contenido inferior */}
         <div className="absolute bottom-0 left-0 w-full px-3 pb-3 pt-6 z-10">
-          <h3 className="font-bold text-white text-[13px] leading-snug mb-2 line-clamp-2">
+          <h2 className="font-bold text-white text-[13px] leading-snug mb-2 line-clamp-2">
             {receta.titulo}
-          </h3>
+          </h2>
 
           <div className="flex items-center justify-between gap-1">
             {/* Autor */}

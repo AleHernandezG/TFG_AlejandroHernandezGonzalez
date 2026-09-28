@@ -245,7 +245,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
           </Button>
           <button
             onClick={handleCerrar}
-            className="w-full mt-3 py-3 text-sm font-bold text-brand hover:opacity-70 transition-opacity"
+            className="w-full mt-3 py-3 text-sm font-bold text-brand-texto hover:opacity-70 transition-opacity"
           >
             Cancelar
           </button>
@@ -264,7 +264,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
               type="button"
               onClick={() => { setErrorEscaneo(null); ticketInputRef.current?.click() }}
               disabled={escaneando}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-medium text-muted-foreground transition-all hover:border-brand/40 hover:text-brand disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-medium text-muted-foreground transition-all hover:border-brand/40 hover:text-brand-texto disabled:opacity-50"
             >
               {escaneando ? (
                 <><Loader2 size={16} className="animate-spin" />Escaneando ticket…</>
@@ -284,7 +284,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
               <ul className="flex flex-col gap-1.5 mb-4">
                 {ingredientesEscaneados.map((ing, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-foreground">
-                    <CheckCircle2 size={14} className="text-brand shrink-0" />
+                    <CheckCircle2 size={14} className="text-brand-texto shrink-0" />
                     <span className="flex-1">{ing.nombre}</span>
                     <span className="text-muted-foreground text-xs">{ing.cantidad} {ing.unidad}</span>
                   </li>
@@ -309,7 +309,7 @@ export function SheetAnadirIngrediente({ abierto, onCerrar, onAnadir, ingredient
           <DialogHeader>
             <div className="flex items-center gap-3 mb-1">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--warm-bg)">
-                <AlertCircle size={20} className="text-brand" />
+                <AlertCircle size={20} className="text-brand-texto" />
               </div>
               <DialogTitle className="text-base font-extrabold text-foreground">
                 Ingrediente duplicado

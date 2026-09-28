@@ -16,11 +16,11 @@ export function HeaderColeccion({ pestana, onCambiar, total }: Props) {
         {pestana === 'guardadas' ? (
           <h1 className="text-3xl font-light tracking-[0.03em] text-foreground leading-tight">
             ¡Mis recetas{' '}
-            <span className="font-bold italic text-brand text-4xl block mt-1">Guardadas!</span>
+            <span className="font-bold italic text-brand-texto text-4xl block mt-1">Guardadas!</span>
           </h1>
         ) : (
           <h1 className="text-3xl tracking-tight text-foreground leading-tight">
-            ¡<span className="font-bold italic text-brand">Mis Recetas</span>!
+            ¡<span className="font-bold italic text-brand-texto">Mis Recetas</span>!
           </h1>
         )}
         <p className="text-muted-foreground text-sm mt-2 font-medium tracking-wide">

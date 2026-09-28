@@ -90,7 +90,7 @@ export function BarraInputChat({ onEnviar, deshabilitado = false }: Props) {
             onClick={() => fileInputRef.current?.click()}
             disabled={deshabilitado}
             className={`mb-0.5 shrink-0 self-end rounded-full p-2 transition-colors hover:bg-(--warm-bg) ${
-              imagen ? 'text-brand' : 'text-muted-foreground hover:text-brand'
+              imagen ? 'text-brand-texto' : 'text-muted-foreground hover:text-brand-texto'
             } disabled:opacity-40`}
             aria-label="Adjuntar imagen"
           >

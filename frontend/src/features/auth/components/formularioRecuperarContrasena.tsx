@@ -74,7 +74,7 @@ export function FormularioRecuperarContrasena() {
         <CardHeader className="space-y-1 pb-5">
           <Link
             href="/"
-            className="mb-1 flex w-fit items-center gap-1.5 text-brand transition-opacity hover:opacity-70"
+            className="mb-1 flex w-fit items-center gap-1.5 text-brand-texto transition-opacity hover:opacity-70"
             aria-label="Volver a Cookr"
           >
             <ChefHat className="h-5 w-5" aria-hidden />
@@ -157,7 +157,7 @@ export function FormularioRecuperarContrasena() {
           {/* Volver al login */}
           <p className="text-center text-sm text-muted-foreground">
             ¿Recuerdas tu contraseña?{" "}
-            <Link href="/login" className="font-medium text-brand hover:underline">
+            <Link href="/login" className="font-medium text-brand-texto hover:underline">
               Volver a iniciar sesión
             </Link>
           </p>

@@ -10,10 +10,12 @@ interface Props {
 
 export function ChipsCategoria({ categorias, activa, onChange }: Props) {
   return (
-    <div className="flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-hide">
+    <div role="group" aria-label="Categorías" className="flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-hide">
       {categorias.map((cat) => (
         <button
           key={cat}
+          type="button"
+          aria-pressed={cat === activa}
           onClick={() => onChange(cat)}
           className={[
             'shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition-colors',

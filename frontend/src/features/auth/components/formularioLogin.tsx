@@ -80,7 +80,7 @@ export function FormularioLogin() {
         <CardHeader className="space-y-1 pb-5">
           <Link
             href="/"
-            className="mb-1 flex w-fit items-center gap-1.5 text-brand transition-opacity hover:opacity-70"
+            className="mb-1 flex w-fit items-center gap-1.5 text-brand-texto transition-opacity hover:opacity-70"
             aria-label="Volver a Cookr"
           >
             <ChefHat className="h-5 w-5" aria-hidden />
@@ -148,7 +148,7 @@ export function FormularioLogin() {
                 {/* TODO Fase 4: enlace real a /recuperar-contrasena */}
                 <Link
                   href="/recuperar-contrasena"
-                  className="text-xs text-muted-foreground transition-colors hover:text-brand"
+                  className="text-xs text-muted-foreground transition-colors hover:text-brand-texto"
                   tabIndex={-1}
                 >
                   ¿Olvidaste tu contraseña?
@@ -208,7 +208,7 @@ export function FormularioLogin() {
             ¿No tienes cuenta?{" "}
             <Link
               href="/registro"
-              className="font-medium text-brand hover:underline"
+              className="font-medium text-brand-texto hover:underline"
             >
               Regístrate gratis
             </Link>

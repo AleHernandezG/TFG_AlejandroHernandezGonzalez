@@ -31,7 +31,7 @@ export default function PaginaTerminos() {
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-4 md:px-10">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-brand transition-opacity hover:opacity-70"
+            className="flex items-center gap-1.5 text-brand-texto transition-opacity hover:opacity-70"
             aria-label="Volver a Cookr"
           >
             <ChefHat className="h-5 w-5" aria-hidden />
@@ -50,7 +50,7 @@ export default function PaginaTerminos() {
       <main className="mx-auto w-full max-w-3xl px-5 py-12 md:px-10 md:py-16">
         {/* ── Título ────────────────────────────────────────────────── */}
         <div className="mb-10">
-          <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand">
+          <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand-texto">
             Legal
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
@@ -73,7 +73,7 @@ export default function PaginaTerminos() {
 
         {/* ── Índice ────────────────────────────────────────────────── */}
         <nav aria-label="Índice de secciones" className="mb-12">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-brand-texto">
             En esta página
           </p>
           <ol className="space-y-1.5">
@@ -81,7 +81,7 @@ export default function PaginaTerminos() {
               <li key={s.id}>
                 <a
                   href={`#${s.id}`}
-                  className="text-sm text-muted-foreground transition-colors hover:text-brand"
+                  className="text-sm text-muted-foreground transition-colors hover:text-brand-texto"
                 >
                   {s.titulo}
                 </a>
@@ -153,7 +153,7 @@ export default function PaginaTerminos() {
               </p>
               <p>
                 Puedes eliminar tu cuenta en cualquier momento desde los ajustes. Consulta nuestra{' '}
-                <Link href="/privacidad" className="text-brand hover:underline">
+                <Link href="/privacidad" className="text-brand-texto hover:underline">
                   Política de privacidad
                 </Link>{' '}
                 para saber qué ocurre con tus datos tras la eliminación.
@@ -248,7 +248,7 @@ export default function PaginaTerminos() {
                   href="https://ai.google.dev/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand hover:underline"
+                  className="text-brand-texto hover:underline"
                 >
                   política de uso de Google AI
                 </a>{' '}
@@ -323,11 +323,11 @@ export default function PaginaTerminos() {
           <div className="flex gap-4 text-xs">
             <Link
               href="/privacidad"
-              className="text-muted-foreground transition-colors hover:text-brand"
+              className="text-muted-foreground transition-colors hover:text-brand-texto"
             >
               Política de privacidad
             </Link>
-            <Link href="/" className="text-muted-foreground transition-colors hover:text-brand">
+            <Link href="/" className="text-muted-foreground transition-colors hover:text-brand-texto">
               Inicio
             </Link>
           </div>

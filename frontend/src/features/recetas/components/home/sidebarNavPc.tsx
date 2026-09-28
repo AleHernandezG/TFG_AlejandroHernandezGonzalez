@@ -20,7 +20,7 @@ export function SidebarNavPc() {
 
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-border/40 bg-background pb-8 pt-24 px-6 lg:flex">
-      <nav className="flex flex-col gap-1">
+      <nav aria-label="Navegación principal" className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ href, Icono, etiqueta }) => {
           const activo = rutaActual === href || rutaActual.startsWith(`${href}/`)
           return (
@@ -30,7 +30,7 @@ export function SidebarNavPc() {
               className={cn(
                 'flex items-center gap-3 rounded-xl p-3 text-sm transition-all duration-200',
                 activo
-                  ? 'bg-warm-bg-accent font-bold text-brand'
+                  ? 'bg-warm-bg-accent font-bold text-brand-texto'
                   : 'font-medium text-muted-foreground hover:translate-x-0.5 hover:bg-warm-bg',
               )}
             >

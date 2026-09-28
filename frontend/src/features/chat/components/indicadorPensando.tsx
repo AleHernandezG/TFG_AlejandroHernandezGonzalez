@@ -19,7 +19,7 @@ export function IndicadorPensando() {
   return (
     <div className="flex w-full justify-start gap-2">
       <div className="mt-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-(--brand-subtle)">
-        <ChefHat className="h-4 w-4 text-brand" />
+        <ChefHat className="h-4 w-4 text-brand-texto" />
       </div>
 
       <div className="rounded-2xl rounded-tl-sm border border-border/15 bg-card px-5 py-4">
