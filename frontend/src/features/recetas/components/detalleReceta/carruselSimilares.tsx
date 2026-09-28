@@ -48,9 +48,9 @@ export function CarruselSimilares({ recetas }: Props) {
               </div>
 
               {/* Info debajo de la imagen */}
-              <h4 className="mb-1 line-clamp-1 text-sm font-bold leading-snug text-foreground">
+              <h3 className="mb-1 line-clamp-1 text-sm font-bold leading-snug text-foreground">
                 {post.receta.titulo}
-              </h4>
+              </h3>
               <div className="flex items-center gap-1.5">
                 <Avatar className="h-5 w-5 shrink-0">
                   <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />

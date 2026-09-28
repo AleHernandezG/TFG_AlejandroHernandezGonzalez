@@ -6,6 +6,32 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-28 · Ola 2 de la interfaz y diagnóstico de trust proxy
+
+**Qué se hizo.** Un solo PR para dos cosas, por no encadenar despliegues. La primera es la ola 2 de
+`revision-ui-2026-09.md`: un solo árbol por pantalla (UI-005), un solo `<main>` (UI-009), landmarks y
+encabezados (UI-009b), los chips de categoría de Discover conectados (UI-012) y los cuatro arreglos de
+accesibilidad que axe no ve: enlace de salto, anillo de foco global, `MotionConfig` y el
+`aria-describedby` de los alérgenos fijos. Revisado en local con Playwright a 1440 y 390 contra un Mongo
+efímero sembrado a mano.
+
+La segunda es temporal: `/api/health` devuelve `req.ip`, `req.ips` y las cabeceras de proxy
+(`X-Forwarded-For`, `CF-Connecting-IP`, `True-Client-IP`). Sirve para saber, con la versión desplegada
+detrás de Cloudflare y Render, qué IP ve de verdad el limitador de login con `trust proxy` a 1, y si
+una `X-Forwarded-For` falsa la cambia. Se quita en el siguiente PR, que es el que trae el arreglo.
+
+**Qué decisión costó tomar.** Cómo hacer que `?categoria=Postres` funcione. El regex con `i` era una
+línea y rompía el índice del feed; se normaliza el valor a igualdad exacta con `canonizarCategoria`.
+Y en el drawer, `aria-disabled` en vez de `disabled`, para que el aviso del candado llegue a leerse.
+
+**Qué queda a medias.** Medir el diagnóstico en producción y en develop, y con eso decidir el arreglo
+de trust proxy. UI-006 (el tono de marca para texto, `#8f4700`) está propuesto pero sin aplicar: cambia
+el color que se ve y quiero el visto bueno antes. La fuga de handles de Jest que salía en el CI no se
+reproduce en local: 274 tests con `--detectOpenHandles` sin ningún handle abierto y seis ejecuciones
+seguidas sin el aviso. No se ha tocado nada, y menos `forceExit`, que la escondería sin arreglarla.
+
+---
+
 ## 2026-09-18 · Cierre del ciclo de producción y revisión de interfaz
 
 **Qué se hizo.** Empezó comprobando que el merge estuviera desplegado y acabó siendo una revisión

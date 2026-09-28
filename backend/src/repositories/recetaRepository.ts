@@ -11,6 +11,7 @@ import {
   RecetaDetalleRespuesta,
 } from "../types/receta";
 import { ComentarioRespuesta, PaginaComentarios } from "../types/comentario";
+import { canonizarCategoria } from "../lib/dietas";
 import { buscarFotoPexelsCascada } from "../services/imagenService";
 import { calcularMacros } from "../services/nutritionService";
 
@@ -222,8 +223,9 @@ export const recetaRepository = {
     if (dietas && dietas.length > 0) {
       categorias["$in"] = dietas;
     }
-    if (categoria) {
-      categorias["$all"] = [categoria];
+    const categoriaCanonica = categoria ? canonizarCategoria(categoria) : "";
+    if (categoriaCanonica) {
+      categorias["$all"] = [categoriaCanonica];
     }
     if (Object.keys(categorias).length > 0) {
       query["categorias"] = categorias;

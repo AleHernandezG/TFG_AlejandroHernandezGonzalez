@@ -23,6 +23,7 @@ export function HeaderDiscover({ query, onChange, filtrosAvanzados, onFiltrosCha
     <header className="px-5 pt-6 pb-4">
       {buscando ? (
         <div className="mb-4 flex items-center gap-2">
+          <h1 className="sr-only">Buscar recetas</h1>
           <span className="text-lg font-extrabold text-brand">Cookr</span>
         </div>
       ) : (

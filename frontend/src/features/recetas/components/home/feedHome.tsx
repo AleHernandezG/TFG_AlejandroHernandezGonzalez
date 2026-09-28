@@ -1,13 +1,13 @@
 'use client'
 
-import { BuscadorFiltros } from '@/components/common/buscadorFiltros'
 import { Skeleton } from '@/components/ui/skeleton'
 import { motion } from 'framer-motion'
 import { SearchX, Sparkles } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
+import { useEffect, useRef } from 'react'
+import type { FiltrosAvanzados, PostFeed } from '@/features/recetas/types/receta.types'
 import { useHomeFeed } from '@/features/recetas/hooks/useHomeFeed'
 import { TarjetaPost } from './tarjetaPost'
+import { FeedHomePc, TarjetaPostSkeletonPc } from './feedHomePc'
 
 function TarjetaPostSkeleton() {
   return (
@@ -34,14 +34,31 @@ function BannerRecomendados() {
   )
 }
 
-export function FeedHome() {
-  const [busqueda, setBusqueda] = useState('')
-  const [filtrosAvanzados, setFiltrosAvanzados] = useState<FiltrosAvanzados>({
-    dietas: [],
-    alergenos: [],
-    dificultad: [],
-  })
+function FeedMovil({ posts, indiceRecomendados }: { posts: PostFeed[]; indiceRecomendados: number }) {
+  return (
+    <>
+      {posts.map((post, i) => (
+        <div key={post.id}>
+          {i === indiceRecomendados && <BannerRecomendados />}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: Math.min(i, 5) * 0.07, ease: 'easeOut' }}
+          >
+            <TarjetaPost post={post} />
+          </motion.div>
+        </div>
+      ))}
+    </>
+  )
+}
 
+interface FeedHomeProps {
+  busqueda: string
+  filtrosAvanzados: FiltrosAvanzados
+}
+
+export function FeedHome({ busqueda, filtrosAvanzados }: FeedHomeProps) {
   const {
     posts,
     indiceRecomendados,
@@ -69,61 +86,69 @@ export function FeedHome() {
     return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
+  if (cargando) {
+    return (
+      <>
+        <div className="lg:hidden">
+          <TarjetaPostSkeleton />
+          <TarjetaPostSkeleton />
+          <TarjetaPostSkeleton />
+        </div>
+        <div className="hidden grid-cols-3 gap-6 lg:grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <TarjetaPostSkeletonPc key={i} />
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  if (esError) {
+    return (
+      <div className="flex flex-col items-center gap-2 px-8 py-16 text-center lg:py-20">
+        <p className="text-base font-semibold text-foreground">Error al cargar recetas</p>
+        <p className="text-sm text-muted-foreground">Inténtalo de nuevo más tarde</p>
+      </div>
+    )
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 px-8 py-16 text-center lg:py-20">
+        <SearchX className="h-10 w-10 text-muted-foreground/40 lg:h-12 lg:w-12" strokeWidth={1.5} />
+        <p className="text-base font-semibold text-foreground">Sin resultados</p>
+        <p className="text-sm text-muted-foreground">
+          {hayBusquedaOFiltros
+            ? 'Prueba con otro término o cambia el filtro'
+            : 'Aún no hay recetas para mostrar'}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <>
-      <BuscadorFiltros
-        onBuscar={setBusqueda}
-        filtrosAvanzados={filtrosAvanzados}
-        onFiltrosAvanzadosChange={setFiltrosAvanzados}
-      />
-
-      <div>
-        {cargando ? (
-          <>
-            <TarjetaPostSkeleton />
-            <TarjetaPostSkeleton />
-            <TarjetaPostSkeleton />
-          </>
-        ) : esError ? (
-          <div className="flex flex-col items-center gap-2 px-8 py-16 text-center">
-            <p className="text-base font-semibold text-foreground">Error al cargar recetas</p>
-            <p className="text-sm text-muted-foreground">Inténtalo de nuevo más tarde</p>
-          </div>
-        ) : posts.length > 0 ? (
-          <>
-            {posts.map((post, i) => (
-              <div key={post.id}>
-                {i === indiceRecomendados && <BannerRecomendados />}
-                <motion.div
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: Math.min(i, 5) * 0.07, ease: 'easeOut' }}
-                >
-                  <TarjetaPost post={post} />
-                </motion.div>
-              </div>
-            ))}
-            
-            <div ref={sentinelRef} className="h-10" />
-            
-            {isFetchingNextPage && (
-              <div className="pb-8">
-                <TarjetaPostSkeleton />
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-2 px-8 py-16 text-center">
-            <SearchX className="h-10 w-10 text-muted-foreground/40" strokeWidth={1.5} />
-            <p className="text-base font-semibold text-foreground">Sin resultados</p>
-            <p className="text-sm text-muted-foreground">
-              {hayBusquedaOFiltros
-                ? 'Prueba con otro término o cambia el filtro'
-                : 'Aún no hay recetas para mostrar'}
-            </p>
-          </div>
-        )}
+      <div className="lg:hidden">
+        <FeedMovil posts={posts} indiceRecomendados={indiceRecomendados} />
       </div>
+      <div className="hidden lg:block">
+        <FeedHomePc posts={posts} indiceRecomendados={indiceRecomendados} />
+      </div>
+
+      <div ref={sentinelRef} className="h-10 lg:mt-6" />
+
+      {isFetchingNextPage && (
+        <>
+          <div className="pb-8 lg:hidden">
+            <TarjetaPostSkeleton />
+          </div>
+          <div className="hidden grid-cols-3 gap-6 lg:grid">
+            <TarjetaPostSkeletonPc />
+            <TarjetaPostSkeletonPc />
+            <TarjetaPostSkeletonPc />
+          </div>
+        </>
+      )}
     </>
   )
 }

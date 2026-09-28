@@ -94,9 +94,9 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
           )}
 
           <div className="absolute bottom-0 left-0 w-full p-4 z-20">
-            <h3 className="font-bold text-white text-base leading-tight mb-2 drop-shadow-xs">
+            <h2 className="font-bold text-white text-base leading-tight mb-2 drop-shadow-xs">
               {receta.titulo}
-            </h3>
+            </h2>
             <div className="flex items-center gap-2">
               {receta.autor.avatarUrl ? (
                 <Image

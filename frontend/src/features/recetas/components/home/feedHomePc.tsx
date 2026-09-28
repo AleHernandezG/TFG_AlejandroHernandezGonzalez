@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { SearchX, Sparkles } from 'lucide-react'
-import type { FiltrosAvanzados, PostFeed } from '../../types/receta.types'
+import { Sparkles } from 'lucide-react'
+import type { PostFeed } from '../../types/receta.types'
 import { TarjetaPostPc, type VarianteTarjeta } from './tarjetaPostPc'
-import { useHomeFeed } from '@/features/recetas/hooks/useHomeFeed'
 
 const VARIANTES: VarianteTarjeta[] = [
   'hero', 'small', 'small', 'wide', 'small', 'small', 'small',
@@ -15,7 +13,7 @@ function varianteParaIndice(i: number): VarianteTarjeta {
   return VARIANTES[i % VARIANTES.length]
 }
 
-function TarjetaPostSkeletonPc() {
+export function TarjetaPostSkeletonPc() {
   return (
     <div className="overflow-hidden rounded-xl">
       <Skeleton className="h-48 w-full" />
@@ -49,76 +47,17 @@ function BannerRecomendados() {
 }
 
 interface FeedHomePcProps {
-  busqueda: string
-  filtrosAvanzados: FiltrosAvanzados
+  posts: PostFeed[]
+  indiceRecomendados: number
 }
 
-export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
-  const {
-    posts,
-    indiceRecomendados,
-    cargando,
-    hayBusquedaOFiltros,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useHomeFeed(busqueda, filtrosAvanzados)
-
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!sentinelRef.current) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
-      },
-      { threshold: 0.1 },
-    )
-    observer.observe(sentinelRef.current)
-    return () => observer.disconnect()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
-
-  if (cargando) {
-    return (
-      <div className="grid grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <TarjetaPostSkeletonPc key={i} />
-        ))}
-      </div>
-    )
-  }
-
-  if (posts.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-2 py-20 text-center">
-        <SearchX className="h-12 w-12 text-muted-foreground/40" strokeWidth={1.5} />
-        <p className="text-base font-semibold text-foreground">Sin resultados</p>
-        <p className="text-sm text-muted-foreground">
-          {hayBusquedaOFiltros
-            ? 'Prueba con otro término o cambia el filtro'
-            : 'Aún no hay recetas para mostrar'}
-        </p>
-      </div>
-    )
-  }
-
-  // Mezcla: rejilla de seguidos, divisor y rejilla de recomendados.
+export function FeedHomePc({ posts, indiceRecomendados }: FeedHomePcProps) {
   if (indiceRecomendados > 0) {
     return (
       <div className="space-y-6">
         <GridBento posts={posts.slice(0, indiceRecomendados)} />
         <BannerRecomendados />
         <GridBento posts={posts.slice(indiceRecomendados)} />
-        <div ref={sentinelRef} className="h-10" />
-        {isFetchingNextPage && (
-          <div className="grid grid-cols-3 gap-6">
-            <TarjetaPostSkeletonPc />
-            <TarjetaPostSkeletonPc />
-            <TarjetaPostSkeletonPc />
-          </div>
-        )}
       </div>
     )
   }
@@ -127,14 +66,6 @@ export function FeedHomePc({ busqueda, filtrosAvanzados }: FeedHomePcProps) {
     <div className="space-y-6">
       {indiceRecomendados === 0 && <BannerRecomendados />}
       <GridBento posts={posts} />
-      <div ref={sentinelRef} className="h-10" />
-      {isFetchingNextPage && (
-        <div className="grid grid-cols-3 gap-6">
-          <TarjetaPostSkeletonPc />
-          <TarjetaPostSkeletonPc />
-          <TarjetaPostSkeletonPc />
-        </div>
-      )}
     </div>
   )
 }

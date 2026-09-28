@@ -31,6 +31,10 @@ export function canonizarDieta(valor: string): string | null {
   return DIETAS.find((dieta) => quitarAcentos(dieta.toLowerCase()) === base) ?? null;
 }
 
+export function canonizarCategoria(valor: string): string {
+  return canonizarDieta(valor) ?? valor.trim().toLowerCase();
+}
+
 export function esRestriccionDeAlergeno(valor: string): boolean {
   return /^sin\s/.test(quitarAcentos(valor.trim().toLowerCase()));
 }

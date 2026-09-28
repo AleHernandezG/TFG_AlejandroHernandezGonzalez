@@ -75,7 +75,7 @@ export function PasosReceta({ pasos }: Props) {
       <ol className="list-none p-0 m-0">
         {pasos.map((paso, i) => (
           <Fragment key={i}>
-            {i > 0 && <div className="h-px bg-border/40" />}
+            {i > 0 && <li aria-hidden="true" className="h-px bg-border/40" />}
             <li
               className={`flex gap-4 py-5 transition-all duration-300 ${
                 activo && i === pasoActual

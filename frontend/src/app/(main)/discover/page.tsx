@@ -9,19 +9,11 @@ export const metadata = {
 export default function DiscoverPage() {
   return (
     <>
-      {/* Mobile */}
-      <div className="lg:hidden">
-        <ContenidoDiscover />
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden lg:flex">
-        <SidebarNavPc />
-        <main className="min-h-screen flex-1 pl-64">
-          <div className="mx-auto max-w-6xl">
-            <ContenidoDiscover />
-          </div>
-        </main>
+      <SidebarNavPc />
+      <div id="contenido" className="min-h-screen outline-hidden lg:pl-64">
+        <div className="lg:mx-auto lg:max-w-6xl">
+          <ContenidoDiscover />
+        </div>
       </div>
     </>
   )

@@ -7,6 +7,7 @@ import { DrawerFiltros } from '@/features/recetas/components/home/drawerFiltros'
 
 interface BuscadorFiltrosProps {
   placeholder?: string
+  busqueda: string
   onBuscar: (query: string) => void
   filtrosAvanzados: FiltrosAvanzados
   onFiltrosAvanzadosChange: (filtros: FiltrosAvanzados) => void
@@ -15,6 +16,7 @@ interface BuscadorFiltrosProps {
 
 export function BuscadorFiltros({
   placeholder = '¿Qué quieres cocinar hoy?',
+  busqueda,
   onBuscar,
   filtrosAvanzados,
   onFiltrosAvanzadosChange,
@@ -38,6 +40,7 @@ export function BuscadorFiltros({
         <input
           type="search"
           placeholder={placeholder}
+          value={busqueda}
           className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-hidden"
           onChange={(e) => onBuscar(e.target.value)}
         />

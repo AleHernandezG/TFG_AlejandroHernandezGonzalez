@@ -63,7 +63,7 @@ cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 269 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 274 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -134,7 +134,7 @@ Es un requisito de salud, no una preferencia de navegación, y por eso vive en e
 
 Se aplica al feed y a los `similares` (los de `findById` y los de `findSimilares`). Si añades otra vía que devuelva recetas, pásale la unión también.
 
-En el frontend, `drawerFiltros.tsx` enseña los alérgenos del perfil marcados y deshabilitados, con candado y enlace a `/perfil`. Si los dejas togglear, el control miente: el backend los aplica igual. `tests/feed.alergenos.test.ts` fija todo esto.
+En el frontend, `drawerFiltros.tsx` enseña los alérgenos del perfil marcados y bloqueados, con candado y enlace a `/perfil`. Si los dejas togglear, el control miente: el backend los aplica igual. Van con `aria-disabled` y `aria-describedby`, no con `disabled`: un botón `disabled` sale del orden de tabulación y el lector de pantalla nunca llega a leer por qué está bloqueado. `tests/feed.alergenos.test.ts` fija todo esto.
 
 El suelo solo protege si las recetas están bien etiquetadas, así que **el backend no se fía de los `alergenos` que manda el cliente**: al crear y editar guarda `alergenosDeReceta()`, que es lo declarado (filtrado a los 14 conocidos) más lo que detecta en los ingredientes. Solo suma, nunca quita. Para las recetas ya guardadas está `npm run recalcular:alergenos`.
 

@@ -82,7 +82,7 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
       </button>
 
       <Link
-        href={`/recetas/${post.id}`}
+        href={`/recetas/${post.id}#comentarios`}
         className="flex items-center gap-1"
         aria-label={`Ver los ${post.comentarios} comentarios`}
       >
@@ -191,9 +191,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
             </span>
           </div>
 
-          <h3 className="mb-2 text-2xl font-bold leading-tight text-foreground">
+          <h2 className="mb-2 text-2xl font-bold leading-tight text-foreground">
             {post.receta.titulo}
-          </h3>
+          </h2>
           <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
             {post.receta.descripcion}
           </p>
@@ -233,9 +233,9 @@ export function TarjetaPostPc({ post, variante = 'small' }: TarjetaPostPcProps) 
           </span>
         </div>
 
-        <h3 className="mb-3 text-lg font-bold leading-tight text-foreground">
+        <h2 className="mb-3 text-lg font-bold leading-tight text-foreground">
           {post.receta.titulo}
-        </h3>
+        </h2>
 
         <div className="relative z-10">
           <AccionesBar compact />

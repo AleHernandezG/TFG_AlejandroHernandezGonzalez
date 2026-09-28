@@ -105,6 +105,21 @@ describe("dietas y categoria se combinan en vez de pisarse", () => {
     const res = await feed("?categoria=postre");
     expect(titulosDe(res)).toEqual(["Flan de huevo", "Sorbete de limón", "Tarta de queso"]);
   });
+
+  it.each(["Postre", "POSTRE", "  postre "])("la categoría %p no distingue mayúsculas ni espacios", async (valor) => {
+    const res = await feed(`?categoria=${encodeURIComponent(valor)}`);
+    expect(titulosDe(res)).toEqual(["Flan de huevo", "Sorbete de limón", "Tarta de queso"]);
+  });
+
+  it("una categoría que es dieta se busca por su id canónico", async () => {
+    const res = await feed("?categoria=Vegana");
+    expect(titulosDe(res)).toEqual(["Hummus", "Sorbete de limón"]);
+  });
+
+  it("una categoría en blanco no filtra nada", async () => {
+    const res = await feed("?categoria=%20%20");
+    expect(res.body.total).toBe(4);
+  });
 });
 
 describe("excluirPropio y soloSiguiendo se combinan en vez de pisarse", () => {

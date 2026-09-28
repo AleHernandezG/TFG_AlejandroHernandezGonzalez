@@ -120,7 +120,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
   }
 
   return (
-    <section className="px-5 pt-6 pb-4">
+    <section id="comentarios" className="scroll-mt-4 px-5 pt-6 pb-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-extrabold text-foreground">

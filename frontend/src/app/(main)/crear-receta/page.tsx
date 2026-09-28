@@ -43,7 +43,7 @@ export default function PaginaCrearReceta() {
         </a>
       </p>
 
-      <main className="relative z-10 mx-auto w-full max-w-[420px] px-5 pt-6 pb-8 md:max-w-2xl">
+      <div className="relative z-10 mx-auto w-full max-w-[420px] px-5 pt-6 pb-8 md:max-w-2xl">
         <h1
           className="text-center text-[1.75rem] font-bold leading-snug tracking-tight text-white mb-6"
           style={{ textShadow: '0 1px 12px rgba(0,0,0,0.9), 0 2px 24px rgba(0,0,0,0.6)' }}
@@ -72,7 +72,7 @@ export default function PaginaCrearReceta() {
           </span>?
         </h1>
         <FormularioCrearReceta />
-      </main>
+      </div>
     </div>
   )
 }
