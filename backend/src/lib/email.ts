@@ -1,11 +1,50 @@
 import axios from "axios";
 
-const MAILJET_API_KEY = process.env.MAILJET_API_KEY;
-const MAILJET_SECRET_KEY = process.env.MAILJET_SECRET_KEY;
-const SENDER_EMAIL = process.env.SENDER_EMAIL ?? process.env.GMAIL_USER ?? "noreply@cookr.app";
-const SENDER_NAME = process.env.SENDER_NAME ?? "Cookr";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:3000";
 const MAILJET_URL = "https://api.mailjet.com/v3.1/send";
+
+const DOMINIOS_SIN_AUTENTICACION_PROPIA = [
+  "gmail.com",
+  "googlemail.com",
+  "hotmail.com",
+  "hotmail.es",
+  "outlook.com",
+  "outlook.es",
+  "live.com",
+  "msn.com",
+  "yahoo.com",
+  "yahoo.es",
+  "icloud.com",
+  "usal.es",
+];
+
+export function dominioQueFallaDMARC(correo: string): string | null {
+  const dominio = correo.split("@").pop()?.trim().toLowerCase() ?? "";
+  return (
+    DOMINIOS_SIN_AUTENTICACION_PROPIA.find((d) => dominio === d || dominio.endsWith(`.${d}`)) ?? null
+  );
+}
+
+export function avisarSiElRemitenteFallaDMARC(): void {
+  if (process.env.NODE_ENV === "test") return;
+
+  const remitente = process.env.SENDER_EMAIL;
+  if (!remitente) {
+    console.warn(
+      "[email] SENDER_EMAIL no está definida: no va a salir ningún correo de verificación ni de recuperación.",
+    );
+    return;
+  }
+
+  const dominio = dominioQueFallaDMARC(remitente);
+  if (!dominio) return;
+
+  console.warn(
+    `[email] SENDER_EMAIL=${remitente} es de ${dominio}, un dominio que no se puede autenticar en Mailjet (SPF/DKIM). ` +
+      "Outlook y Hotmail van a descartar estos correos por DMARC sin avisar, aunque Mailjet responda 200. " +
+      "Para que lleguen, usa un remitente de un dominio propio autenticado en Mailjet.",
+  );
+}
 
 async function enviarEmail(opciones: {
   correo: string;
@@ -13,8 +52,18 @@ async function enviarEmail(opciones: {
   asunto: string;
   html: string;
 }): Promise<void> {
-  if (!MAILJET_API_KEY || !MAILJET_SECRET_KEY) {
+  const apiKey = process.env.MAILJET_API_KEY;
+  const secretKey = process.env.MAILJET_SECRET_KEY;
+  const remitente = process.env.SENDER_EMAIL;
+  const responderA = process.env.REPLY_TO_EMAIL;
+
+  if (!apiKey || !secretKey) {
     throw new Error("MAILJET_API_KEY / MAILJET_SECRET_KEY no configuradas");
+  }
+  if (!remitente) {
+    throw new Error(
+      "SENDER_EMAIL no configurada: define el remitente de los correos, un buzón de un dominio autenticado en Mailjet",
+    );
   }
 
   await axios.post(
@@ -22,7 +71,8 @@ async function enviarEmail(opciones: {
     {
       Messages: [
         {
-          From: { Email: SENDER_EMAIL, Name: SENDER_NAME },
+          From: { Email: remitente, Name: process.env.SENDER_NAME ?? "Cookr" },
+          ...(responderA ? { ReplyTo: { Email: responderA } } : {}),
           To: [{ Email: opciones.correo, Name: opciones.nombre }],
           Subject: opciones.asunto,
           HTMLPart: opciones.html,
@@ -30,7 +80,7 @@ async function enviarEmail(opciones: {
       ],
     },
     {
-      auth: { username: MAILJET_API_KEY, password: MAILJET_SECRET_KEY },
+      auth: { username: apiKey, password: secretKey },
       timeout: 10000,
     },
   );

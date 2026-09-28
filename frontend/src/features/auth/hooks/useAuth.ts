@@ -16,20 +16,35 @@ export function useAuth() {
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  async function intentarLogin(correo: string, contrasena: string) {
+    const resultado = await signIn('credentials', { correo, contrasena, redirect: false })
+    const session = resultado?.ok ? await getSession() : null
+    return { resultado, session }
+  }
+
   async function iniciarSesion(correo: string, contrasena: string): Promise<void> {
     setCargando(true)
     setError(null)
-    const resultado = await signIn('credentials', { correo, contrasena, redirect: false })
-    if (resultado?.ok) {
-      const session = await getSession()
-      router.push(session?.user?.perfilCompleto ? '/home' : '/completar-perfil')
+
+    let { resultado, session } = await intentarLogin(correo, contrasena)
+    if (resultado?.ok && !session) {
+      ;({ resultado, session } = await intentarLogin(correo, contrasena))
+    }
+
+    if (session) {
+      router.push(session.user?.perfilCompleto ? '/home' : '/completar-perfil')
       return
     }
-    setError(
-      resultado?.error === 'Debes verificar tu correo antes de iniciar sesión'
-        ? 'Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.'
-        : 'Correo o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo.',
-    )
+
+    if (resultado?.ok) {
+      setError('No se pudo iniciar sesión. Recarga la página e inténtalo de nuevo.')
+    } else {
+      setError(
+        resultado?.error === 'Debes verificar tu correo antes de iniciar sesión'
+          ? 'Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.'
+          : 'Correo o contraseña incorrectos. Comprueba tus datos e inténtalo de nuevo.',
+      )
+    }
     setCargando(false)
   }
 

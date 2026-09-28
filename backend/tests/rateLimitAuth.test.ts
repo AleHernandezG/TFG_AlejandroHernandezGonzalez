@@ -129,25 +129,46 @@ describe("limitador de recuperación de contraseña", () => {
   });
 });
 
-// Flecos anotados al final de la Fase 1: estas dos rutas consumen token y se
-// quedaron sin limitar. No es una vulnerabilidad (los tokens son de 256 bits),
-// pero el test deja el hueco documentado en vez de en un comentario del plan.
-describe("rutas de token sin limitar (pendiente de la Fase 1)", () => {
-  it("/verificar-email sigue aceptando intentos más allá de cualquier cupo", async () => {
-    for (let i = 0; i < 12; i++) {
-      const res = await request(app)
-        .post("/api/auth/verificar-email")
-        .send({ token: `intento-${i}` });
+describe.each([
+  ["/verificar-email", {}],
+  ["/nueva-contrasena", { contrasena: "ClaveNueva123" }],
+])("limitador de %s", (ruta, extra) => {
+  const intentar = (i: number) =>
+    request(app)
+      .post(`/api/auth${ruta}`)
+      .send({ token: `intento-${i}`, ...extra });
+
+  it("corta al intento 21 tras 20 tokens inválidos desde la misma IP", async () => {
+    for (let i = 0; i < 20; i++) {
+      const res = await intentar(i);
       expect(res.status).toBe(400);
     }
+
+    const bloqueado = await intentar(20);
+
+    expect(bloqueado.status).toBe(429);
+    expect(bloqueado.body.error).toMatch(/Vuelve a probar en una hora/);
   });
 
-  it("/nueva-contrasena sigue aceptando intentos más allá de cualquier cupo", async () => {
-    for (let i = 0; i < 12; i++) {
-      const res = await request(app)
-        .post("/api/auth/nueva-contrasena")
-        .send({ token: `intento-${i}`, contrasena: "ClaveNueva123" });
-      expect(res.status).toBe(400);
+  it("empieza con el cupo entero aunque el test anterior lo agotara", async () => {
+    const res = await intentar(0);
+
+    expect(res.status).toBe(400);
+    expect(Number(res.headers["ratelimit-remaining"])).toBe(19);
+  });
+});
+
+describe("limitadores de las rutas de token", () => {
+  it("no comparten cupo entre sí", async () => {
+    for (let i = 0; i < 20; i++) {
+      await request(app).post("/api/auth/verificar-email").send({ token: `intento-${i}` });
     }
+
+    const res = await request(app)
+      .post("/api/auth/nueva-contrasena")
+      .send({ token: "intento-0", contrasena: "ClaveNueva123" });
+
+    expect(res.status).toBe(400);
+    expect(Number(res.headers["ratelimit-remaining"])).toBe(19);
   });
 });
