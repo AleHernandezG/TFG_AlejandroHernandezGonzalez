@@ -1,3 +1,4 @@
+import { EnlaceSaltoContenido } from '@/components/common/enlaceSaltoContenido'
 import { NavBarInferior } from '@/components/common/navBarInferior'
 
 export default function LayoutPrincipal({
@@ -7,7 +8,8 @@ export default function LayoutPrincipal({
 }) {
   return (
     <>
-      <main className="pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <EnlaceSaltoContenido />
+      <main className="pb-[calc(4.5rem+env(safe-area-inset-bottom))] outline-hidden lg:pb-0">
         {children}
       </main>
       <NavBarInferior />

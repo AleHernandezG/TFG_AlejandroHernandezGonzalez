@@ -22,14 +22,14 @@ Cada hallazgo lleva `UI-XXX`, fichero y línea. Al final hay un orden de ataque.
 | UI-002 | La tarjeta destacada estira y deja una franja muerta | `tarjetaPostPc.tsx:119` | 30 min | ✅ 18/09 |
 | UI-003 | **Like y guardar en escritorio no llaman al backend** | `tarjetaPostPc.tsx:26-31` | 1 h | ✅ 18/09 |
 | UI-004 | Cuatro pantallas de escritorio limitadas a 512–768 px en 1440 | 4 `page.tsx` | 3 h | ✅ 18/09 |
-| UI-005 | Cada pantalla monta su árbol dos veces | 5 `page.tsx` | 4 h | abierto |
-| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h | abierto |
+| UI-005 | Cada pantalla monta su árbol dos veces | 5 `page.tsx` | 4 h | ✅ 28/09 |
+| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h | ✅ 28/09 |
 | UI-007 | Dos `<select>` sin nombre accesible | formulario de crear receta | 20 min | ✅ 18/09 |
 | UI-008 | El botón de filtros de Discover no tiene nombre | `contenidoDiscover.tsx` | 10 min | ✅ 18/09 |
-| UI-009 | `<main>` anidado en todas las rutas | `(main)/layout.tsx` + páginas | 30 min | abierto |
+| UI-009 | `<main>` anidado en todas las rutas | `(main)/layout.tsx` + páginas | 30 min | ✅ 28/09 |
 | UI-010 | El FAB tapa un campo del formulario | `navBarInferior.tsx:47` | 20 min | ✅ 18/09 |
 | UI-011 | No hay tablet: de 767 a 1023 se ve el móvil estirado | `page.tsx` × 5 | 3 h | abierto |
-| UI-012 | `ContenidoDiscover` nunca pasa `categoria` al hook | `contenidoDiscover.tsx` | 15 min | abierto |
+| UI-012 | `ContenidoDiscover` nunca pasa `categoria` al hook | `contenidoDiscover.tsx` | 15 min | ✅ 28/09 |
 
 ---
 
@@ -53,6 +53,55 @@ fila de rejilla, y con `align-items: stretch` el hueco no se elimina, **se muda 
 El arreglo fue dar a la imagen de las dos variantes `flex-1` con un suelo `min-h-*`, de modo que sea la
 imagen la que absorbe el sobrante de la fila. El `row-span-2` sí se quitó y el ciclo suma nueve, como
 pedía UI-001, y no se usó `grid-auto-flow: dense`.
+
+---
+
+## Ola 2, cerrada el 28 de septiembre de 2026
+
+La parte estructural: UI-005, UI-009, UI-009b y UI-012, más los cuatro arreglos de «Lo que no detecta
+axe» de la sección 3, y al final UI-006. Queda abierto UI-011, y de la sección 4 UI-013, UI-014, UI-015 y UI-017.
+
+Lo que conviene saber de esta ola, porque no sale en el diff a primera vista:
+
+**La bifurcación del feed sigue existiendo, pero abajo del todo.** `FeedHome` es el único contenedor:
+un `useHomeFeed`, un `IntersectionObserver`, un estado de carga, un error y un vacío. Lo único que se
+pinta en dos variantes es la lista de tarjetas (`FeedMovil` vertical, `FeedHomePc` bento), que es el
+caso legítimo que ya reconocía UI-005. `LayoutHomePc` desaparece: ahora es `ContenidoHome`, que guarda
+la búsqueda y los filtros una sola vez y se los pasa a las dos cabeceras. Por eso `BuscadorFiltros`
+pasó a input controlado (`busqueda` es obligatoria): si se busca «gazpacho» en móvil y se ensancha la
+ventana, el buscador de escritorio ya lo tiene escrito. Antes cada árbol tenía el suyo.
+
+**El ancla `#comentarios` ya existe.** El detalle es una sola rejilla `md:grid-cols-2` y monta
+`ComentariosReceta` una vez, con `id="comentarios"` y `scroll-mt-4`. El enlace de comentarios de la
+tarjeta de escritorio apunta ahí. La tarjeta de móvil sigue sin enlace a comentarios: eso es la
+decisión de UI-003 sobre qué acciones existen en el feed, no un fallo de esta ola.
+
+**La categoría se normaliza en el backend, y no con una expresión regular.** El arreglo obvio para
+que `?categoria=Postres` funcione era un `$regex` con la opción `i`. Rompe el índice
+`{categorias: 1, fechaPublicacion: -1}`: Mongo no puede usar el orden del índice con un regex que no
+distingue mayúsculas y acaba ordenando en memoria, que es justo lo que vigila
+`tests/feed.indices.test.ts`. `canonizarCategoria` (`lib/dietas.ts`) pasa el valor a minúsculas y sin
+espacios, y si es una dieta lo lleva a su identificador canónico, así que `?categoria=Vegana` busca
+`vegano`. Luego va como igualdad exacta al `$all`. Cinco tests nuevos en `feed.filtros.test.ts`.
+
+Con esto el filtro de Discover depende de que los datos estén limpios, que es lo que avisaba UI-012.
+Las recetas antiguas guardadas como `vegana` o `vegetariana` no salen en el chip «Vegano» hasta que
+`npm run normalizar:categorias` se ejecute contra Atlas (REV-009).
+
+**Los alérgenos fijos del drawer usan `aria-disabled`, no `disabled`.** Un botón con `disabled` sale
+del orden de tabulación, y entonces el `aria-describedby` que explica el candado no lo oye nadie. Con
+`aria-disabled` el botón sigue siendo enfocable, el lector anuncia «pulsado, no disponible» más el
+motivo, y `toggleAlergeno` ya ignoraba los fijos, así que un clic no los desmarca.
+
+**El anillo de foco global va en `@layer base`.** Declarado con `:where(...)` para que no gane
+especificidad. Si se pone fuera de la capa, pisa los `focus-visible:ring-*` de los componentes de
+shadcn, que están mejor pensados para cada caso.
+
+Comprobado en local con Playwright a 1440 y 390: un solo `<main>`, un solo `#contenido`, `<h1>` oculto
+en el feed, la búsqueda conservada al cruzar el punto de corte, el enlace de salto como primer Tab y
+el foco en la primera tarjeta al activarlo, el chip «Postres» filtrando con el suelo de alérgenos
+aplicado, el vacío de Discover con salida y el ancla de comentarios en las dos anchuras. En consola,
+solo los avisos que ya había (refs de shadcn en desarrollo y `sizes` de `next/image`).
 
 ---
 
@@ -238,6 +287,8 @@ cuando el post cambia de identidad al refetchear el feed. El botón de comentari
 `detalleRecetaCliente.tsx` monte `ComentariosReceta` dos veces (UI-005). El enlace lleva a
 `/recetas/{id}` a secas; el ancla se añade cuando se cierre UI-005.
 
+**Ancla añadida el 28/09/2026**, con UI-005 cerrado: el enlace va a `/recetas/{id}#comentarios`.
+
 La decisión de fondo (si el like desde el feed existe en las dos plataformas) sigue sin tomar. Ahora
 mismo funciona en escritorio y no está en móvil.
 
@@ -278,7 +329,7 @@ una incoherencia: `contenidoChat.tsx:31` es un `fixed inset-0 z-[60]`, una capa 
 encima del `z-40` de la barra, así que la barra no se vería de todos modos y el chat tiene su propia
 salida.
 
-### UI-005 · Cada pantalla se monta dos veces
+### UI-005 · Cada pantalla se monta dos veces ✅
 
 `app/(main)/discover/page.tsx`, `coleccion`, `despensa`, `perfil`, `home`
 
@@ -299,7 +350,11 @@ El patrón correcto en Tailwind es un solo árbol con clases por punto de corte.
 falta cambiar de componente (la tarjeta del feed es un caso legítimo: móvil vertical, escritorio
 bento), que la bifurcación sea lo más pequeña posible y esté al final del árbol, no al principio.
 
-### UI-012 · Discover ignora el filtro de categoría
+**Hecho el 28/09/2026.** Las cinco páginas y el detalle de receta montan un solo árbol, con la barra
+lateral `SidebarNavPc` al lado y el contenido en `#contenido` con `lg:pl-64`. La única bifurcación que
+queda es la lista de tarjetas del feed. Detalles en la ola 2, arriba.
+
+### UI-012 · Discover ignora el filtro de categoría ✅
 
 `features/discover/components/contenidoDiscover.tsx`
 
@@ -326,6 +381,12 @@ prompt de Gemini no enumera las dietas válidas y el validador acepta cualquier 
 cuatro aparece al filtrar por dieta ni puntúa en el feed personalizado. Va como REV-009 en el registro
 de producción, porque es backend y datos, no interfaz. Si se conectan las categorías de Discover sin
 arreglar eso antes, el filtro nuevo nacerá mintiendo.
+
+**Hecho el 28/09/2026.** `ContenidoDiscover` pinta `ChipsCategoria` con `CATEGORIAS_DISCOVER` y pasa
+la categoría a `useDiscover`. El repositorio normaliza con `canonizarCategoria` en vez de fiarse del
+cliente. Si una categoría deja la pestaña vacía, el mensaje lo dice («No hay recetas de postres en
+esta pestaña») y ofrece «Ver todas las categorías». REV-009 está arreglado en el código; lo que falta
+es pasar `normalizar:categorias` por Atlas.
 
 ---
 
@@ -378,7 +439,7 @@ Repasados los de la despensa: los lápices y las papeleras ya venían con `aria-
 `Eliminar {nombre}`). En el panel de preferencias los iconos de alérgeno pasaron a `alt=""`, que es lo
 correcto: la etiqueta de texto va al lado y un lector de pantalla los leía dos veces.
 
-### UI-006 · El color de marca no llega a AA (seria)
+### UI-006 · El color de marca no llega a AA (seria) ✅
 
 `--brand` es `#ad5600`. Sobre los fondos cálidos de la propia aplicación:
 
@@ -397,9 +458,31 @@ No hay que cambiar la identidad. Basta con un tono más oscuro reservado para te
 `--brand-texto` en `globals.css` y se usa en las combinaciones de la tabla; `--brand` se queda para
 rellenos, bordes e iconos grandes, donde el umbral es 3:1 y sí lo cumple.
 
-Para el modo oscuro hay que rehacer la comprobación cuando exista: hoy no hay.
+Hecho el 28/09/2026. `--brand-texto` es `oklch(0.48 0.12 55)`, que en sRGB sale `#8f4700`, y
+`@theme` lo expone como `text-brand-texto`. Las cifras de arriba se midieron a ojo sobre capturas; con
+los fondos reales de `globals.css` convertidos desde oklch quedan así:
 
-### UI-009 · `<main>` dentro de `<main>` (moderada)
+| Fondo | `--brand` | `--brand-texto` |
+|---|---|---|
+| `--background` | 4,87:1 | 6,53:1 |
+| `--warm-bg` | 4,66:1 | 6,25:1 |
+| `--warm-bg-accent` | 4,13:1 | 5,54:1 |
+| `--brand-subtle` | 4,25:1 | 5,70:1 |
+| `--muted` | 4,39:1 | 5,89:1 |
+| `--accent` | 4,01:1 | 5,37:1 |
+| `--brand-muted` | 3,51:1 | 4,71:1 |
+
+Como `--brand` falla en casi todos, no tenía sentido decidir caso por caso: todo el texto que era
+`text-brand` pasa a `text-brand-texto`, hover incluido, y también los dos `text-brand/70` de colección
+y del bento de la landing. Se quedan en `--brand` los tres títulos grandes que van sobre foto
+oscurecida («cocinando» y «Cookr» en el hero, «creación» en crear receta), donde el tono claro se lee
+mejor, y los iconos decorativos con opacidad, que no son texto.
+
+El bloque `.dark` de `globals.css` también lleva `--brand-texto`, con el mismo valor que su `--brand`.
+Ese bloque no lo activa nada todavía (ver «Sin modo oscuro» en la sección 5), así que su contraste
+está sin comprobar.
+
+### UI-009 · `<main>` dentro de `<main>` (moderada) ✅
 
 `app/(main)/layout.tsx:10` envuelve todo en un `<main>`, y encima `/discover`, `/coleccion`,
 `/despensa`, `/perfil`, `/home` y `/crear-receta` añaden el suyo. Dos `<main>` en el documento: la
@@ -409,7 +492,10 @@ principal es ambiguo.
 Arreglo: el `<main>` se queda en el layout y las páginas usan `<div>` o `<section>`. Una sola línea por
 fichero.
 
-### UI-009b · Contenido fuera de landmarks y jerarquía de encabezados
+**Hecho el 28/09/2026.** Salió solo al cerrar UI-005: las páginas nuevas ya usan `<div id="contenido">`.
+La única que había que tocar aparte era `/crear-receta`.
+
+### UI-009b · Contenido fuera de landmarks y jerarquía de encabezados ✅
 
 - `region` en móvil: la cabecera del feed y la barra inferior están fuera de cualquier landmark.
   `<header>` en `headerHome.tsx` y `<nav aria-label="Navegación principal">` en `navBarInferior.tsx`
@@ -420,6 +506,11 @@ fichero.
   de escritorio usan `<h2>` para el destacado y `<h3>` para las demás, lo que en la práctica dice que
   unas recetas son subsecciones de otras. Todas deberían ser del mismo nivel.
 - `list` en el detalle: `<ol class="list-none p-0 m-0">` con hijos que no son `<li>`.
+
+**Hecho el 28/09/2026.** Las dos barras de navegación llevan `aria-label="Navegación principal"`. El
+feed tiene su `<h1>` oculto y la búsqueda de Discover, que quitaba el título, también. Todas las
+tarjetas (feed de escritorio, Discover, colección) usan `<h2>`, y el carrusel de similares baja de
+`<h4>` a `<h3>`. El separador de la lista de pasos pasó a `<li aria-hidden="true">`.
 
 ### Lo que no detecta axe pero se ve al usar la aplicación
 
@@ -439,6 +530,13 @@ del sistema. Se resuelve de una vez envolviendo la aplicación en `<MotionConfig
 pero el estado bloqueado del drawer de filtros (los alérgenos del perfil, marcados y deshabilitados con
 un candado) necesita `aria-describedby` que explique por qué no se pueden tocar. Es información de
 salud: que un lector de pantalla diga solo «casilla marcada, deshabilitada» no basta.
+
+**Los cuatro, hechos el 28/09/2026.** `EnlaceSaltoContenido` es el primer elemento enfocable de
+`(main)/layout.tsx` y lleva el foco a `#contenido` (o al `<main>` si la página no lo tiene). El anillo
+global está en `globals.css`, dentro de `@layer base`. `providers.tsx` envuelve la aplicación en
+`<MotionConfig reducedMotion="user">`. Y los alérgenos fijos del drawer llevan `aria-pressed`,
+`aria-disabled` y `aria-describedby` apuntando al aviso del candado. Por qué `aria-disabled` y no
+`disabled`, en la ola 2.
 
 ---
 
@@ -512,14 +610,15 @@ direcciones) y el resto de la aplicación hablar siempre en minúsculas sin tild
   de `tarjetaPost.tsx:12-19` sigue aparte, con su propio formato («Hace 88d») y sin el `Math.max(0, …)`
   que evita el «Hace -1m». Unificarla cambia el texto que se ve en el feed, así que es decisión de
   copia: o el feed adopta «hace 88 d», o `lib/tiempo.ts` exporta las dos variantes.
-- **`CATEGORIAS_DISCOVER` no la usa nadie.** Código muerto desde que Discover dejó de pasar
-  `categoria` (UI-012). O se conecta o se borra.
+- ~~**`CATEGORIAS_DISCOVER` no la usa nadie.**~~ Conectada el 28/09/2026 con UI-012: son los chips
+  de Discover.
 - **No hay forma de borrar un comentario.** Ni para su autor ni para el de la receta. Falta
   `DELETE /api/recetas/:id/comentarios/:comentarioId` con la comprobación de permiso y el decremento de
   `numComentarios` en la misma operación.
-- **Sin modo oscuro.** `globals.css` no declara variables para `prefers-color-scheme: dark`. No es
-  urgente, pero conviene decidirlo antes de repartir tokens de color nuevos por UI-006, para no tener
-  que hacer el trabajo dos veces.
+- **Sin modo oscuro.** Corrección del 28/09/2026: `globals.css` sí tiene un bloque `.dark` con todos
+  los tokens (el que trae shadcn), pero nada pone la clase `dark` en el documento ni mira
+  `prefers-color-scheme`, así que nunca se aplica. Si algún día se activa, hay que medir sus
+  contrastes desde cero, `--brand-texto` incluido.
 
 ---
 
@@ -527,27 +626,28 @@ direcciones) y el resto de la aplicación hablar siempre en minúsculas sin tild
 
 **Primero, lo que está roto** (una tarde): ✅ cerrado el 18/09/2026
 
-1. ~~UI-003, el like y el guardar de escritorio.~~ Hecho, sin el ancla `#comentarios`.
+1. ~~UI-003, el like y el guardar de escritorio.~~ Hecho. El ancla `#comentarios` llegó el 28/09 con
+   UI-005.
 2. ~~UI-007 y UI-008, las tres violaciones críticas de accesibilidad.~~ Hechas.
-3. UI-009, el `<main>` anidado. Una línea por fichero. **Sigue abierto**: es el único de este bloque
-   que no se tocó, y conviene hacerlo junto a UI-005, que mueve los mismos ficheros.
+3. ~~UI-009, el `<main>` anidado.~~ Hecho el 28/09/2026, junto a UI-005.
 4. ~~UI-010, el FAB que tapa un campo del formulario.~~ Hecho con la opción 1.
 5. ~~UI-001, el hueco del bento.~~ Hecho, más el `flex-1` de las imágenes que UI-002 necesitaba de
    verdad.
 
 **Después, el espacio y la accesibilidad de fondo** (dos o tres días):
 
-6. UI-006, el tono de marca para texto sobre fondo cálido, con la revisión de contrastes entera.
+6. ~~UI-006, el tono de marca para texto sobre fondo cálido.~~ Hecho el 28/09/2026 con `--brand-texto`.
 7. ~~UI-004, los anchos de despensa, colección y perfil.~~ Hecho el 18/09/2026, las cuatro pantallas.
 8. UI-011, el punto de corte `md` para tablet.
 9. UI-014, los filtros activos visibles.
 
 **Luego, lo estructural** (una semana):
 
-10. UI-005, un solo árbol por pantalla.
+10. ~~UI-005, un solo árbol por pantalla.~~ Hecho el 28/09/2026, con UI-012 de paso.
 11. UI-017, un solo vocabulario de dificultad.
-12. UI-013, estados vacíos con salida.
-13. Enlace de salto al contenido, `focus-visible` global y `MotionConfig reducedMotion="user"`.
+12. UI-013, estados vacíos con salida. Discover ya tiene el suyo para las categorías.
+13. ~~Enlace de salto al contenido, `focus-visible` global y `MotionConfig reducedMotion="user"`.~~
+    Hecho el 28/09/2026.
 
 El formulario de crear receta va por su cuenta en `docs/diseno/formulario-crear-receta.md`, los eventos
 en `docs/estado/eventos.md` y la aplicación instalable en `docs/estado/pwa.md`.

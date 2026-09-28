@@ -11,23 +11,13 @@ export const metadata: Metadata = {
 export default function PaginaDespensa() {
   return (
     <>
-      {/* Mobile */}
-      <div className="min-h-screen bg-background lg:hidden">
-        <Suspense>
-          <ContenidoDespensa />
-        </Suspense>
-      </div>
-
-      {/* Desktop */}
-      <div className="hidden lg:flex">
-        <SidebarNavPc />
-        <main className="min-h-screen flex-1 bg-background pl-64">
-          <div className="mx-auto max-w-6xl py-10">
-            <Suspense>
-              <ContenidoDespensa />
-            </Suspense>
-          </div>
-        </main>
+      <SidebarNavPc />
+      <div id="contenido" className="min-h-screen bg-background outline-hidden lg:pl-64">
+        <div className="lg:mx-auto lg:max-w-6xl lg:py-10">
+          <Suspense>
+            <ContenidoDespensa />
+          </Suspense>
+        </div>
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Lock } from 'lucide-react'
@@ -31,6 +31,7 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
   const [local, setLocal] = useState<FiltrosAvanzados>(filtros)
   const { data: perfil } = useMiPerfil()
   const alergenosDelPerfil = perfil?.alergias ?? []
+  const idAvisoPerfil = useId()
 
   function handleOpen(v: boolean) {
     if (v) setLocal(filtros)
@@ -158,7 +159,9 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
                     key={a.id}
                     type="button"
                     onClick={() => toggleAlergeno(a.id)}
-                    disabled={fijo}
+                    aria-pressed={activo}
+                    aria-disabled={fijo || undefined}
+                    aria-describedby={fijo ? idAvisoPerfil : undefined}
                     title={fijo ? 'Lo tienes en tu perfil. Se aplica siempre.' : undefined}
                     className={cn(
                       'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
@@ -182,7 +185,7 @@ export function DrawerFiltros({ filtros, onChange, children }: Props) {
               })}
             </div>
             {alergenosDelPerfil.length > 0 && (
-              <p className="mt-3 text-[11px] text-muted-foreground/70">
+              <p id={idAvisoPerfil} className="mt-3 text-[11px] text-muted-foreground/70">
                 Los que tienen candado vienen de tu perfil y se aplican siempre. Puedes{' '}
                 <Link href="/perfil" className="underline hover:text-foreground">
                   cambiarlos en tu perfil

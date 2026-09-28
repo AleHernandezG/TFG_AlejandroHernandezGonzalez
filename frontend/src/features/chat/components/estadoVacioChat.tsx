@@ -12,13 +12,13 @@ export function EstadoVacioChat({ onChipClick }: Props) {
       <div className="flex w-full max-w-xs flex-col items-center gap-8 text-center">
         {/* Icono animado */}
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-(--brand-subtle) shadow-[0px_12px_32px_oklch(0.22_0.02_50/0.06)]">
-          <Sparkles className="h-7 w-7 text-brand" />
+          <Sparkles className="h-7 w-7 text-brand-texto" />
         </div>
 
         {/* Título */}
         <h2 className="text-2xl font-bold leading-snug tracking-wide text-foreground">
           ¿En qué te puedo{' '}
-          <span className="italic text-brand">ayudar?</span>
+          <span className="italic text-brand-texto">ayudar?</span>
         </h2>
 
         {/* Chips sugeridos */}

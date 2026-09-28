@@ -120,7 +120,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
   }
 
   return (
-    <section className="px-5 pt-6 pb-4">
+    <section id="comentarios" className="scroll-mt-4 px-5 pt-6 pb-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-extrabold text-foreground">
@@ -129,7 +129,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
         </h2>
         {totalMostrado > 3 && (
           <button
-            className="text-sm font-semibold text-brand hover:opacity-80 transition-opacity"
+            className="text-sm font-semibold text-brand-texto hover:opacity-80 transition-opacity"
             onClick={() => setSheetAbierto(true)}
           >
             Ver todos

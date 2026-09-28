@@ -44,7 +44,7 @@ export function TarjetaPost({ post }: TarjetaPostProps) {
       <div className="mb-3 flex items-center gap-3">
         <Avatar className="h-9 w-9 shrink-0">
           <AvatarImage src={post.autor.avatarUrl} alt={post.autor.nombre} />
-          <AvatarFallback className="bg-brand/10 text-xs font-semibold text-brand">
+          <AvatarFallback className="bg-brand/10 text-xs font-semibold text-brand-texto">
             {post.autor.nombre.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -111,7 +111,7 @@ export function TarjetaPost({ post }: TarjetaPostProps) {
           >
             <Bookmark
               className={`h-5 w-5 transition-colors ${
-                guardado ? 'fill-brand text-brand' : 'text-muted-foreground'
+                guardado ? 'fill-brand text-brand-texto' : 'text-muted-foreground'
               }`}
               strokeWidth={guardado ? 0 : 1.8}
             />

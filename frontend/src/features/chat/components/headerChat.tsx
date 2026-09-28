@@ -15,7 +15,7 @@ export function HeaderChat({ onVerHistorial }: Props) {
       <div className="flex w-full items-center justify-between px-4 py-3">
         <button
           onClick={() => router.back()}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-brand transition-colors hover:bg-(--warm-bg) active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-brand-texto transition-colors hover:bg-(--warm-bg) active:scale-95"
           aria-label="Volver"
         >
           <ArrowLeft className="h-5 w-5" />

@@ -18,7 +18,7 @@ export function TarjetaDestacada({ evento }: Props) {
       {/* Contenido */}
       <div className="relative z-10 flex h-full flex-col justify-between p-5">
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand">
+          <span className="flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-texto">
             <Sparkles size={11} />
             {evento.etiqueta}
           </span>

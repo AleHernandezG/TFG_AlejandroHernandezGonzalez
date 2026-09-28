@@ -150,7 +150,7 @@ export function SeccionIngredientes() {
       <button
         type="button"
         onClick={() => append({ nombre: '', cantidad: '', unidad: '' })}
-        className="mt-4 flex items-center gap-1.5 text-sm font-bold text-brand hover:opacity-80 transition-opacity"
+        className="mt-4 flex items-center gap-1.5 text-sm font-bold text-brand-texto hover:opacity-80 transition-opacity"
       >
         <Plus size={16} />
         Añadir ingrediente

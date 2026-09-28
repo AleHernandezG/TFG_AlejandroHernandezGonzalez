@@ -6,8 +6,9 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { HeaderDiscover } from './headerDiscover'
 import { TarjetaDiscover } from './tarjetaDiscover'
 import { EstadoVacioDiscover } from './estadoVacioDiscover'
-import { SUGERENCIAS_POPULARES } from '@/features/discover/data/datosDiscover'
-import type { TabDiscover } from '@/features/discover/types/discover.types'
+import { ChipsCategoria } from './chipsCategoria'
+import { CATEGORIAS_DISCOVER, SUGERENCIAS_POPULARES } from '@/features/discover/data/datosDiscover'
+import type { CategoriaDiscover, TabDiscover } from '@/features/discover/types/discover.types'
 import type { FiltrosAvanzados } from '@/features/recetas/types/receta.types'
 import { useDiscover } from '@/features/discover/hooks/useDiscover'
 
@@ -33,6 +34,7 @@ function SkeletonTarjeta() {
 export function ContenidoDiscover() {
   const [query, setQuery] = useState('')
   const [tabActiva, setTabActiva] = useState<TabDiscover>('recientes')
+  const [categoria, setCategoria] = useState<CategoriaDiscover>('Todos')
   const [filtrosAvanzados, setFiltrosAvanzados] = useState<FiltrosAvanzados>({
     dietas: [],
     alergenos: [],
@@ -50,6 +52,7 @@ export function ContenidoDiscover() {
     isLoading,
   } = useDiscover({
     q: queryDebounced || undefined,
+    categoria,
     tab: tabActiva,
     filtrosAvanzados,
   })
@@ -87,6 +90,12 @@ export function ContenidoDiscover() {
         onChange={setQuery}
         filtrosAvanzados={filtrosAvanzados}
         onFiltrosChange={setFiltrosAvanzados}
+      />
+
+      <ChipsCategoria
+        categorias={CATEGORIAS_DISCOVER}
+        activa={categoria}
+        onChange={setCategoria}
       />
 
       <AnimatePresence mode="wait">
@@ -129,6 +138,8 @@ export function ContenidoDiscover() {
                     ] as { id: TabDiscover; label: string }[]).map(({ id, label }) => (
                       <button
                         key={id}
+                        type="button"
+                        aria-pressed={id === tabActiva}
                         onClick={() => setTabActiva(id)}
                         className={[
                           'rounded-full px-3 py-1 text-xs font-bold transition-colors',
@@ -154,6 +165,24 @@ export function ContenidoDiscover() {
               </div>
             ) : (
               <>
+                {recetas.length === 0 && (
+                  <div className="flex flex-col items-center gap-3 px-5 pt-6 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {categoria === 'Todos'
+                        ? 'Todavía no hay recetas aquí.'
+                        : `No hay recetas de ${categoria.toLowerCase()} en esta pestaña.`}
+                    </p>
+                    {categoria !== 'Todos' && (
+                      <button
+                        onClick={() => setCategoria('Todos')}
+                        className="rounded-full bg-(--warm-bg-accent) px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-brand/10 hover:text-brand-texto"
+                      >
+                        Ver todas las categorías
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 <motion.div
                   variants={variantesGrid}
                   initial="oculto"

@@ -20,7 +20,7 @@ export function PasosReceta({ pasos }: Props) {
         {soportado && !activo && (
           <button
             onClick={() => iniciar(pasos)}
-            className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand-texto rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
           >
             <Headphones size={14} />
             Modo manos libres
@@ -34,19 +34,19 @@ export function PasosReceta({ pasos }: Props) {
           <button
             onClick={anterior}
             disabled={pasoActual === 0}
-            className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand"
+            className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand-texto"
             aria-label="Paso anterior"
           >
             <ChevronLeft size={18} />
           </button>
 
-          <span className="flex-1 text-center text-xs font-bold text-brand">
+          <span className="flex-1 text-center text-xs font-bold text-brand-texto">
             Paso {pasoActual + 1} de {pasos.length}
           </span>
 
           <button
             onClick={pausado ? reanudar : pausar}
-            className="p-1.5 rounded-full hover:bg-brand/20 transition-colors text-brand"
+            className="p-1.5 rounded-full hover:bg-brand/20 transition-colors text-brand-texto"
             aria-label={pausado ? 'Reanudar' : 'Pausar'}
           >
             {pausado ? <Play size={16} /> : <Pause size={16} />}
@@ -55,7 +55,7 @@ export function PasosReceta({ pasos }: Props) {
           <button
             onClick={siguiente}
             disabled={pasoActual === pasos.length - 1}
-            className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand"
+            className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand-texto"
             aria-label="Siguiente paso"
           >
             <ChevronRight size={18} />
@@ -75,7 +75,7 @@ export function PasosReceta({ pasos }: Props) {
       <ol className="list-none p-0 m-0">
         {pasos.map((paso, i) => (
           <Fragment key={i}>
-            {i > 0 && <div className="h-px bg-border/40" />}
+            {i > 0 && <li aria-hidden="true" className="h-px bg-border/40" />}
             <li
               className={`flex gap-4 py-5 transition-all duration-300 ${
                 activo && i === pasoActual
@@ -87,7 +87,7 @@ export function PasosReceta({ pasos }: Props) {
                 className={`shrink-0 h-8 w-8 flex items-center justify-center rounded-full font-black text-sm border transition-colors ${
                   activo && i === pasoActual
                     ? 'bg-brand text-brand-foreground border-brand'
-                    : 'bg-(--brand-subtle) text-brand border-brand/20'
+                    : 'bg-(--brand-subtle) text-brand-texto border-brand/20'
                 }`}
               >
                 {i + 1}

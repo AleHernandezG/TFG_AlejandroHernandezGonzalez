@@ -57,7 +57,7 @@ export function TarjetaAvatarPerfil({ nombre, email, avatar }: Props) {
         <button
           onClick={() => inputRef.current?.click()}
           disabled={isPending}
-          className="absolute bottom-0 right-0 bg-card rounded-full p-1.5 shadow-xs border border-border text-muted-foreground hover:text-brand transition-colors disabled:opacity-60"
+          className="absolute bottom-0 right-0 bg-card rounded-full p-1.5 shadow-xs border border-border text-muted-foreground hover:text-brand-texto transition-colors disabled:opacity-60"
           aria-label="Cambiar foto de perfil"
         >
           {isPending ? (

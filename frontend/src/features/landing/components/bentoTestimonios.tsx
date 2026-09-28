@@ -28,7 +28,7 @@ export function BentoTestimonios() {
     >
       {/* Encabezado de sección */}
       <motion.div variants={elemento} className="mb-12 text-center">
-        <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand">
+        <span className="mb-3 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-brand-texto">
           Comunidad
         </span>
         <h2 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl lg:text-4xl">

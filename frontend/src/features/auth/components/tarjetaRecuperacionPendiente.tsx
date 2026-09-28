@@ -57,7 +57,7 @@ export function TarjetaRecuperacionPendiente({ email }: Props) {
         <CardContent className="flex flex-col items-center gap-6 px-6 py-10 text-center">
           {/* Icono */}
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-(--brand-subtle)">
-            <Mail className="h-8 w-8 text-brand" aria-hidden />
+            <Mail className="h-8 w-8 text-brand-texto" aria-hidden />
           </div>
 
           {/* Título y descripción */}
@@ -88,7 +88,7 @@ export function TarjetaRecuperacionPendiente({ email }: Props) {
             <motion.p
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm font-medium text-brand"
+              className="text-sm font-medium text-brand-texto"
             >
               Correo reenviado correctamente.
             </motion.p>
