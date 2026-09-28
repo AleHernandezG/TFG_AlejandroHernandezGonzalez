@@ -97,7 +97,7 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
       <button
         onClick={handleAnadirDespensa}
         disabled={añadido}
-        className="mb-8 flex w-full items-center justify-center text-sm font-bold text-brand transition-opacity hover:opacity-80 disabled:opacity-60"
+        className="mb-8 flex w-full items-center justify-center text-sm font-bold text-brand-texto transition-opacity hover:opacity-80 disabled:opacity-60"
       >
         {añadido ? '✓ Añadidos' : 'Añadir a mi despensa'}
       </button>

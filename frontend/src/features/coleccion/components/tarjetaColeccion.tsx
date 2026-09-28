@@ -79,7 +79,7 @@ export function TarjetaColeccion({ receta, pestana }: Props) {
             <button
               aria-label="Quitar de guardadas"
               onClick={handleDesguardar}
-              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-brand shadow-xs hover:scale-110 transition-transform"
+              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-brand-texto shadow-xs hover:scale-110 transition-transform"
             >
               <Bookmark className="w-4 h-4 fill-current" />
             </button>

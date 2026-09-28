@@ -16,9 +16,9 @@ export function GridRecetasColeccion({ recetas, pestana }: Props) {
           <Link href="/crear-receta" className="block">
             <div className="aspect-3/4 rounded-xl border-2 border-dashed border-brand/40 bg-brand/5 flex flex-col items-center justify-center gap-2 hover:bg-brand/10 hover:border-brand/60 transition-colors">
               <div className="w-11 h-11 rounded-full bg-brand/15 flex items-center justify-center">
-                <Plus className="w-5 h-5 text-brand" strokeWidth={2.5} />
+                <Plus className="w-5 h-5 text-brand-texto" strokeWidth={2.5} />
               </div>
-              <span className="text-xs font-semibold text-brand/70 text-center leading-tight px-3">
+              <span className="text-xs font-semibold text-brand-texto text-center leading-tight px-3">
                 Nueva receta
               </span>
             </div>

@@ -105,7 +105,7 @@ export function CabeceraReceta({ receta }: Props) {
           ))}
           <Badge
             variant="secondary"
-            className="bg-brand/15 text-brand border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
+            className="bg-brand/15 text-brand-texto border-0 text-[10px] font-bold tracking-wider uppercase rounded-full px-2.5 py-1"
           >
             {receta.receta.dificultad}
           </Badge>
@@ -184,7 +184,7 @@ export function CabeceraReceta({ receta }: Props) {
           {/* Compartir */}
           <button
             onClick={handleCompartir}
-            className={`flex flex-col items-center gap-0.5 transition-colors ${urlCopiada ? 'text-brand' : 'text-muted-foreground'}`}
+            className={`flex flex-col items-center gap-0.5 transition-colors ${urlCopiada ? 'text-brand-texto' : 'text-muted-foreground'}`}
           >
             {urlCopiada ? <Check size={22} /> : <Share2 size={22} />}
             <span className="text-[10px] font-bold">{urlCopiada ? '¡Copiado!' : 'Compartir'}</span>

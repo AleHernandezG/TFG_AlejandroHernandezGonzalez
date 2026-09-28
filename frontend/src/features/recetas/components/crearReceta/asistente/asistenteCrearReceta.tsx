@@ -97,7 +97,7 @@ export function AsistenteCrearReceta({
 
             <div className="min-w-0 flex-1">
               {vista === 'pasos' && (
-                <p aria-hidden className="mb-1 text-[11px] font-bold uppercase tracking-wider text-brand">
+                <p aria-hidden className="mb-1 text-[11px] font-bold uppercase tracking-wider text-brand-texto">
                   Paso {indice + 1} de {total}
                 </p>
               )}
@@ -118,7 +118,7 @@ export function AsistenteCrearReceta({
                   type="button"
                   onClick={() => setVista('ia')}
                   aria-label="Crear con IA"
-                  className="flex items-center gap-1.5 rounded-full bg-brand-subtle px-3 py-2 text-xs font-bold text-brand transition-colors hover:bg-brand-muted"
+                  className="flex items-center gap-1.5 rounded-full bg-brand-subtle px-3 py-2 text-xs font-bold text-brand-texto transition-colors hover:bg-brand-muted"
                 >
                   <Sparkles size={14} />
                   <span className="hidden sm:inline">Crear con IA</span>
@@ -153,7 +153,7 @@ export function AsistenteCrearReceta({
                     <button
                       type="button"
                       onClick={onEmpezarDeCero}
-                      className="text-xs font-bold text-brand underline underline-offset-2"
+                      className="text-xs font-bold text-brand-texto underline underline-offset-2"
                     >
                       Empezar de cero
                     </button>
@@ -168,7 +168,7 @@ export function AsistenteCrearReceta({
 
                 {paso.ayuda && (
                   <p className="flex items-start gap-2 px-1 text-xs text-muted-foreground">
-                    <Lightbulb size={14} className="mt-0.5 shrink-0 text-brand" />
+                    <Lightbulb size={14} className="mt-0.5 shrink-0 text-brand-texto" />
                     {paso.ayuda}
                   </p>
                 )}

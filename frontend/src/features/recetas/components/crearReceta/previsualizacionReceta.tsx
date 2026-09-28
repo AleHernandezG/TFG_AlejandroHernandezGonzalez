@@ -97,7 +97,7 @@ export function PrevisualizacionReceta() {
             soportado && !activo ? (
               <button
                 onClick={() => iniciar(datos.pasos.map((p) => p.texto))}
-                className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
+                className="flex items-center gap-1.5 bg-(--brand-subtle) text-brand-texto rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide active:scale-95 transition-transform"
               >
                 <Headphones size={14} />
                 Modo manos libres
@@ -107,16 +107,16 @@ export function PrevisualizacionReceta() {
           controles={
             activo ? (
               <div className="mb-5 flex items-center gap-2 rounded-2xl bg-brand/10 border border-brand/20 px-4 py-2.5">
-                <button onClick={anterior} disabled={pasoActual === 0} className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand" aria-label="Paso anterior">
+                <button onClick={anterior} disabled={pasoActual === 0} className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand-texto" aria-label="Paso anterior">
                   <ChevronLeft size={18} />
                 </button>
-                <span className="flex-1 text-center text-xs font-bold text-brand">
+                <span className="flex-1 text-center text-xs font-bold text-brand-texto">
                   Paso {pasoActual + 1} de {datos.pasos.length}
                 </span>
-                <button onClick={pausado ? reanudar : pausar} className="p-1.5 rounded-full hover:bg-brand/20 transition-colors text-brand" aria-label={pausado ? 'Reanudar' : 'Pausar'}>
+                <button onClick={pausado ? reanudar : pausar} className="p-1.5 rounded-full hover:bg-brand/20 transition-colors text-brand-texto" aria-label={pausado ? 'Reanudar' : 'Pausar'}>
                   {pausado ? <Play size={16} /> : <Pause size={16} />}
                 </button>
-                <button onClick={siguiente} disabled={pasoActual === datos.pasos.length - 1} className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand" aria-label="Siguiente paso">
+                <button onClick={siguiente} disabled={pasoActual === datos.pasos.length - 1} className="p-1.5 rounded-full hover:bg-brand/20 disabled:opacity-30 transition-colors text-brand-texto" aria-label="Siguiente paso">
                   <ChevronRight size={18} />
                 </button>
                 <button onClick={detener} className="p-1.5 rounded-full hover:bg-destructive/10 transition-colors text-destructive ml-1" aria-label="Detener">

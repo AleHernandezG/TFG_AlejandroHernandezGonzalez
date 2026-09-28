@@ -175,7 +175,7 @@ export function ContenidoDiscover() {
                     {categoria !== 'Todos' && (
                       <button
                         onClick={() => setCategoria('Todos')}
-                        className="rounded-full bg-(--warm-bg-accent) px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-brand/10 hover:text-brand"
+                        className="rounded-full bg-(--warm-bg-accent) px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-brand/10 hover:text-brand-texto"
                       >
                         Ver todas las categorías
                       </button>

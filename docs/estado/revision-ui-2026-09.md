@@ -23,7 +23,7 @@ Cada hallazgo lleva `UI-XXX`, fichero y línea. Al final hay un orden de ataque.
 | UI-003 | **Like y guardar en escritorio no llaman al backend** | `tarjetaPostPc.tsx:26-31` | 1 h | ✅ 18/09 |
 | UI-004 | Cuatro pantallas de escritorio limitadas a 512–768 px en 1440 | 4 `page.tsx` | 3 h | ✅ 18/09 |
 | UI-005 | Cada pantalla monta su árbol dos veces | 5 `page.tsx` | 4 h | ✅ 28/09 |
-| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h | abierto |
+| UI-006 | Contraste de marca por debajo de AA (4,14:1) | `globals.css` | 2 h | ✅ 28/09 |
 | UI-007 | Dos `<select>` sin nombre accesible | formulario de crear receta | 20 min | ✅ 18/09 |
 | UI-008 | El botón de filtros de Discover no tiene nombre | `contenidoDiscover.tsx` | 10 min | ✅ 18/09 |
 | UI-009 | `<main>` anidado en todas las rutas | `(main)/layout.tsx` + páginas | 30 min | ✅ 28/09 |
@@ -59,7 +59,7 @@ pedía UI-001, y no se usó `grid-auto-flow: dense`.
 ## Ola 2, cerrada el 28 de septiembre de 2026
 
 La parte estructural: UI-005, UI-009, UI-009b y UI-012, más los cuatro arreglos de «Lo que no detecta
-axe» de la sección 3. Quedan abiertos UI-006 y UI-011, y de la sección 4 UI-013, UI-014, UI-015 y UI-017.
+axe» de la sección 3, y al final UI-006. Queda abierto UI-011, y de la sección 4 UI-013, UI-014, UI-015 y UI-017.
 
 Lo que conviene saber de esta ola, porque no sale en el diff a primera vista:
 
@@ -439,7 +439,7 @@ Repasados los de la despensa: los lápices y las papeleras ya venían con `aria-
 `Eliminar {nombre}`). En el panel de preferencias los iconos de alérgeno pasaron a `alt=""`, que es lo
 correcto: la etiqueta de texto va al lado y un lector de pantalla los leía dos veces.
 
-### UI-006 · El color de marca no llega a AA (seria)
+### UI-006 · El color de marca no llega a AA (seria) ✅
 
 `--brand` es `#ad5600`. Sobre los fondos cálidos de la propia aplicación:
 
@@ -458,7 +458,29 @@ No hay que cambiar la identidad. Basta con un tono más oscuro reservado para te
 `--brand-texto` en `globals.css` y se usa en las combinaciones de la tabla; `--brand` se queda para
 rellenos, bordes e iconos grandes, donde el umbral es 3:1 y sí lo cumple.
 
-Para el modo oscuro hay que rehacer la comprobación cuando exista: hoy no hay.
+Hecho el 28/09/2026. `--brand-texto` es `oklch(0.48 0.12 55)`, que en sRGB sale `#8f4700`, y
+`@theme` lo expone como `text-brand-texto`. Las cifras de arriba se midieron a ojo sobre capturas; con
+los fondos reales de `globals.css` convertidos desde oklch quedan así:
+
+| Fondo | `--brand` | `--brand-texto` |
+|---|---|---|
+| `--background` | 4,87:1 | 6,53:1 |
+| `--warm-bg` | 4,66:1 | 6,25:1 |
+| `--warm-bg-accent` | 4,13:1 | 5,54:1 |
+| `--brand-subtle` | 4,25:1 | 5,70:1 |
+| `--muted` | 4,39:1 | 5,89:1 |
+| `--accent` | 4,01:1 | 5,37:1 |
+| `--brand-muted` | 3,51:1 | 4,71:1 |
+
+Como `--brand` falla en casi todos, no tenía sentido decidir caso por caso: todo el texto que era
+`text-brand` pasa a `text-brand-texto`, hover incluido, y también los dos `text-brand/70` de colección
+y del bento de la landing. Se quedan en `--brand` los tres títulos grandes que van sobre foto
+oscurecida («cocinando» y «Cookr» en el hero, «creación» en crear receta), donde el tono claro se lee
+mejor, y los iconos decorativos con opacidad, que no son texto.
+
+El bloque `.dark` de `globals.css` también lleva `--brand-texto`, con el mismo valor que su `--brand`.
+Ese bloque no lo activa nada todavía (ver «Sin modo oscuro» en la sección 5), así que su contraste
+está sin comprobar.
 
 ### UI-009 · `<main>` dentro de `<main>` (moderada) ✅
 
@@ -593,9 +615,10 @@ direcciones) y el resto de la aplicación hablar siempre en minúsculas sin tild
 - **No hay forma de borrar un comentario.** Ni para su autor ni para el de la receta. Falta
   `DELETE /api/recetas/:id/comentarios/:comentarioId` con la comprobación de permiso y el decremento de
   `numComentarios` en la misma operación.
-- **Sin modo oscuro.** `globals.css` no declara variables para `prefers-color-scheme: dark`. No es
-  urgente, pero conviene decidirlo antes de repartir tokens de color nuevos por UI-006, para no tener
-  que hacer el trabajo dos veces.
+- **Sin modo oscuro.** Corrección del 28/09/2026: `globals.css` sí tiene un bloque `.dark` con todos
+  los tokens (el que trae shadcn), pero nada pone la clase `dark` en el documento ni mira
+  `prefers-color-scheme`, así que nunca se aplica. Si algún día se activa, hay que medir sus
+  contrastes desde cero, `--brand-texto` incluido.
 
 ---
 
@@ -613,7 +636,7 @@ direcciones) y el resto de la aplicación hablar siempre en minúsculas sin tild
 
 **Después, el espacio y la accesibilidad de fondo** (dos o tres días):
 
-6. UI-006, el tono de marca para texto sobre fondo cálido, con la revisión de contrastes entera.
+6. ~~UI-006, el tono de marca para texto sobre fondo cálido.~~ Hecho el 28/09/2026 con `--brand-texto`.
 7. ~~UI-004, los anchos de despensa, colección y perfil.~~ Hecho el 18/09/2026, las cuatro pantallas.
 8. UI-011, el punto de corte `md` para tablet.
 9. UI-014, los filtros activos visibles.

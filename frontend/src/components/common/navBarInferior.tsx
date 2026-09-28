@@ -67,14 +67,14 @@ export function NavBarInferior() {
                 >
                   <Icono
                     className={`h-[22px] w-[22px] ${
-                      estaActivo ? 'text-brand' : 'text-muted-foreground'
+                      estaActivo ? 'text-brand-texto' : 'text-muted-foreground'
                     }`}
                     strokeWidth={estaActivo ? 2.2 : 1.8}
                   />
                 </motion.div>
                 <span
                   className={`relative max-w-full truncate text-[10px] leading-none ${
-                    estaActivo ? 'font-semibold text-brand' : 'font-medium text-muted-foreground'
+                    estaActivo ? 'font-semibold text-brand-texto' : 'font-medium text-muted-foreground'
                   }`}
                 >
                   {etiqueta}

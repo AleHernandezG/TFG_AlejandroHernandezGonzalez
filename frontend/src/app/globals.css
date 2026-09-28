@@ -31,6 +31,7 @@
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
   --color-brand-subtle: var(--brand-subtle);
+  --color-brand-texto: var(--brand-texto);
 
   --color-warm-bg: var(--warm-bg);
   --color-warm-bg-accent: var(--warm-bg-accent);
@@ -115,6 +116,7 @@
     --brand-foreground: oklch(0.98 0.005 75);
     --brand-muted: oklch(0.88 0.06 65);
     --brand-subtle: oklch(0.94 0.03 70);
+    --brand-texto: oklch(0.48 0.12 55);
 
     --warm-bg: oklch(0.97 0.01 75);
     --warm-bg-accent: oklch(0.93 0.025 70);
@@ -188,6 +190,7 @@
     --brand-foreground: oklch(0.16 0.015 50);
     --brand-muted: oklch(0.30 0.05 55);
     --brand-subtle: oklch(0.22 0.03 50);
+    --brand-texto: oklch(0.72 0.12 60);
 
     --warm-bg: oklch(0.18 0.015 50);
     --warm-bg-accent: oklch(0.22 0.025 55);

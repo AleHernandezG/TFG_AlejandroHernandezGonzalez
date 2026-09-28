@@ -26,8 +26,8 @@ function TarjetaPostSkeleton() {
 function BannerRecomendados() {
   return (
     <div className="mx-4 mb-2 mt-2 flex items-center gap-2 rounded-xl bg-brand/8 border border-brand/15 px-3.5 py-2.5">
-      <Sparkles size={14} className="text-brand shrink-0" />
-      <p className="text-xs font-semibold text-brand">
+      <Sparkles size={14} className="text-brand-texto shrink-0" />
+      <p className="text-xs font-semibold text-brand-texto">
         Recetas para ti — basadas en tus gustos
       </p>
     </div>

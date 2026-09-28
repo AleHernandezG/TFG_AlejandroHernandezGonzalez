@@ -30,7 +30,7 @@ export function HeaderDespensa({ total }: Props) {
         <div className="min-w-0">
           <h1 className="text-[1.75rem] font-extrabold text-foreground leading-tight tracking-tight mb-1">
             ¡Bienvenido a tu{' '}
-            <span className="font-black italic text-brand">Despensa</span>!
+            <span className="font-black italic text-brand-texto">Despensa</span>!
           </h1>
           <p className="text-sm text-muted-foreground">
             {total === 0

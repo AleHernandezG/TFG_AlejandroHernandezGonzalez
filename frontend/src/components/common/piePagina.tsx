@@ -48,7 +48,7 @@ export function PiePagina() {
 
           {/* Stack tecnológico */}
           <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-brand">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-brand-texto">
               Construido con
             </p>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
@@ -69,7 +69,7 @@ export function PiePagina() {
 
           {/* Enlaces útiles */}
           <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-brand">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-brand-texto">
               Enlaces
             </p>
             <ul className="flex flex-col gap-2">

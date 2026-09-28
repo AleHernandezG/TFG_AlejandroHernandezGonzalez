@@ -129,7 +129,7 @@ export function ComentariosReceta({ recetaId, total }: Props) {
         </h2>
         {totalMostrado > 3 && (
           <button
-            className="text-sm font-semibold text-brand hover:opacity-80 transition-opacity"
+            className="text-sm font-semibold text-brand-texto hover:opacity-80 transition-opacity"
             onClick={() => setSheetAbierto(true)}
           >
             Ver todos

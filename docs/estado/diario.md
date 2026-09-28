@@ -23,10 +23,11 @@ una `X-Forwarded-For` falsa la cambia. Se quita en el siguiente PR, que es el qu
 **Qué decisión costó tomar.** Cómo hacer que `?categoria=Postres` funcione. El regex con `i` era una
 línea y rompía el índice del feed; se normaliza el valor a igualdad exacta con `canonizarCategoria`.
 Y en el drawer, `aria-disabled` en vez de `disabled`, para que el aviso del candado llegue a leerse.
+UI-006 entró al final, con visto bueno: `--brand-texto` para todo el texto naranja, salvo los tres
+títulos que van encima de una foto oscurecida, donde oscurecer el tono habría bajado el contraste.
 
 **Qué queda a medias.** Medir el diagnóstico en producción y en develop, y con eso decidir el arreglo
-de trust proxy. UI-006 (el tono de marca para texto, `#8f4700`) está propuesto pero sin aplicar: cambia
-el color que se ve y quiero el visto bueno antes. La fuga de handles de Jest que salía en el CI no se
+de trust proxy. La fuga de handles de Jest que salía en el CI no se
 reproduce en local: 274 tests con `--detectOpenHandles` sin ningún handle abierto y seis ejecuciones
 seguidas sin el aviso. No se ha tocado nada, y menos `forceExit`, que la escondería sin arreglarla.
 

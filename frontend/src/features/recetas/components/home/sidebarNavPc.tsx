@@ -30,7 +30,7 @@ export function SidebarNavPc() {
               className={cn(
                 'flex items-center gap-3 rounded-xl p-3 text-sm transition-all duration-200',
                 activo
-                  ? 'bg-warm-bg-accent font-bold text-brand'
+                  ? 'bg-warm-bg-accent font-bold text-brand-texto'
                   : 'font-medium text-muted-foreground hover:translate-x-0.5 hover:bg-warm-bg',
               )}
             >

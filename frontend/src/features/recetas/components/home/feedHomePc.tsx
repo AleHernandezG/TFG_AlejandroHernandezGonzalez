@@ -38,8 +38,8 @@ function GridBento({ posts }: { posts: PostFeed[] }) {
 function BannerRecomendados() {
   return (
     <div className="mb-6 flex items-center gap-2 rounded-xl border border-brand/15 bg-brand/8 px-4 py-3">
-      <Sparkles size={16} className="shrink-0 text-brand" />
-      <p className="text-sm font-semibold text-brand">
+      <Sparkles size={16} className="shrink-0 text-brand-texto" />
+      <p className="text-sm font-semibold text-brand-texto">
         Recetas para ti — basadas en tus gustos
       </p>
     </div>
