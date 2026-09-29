@@ -519,6 +519,13 @@ Dos puntos de ese documento siguen abiertos y no son cosméticos: si Render mete
 por delante, el `trust proxy = 1` de `app.ts:17` hace que el limitador por IP corte a todos los
 usuarios a la vez o a ninguno.
 
+**Actualización 29/09/2026.** Medido en producción: pasaba lo primero. Por delante hay Cloudflare y un
+balanceador interno de Render, y `req.ip` salía `10.x`, con unos tres valores para toda la web. Los
+limitadores de auth cuentan ahora con `ipDelCliente()` (`backend/src/lib/ipCliente.ts`): la IP que
+reenvía NextAuth firmada con `CLIENT_IP_TOKEN`, después `cf-connecting-ip` y después `req.ip`. El
+detalle está en el diario de ese día. Queda abierto hasta comprobarlo en producción con la variable
+dada de alta en los dos lados.
+
 ---
 
 ### B8 · Restos menores

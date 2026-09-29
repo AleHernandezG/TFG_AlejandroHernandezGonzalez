@@ -1,5 +1,6 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { crearStore, reiniciarStores } from "../lib/rateLimitStore";
+import { ipDelCliente } from "../lib/ipCliente";
 
 type OpcionesLimite = {
   ventanaMinutos: number;
@@ -17,6 +18,7 @@ function limitarPorIP({ ventanaMinutos, maxIntentos, mensaje, prefijo, soloConta
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: soloContarFallos,
+    keyGenerator: (req) => ipKeyGenerator(ipDelCliente(req)),
     store: crearStore(`auth:${prefijo}`),
   });
 }

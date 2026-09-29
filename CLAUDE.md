@@ -63,7 +63,7 @@ cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 274 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 286 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -187,6 +187,7 @@ Los mensajes de commit sí van en inglés e imperativo.
 - `services/ingredientesService.ts`: `buscarIngredientesEdamam()` **no llama a Edamam**, llama a Open Food Facts. Edamam se usa en `nutritionService.ts` (junto con USDA). El nombre es engañoso.
 - `middlewares/rateLimitIA.ts` limita por usuario (`express-rate-limit`, ventana de 60 s) y hace `next()` cuando no hay `req.usuario`, así que **no protege rutas sin autenticar** (todas sus rutas llevan `requerirAuth` delante, así que en la práctica siempre hay usuario). El login se limita por otro middleware distinto, `rateLimitAuth.ts`, por IP; no los confundas.
 - Los dos limitadores comparten store vía `lib/rateLimitStore.ts`: **Redis (Upstash) si `UPSTASH_REDIS_URL` y `UPSTASH_REDIS_TOKEN` están definidas, memoria si no.** El fallback en memoria se reinicia en cada redeploy; el de Redis sobrevive. `reiniciarLimitesAuth()` (que usa `tests/setup.ts`) reinicia todos los stores registrados.
+- **`req.ip` no es la IP del usuario en Render.** Por delante hay Cloudflare y un balanceador interno, y con `trust proxy 1` `req.ip` sale `10.x`, que toma unos tres valores para toda la web (comprobado en producción el 29/09/2026). Por eso `rateLimitAuth.ts` cuenta con `ipDelCliente()` de `lib/ipCliente.ts`. Primero mira `x-client-ip`, pero solo si llega con `x-client-ip-token` igual a `CLIENT_IP_TOKEN`: lo manda NextAuth (`frontend/src/lib/ipCliente.ts`) en el login y en el de Google, que salen del servidor de Vercel y no del navegador. Si no, usa `cf-connecting-ip`, que es de fiar porque Cloudflare bloquea una falsa (error 1000); si Render deja de ir detrás de Cloudflare, deja de serlo y cualquiera puede rotarla. `req.ip` queda como último recurso. `trust proxy 1` se queda en `app.ts` para el paso 3; no lo subas pensando que arregla esto. Una llamada nueva a una ruta limitada que salga del servidor de Next tiene que llevar `...cabecerasIpCliente()` o todos sus usuarios compartirán cupo.
 - Con `npm run dev`, abrir cualquier diálogo, *sheet* o *drawer* saca `Function components cannot be given refs` en `DialogOverlay` y compañía. Los componentes de `components/ui/` son de shadcn v4, pensados para React 19, y Cookr va con React 18. Solo sale en desarrollo y no rompe nada; quitarlo es pasar `components/ui/` a `forwardRef` o subir a React 19.
 - Versiones reales: **Next 14.2.35, React 18, Express 4.19, Tailwind 4, Node ≥20**. Muchos ejemplos de shadcn y de la doc de Next ya asumen Next 15 y React 19: no los copies tal cual.
 
@@ -195,12 +196,14 @@ Los mensajes de commit sí van en inglés e imperativo.
 Plantillas en `backend/.env.example` y `frontend/.env.example`.
 
 Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL` (obligatoria), `REPLY_TO_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
-`GOOGLE_CLIENT_ID`.
+`GOOGLE_CLIENT_ID`, `CLIENT_IP_TOKEN`.
 
 `GOOGLE_CLIENT_ID` tiene que valer **lo mismo** en el backend y en el frontend: el backend lo usa
 como `audience` al verificar el `id_token` de Google en `lib/googleAuth.ts`. Si falta, `POST /api/auth/google` responde 503 en vez de dejar pasar a nadie.
 
-Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend), `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+`CLIENT_IP_TOKEN` también tiene que valer lo mismo en los dos lados. Si falta en cualquiera, nada se rompe, pero el login y el de Google vuelven a contar por la IP de Vercel (ver trampas). El backend avisa al arrancar en producción si no la tiene.
+
+Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend), `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLIENT_IP_TOKEN` (solo servidor, nunca con `NEXT_PUBLIC_`).
 
 ## Despliegue
 

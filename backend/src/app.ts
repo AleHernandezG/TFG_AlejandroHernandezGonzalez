@@ -44,16 +44,8 @@ app.use("/api/subidas", jsonEstandar, subidasRoutes);
 // GET /api/health — health check público (sin auth).
 // Usado por scripts/keep-alive.sh para mantener Render free tier activo antes de demos.
 // Responde 200 { estado: "ok", entorno } mientras el proceso esté vivo.
-app.get("/api/health", (req, res) => {
-  res.json({
-    estado: "ok",
-    entorno: process.env.NODE_ENV,
-    ip: req.ip,
-    ips: req.ips,
-    xff: req.headers["x-forwarded-for"] ?? null,
-    cfConnectingIp: req.headers["cf-connecting-ip"] ?? null,
-    trueClientIp: req.headers["true-client-ip"] ?? null,
-  });
+app.get("/api/health", (_req, res) => {
+  res.json({ estado: "ok", entorno: process.env.NODE_ENV });
 });
 
 app.use((_req, res) => {
