@@ -523,8 +523,14 @@ usuarios a la vez o a ninguno.
 balanceador interno de Render, y `req.ip` salía `10.x`, con unos tres valores para toda la web. Los
 limitadores de auth cuentan ahora con `ipDelCliente()` (`backend/src/lib/ipCliente.ts`): la IP que
 reenvía NextAuth firmada con `CLIENT_IP_TOKEN`, después `cf-connecting-ip` y después `req.ip`. El
-detalle está en el diario de ese día. Queda abierto hasta comprobarlo en producción con la variable
-dada de alta en los dos lados.
+detalle está en el diario de ese día.
+
+**Cerrado el 29/09/2026 en lo que toca al proxy.** Desplegado con los PRs #49 y #50 (`75c179d`) y
+comprobado en producción con `CLIENT_IP_TOKEN` en Render y en Vercel. Cuatro `verificar-email` seguidos
+bajan el cupo de uno en uno (19, 18, 17, 16), así que cuenta por la IP del cliente y no por los `10.x`.
+Una `x-client-ip` con token inventado no cambia de cubo. Y un login fallido por NextAuth cuenta en el
+mismo cubo que uno directo desde la misma IP, que es la prueba de que el token cuadra en los dos lados.
+El resto del checklist de `REVISION_DESPLIEGUE.md` no entra aquí y sigue sin marcar.
 
 ---
 
