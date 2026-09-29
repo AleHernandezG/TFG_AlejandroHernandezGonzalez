@@ -6,6 +6,41 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-29 · Los limitadores de auth cuentan por la IP del usuario
+
+**Qué se hizo.** Primero medir. Con el diagnóstico del 28 ya desplegado, `/api/health` en producción
+enseñó que la cadena es navegador → Cloudflare → balanceador interno de Render → Express, con una
+`X-Forwarded-For` del tipo `cliente, edge de CF, 10.x`. Con `trust proxy 1`, `req.ip` era ese `10.x`,
+y en varias decenas de peticiones solo salieron unos tres valores distintos. Es decir, toda la web
+compartía tres cubos: unas 15 altas por hora para todo el mundo, y cualquiera con diez contraseñas
+mal podía dejar sin login a un tercio de los usuarios durante 15 minutos. La parte buena: suplantar
+no funcionaba. Una `X-Forwarded-For` falsa se queda a la izquierda y no cambia `req.ip`, una
+`CF-Connecting-IP` falsa la corta Cloudflare con el error 1000 y `True-Client-IP` la sobrescribe.
+
+El arreglo es `ipDelCliente()` en `backend/src/lib/ipCliente.ts`, que es lo que usa ahora el
+`keyGenerator` de todos los limitadores de `rateLimitAuth.ts`, pasado por `ipKeyGenerator` para que
+una IPv6 cuente por subred. El diagnóstico de `/api/health` se va y vuelve a su forma de siempre.
+
+**Qué decisión costó tomar.** Qué hacer con el login y con Google. Esas dos llamadas no salen del
+navegador sino del servidor de Vercel, dentro de NextAuth, así que su `cf-connecting-ip` es la de
+Vercel y seguirían todos en el mismo cubo. Subir `trust proxy` no servía de nada, porque el problema
+no es cuántos saltos hay sino quién hace la petición. Se eligió que NextAuth reenvíe la IP que Vercel
+le da (`x-real-ip`, que Vercel sobrescribe y no se puede falsear) en `x-client-ip`, junto con un
+secreto compartido, `CLIENT_IP_TOKEN`. El backend solo se la cree si el secreto coincide; si no, pasa
+a `cf-connecting-ip` y después a `req.ip`. La comparación va con `timingSafeEqual` sobre un SHA-256
+para no filtrar la longitud.
+
+Probado con 12 tests nuevos (286 en total) y de punta a punta en local, con el backend E2E y
+`next dev` compartiendo token: diez logins fallidos por NextAuth con `x-real-ip` A, el undécimo da
+429, y la IP B sigue entrando mientras A está bloqueada.
+
+**Qué queda a medias.** `CLIENT_IP_TOKEN` hay que darla de alta en Render y en Vercel, con el mismo
+valor, **antes** del merge a `main`. Si falta, no se rompe nada: el login y Google siguen como hoy y
+el backend lo avisa al arrancar. Después, repetir en producción: seis recuperaciones de contraseña
+desde una red no bloquean a otra. La fuga de handles de Jest del CI sigue sin reproducirse.
+
+---
+
 ## 2026-09-28 · Ola 2 de la interfaz y diagnóstico de trust proxy
 
 **Qué se hizo.** Un solo PR para dos cosas, por no encadenar despliegues. La primera es la ola 2 de

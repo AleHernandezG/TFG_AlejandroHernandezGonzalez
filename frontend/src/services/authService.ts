@@ -25,13 +25,17 @@ export const authService = {
     return data;
   },
 
-  async login(datos: {
-    correo: string;
-    contrasena: string;
-  }): Promise<RespuestaLogin> {
+  async login(
+    datos: {
+      correo: string;
+      contrasena: string;
+    },
+    cabeceras: Record<string, string> = {},
+  ): Promise<RespuestaLogin> {
     const { data } = await apiClient.post<RespuestaLogin>(
       "/auth/login",
       datos,
+      { headers: cabeceras },
     );
     return data;
   },
