@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { authService } from "@/services/authService";
 import axios from "axios";
+import { cabecerasIpCliente } from "@/lib/ipCliente";
 
 // ─── Extensión de tipos NextAuth ──────────────────────────────────────────────
 declare module "next-auth" {
@@ -40,10 +41,13 @@ export const opcionesAuth: NextAuthOptions = {
         if (!credentials?.correo || !credentials?.contrasena) return null;
 
         try {
-          const { token, usuario, perfilCompleto } = await authService.login({
-            correo: credentials.correo,
-            contrasena: credentials.contrasena,
-          });
+          const { token, usuario, perfilCompleto } = await authService.login(
+            {
+              correo: credentials.correo,
+              contrasena: credentials.contrasena,
+            },
+            cabecerasIpCliente(),
+          );
 
           const fotoUrl = usuario.foto && !usuario.foto.startsWith("data:") ? usuario.foto : null;
           return {
@@ -103,7 +107,7 @@ export const opcionesAuth: NextAuthOptions = {
         try {
           const res = await fetch(`${API_URL}/auth/google`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...cabecerasIpCliente() },
             body: JSON.stringify({ idToken: account.id_token }),
           });
 

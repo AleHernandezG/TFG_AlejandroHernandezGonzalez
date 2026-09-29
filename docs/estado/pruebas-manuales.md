@@ -34,6 +34,11 @@ bash scripts/dev.sh          # FE :3000, BE :4000
       si se ha colado una foto `data:` en el token de NextAuth.
 - [ ] **El limitador no molesta.** Entrar y salir cinco veces seguidas no da 429. El límite son 10
       fallos por IP cada 15 minutos, y los aciertos no cuentan.
+- [ ] **El limitador cuenta por usuario, no por Vercel.** Falla la contraseña once veces desde el
+      móvil con datos: el undécimo intento da «Demasiados intentos». Sin cerrar esa ventana, entra
+      desde el wifi de casa con una contraseña mala: tiene que decir «Credenciales incorrectas».
+      Si también dice «Demasiados intentos», falta `CLIENT_IP_TOKEN` en Render o en Vercel, o no
+      vale lo mismo en los dos.
 
 | Síntoma | Casi seguro que es |
 |---|---|
@@ -41,6 +46,7 @@ bash scripts/dev.sh          # FE :3000, BE :4000
 | 401 con un token que parece bueno | los dos `GOOGLE_CLIENT_ID` no son el mismo, el `audience` no cuadra |
 | «No se pudo iniciar sesión con Google» | Google no devolvió `id_token`; mira los scopes del cliente OAuth |
 | Login en bucle o cookie enorme | una foto base64 se ha colado en el token de NextAuth |
+| 429 en el login para gente que no ha fallado nunca | `CLIENT_IP_TOKEN` falta o no coincide entre Render y Vercel |
 
 ---
 
