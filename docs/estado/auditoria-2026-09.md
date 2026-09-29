@@ -544,6 +544,14 @@ El resto del checklist de `REVISION_DESPLIEGUE.md` no entra aquí y sigue sin ma
   esta máquina y en ningún otro sitio. Para un TFG que alguien puede querer reproducir, conviene
   al menos decirlo en el README.
 
+**Cerrado el 29/09/2026.** El `TODO` del login está borrado; el enlace se queda como estaba. El Worker
+tiene ahora `worker.test.js` con `node --test`, sin dependencias y con `fetch` simulado: fallo cerrado
+sin `PROXY_TOKEN`, 403, rutas no permitidas, reenvío de ruta, query y cuerpo, y que a Google no le
+llegan ni el token ni la IP del cliente. Los corre el job `ci-gemini-proxy`. El despliegue sigue a
+mano, porque automatizarlo pide un token de Cloudflare en los secretos de GitHub y eso es otra
+decisión. El README de la raíz ya cuenta tres unidades y avisa de que `dev.sh` y `liberarPuertos.txt`
+solo van en Windows.
+
 ---
 
 ## 3. Lo que falta

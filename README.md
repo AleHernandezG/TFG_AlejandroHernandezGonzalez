@@ -33,13 +33,20 @@ Aplicación web para cocinar con lo que tienes. Cookr guarda tus recetas, conoce
 
 ## Estructura
 
-Es un *monorepo* con dos aplicaciones independientes:
+Es un *monorepo* con tres piezas que se despliegan por separado:
 
 ```
-frontend/   Cliente Next.js (App Router, código por features)
-backend/    API REST sobre Express, organizada en capas
-scripts/    Utilidades de arranque y mantenimiento
+frontend/      Cliente Next.js (App Router, código por features)
+backend/       API REST sobre Express, organizada en capas
+gemini-proxy/  Cloudflare Worker que hace de proxy hacia la API de Gemini
+scripts/       Utilidades de arranque y mantenimiento
 ```
+
+Ojo con `scripts/` si no estás en Windows. `dev.sh` libera los puertos con `powershell.exe` y
+`taskkill`, así que solo funciona desde Git Bash en Windows, y `liberarPuertos.txt` es un comando de
+`cmd`. En Linux o macOS arranca cada parte con su `npm run dev`, como en el paso 4 de abajo. El resto
+(`build.sh`, `lint.sh`, `keep-alive.sh`, `test-auth.sh`) es bash normal y va en cualquier sitio;
+`test-auth.ps1` es la versión en PowerShell de `test-auth.sh`.
 
 ## Puesta en marcha
 
@@ -64,7 +71,7 @@ cd backend  && npm run dev
 
 ## Despliegue
 
-Cada `push` a `main` dispara el flujo de GitHub Actions: comprueba el cliente y el servidor (linting y tipos) y, si todo pasa, publica el servidor en Render mediante un *deploy hook*. El cliente se publica solo en Vercel a través de su integración con Git. La base de datos vive en MongoDB Atlas.
+Cada `push` a `main` dispara el flujo de GitHub Actions: comprueba el cliente, el servidor y el proxy de Gemini (linting, tipos y tests) y, si el cliente y el servidor pasan, publica el servidor en Render mediante un *deploy hook*. El proxy se despliega a mano en Cloudflare (ver `gemini-proxy/README.md`). El cliente se publica solo en Vercel a través de su integración con Git. La base de datos vive en MongoDB Atlas.
 
 ## Documentación
 

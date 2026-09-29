@@ -34,6 +34,22 @@ Genera un token cualquiera, por ejemplo:
 node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
 ```
 
+## Tests
+
+```bash
+cd gemini-proxy
+npm test
+```
+
+No hay nada que instalar: es `node --test` (Node 20 o más) contra `worker.js`, con `fetch` simulado,
+así que ninguna prueba sale a Google. Cubren el fallo cerrado sin `PROXY_TOKEN`, el 403, las rutas
+que no se reenvían, que la ruta y la query llegan intactas, que a Google no le llegan ni el token del
+proxy ni la IP del cliente, y que el cuerpo del POST pasa tal cual. El CI los corre en cada PR (job
+`ci-gemini-proxy`). El despliegue del Worker sigue siendo a mano: el CI no toca Cloudflare.
+
+`package.json` existe solo para `"type": "module"` y el script de test. No tiene dependencias y
+wrangler lo ignora al desplegar.
+
 ## Desplegar
 
 ### Opción A — Panel de Cloudflare (sin instalar nada)
