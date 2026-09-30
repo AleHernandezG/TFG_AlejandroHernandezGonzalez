@@ -145,7 +145,6 @@ export function FormularioLogin() {
             <motion.div variants={variantesCampo} className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="contrasena">Contraseña</Label>
-                {/* TODO Fase 4: enlace real a /recuperar-contrasena */}
                 <Link
                   href="/recuperar-contrasena"
                   className="text-xs text-muted-foreground transition-colors hover:text-brand-texto"

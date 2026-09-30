@@ -68,6 +68,25 @@ jobs:
           JWT_SECRET: test-secret-solo-para-ci
           MONGOMS_DOWNLOAD_DIR: /home/runner/.cache/mongodb-binaries
 
+  # ── CI Gemini proxy ──────────────────────────────────────────────────────────
+  # Sin dependencias: node --test contra worker.js con fetch simulado.
+  # El Worker se despliega a mano en Cloudflare, así que no entra en el needs de deploy.
+  ci-gemini-proxy:
+    name: Tests — Gemini proxy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gemini-proxy
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Tests
+        run: npm test
+
   # ── E2E (Playwright) ─────────────────────────────────────────────────────────
   # A propósito NO está en el `needs` de deploy: los E2E son flaky por naturaleza
   # y un falso rojo no debe dejarte sin poder desplegar un hotfix. Si aguanta en

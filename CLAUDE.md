@@ -46,6 +46,9 @@ cd backend && npm test -- tests/auth.test.ts        # un fichero
 cd backend && npm test -- -t "rechaza un correo"    # un caso
 cd backend && npm run test:cov
 
+# Tests del Worker (node --test, sin npm install)
+cd gemini-proxy && npm test
+
 # Datos de prueba
 cd backend && npm run seed:completo        # dataset completo
 cd backend && npm run seed:masivo          # dataset grande (llama a Pexels)
@@ -63,7 +66,7 @@ cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
 ```
 
-**Hay 286 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky).
+**Hay 286 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky). `ci-gemini-proxy` pasa los 10 tests del Worker (`gemini-proxy/worker.test.js`, con `fetch` simulado) y tampoco está en el `needs` del deploy: el Worker se despliega a mano.
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 

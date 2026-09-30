@@ -34,10 +34,13 @@ Probado con 12 tests nuevos (286 en total) y de punta a punta en local, con el b
 `next dev` compartiendo token: diez logins fallidos por NextAuth con `x-real-ip` A, el undécimo da
 429, y la IP B sigue entrando mientras A está bloqueada.
 
-**Qué queda a medias.** `CLIENT_IP_TOKEN` hay que darla de alta en Render y en Vercel, con el mismo
-valor, **antes** del merge a `main`. Si falta, no se rompe nada: el login y Google siguen como hoy y
-el backend lo avisa al arrancar. Después, repetir en producción: seis recuperaciones de contraseña
-desde una red no bloquean a otra. La fuga de handles de Jest del CI sigue sin reproducirse.
+Por la tarde, desplegado con los PRs #49 y #50 y `CLIENT_IP_TOKEN` en los dos lados. En producción,
+el cupo baja de uno en uno desde la misma IP, una `x-client-ip` con token inventado se ignora y un
+login fallido por NextAuth cae en el mismo cubo que uno directo. B7 queda cerrado en su parte de proxy.
+
+**Qué queda a medias.** La prueba de `pruebas-manuales.md` con dos redes de verdad (móvil con datos y
+wifi), que desde una sola máquina no se puede hacer. La fuga de handles de Jest del CI sigue sin
+reproducirse.
 
 ---
 
