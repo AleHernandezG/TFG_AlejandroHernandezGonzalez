@@ -11,6 +11,7 @@ docs/
 ├── estado/       ¿qué pasa ahora y qué toca hacer?
 ├── referencia/   ¿cómo es Cookr por dentro?
 ├── cambios/      ¿qué se tocó, cuándo y por qué?
+├── decisiones/   ¿por qué se eligió esto y no lo otro?
 ├── diseno/       ¿cómo tiene que verse?
 └── historico/    fue cierto y ya no lo es. No se consulta para decidir
 ```
@@ -32,13 +33,14 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | Tocar cualquier cosa | `../CLAUDE.md` |
 | Saber qué está roto ahora mismo | `estado/auditoria-2026-09.md` |
 | Saber qué toca hacer y en qué orden | `estado/plan-2026-09.md` |
+| Retomar el trabajo tras unos días sin tocarlo | `estado/pendientes.md` |
 | Ver el catálogo de producto que viene después | `informe_auditoria_mejoras.md`, y el plan a partir de F12 |
 | Comprobar algo a mano en un rato libre | `estado/pruebas-manuales.md` |
 | Tocar cualquier pantalla, en móvil o escritorio | `estado/revision-ui-2026-09.md` |
 | Rehacer el formulario de crear receta | `diseno/formulario-crear-receta.md` |
 | Hacer Cookr instalable como aplicación | `estado/pwa.md` |
 | Montar los eventos semanales o mensuales | `estado/eventos.md` |
-| Entender por qué el código es como es | `cambios/` y `historico/fases/tech-debt.md` |
+| Entender por qué el código es como es | `decisiones/`, `cambios/` y `historico/fases/tech-debt.md` |
 | Desplegar o revisar producción | `../REVISION_DESPLIEGUE.md` |
 | Entender la infraestructura y los servicios externos | `referencia/infraestructura.md` |
 | Saber dónde va cada fichero del frontend | `referencia/estructura-frontend.md` |
@@ -55,11 +57,12 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | `plan-2026-09.md` | El plan que sale de esa auditoría. Bloques F0 y F6 a F12, con criterio de cierre comprobable |
 | `pruebas-manuales.md` | Lo que los tests no pueden comprobar: Google real, entrega de correo, el proxy. Con pasos y síntomas |
 | `diario.md` | Una entrada por sesión de trabajo |
+| `pendientes.md` | Foto de lo que falta: en qué rama estás, qué va después y qué dicen los últimos logs de GitHub. Si choca con el plan, manda el plan |
 | `revision-ui-2026-09.md` | Revisión de interfaz del 18 de septiembre, móvil y escritorio. Doce puntos (UI-001 a UI-012) con fichero, línea y coste, más el resultado de axe-core sobre ocho rutas |
 | `pwa.md` | Qué hace falta para que Cookr se instale como aplicación en PC, móvil y tablet: manifiesto, iconos, service worker y modo sin conexión |
 | `eventos.md` | Diseño de los eventos semanales y mensuales de verdad, para sustituir el booleano `esEvento` y la tarjeta destacada inventada |
 
-Estos siete se actualizan. El resto de la carpeta `docs/`, no.
+Estos ocho se actualizan. El resto de la carpeta `docs/`, no.
 
 ---
 
@@ -105,6 +108,21 @@ que costaron y lo que quedó a medias, que es lo que no se puede reconstruir ley
 | `f6-seguridad.md` | Bloque F6, 4 de septiembre. Verificación del `id_token`, proxy cerrado, `$regex` escapado, 404 en JSON |
 | `f7-rendimiento.md` | Bloque F7, 4 de septiembre. Índices en Mongo, el feed ordenado en la base, escrituras atómicas y las imágenes fuera de Mongo (F7.4, migrado: 6,72 MB → 0,24 MB) |
 | `revision-produccion.md` | Revisión de producción del 16 de septiembre y todo lo que salió de ella hasta el 18: alérgenos que el detector no veía, la paginación de comentarios, el 401 de Pexels, las fotos huérfanas en Cloudinary, el recálculo ejecutado en Atlas, la limpieza de recetas de prueba y la verificación de los filtros del feed. REV-009 sigue abierto |
+
+---
+
+## `decisiones/` · por qué así y no de otra manera
+
+Una ficha por decisión que alguien podría deshacer sin saber que se pensó: contexto, qué se eligió,
+qué se descartó y qué obliga a partir de ahí. Se numeran en orden y no se reescriben; si una decisión
+cambia, se escribe una ficha nueva que diga cuál sustituye.
+
+| Documento | Qué es |
+|---|---|
+| `0001-detalle-receta-publico.md` | 30 de septiembre. El detalle de receta se ve sin sesión; me gusta, guardar, comentar y la despensa mandan al login |
+
+Es el arranque de F10.4. Faltan las fichas de lo que ya estaba decidido antes, como el correo por
+HTTP o el doble token.
 
 ---
 

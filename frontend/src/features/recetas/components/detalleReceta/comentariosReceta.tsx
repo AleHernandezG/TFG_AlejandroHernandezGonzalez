@@ -12,9 +12,12 @@ import {
 } from '@/components/ui/sheet'
 import { tiempoRelativo } from '@/lib/tiempo'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAgregarComentario } from '../../hooks/useAgregarComentario'
 import { useComentarios, useInvalidarComentarios } from '../../hooks/useComentarios'
+import { urlLoginVolviendoA } from '../../hooks/useAccionConSesion'
 import type { Comentario } from '../../types/receta.types'
 
 function ItemComentario({ c }: { c: Comentario }) {
@@ -52,13 +55,22 @@ function SkeletonComentario() {
   )
 }
 
+function EnlaceLoginParaComentar() {
+  const rutaActual = usePathname()
+  return (
+    <Button asChild variant="secondary" className="w-full rounded-full text-sm font-semibold">
+      <Link href={urlLoginVolviendoA(rutaActual)}>Inicia sesión para comentar</Link>
+    </Button>
+  )
+}
+
 type Props = {
   recetaId: string
   total: number
 }
 
 export function ComentariosReceta({ recetaId, total }: Props) {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [texto, setTexto] = useState('')
   const [nuevos, setNuevos] = useState<Comentario[]>([])
   const [sheetAbierto, setSheetAbierto] = useState(false)
@@ -170,6 +182,12 @@ export function ComentariosReceta({ recetaId, total }: Props) {
         </div>
       )}
 
+      {status === 'unauthenticated' && (
+        <div className="mb-5">
+          <EnlaceLoginParaComentar />
+        </div>
+      )}
+
       {/* Preview */}
       {totalMostrado === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">
@@ -276,6 +294,11 @@ export function ComentariosReceta({ recetaId, total }: Props) {
                   Publicar
                 </Button>
               </div>
+            </div>
+          )}
+          {status === 'unauthenticated' && (
+            <div className="border-t border-border/30 px-5 py-3 bg-background">
+              <EnlaceLoginParaComentar />
             </div>
           )}
         </SheetContent>

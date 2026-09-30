@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { despensaService } from "../services/despensaService";
 import { manejarError } from "../middlewares/errores";
+import type { ItemsDespensaNuevos } from "../lib/validadores";
 
 export const despensaController = {
   async obtener(req: Request, res: Response): Promise<void> {
@@ -14,47 +15,12 @@ export const despensaController = {
 
   async añadir(req: Request, res: Response): Promise<void> {
     try {
-      const body = req.body;
-
-      if (Array.isArray(body)) {
-        const itemsValidados = body.map((item: { nombre: string; cantidad: number; unidad: string; emoji: string }) => {
-          const { nombre, cantidad, unidad, emoji } = item;
-          if (!nombre?.trim() || !unidad?.trim() || !emoji?.trim() || cantidad == null) {
-            throw Object.assign(new Error("nombre, cantidad, unidad y emoji son obligatorios en todos los elementos"), { status: 400 });
-          }
-          return {
-            nombre: nombre.trim(),
-            cantidad: Number(cantidad),
-            unidad: unidad.trim(),
-            emoji: emoji.trim(),
-            fechaAnadido: new Date(),
-          };
-        });
-
-        const items = await despensaService.añadirLote(req.usuario!.id, itemsValidados);
-        res.status(201).json(items);
-        return;
-      }
-
-      const { nombre, cantidad, unidad, emoji } = body as {
-        nombre: string;
-        cantidad: number;
-        unidad: string;
-        emoji: string;
-      };
-
-      if (!nombre?.trim() || !unidad?.trim() || !emoji?.trim() || cantidad == null) {
-        res.status(400).json({ error: "nombre, cantidad, unidad y emoji son obligatorios" });
-        return;
-      }
-
-      const items = await despensaService.añadir(req.usuario!.id, {
-        nombre: nombre.trim(),
-        cantidad: Number(cantidad),
-        unidad: unidad.trim(),
-        emoji: emoji.trim(),
-        fechaAnadido: new Date(),
-      });
+      const nuevos = req.body as ItemsDespensaNuevos;
+      const fechaAnadido = new Date();
+      const items = await despensaService.añadirLote(
+        req.usuario!.id,
+        nuevos.map((item) => ({ ...item, fechaAnadido })),
+      );
       res.status(201).json(items);
     } catch (error) {
       manejarError(res, error);

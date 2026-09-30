@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ChipAlergeno } from '@/components/common/chipAlergeno'
 import { useToggleLike } from '@/features/recetas/hooks/useToggleLike'
 import { useToggleSeguir } from '@/features/recetas/hooks/useToggleSeguir'
+import { useAccionConSesion } from '@/features/recetas/hooks/useAccionConSesion'
 import { useEliminarReceta } from '@/features/coleccion/hooks/useEliminarReceta'
 import { useComentarios } from '@/features/recetas/hooks/useComentarios'
 import { DIETAS_OPCIONES } from '@/config/opcionesUsuario'
@@ -29,6 +30,7 @@ type Props = {
 export function CabeceraReceta({ receta }: Props) {
   const { data: session } = useSession()
   const router = useRouter()
+  const conSesion = useAccionConSesion()
   const [liked, setLiked] = useState(receta.liked)
   const [likes, setLikes] = useState(receta.likes)
   const [siguiendo, setSiguiendo] = useState(receta.sigueAlAutor)
@@ -49,15 +51,17 @@ export function CabeceraReceta({ receta }: Props) {
   const esPropiaReceta = session?.user?.id === receta.autor.id || !receta.autor.id
 
   function toggleLike() {
-    const siguiente = !liked
-    setLiked(siguiente)
-    setLikes((l) => (siguiente ? l + 1 : l - 1))
-    mutarLike(undefined, {
-      onSuccess: () => router.refresh(),
-      onError: () => {
-        setLiked((prev) => !prev)
-        setLikes((l) => (siguiente ? l - 1 : l + 1))
-      },
+    conSesion(() => {
+      const siguiente = !liked
+      setLiked(siguiente)
+      setLikes((l) => (siguiente ? l + 1 : l - 1))
+      mutarLike(undefined, {
+        onSuccess: () => router.refresh(),
+        onError: () => {
+          setLiked((prev) => !prev)
+          setLikes((l) => (siguiente ? l - 1 : l + 1))
+        },
+      })
     })
   }
 
@@ -160,7 +164,12 @@ export function CabeceraReceta({ receta }: Props) {
         {/* Acciones sociales — icono encima, número/label debajo */}
         <div className="flex items-center gap-5">
           {/* Like */}
-          <button onClick={toggleLike} className="flex flex-col items-center gap-0.5">
+          <button
+            onClick={toggleLike}
+            aria-label={liked ? 'Quitar me gusta' : 'Me gusta'}
+            aria-pressed={liked}
+            className="flex flex-col items-center gap-0.5"
+          >
             <motion.div
               animate={liked ? { scale: [1, 1.3, 1] } : { scale: 1 }}
               transition={{ duration: 0.25 }}

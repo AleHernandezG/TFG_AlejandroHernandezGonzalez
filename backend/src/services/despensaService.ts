@@ -5,11 +5,6 @@ export const despensaService = {
   obtener: (usuarioId: string) =>
     despensaRepository.obtener(usuarioId),
 
-  añadir: (
-    usuarioId: string,
-    item: Omit<IItemDespensa, "_id">,
-  ) => despensaRepository.añadir(usuarioId, item),
-
   añadirLote: (
     usuarioId: string,
     items: Omit<IItemDespensa, "_id">[],

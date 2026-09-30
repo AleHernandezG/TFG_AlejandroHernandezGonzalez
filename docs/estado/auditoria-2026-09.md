@@ -656,13 +656,18 @@ está en `docs/cambios/revision-produccion.md`, con el mismo código.
 
 - **A5.** Cerrado con F7.4. Le faltaba borrar: las fotos de recetas borradas o cambiadas se quedaban en
   Cloudinary, y eso es REV-005.
-- **M1.** `PUT /api/usuarios/me/foto` ya pasa por `validarBody(esquemaFotoUsuario)`. El resto de M1 está
-  en F8.1.
-- **M2.** Sigue abierto. REV-001 hace que las recetas nuevas solo guarden alérgenos de la lista de 14 y
-  deja un test que vigila que el catálogo del backend y el del frontend no se separen, que era parte
-  del arreglo propuesto. Las `alergias` del perfil siguen aceptando cualquier texto.
-- **M5.** A medias. `/editar-receta/:path*` entra en el `matcher`; `/completar-perfil` y la cuestión de
-  `/recetas/:path*` siguen como estaban.
+- **M1.** Cerrado con F8.1 el 30 de septiembre. `PUT /api/usuarios/me/foto` fue el primero, el 17; ahora
+  todas las rutas con cuerpo pasan por `validarBody` y ningún controlador importa Zod.
+- **M2.** Cerrado en la API con F8.2 el 30 de septiembre: un alérgeno fuera de los 14 da 400 en el
+  perfil y en las preferencias. REV-001 ya había cerrado el lado de las recetas. Lo que hay guardado en
+  Atlas se normaliza con `npm run normalizar:alergias` después del despliegue, y el `enum` de Mongoose
+  entra cuando eso esté hecho.
+- **M3.** Cerrado con F8.3. `NEXT_PUBLIC_API_URL` está en el ejemplo del frontend y un clon limpio
+  arranca con él.
+- **M4.** Cerrado con F8.3. El ejemplo del backend tiene todas las variables que lee el código y ninguna
+  más.
+- **M5.** Cerrado con F8.4. `/completar-perfil` entra en el `matcher` y `/recetas/:path*` sale: el
+  detalle es público, decidido en `docs/decisiones/0001-detalle-receta-publico.md`.
 - **M7.** Cerrado con F7.5, migrado en producción el 16 de septiembre. REV-002 y REV-004 son dos fallos
   del frontend que entraron con ese cambio.
 

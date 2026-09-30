@@ -9,6 +9,7 @@ import { PasosReceta } from './pasosReceta'
 import { ComentariosReceta } from './comentariosReceta'
 import { CarruselSimilares } from './carruselSimilares'
 import { useToggleGuardado } from '@/features/recetas/hooks/useToggleGuardado'
+import { useAccionConSesion } from '@/features/recetas/hooks/useAccionConSesion'
 import type { RecetaDetalle } from '@/features/recetas/types/receta.types'
 
 type Props = {
@@ -17,14 +18,17 @@ type Props = {
 
 export function DetalleRecetaCliente({ receta }: Props) {
   const router = useRouter()
+  const conSesion = useAccionConSesion()
   const [guardado, setGuardado] = useState(receta.guardado)
   const { mutate: mutarGuardado } = useToggleGuardado(receta.id)
 
   function toggleGuardado() {
-    setGuardado((prev) => !prev)
-    mutarGuardado(undefined, {
-      onSuccess: () => router.refresh(),
-      onError: () => setGuardado((prev) => !prev),
+    conSesion(() => {
+      setGuardado((prev) => !prev)
+      mutarGuardado(undefined, {
+        onSuccess: () => router.refresh(),
+        onError: () => setGuardado((prev) => !prev),
+      })
     })
   }
 

@@ -37,3 +37,40 @@ export function contarRecetasDe(correo: string): Promise<number> {
     return db.collection('recetas').countDocuments({ autorId: usuario._id })
   })
 }
+
+export function crearRecetaPublicada(titulo: string): Promise<string> {
+  return conBD(async (db) => {
+    const { insertedId: autorId } = await db.collection('usuarios').insertOne({
+      nombre: 'Autora E2E',
+      correo: correoUnico('autora'),
+      proveedor: 'local',
+      cuentaVerificada: true,
+      perfilCompleto: true,
+      alergias: [],
+      preferencias: [],
+    })
+
+    const { insertedId } = await db.collection('recetas').insertOne({
+      autorId,
+      titulo,
+      descripcion: 'Una receta que cualquiera puede leer sin haber iniciado sesión.',
+      imagenUrl: '',
+      fotoFuente: 'usuario',
+      fotoCredito: null,
+      tiempo: '20 min',
+      dificultad: 'Fácil',
+      porciones: 2,
+      categorias: [],
+      ingredientes: [{ nombre: 'Patata', cantidad: 300, unidad: 'g' }],
+      pasos: ['Pelar las patatas, cortarlas finas y freírlas a fuego suave.'],
+      alergenos: [],
+      macros: { calorias: 200, proteinas: 4, carbos: 30, grasas: 8 },
+      likes: [],
+      numComentarios: 0,
+      esEvento: false,
+      fechaPublicacion: new Date(),
+    })
+
+    return insertedId.toHexString()
+  })
+}

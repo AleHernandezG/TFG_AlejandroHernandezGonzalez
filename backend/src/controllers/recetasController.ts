@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { recetasService, type IngredientePreview } from "../services/recetasService";
-import { esquemaCrearRecetaBody } from "../lib/validadores";
+import type { CambiosReceta, DatosCrearReceta } from "../lib/validadores";
 import { manejarError } from "../middlewares/errores";
 
 export const recetasController = {
@@ -137,12 +137,8 @@ export const recetasController = {
 
   async crear(req: Request, res: Response): Promise<void> {
     try {
-      const resultado = esquemaCrearRecetaBody.safeParse(req.body);
-      if (!resultado.success) {
-        res.status(400).json({ error: "Datos inválidos", detalle: resultado.error.flatten() });
-        return;
-      }
-      const { id } = await recetasService.crear(resultado.data, req.usuario!.id);
+      const datos = req.body as DatosCrearReceta;
+      const { id } = await recetasService.crear(datos, req.usuario!.id);
       res.status(201).json({ id });
     } catch (error) {
       manejarError(res, error);
@@ -151,12 +147,8 @@ export const recetasController = {
 
   async actualizar(req: Request, res: Response): Promise<void> {
     try {
-      const resultado = esquemaCrearRecetaBody.partial().safeParse(req.body);
-      if (!resultado.success) {
-        res.status(400).json({ error: "Datos inválidos", detalle: resultado.error.flatten() });
-        return;
-      }
-      await recetasService.actualizar(req.params.id, req.usuario!.id, resultado.data);
+      const cambios = req.body as CambiosReceta;
+      await recetasService.actualizar(req.params.id, req.usuario!.id, cambios);
       res.status(204).send();
     } catch (error) {
       manejarError(res, error);

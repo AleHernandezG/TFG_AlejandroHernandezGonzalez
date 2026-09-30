@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import ts from "typescript";
 import {
+  ALERGENOS,
   alergenosDeReceta,
   detectarAlergenos,
   DatoIngrediente,
@@ -13,14 +14,22 @@ type ModuloFrontend = {
   detectarAlergenos: (nombres: string[]) => string[];
 };
 
-function cargarCatalogoDelFrontend(): ModuloFrontend {
-  const ruta = path.resolve(__dirname, "../../frontend/src/config/ingredientes.ts");
+type OpcionesUsuarioFrontend = {
+  ALERGENOS_OPCIONES: { id: string }[];
+};
+
+function cargarDelFrontend<T>(rutaEnSrc: string): T {
+  const ruta = path.resolve(__dirname, "../../frontend/src", rutaEnSrc);
   const { outputText } = ts.transpileModule(fs.readFileSync(ruta, "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
   });
-  const modulo = { exports: {} as ModuloFrontend };
+  const modulo = { exports: {} as T };
   new Function("module", "exports", outputText)(modulo, modulo.exports);
   return modulo.exports;
+}
+
+function cargarCatalogoDelFrontend(): ModuloFrontend {
+  return cargarDelFrontend<ModuloFrontend>("config/ingredientes.ts");
 }
 
 const ordenados = (alergenos: string[]) => [...alergenos].sort();
@@ -115,5 +124,14 @@ describe("el catálogo del backend es copia del del frontend", () => {
     );
 
     expect(distintos).toEqual([]);
+  });
+});
+
+describe("los alérgenos que ofrece el perfil son los del catálogo del backend", () => {
+  it("el frontend ofrece exactamente los 14 ids que acepta el backend", () => {
+    const { ALERGENOS_OPCIONES } = cargarDelFrontend<OpcionesUsuarioFrontend>("config/opcionesUsuario.ts");
+
+    expect(ordenados(ALERGENOS_OPCIONES.map((opcion) => opcion.id))).toEqual(ordenados(ALERGENOS));
+    expect(ALERGENOS).toHaveLength(14);
   });
 });
