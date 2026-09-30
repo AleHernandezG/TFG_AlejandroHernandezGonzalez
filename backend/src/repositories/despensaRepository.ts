@@ -13,19 +13,6 @@ export const despensaRepository = {
     return usuario.despensa ?? [];
   },
 
-  async añadir(
-    usuarioId: string,
-    item: Omit<IItemDespensa, "_id">,
-  ): Promise<IItemDespensa[]> {
-    const usuario = await Usuario.findByIdAndUpdate(
-      usuarioId,
-      { $push: { despensa: item } },
-      { new: true },
-    ).select("despensa");
-    if (!usuario) notFound();
-    return usuario.despensa ?? [];
-  },
-
   async añadirLote(
     usuarioId: string,
     items: Omit<IItemDespensa, "_id">[],

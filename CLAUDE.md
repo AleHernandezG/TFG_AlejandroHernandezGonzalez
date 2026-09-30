@@ -64,9 +64,11 @@ cd backend && npm run build && npm run pruebas:ui
 cd backend && npm run migrar:comentarios
 cd backend && npm run recalcular:alergenos
 cd backend && npm run recalcular:alergenos -- --apply    # copia previa en backend/respaldos/
+cd backend && npm run normalizar:alergias                # alergias del perfil → los 14 ids
+cd backend && npm run normalizar:alergias -- --apply     # copia previa; deshacer con -- --restaurar "<fichero>"
 ```
 
-**Hay 286 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **2 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky). `ci-gemini-proxy` pasa los 10 tests del Worker (`gemini-proxy/worker.test.js`, con `fetch` simulado) y tampoco está en el `needs` del deploy: el Worker se despliega a mano.
+**Hay 329 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **5 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky). `ci-gemini-proxy` pasa los 10 tests del Worker (`gemini-proxy/worker.test.js`, con `fetch` simulado) y tampoco está en el `needs` del deploy: el Worker se despliega a mano.
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -109,6 +111,8 @@ El `token` sale de `useSession()` → `session.user.backendToken`. Si añades un
 **Nunca metas un `data:` URI (base64) en el token de NextAuth.** Revienta la cookie de sesión y rompe el login. En `lib/auth.ts` hay filtros explícitos para esto: las fotos base64 viven en el perfil del backend, en la sesión solo van URLs `http(s)`.
 
 Las rutas protegidas del cliente se declaran en el `matcher` de `frontend/src/middleware.ts` (`next-auth/middleware`). Una página nueva que requiera sesión hay que añadirla ahí.
+
+`/recetas/[id]` **no** está en el `matcher` a propósito: el detalle es público (`docs/decisiones/0001-detalle-receta-publico.md`). Cualquier acción nueva en esa página que llame a un endpoint autenticado tiene que pasar por `useAccionConSesion()`, que manda al visitante al login en vez de lanzar la petición y comerse un 401.
 
 ### Backend: capas estrictas
 
@@ -198,15 +202,19 @@ Los mensajes de commit sí van en inglés e imperativo.
 
 Plantillas en `backend/.env.example` y `frontend/.env.example`.
 
-Backend: `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL` (obligatoria), `REPLY_TO_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
-`GOOGLE_CLIENT_ID`, `CLIENT_IP_TOKEN`.
+Backend: `PORT`, `NODE_ENV`, `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL`, `MAILJET_API_KEY`, `MAILJET_SECRET_KEY`, `SENDER_EMAIL` (obligatoria), `SENDER_NAME`, `REPLY_TO_EMAIL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_MAX_LLAMADAS_DIA`, `GEMINI_BASE_URL`, `GEMINI_PROXY_TOKEN`, `PEXELS_API_KEY`, `EDAMAM_APP_ID`, `EDAMAM_APP_KEY`, `USDA_API_KEY`,
+`GOOGLE_CLIENT_ID`, `CLIENT_IP_TOKEN`, `CLOUDINARY_URL`, `UPSTASH_REDIS_URL`, `UPSTASH_REDIS_TOKEN`.
+
+La lista sale de un `grep` de `process.env` en `backend/src` y `frontend/src` (30/09/2026) y cuadra una a una con los dos `.env.example`. Si añades una variable al código, añádela a su plantilla y aquí.
+
+Con las plantillas copiadas tal cual el backend no arranca: `MONGODB_URI` es un marcador y sale con `EBADNAME`. Con `MONGODB_URI` y `JWT_SECRET` rellenos arranca, pero sin Mailjet el registro responde 201 y el correo de verificación no sale, así que en local la cuenta se verifica a mano en la base (como hacen los E2E).
 
 `GOOGLE_CLIENT_ID` tiene que valer **lo mismo** en el backend y en el frontend: el backend lo usa
 como `audience` al verificar el `id_token` de Google en `lib/googleAuth.ts`. Si falta, `POST /api/auth/google` responde 503 en vez de dejar pasar a nadie.
 
 `CLIENT_IP_TOKEN` también tiene que valer lo mismo en los dos lados. Si falta en cualquiera, nada se rompe, pero el login y el de Google vuelven a contar por la IP de Vercel (ver trampas). El backend avisa al arrancar en producción si no la tiene.
 
-Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend), `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLIENT_IP_TOKEN` (solo servidor, nunca con `NEXT_PUBLIC_`).
+Frontend: `NEXT_PUBLIC_API_URL` (apunta a `/api` del backend; sin ella en Vercel el frontend llama a `localhost:4000`), `NEXTAUTH_URL`, `NEXTAUTH_SECRET` (estas dos las lee NextAuth, no el código), `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `CLIENT_IP_TOKEN` (solo servidor, nunca con `NEXT_PUBLIC_`).
 
 ## Despliegue
 

@@ -6,6 +6,52 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-09-30 · F8 cerrado: el código cumple lo que dice `CLAUDE.md`
+
+**Qué se hizo.** Los cuatro puntos de F8, en la rama `fix/cerrar-f8`.
+
+Zod en todas las rutas con cuerpo, incluidos el chat, `escanear-ticket` y `generar-desde-texto`, que
+no estaban en la lista pero validaban a mano igual. Los controladores dejan de importar Zod: los tipos
+salen de `validadores.ts` con `z.infer`. Las reglas y los mensajes son los de antes, comprobados uno a
+uno. Lo único que cambia hacia fuera es que los 400 de recetas traían `detalle` y ahora traen
+`errores`, como el resto; `usePerfil` se adapta para enseñar el primer mensaje. 43 tests nuevos,
+329 en total.
+
+Las alergias del perfil y las preferencias solo admiten los 14 ids. El frontend ya mandaba ids, así
+que ahí no hubo nada que tocar. Para lo que hay guardado, `npm run normalizar:alergias`: traduce
+«gluten» a `cereales`, «lactosa» a `lacteos` y compañía, deja copia antes de escribir, sabe deshacerse
+con `--restaurar` y lista lo que no entiende sin borrarlo. Probado contra un Mongo efímero con perfiles
+inventados: en seco no toca nada, aplicado arregla lo que debe y la segunda pasada sale limpia.
+
+Los `.env.example`, contra un grep de todos los `process.env`, y después de verdad: clon en una carpeta
+limpia, `npm ci`, plantillas copiadas y a arrancar. Las plantillas tal cual no arrancan el backend
+(`EBADNAME`, el `MONGODB_URI` de ejemplo no existe), cosa esperable. Con Mongo y `JWT_SECRET` rellenos
+arranca todo, pero el registro sin Mailjet deja una cuenta que no puede entrar. Está escrito en
+`CLAUDE.md`.
+
+El detalle de receta pasa a ser público, con ADR (`docs/decisiones/0001`) y un E2E nuevo a 1440 y a
+390 que abre una receta sin sesión y prueba que cada acción lleva al login sin ningún 401.
+
+**Qué decisión costó tomar.** Dos.
+
+El `enum` de Mongoose que pedía F8.2. Ponerlo hoy haría que un usuario con «gluten» guardado no
+pudiera cambiar ni la foto, porque Mongoose valida el documento entero al guardar. Así que el enum
+espera a que la normalización haya pasado por Atlas. La validación de entrada sí va ya, y eso tiene un
+coste: el panel de preferencias reenvía lo que tenga el perfil, así que un perfil antiguo da 400 hasta
+que se normalice. Por eso la normalización va justo después del despliegue y no otro día.
+
+Qué hacer cuando un visitante pulsa «me gusta». Esconder los botones dejaba la página coja y no
+invitaba a nada; dejarlos como estaban era un 401 en silencio, y en la despensa además un «✓ Añadidos»
+mentiroso. Se quedan visibles y mandan al login con `callbackUrl`. Mientras la sesión carga, el clic no
+hace nada: es mejor perder un clic que mandar al login a alguien que ya ha entrado.
+
+**Qué queda a medias.** Commitear y subir; lo lanza Alejandro. La normalización contra Atlas, en seco y
+luego con `-- --apply`, cuando Render esté Live. Después, el `enum` en `usuarioMongo.ts`. Y el login,
+que no respeta el `callbackUrl`: el visitante entra y acaba en `/home`, no en la receta. Arreglarlo
+pide validar que el destino es una ruta interna.
+
+---
+
 ## 2026-09-29 · Los limitadores de auth cuentan por la IP del usuario
 
 **Qué se hizo.** Primero medir. Con el diagnóstico del 28 ya desplegado, `/api/health` en producción

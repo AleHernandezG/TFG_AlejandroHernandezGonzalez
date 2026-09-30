@@ -11,6 +11,6 @@ export const config = {
     '/crear-receta',
     '/crear-receta/revisar',
     '/editar-receta/:path*',
-    '/recetas/:path*',
+    '/completar-perfil',
   ],
 };
