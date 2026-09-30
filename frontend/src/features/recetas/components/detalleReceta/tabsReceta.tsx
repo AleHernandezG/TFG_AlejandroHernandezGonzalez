@@ -5,6 +5,7 @@ import { Minus, Plus } from 'lucide-react'
 import type { Ingrediente, MacrosReceta } from '../../types/receta.types'
 import { useMiDespensa, useAñadirItem } from '@/features/despensa/hooks/useMiDespensa'
 import { getEmojiIngrediente } from '@/features/despensa/data/datosDespensa'
+import { useAccionConSesion } from '@/features/recetas/hooks/useAccionConSesion'
 
 type Props = {
   ingredientes: Ingrediente[]
@@ -26,21 +27,24 @@ export function TabsReceta({ ingredientes, macros, porcionesBase }: Props) {
 
   const { data: despensa = [] } = useMiDespensa()
   const { mutate: añadir } = useAñadirItem()
+  const conSesion = useAccionConSesion()
 
   function handleAnadirDespensa() {
-    const nombresEnDespensa = new Set(despensa.map((i) => i.nombre.toLowerCase()))
-    ingredientes.forEach((ing) => {
-      if (!nombresEnDespensa.has(ing.nombre.toLowerCase())) {
-        añadir({
-          nombre: ing.nombre,
-          cantidad: ing.cantidad,
-          unidad: ing.unidad,
-          emoji: getEmojiIngrediente(ing.nombre),
-        })
-      }
+    conSesion(() => {
+      const nombresEnDespensa = new Set(despensa.map((i) => i.nombre.toLowerCase()))
+      ingredientes.forEach((ing) => {
+        if (!nombresEnDespensa.has(ing.nombre.toLowerCase())) {
+          añadir({
+            nombre: ing.nombre,
+            cantidad: ing.cantidad,
+            unidad: ing.unidad,
+            emoji: getEmojiIngrediente(ing.nombre),
+          })
+        }
+      })
+      setAñadido(true)
+      setTimeout(() => setAñadido(false), 3000)
     })
-    setAñadido(true)
-    setTimeout(() => setAñadido(false), 3000)
   }
 
   function escalarCantidad(cantidad: number): string {

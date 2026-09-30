@@ -111,7 +111,10 @@ describe("las recetas guardan la URL de la imagen, no la imagen", () => {
       .send(cuerpoReceta({ imagenUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==" }));
 
     expect(res.status).toBe(400);
-    expect(res.body.detalle.fieldErrors.imagenUrl?.[0]).toMatch(/URL https/);
+    expect(res.body.errores).toContainEqual({
+      campo: "imagenUrl",
+      mensaje: expect.stringMatching(/URL https/),
+    });
 
     expect(await Receta.countDocuments()).toBe(0);
   });

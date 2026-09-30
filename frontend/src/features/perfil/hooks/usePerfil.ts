@@ -95,7 +95,8 @@ export function useSubirFoto() {
 
 export function extraerMensajeError(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    return (error.response?.data as { error?: string })?.error ?? 'Error al procesar la solicitud'
+    const datos = error.response?.data as { error?: string; errores?: { mensaje: string }[] } | undefined
+    return datos?.errores?.[0]?.mensaje ?? datos?.error ?? 'Error al procesar la solicitud'
   }
   return 'Error al procesar la solicitud'
 }
