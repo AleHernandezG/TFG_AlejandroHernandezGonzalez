@@ -16,7 +16,14 @@ const caracteristicas = [
 
 const textShadow = '0 1px 12px rgba(0,0,0,0.95), 0 2px 24px rgba(0,0,0,0.7)'
 
-export default function PaginaLogin() {
+type PropsPaginaLogin = {
+  searchParams: { callbackUrl?: string | string[] }
+}
+
+export default function PaginaLogin({ searchParams }: PropsPaginaLogin) {
+  const callbackUrl =
+    typeof searchParams.callbackUrl === 'string' ? searchParams.callbackUrl : undefined
+
   return (
     <div className="relative flex min-h-screen">
       {/* ── Imagen de fondo a pantalla completa ── */}
@@ -33,7 +40,7 @@ export default function PaginaLogin() {
       {/* ── Panel izquierdo — formulario ── */}
       <main className="relative z-10 flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2">
         <div className="w-full max-w-md">
-          <FormularioLogin />
+          <FormularioLogin callbackUrl={callbackUrl} />
         </div>
       </main>
 

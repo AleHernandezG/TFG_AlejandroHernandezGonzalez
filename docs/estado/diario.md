@@ -6,6 +6,66 @@ semanas no reconstruya el razonamiento desde el `git log`.
 
 ---
 
+## 2026-10-04 · Seis bloques en una sesión: `callbackUrl`, seguir, barreras, cobertura, contrato y fichas
+
+**Qué se hizo.** Los seis bloques de `prompt-2026-10.md`, en la rama `feat/barreras-contrato-callback`,
+sin commitear. Cómo probar cada uno está en `por-probar.md`.
+
+El login respeta el `callbackUrl`. Una función pura, `destinoTrasLogin()`, decide si el destino vale:
+ruta interna o `/home`. La usan el login con credenciales, el botón de Google y `/completar-perfil`.
+Tres E2E nuevos, 8 en total.
+
+El endpoint de seguir tiene 16 tests, y escribirlos destapó un bug: dos llamadas a la vez daban 500 y
+podían dejar escrito un lado de la relación y el otro no. Arreglado en `usuarioRepository`.
+
+Las barreras de F9.2: tres nuevas en `barreras.test.ts` y la de alérgenos, que ya existía, ampliada.
+Las cuatro vistas en rojo rompiendo su regla. Mirando dónde se listan los alérgenos apareció una
+cuarta lista que nadie vigilaba, el mapa de `chipAlergeno.tsx`, que devuelve `null` con un id que no
+conoce: si se quedaba atrás, el detalle dejaba de pintar un alérgeno que el backend sí había guardado.
+
+La cobertura, medida: 72,01 % de sentencias, y ningún controlador por debajo del 40 %. La última
+cifra era del 36 %, del 4 de septiembre.
+
+El contrato de la API, en `referencia/api.md`. Son 40 endpoints, no 37. Un test lo compara con los
+routers montados, en las dos direcciones, y comprueba también la auth de cada uno.
+
+Seis fichas de decisiones, de la 0002 a la 0007. 366 tests en total.
+
+**Qué decisión costó tomar.** Cuatro.
+
+Si el destino sobrevive a `/completar-perfil`. Sobrevive. Un usuario nuevo de Google que venía de
+pulsar «me gusta» es justo el que más interesa que vuelva a la receta, y perder el destino en ese
+paso dejaba el arreglo a medias para el caso que lo motivó. El destino viaja en el `?callbackUrl=`
+de esa página y se vuelve a validar al leerlo. El coste es que `/completar-perfil?callbackUrl=X`
+redirige a `X` a quien ya tiene el perfil completo: es un redirector, pero solo hacia rutas internas.
+
+Cómo hacer atómico el seguir, que escribe en dos documentos. Sin transacciones (el Mongo efímero de
+los tests no es un replica set), la relación tiene una sola verdad, los `seguidos` de quien sigue,
+que se alterna en una operación atómica como los likes de F7.3. Los `seguidores` del otro se copian
+de ahí y se releen después de escribir, por si otra llamada cambió la verdad entre medias. Es más
+código que antes, pero el anterior fallaba con un doble clic.
+
+Qué hacer con las dos fichas cuyo porqué no está escrito. La del doble token dice que funciona así y
+qué cuesta, y dice en negrita que el motivo de descartar las alternativas no está en `CLAUDE.md` ni en
+`docs/cambios/`. La de Redis hace lo mismo con el store de los limitadores. Escribir un motivo
+verosímil habría sido fácil y habría quedado como historia del proyecto sin serlo.
+
+Si F9.1 se da por cerrado. Las dos cifras del criterio ya se cumplen, pero la despensa y el chat, que
+son dos de las cuatro reglas que el bloque quería cubrir, siguen casi sin tests. No se marca. La
+cifra global sube en buena parte por tests que no existían en septiembre, no porque alguien haya
+cubierto la despensa.
+
+**Qué queda a medias.** Commitear, que lo hace Alejandro: un commit por bloque, con los mensajes al
+final de `por-probar.md`. Probar Google con una cuenta real, que desde aquí no se puede. El destino no
+sobrevive al registro con correo: el enlace «Regístrate gratis» no lo arrastra. El E2E del registro,
+`flujoPrincipal.spec.ts`, falla en local con `next dev` en frío y no se ha tocado. Y tres cosas vistas
+de paso que no eran de esta sesión: el JWT del backend caduca a los 7 días sin que nada lo renueve ni
+cierre la sesión de NextAuth; `GET /api/ingredientes/buscar` llama a un servicio externo sin sesión ni
+limitador; y `CLAUDE.md` sigue hablando de `buscarIngredientesEdamam()`, que en el código ya se llama
+`buscarIngredientesOpenFoodFacts()`.
+
+---
+
 ## 2026-09-30 · F8 cerrado: el código cumple lo que dice `CLAUDE.md`
 
 **Qué se hizo.** Los cuatro puntos de F8, en la rama `fix/cerrar-f8`.

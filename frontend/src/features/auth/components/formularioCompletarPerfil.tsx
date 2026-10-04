@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { SelectorChips } from "@/components/common/selectorChips";
 import { ALERGENOS_OPCIONES, DIETAS_OPCIONES } from "@/config/opcionesUsuario";
 import { authService } from "@/services/authService";
+import { destinoTrasLogin } from "@/lib/destinoTrasLogin";
 
-export function FormularioCompletarPerfil() {
+export function FormularioCompletarPerfil({ destino }: { destino?: string }) {
   const router = useRouter();
   const { data: session, update } = useSession();
   const [alergenos, setAlergenos] = useState<string[]>([]);
@@ -30,7 +31,7 @@ export function FormularioCompletarPerfil() {
       await authService.completarPerfil({ alergias: alergenos, preferencias: dietas }, token);
       // Actualizar el JWT de NextAuth para que perfilCompleto sea true
       await update({ perfilCompleto: true });
-      router.push("/home");
+      router.push(destinoTrasLogin(destino));
     } catch {
       setError("No se pudo guardar tu perfil. Inténtalo de nuevo.");
       setCargando(false);

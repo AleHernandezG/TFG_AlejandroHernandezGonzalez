@@ -1,6 +1,6 @@
 # Documentación de Cookr
 
-141 ficheros. La mayoría son de marzo a junio de 2026 y describen decisiones de sprints que ya se
+157 ficheros. La mayoría son de marzo a junio de 2026 y describen decisiones de sprints que ya se
 cerraron. Este índice existe para que no haya que abrir ninguno para saber cuál sirve.
 
 Cada carpeta responde a una pregunta distinta. Si dudas de dónde va algo nuevo, la pregunta te lo
@@ -34,6 +34,8 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | Saber qué está roto ahora mismo | `estado/auditoria-2026-09.md` |
 | Saber qué toca hacer y en qué orden | `estado/plan-2026-09.md` |
 | Retomar el trabajo tras unos días sin tocarlo | `estado/pendientes.md` |
+| Probar lo último que se hizo y commitearlo | `estado/por-probar.md` |
+| Saber qué acepta y qué devuelve un endpoint | `referencia/api.md` |
 | Ver el catálogo de producto que viene después | `informe_auditoria_mejoras.md`, y el plan a partir de F12 |
 | Comprobar algo a mano en un rato libre | `estado/pruebas-manuales.md` |
 | Tocar cualquier pantalla, en móvil o escritorio | `estado/revision-ui-2026-09.md` |
@@ -61,8 +63,10 @@ Fuera de aquí, y por encima de todo esto: **`../CLAUDE.md`**, el contrato del r
 | `revision-ui-2026-09.md` | Revisión de interfaz del 18 de septiembre, móvil y escritorio. Doce puntos (UI-001 a UI-012) con fichero, línea y coste, más el resultado de axe-core sobre ocho rutas |
 | `pwa.md` | Qué hace falta para que Cookr se instale como aplicación en PC, móvil y tablet: manifiesto, iconos, service worker y modo sin conexión |
 | `eventos.md` | Diseño de los eventos semanales y mensuales de verdad, para sustituir el booleano `esEvento` y la tarjeta destacada inventada |
+| `por-probar.md` | Lo que salió de la sesión del 4 de octubre: qué se hizo en cada bloque, cómo probarlo paso a paso, lo que no se pudo comprobar y los textos de commit y de PR. Se reescribe en cada sesión que deje trabajo sin commitear |
+| `prompt-2026-10.md` | El prompt de arranque de la sesión del 4 de octubre: `callbackUrl`, test de seguir, F9.2, medición de F9.1, F10.3 y F10.4. Guardado tal cual se pegó; no se actualiza |
 
-Estos ocho se actualizan. El resto de la carpeta `docs/`, no.
+Los nueve primeros se actualizan. El resto de la carpeta `docs/`, no.
 
 ---
 
@@ -92,9 +96,11 @@ F7.6, F13, F14, F15 y F12.
 | `estructura-frontend.md` | Estructura de carpetas del cliente y convenciones de nombres |
 | `metodo-cookr.md` | Qué se adopta del método de DietMetric y qué no, con el porqué |
 | `sinergias-proyectos.md` | Análisis de proyectos en `Desktop/Proyectos` y módulos reutilizables para Cookr |
+| `api.md` | Contrato de la API, del 4 de octubre: los 40 endpoints con método, ruta, auth, limitadores, cuerpo, respuesta y errores |
 
-Falta el contrato de la API: los 37 endpoints solo se conocen leyendo `backend/src/routes/`. Es la
-tarea F10.3 del plan, y cuando se escriba vive aquí.
+`api.md` no se puede quedar viejo sin que se note: `backend/tests/contrato.api.test.ts` lo compara
+con los routers montados y falla si aparece un endpoint sin documentar, si sobra uno o si la auth
+escrita no es la real. Un endpoint nuevo se documenta en el mismo cambio.
 
 ---
 
@@ -120,9 +126,17 @@ cambia, se escribe una ficha nueva que diga cuál sustituye.
 | Documento | Qué es |
 |---|---|
 | `0001-detalle-receta-publico.md` | 30 de septiembre. El detalle de receta se ve sin sesión; me gusta, guardar, comentar y la despensa mandan al login |
+| `0002-correo-por-http.md` | El correo sale por la API REST de Mailjet porque Render bloquea SMTP. Por qué Mailjet y no otro no está escrito |
+| `0003-alergenos-como-suelo-en-el-backend.md` | Los alérgenos del perfil se aplican siempre y los aplica el backend; el query solo suma |
+| `0004-doble-token.md` | La sesión de NextAuth lleva dentro el JWT del backend. El motivo de descartar las alternativas no está escrito, y la ficha lo dice |
+| `0005-e2e-fuera-del-bloqueo-del-deploy.md` | Los E2E corren en el CI pero no están en el `needs` del deploy, porque son inestables |
+| `0006-redis-con-respaldo-en-memoria.md` | Limitadores, tope de Gemini y cachés de IA: Upstash si está configurado, memoria si no |
+| `0007-imagenes-en-cloudinary.md` | 4 de septiembre. Cloudinary frente a R2, y subida directa desde el navegador con firma del backend |
 
-Es el arranque de F10.4. Faltan las fichas de lo que ya estaba decidido antes, como el correo por
-HTTP o el doble token.
+Las fichas 0002 a 0006 se escribieron el 4 de octubre sobre decisiones que ya estaban tomadas y
+solo vivían en `CLAUDE.md`. Donde el motivo no estaba escrito en ningún sitio, la ficha lo dice en
+vez de inventarlo. Faltan dos, que no se escriben hasta que la decisión exista: la búsqueda difusa
+(F15) y qué se guarda al importar una receta ajena (F12.1).
 
 ---
 

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/authService'
+import { destinoTrasLogin, rutaCompletarPerfil } from '@/lib/destinoTrasLogin'
 import axios from 'axios'
 
 function extraerMensaje(error: unknown, fallback: string): string {
@@ -22,7 +23,12 @@ export function useAuth() {
     return { resultado, session }
   }
 
-  async function iniciarSesion(correo: string, contrasena: string): Promise<void> {
+  async function iniciarSesion(
+    correo: string,
+    contrasena: string,
+    callbackUrl?: string,
+  ): Promise<void> {
+    const destino = destinoTrasLogin(callbackUrl)
     setCargando(true)
     setError(null)
 
@@ -32,7 +38,7 @@ export function useAuth() {
     }
 
     if (session) {
-      router.push(session.user?.perfilCompleto ? '/home' : '/completar-perfil')
+      router.push(session.user?.perfilCompleto ? destino : rutaCompletarPerfil(destino))
       return
     }
 

@@ -134,4 +134,17 @@ describe("los alérgenos que ofrece el perfil son los del catálogo del backend"
     expect(ordenados(ALERGENOS_OPCIONES.map((opcion) => opcion.id))).toEqual(ordenados(ALERGENOS));
     expect(ALERGENOS).toHaveLength(14);
   });
+
+  // chipAlergeno.tsx tiene su propia lista y devuelve null con un id que no conoce: si se queda
+  // atrás, el detalle de la receta deja de enseñar un alérgeno que el backend sí ha guardado.
+  it("el chip del detalle de receta sabe pintar los 14", () => {
+    const codigo = fs.readFileSync(
+      path.resolve(__dirname, "../../frontend/src/components/common/chipAlergeno.tsx"),
+      "utf8",
+    );
+    const mapa = codigo.match(/const ALERGENOS[^=]*=\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
+    const ids = [...mapa.matchAll(/^\s*(\w+):\s*\{/gm)].map((m) => m[1]);
+
+    expect(ordenados(ids)).toEqual(ordenados(ALERGENOS));
+  });
 });

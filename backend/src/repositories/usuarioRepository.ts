@@ -129,29 +129,61 @@ export const usuarioRepository = {
       throw Object.assign(new Error("No puedes seguirte a ti mismo"), { status: 400 });
     }
 
-    const [seguidor, seguido] = await Promise.all([
-      Usuario.findById(seguidorId),
-      Usuario.findById(seguidoId),
-    ]);
+    const seguidoObjId = new Types.ObjectId(seguidoId);
+    const seguidorObjId = new Types.ObjectId(seguidorId);
 
-    if (!seguidor || !seguido) {
+    if (!(await Usuario.exists({ _id: seguidoObjId }))) {
       throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
     }
 
-    const seguidoObjId = new Types.ObjectId(seguidoId);
-    const seguidorObjId = new Types.ObjectId(seguidorId);
-    const yaSiguiendo = (seguidor.seguidos ?? []).some((id) => id.equals(seguidoObjId));
+    // La verdad es `seguidos` del que sigue, y se alterna en una sola operación atómica.
+    // Con findById + save, dos llamadas a la vez chocaban en la versión del documento (500)
+    // y podían dejar escrito un lado de la relación y el otro no.
+    const seguidos = { $ifNull: ["$seguidos", []] };
+    const seguidor = await Usuario.findByIdAndUpdate(
+      seguidorObjId,
+      [
+        {
+          $set: {
+            seguidos: {
+              $cond: [
+                { $in: [seguidoObjId, seguidos] },
+                { $filter: { input: seguidos, cond: { $ne: ["$$this", seguidoObjId] } } },
+                { $concatArrays: [seguidos, [seguidoObjId]] },
+              ],
+            },
+          },
+        },
+      ],
+      { new: true, projection: { seguidos: 1 } },
+    )
+      .lean()
+      .exec();
 
-    if (yaSiguiendo) {
-      seguidor.seguidos = (seguidor.seguidos ?? []).filter((id) => !id.equals(seguidoObjId));
-      seguido.seguidores = (seguido.seguidores ?? []).filter((id) => !id.equals(seguidorObjId));
-    } else {
-      seguidor.seguidos = [...(seguidor.seguidos ?? []), seguidoObjId];
-      seguido.seguidores = [...(seguido.seguidores ?? []), seguidorObjId];
+    if (!seguidor) {
+      throw Object.assign(new Error("Usuario no encontrado"), { status: 404 });
     }
 
-    await Promise.all([seguidor.save(), seguido.save()]);
-    return { siguiendo: !yaSiguiendo };
+    // `seguidores` del otro se copia de esa verdad. Se relee después de escribir porque otra
+    // llamada puede haberla cambiado entre medias; quien escribe el último deja los dos lados iguales.
+    const sigueAhora = async () =>
+      (await Usuario.exists({ _id: seguidorObjId, seguidos: seguidoObjId })) !== null;
+
+    let reflejado = await sigueAhora();
+    for (let intento = 0; intento < 5; intento++) {
+      await Usuario.updateOne(
+        { _id: seguidoObjId },
+        reflejado
+          ? { $addToSet: { seguidores: seguidorObjId } }
+          : { $pull: { seguidores: seguidorObjId } },
+      ).exec();
+      const actual = await sigueAhora();
+      if (actual === reflejado) break;
+      reflejado = actual;
+    }
+
+    const siguiendo = (seguidor.seguidos as Types.ObjectId[]).some((id) => id.equals(seguidoObjId));
+    return { siguiendo };
   },
 
   async obtenerDespensa(

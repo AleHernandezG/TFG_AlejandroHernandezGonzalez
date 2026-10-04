@@ -21,6 +21,7 @@ import {
 import { BotonGoogle } from "./botonGoogle";
 import { DivisorOAuth } from "./divisorOAuth";
 import { useAuth } from "@/features/auth/hooks";
+import { destinoTrasLogin, rutaCompletarPerfil } from "@/lib/destinoTrasLogin";
 import {
   esquemaLogin,
   type DatosLogin,
@@ -51,7 +52,8 @@ const variantesCampo: Variants = {
 
 // ─── Componente ──────────────────────────────────────────────────────────────
 
-export function FormularioLogin() {
+export function FormularioLogin({ callbackUrl }: { callbackUrl?: string }) {
+  const destino = destinoTrasLogin(callbackUrl);
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const { iniciarSesion, cargando, error } = useAuth();
 
@@ -65,7 +67,7 @@ export function FormularioLogin() {
   });
 
   const alEnviar = (datos: DatosLogin) =>
-    iniciarSesion(datos.correo, datos.contrasena);
+    iniciarSesion(datos.correo, datos.contrasena, destino);
 
   // ── Formulario ──────────────────────────────────────────────────────────────
   return (
@@ -96,7 +98,10 @@ export function FormularioLogin() {
 
         <CardContent className="space-y-5">
           {/* Botón Google */}
-          <BotonGoogle textoAccion="Continuar con Google" />
+          <BotonGoogle
+            textoAccion="Continuar con Google"
+            urlRetorno={rutaCompletarPerfil(destino)}
+          />
 
           {/* Divisor */}
           <DivisorOAuth />

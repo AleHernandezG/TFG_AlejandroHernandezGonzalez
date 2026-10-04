@@ -68,7 +68,7 @@ cd backend && npm run normalizar:alergias                # alergias del perfil �
 cd backend && npm run normalizar:alergias -- --apply     # copia previa; deshacer con -- --restaurar "<fichero>"
 ```
 
-**Hay 329 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **5 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky). `ci-gemini-proxy` pasa los 10 tests del Worker (`gemini-proxy/worker.test.js`, con `fetch` simulado) y tampoco está en el `needs` del deploy: el Worker se despliega a mano.
+**Hay 366 tests unitarios en el backend** (Jest + ts-jest + Supertest + mongodb-memory-server, desde el 16/07/2026) y **8 E2E en el frontend** (Playwright, desde el 17/07/2026, en `frontend/e2e/`). El frontend no tiene tests unitarios. El CI ejecuta lint, typecheck y `npm test`; el job `deploy` depende de `ci-backend`, así que un test unitario en rojo bloquea el despliegue a Render. El job `e2e` corre aparte y **no** bloquea el deploy a propósito (los E2E son flaky). `ci-gemini-proxy` pasa los 10 tests del Worker (`gemini-proxy/worker.test.js`, con `fetch` simulado) y tampoco está en el `needs` del deploy: el Worker se despliega a mano.
 
 Detalles en `/cookr-tests`. Lo que hay que saber antes de tocar nada:
 
@@ -83,6 +83,18 @@ Dos cosas del código de producción que existen por los tests, para que nadie l
 - `app.ts` **calla a morgan cuando `NODE_ENV === "test"`**, o la salida de `npm test` es ilegible.
 
 Ya **no** queda ningún test que fije comportamiento equivocado a propósito: los tres bugs que documentaban se arreglaron en la Fase 2b (17/07/2026) y los tests están del derecho.
+
+### Tests barrera: fallan si te saltas una regla de este fichero
+
+Desde el 04/10/2026 (F9.2 y F10.3). No prueban una función: recorren los routers o leen el código fuente. Si uno se pone en rojo, lo normal es que la regla se haya roto, no que el test esté viejo.
+
+- **Un `POST`, `PUT` o `PATCH` nuevo necesita `validarBody`** o entrar en la lista `SIN_CUERPO` de `tests/barreras.test.ts`, que es solo para rutas que no leen `req.body` (los interruptores de me gusta, guardar y seguir, y `chat/receta-despensa`).
+- **Nada de `services/`, `controllers/`, `routes/` ni `middlewares/` importa de `models/`.** Lo vigila el mismo fichero.
+- **Una variable nueva leída con `process.env` tiene que estar en el `.env.example` de su paquete**, y una que se deje de leer tiene que salir de él. Las dos direcciones, en backend y frontend. `NEXTAUTH_URL` y `NEXTAUTH_SECRET` son la excepción declarada: las lee NextAuth.
+- **Los 14 alérgenos son los mismos en cuatro sitios**: los dos catálogos, `opcionesUsuario.ts` y el mapa de `frontend/src/components/common/chipAlergeno.tsx`, que devuelve `null` con un id que no conoce. `tests/alergenos.deteccion.test.ts`.
+- **Un endpoint nuevo se documenta en `docs/referencia/api.md`** en el mismo cambio, con su título `### MÉTODO /api/ruta`, su línea de **Auth** y la cifra total actualizada. `tests/contrato.api.test.ts` compara el documento con los routers montados y falla en las dos direcciones.
+
+`tests/helpers/rutas.ts` saca los endpoints de `app._router` (Express 4). Si se sube a Express 5, ese helper hay que rehacerlo y las barreras lo dirán: comprueban que encuentran al menos 30 endpoints.
 
 ## Arquitectura: lo que no se ve leyendo un solo fichero
 
@@ -113,6 +125,8 @@ El `token` sale de `useSession()` → `session.user.backendToken`. Si añades un
 Las rutas protegidas del cliente se declaran en el `matcher` de `frontend/src/middleware.ts` (`next-auth/middleware`). Una página nueva que requiera sesión hay que añadirla ahí.
 
 `/recetas/[id]` **no** está en el `matcher` a propósito: el detalle es público (`docs/decisiones/0001-detalle-receta-publico.md`). Cualquier acción nueva en esa página que llame a un endpoint autenticado tiene que pasar por `useAccionConSesion()`, que manda al visitante al login en vez de lanzar la petición y comerse un 401.
+
+**El destino tras el login se valida en un solo sitio: `destinoTrasLogin()` de `frontend/src/lib/destinoTrasLogin.ts`.** El `callbackUrl` viene de la URL y lo puede escribir cualquiera, así que solo vale una ruta interna (empieza por `/`, no por `//` ni `/\`, sin tabuladores ni saltos de línea); todo lo demás cae en `/home`. Lo usan los tres caminos: credenciales (`useAuth`), Google (`BotonGoogle`, vía `rutaCompletarPerfil()`) y `/completar-perfil`, que conserva el destino en su propio `?callbackUrl=` para que un usuario nuevo vuelva a donde iba al terminar. Cualquier redirección nueva que salga de un parámetro de la URL pasa por esa función; no escribas otra validación ni hagas `router.push(searchParams.get(...))` a pelo, que eso es una redirección abierta. `frontend/e2e/loginCallbackUrl.spec.ts` lo fija.
 
 ### Backend: capas estrictas
 

@@ -38,6 +38,35 @@ export function contarRecetasDe(correo: string): Promise<number> {
   })
 }
 
+export const CONTRASENA_E2E = 'Test1234'
+// bcrypt de CONTRASENA_E2E. Va precalculado porque el frontend no tiene bcryptjs.
+const HASH_CONTRASENA_E2E = '$2a$04$t5NdDl.kMcjRV.hqWiJPwOvXT7J8QUz/qZ6URbNDCHyFl1J7ViOkm'
+
+// Inserta el usuario directamente en vez de registrarlo por la interfaz: el limitador
+// de registro corta a los 5 por IP y hora, y flujoPrincipal.spec.ts ya gasta 2.
+export function crearUsuarioVerificado(opciones: { perfilCompleto?: boolean } = {}): Promise<string> {
+  return conBD(async (db) => {
+    const correo = correoUnico('login')
+    await db.collection('usuarios').insertOne({
+      nombre: 'Visitante E2E',
+      correo,
+      contrasena: HASH_CONTRASENA_E2E,
+      rol: 'usuario',
+      proveedor: 'local',
+      cuentaVerificada: true,
+      perfilCompleto: opciones.perfilCompleto ?? true,
+      alergias: [],
+      preferencias: [],
+      recetasGuardadas: [],
+      seguidos: [],
+      seguidores: [],
+      despensa: [],
+      fechaRegistro: new Date(),
+    })
+    return correo
+  })
+}
+
 export function crearRecetaPublicada(titulo: string): Promise<string> {
   return conBD(async (db) => {
     const { insertedId: autorId } = await db.collection('usuarios').insertOne({
